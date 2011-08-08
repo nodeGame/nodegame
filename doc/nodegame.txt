@@ -1,0 +1,48 @@
+nodeGame Documentation
+======================
+Stefano Balietti <sbalietti@ethz.ch>
+v0.2, Aug 2011
+
+// Web page meta data.  
+:keywords:    nodeGame,node.js,websockets,HTML5,experiments,games,javascript
+:description: nodeGame is a free, open source javascript library implementing communication for game-like applications in browser.     	    
+
+
+Introduction
+------------
+
+**+nodeGame+** is a free, open source javascript library implementing
+the communication infrastructure for game-like applications in browser
+environment. 
+
+Features
+~~~~~~~~~
+- Synchronous and Asynchronous games 
+- Keep track of the state of the players
+- Start/Pause/Resume games
+- Reliable Messaging
+- Anti flood protection (to do)
+- SSL connection (to check)
+- Statistics 
+- Output Formatting
+- Mailing
+- Easy to customize. See <<section-example,example>> 
+- much more... 
+
+
+Technology
+----------
+
+**+nodeGame+** is 100% javascript code. Server technology is based on
+  http://nodejs.org[node.js]
+
+
+[[section-example]]
+Example
+-------
+
+----------------------
+Code here
+   d
+-------------------
+

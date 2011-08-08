@@ -1,0 +1,20 @@
+<!doctype html>
+<title>INSTRUCTIONS</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<body>
+	<h1>Instructions of the Game. Please read carefully</h1>
+	<div id="instructions"></div>
+</body>
+<script type="text/javascript" charset="utf-8">
+//	  var rootEl = document.getElementById('instructions');
+//    
+//    console.log('SSSS ' + rootEl);
+//    
+//    var b = this.window.addButton(rootEl,'I have read and understood the instructions');
+//    
+//		//var that = this;
+//		
+//    b.onclick = function() {
+//      that.DONE('Done for now...');
+//    };
+</script>

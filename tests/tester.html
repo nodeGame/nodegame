@@ -1,0 +1,114 @@
+<!doctype html>
+
+<script>
+	/*
+ * GameState
+ * 
+ * Representation of a state of the game
+ * 
+ */
+
+GameState.UNKNOWN = 0;
+GameState.STARTING = 10;
+GameState.PLAYING = 50;
+GameState.DONE = 100;
+
+function GameState (state,step,round) {
+  
+  // TODO: add checkings
+  this.state = state || 0;
+  this.step = step || 0;
+  this.round = round || 0;
+  
+  this.is = GameState.UNKNOWN;
+
+  this.paused = false;
+}
+ 
+GameState.prototype.import = function (gamestate) {
+  this.state = gamestate.state;
+  this.step = gamestate.step;
+  this.round = gamestate.round;
+  this.is = gamestate.is;
+  this.paused = gamestate.paused;
+};
+
+GameState.prototype.toString = function () {
+  var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
+  
+  if (this.paused) {
+    out += ' (P)';
+  }
+  return out;
+};
+
+// Compares two GameStates. 
+// If they are equal returns 0,
+// If gm1 is more ahead returns 1, vicersa -1;
+// If strict is set, also the is property is compared
+GameState.compare = function (gs1, gs2, strict) {
+  var strict = strict || false;
+    
+  var result = gs1.state - gs2.state;
+  
+  if (result === 0) {
+    result = gs1.round - gs2.round;
+    
+    if (result === 0) {
+      result = gs1.step - gs2.step;
+      
+      if (strict && result === 0) {
+        result = gs1.is - gs2.is;
+      }
+    }
+  }
+  //console.log('EQUAL? ' + result);
+  
+  return result;
+};
+
+GameState.parse = function(gamestate) {
+  try {
+    var gs = new GameState();
+    gs.import(gamestate);
+    return gs;
+  }
+  catch(e){
+    throw 'Error while trying to parsing GameState ' + e.message;
+  }
+};
+
+GameState.stringify = function (gs) {
+  return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
+};
+
+
+
+	function Mario() {};
+	
+	Mario.prototype = {
+	   
+		 constructor: Mario,
+		 
+		 GameState: function(state, step, round){
+	 	   return new GameState(state, step, round);
+	   },
+		 
+		 'GameState.prototype': GameState.prototype,
+		 
+		 gmp: GameState.prototype
+		 
+		 	
+	};
+	
+	var m = new Mario();
+	
+	var gm = m.GameState(2,2);
+  console.log(gm);
+	
+	console.log(gm.__proto__);
+
+//	aa = gm(2,2);
+//	
+	
+</script>

@@ -1,0 +1,33 @@
+<!doctype html>
+<title>Test Game</title>
+<body>
+<div id="root"></div>
+<!--
+<script src="client/build/nodegame-w-0.1.js" charset="utf-8"></script>
+<script src="client/build/nodewindow-0.2.js" charset="utf-8"></script>
+<script src="client/build/nodegame-gadgets-new-0.2.js" charset="utf-8"></script>
+-->
+<script src="client/build/0.2/nodegame-all-0.2.js" charset="utf-8"></script>
+
+
+<script src="games/example/Game_Example.js" charset="utf-8"></script> 
+<!-- <script src="games/ultimatum/Ultimatum.js" charset="utf-8"></script> -->
+
+<script>
+  	window.onload = function(){
+	
+		// Create the Client
+			
+		var net = {
+			name: "P_" + Math.floor(Math.random()*100),
+			host: "localhost",
+			port: 8005 // 8004 Admin Port
+		};
+		
+  
+		//node.play(net, new Ultimatum());
+		node.play(net, new Game_Example());
+			
+	}
+</script>
+</body>

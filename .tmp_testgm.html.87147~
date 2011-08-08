@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<title>WebSocket Test Page</title>
+<body>
+	<div id="test"></div>
+
+
+<script src="client/BrowserControl.js" charset="utf-8"></script>
+<script src="client/GameNode.js" charset="utf-8"></script>
+<script src="client/GameSocketClient.js" charset="utf-8"></script>
+<script src="client/EventListener.js" charset="utf-8"></script>
+<script src="client/Game.js" charset="utf-8"></script>
+<script src="client/GameMsg.js" charset="utf-8"></script>
+<script src="client/GameMsgGenerator.js" charset="utf-8"></script>
+<script src="client/BrowserControl.js" charset="utf-8"></script>
+<script src="client/PlayerList.js" charset="utf-8"></script>
+<script src="tests/TestGameWindow.js" charset="utf-8"></script>
+</body>
