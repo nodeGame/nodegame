@@ -4,6 +4,7 @@
  * Parametrically display Chernoff Faces
  * 
  */
+
 function FacePainter (canvas, settings) {
 	
 	this.canvas = canvas;
@@ -15,10 +16,7 @@ function FacePainter (canvas, settings) {
 	this.x_origin = null;
 	this.y_origin = null;
 	
-
-
 	this.setCanvas(canvas);
-	
 	
 };
 
@@ -35,7 +33,7 @@ FacePainter.prototype.setCanvas = function(canvas) {
 	
 	
 	this.headRadius = Math.min(canvas.width,canvas.height) * 0.4;
-}
+};
 
 // Draws a Chernoff face.
 //
@@ -52,37 +50,13 @@ FacePainter.prototype.draw = function (face, x, y) {
 
 	this.drawPupils(face, x, y);
 
+	this.drawEyebrow(face, x, y);
+
+	this.drawNose(face, x, y);
 	
-	//	this.draw_eyebrow(g, face.p[4]);
-//	this.draw_nose(g, face.p[5]);
 //	this.draw_mouth(g, face.p[6], face.p[9], face.p[10]);
 };		
 		
-FacePainter.prototype.drawOval = function (settings) {
-	
-	var x = settings.x || this.centerX;
-	var y = settings.y || this.centerY;
-
-	var radius = settings.radius || 100;
-	var eccentricity = settings.eccentricity;
-	
-	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
-	var color = settings.color || '#000000';
-	
-	console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Ecc.: ' + eccentricity);
-	
-	this.ctx.lineWidth = lineWidth;
-	this.ctx.strokeStyle = color;
-	
-	this.ctx.save();
-	this.ctx.scale(eccentricity, 1);
-	this.ctx.beginPath();
-	this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore();
-}
-
 FacePainter.prototype.drawHead = function (face, x, y) {
 	
 	var radius = face.head_radius;
@@ -92,78 +66,216 @@ FacePainter.prototype.drawHead = function (face, x, y) {
 				   x: x, 
 				   y: y,
 				   radius: radius,
-				   eccentricity: eccentricity,
-				   lineWidth: 4,
-				   color: '#FF0000'
+				   scale_x: face.head_scale_x,
+				   scale_y: face.head_scale_y
+				   
+				   //lineWidth: 4,
+				   //color: '#FF0000'
 	});
 };
 
 FacePainter.prototype.drawEyes = function (face, x, y) {
 
-	
+	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
 	var spacing = face.eye_spacing;
+	
+	// Not used now
+	// If eye_l and eye_r are set spacing will be ignored
+//	var eye_l = face.eye_left_x;
+//	var eye_r = face.eye_right_x;
+	
 	var radius = face.eye_radius;
-	var eccentricity = face.eye_eccetricity;
+
 
 	this.drawOval({
-					x: x-spacing,
-					y: y,
+					x: x - spacing,
+					y: height,
 					radius: radius,
-					eccentricity: eccentricity
+					scale_x: face.eye_scale_x,
+					scale_y: face.eye_scale_y
 	});
 	
 	this.drawOval({
-					x: x+spacing,
-					y: y,
+					x: x + spacing,
+					y: height,
 					radius: radius,
-					eccentricity: eccentricity
+					scale_x: face.eye_scale_x,
+					scale_y: face.eye_scale_y
 	});
 }
 
-	
+// TODO Scaling ?
+FacePainter.computeFaceOffset = function (face, offset) {
+	return face.head_radius/2 * offset;
+};
 
 FacePainter.prototype.drawPupils = function (face, x, y) {
 		
 	var radius = face.pupil_radius;
-	var eccentricity = 1 || face.eye_pupils_eccetricity;
+	var spacing = face.eye_spacing;
+	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
 	
 	this.drawOval({
-					x: face.eye_left - (radius/2),
-					y: y + (radius/2),
+					x: x - spacing,
+					y: height,
 					radius: radius,
-					eccentricity: eccentricity,
+					scale_x: face.pupil_scale_x,
+					scale_y: face.pupil_scale_y,
 					color: '#black'
 	});
 	
 	this.drawOval({
-					x: x - (radius/2),
-					y: y + (radius/2),
+					x: x + spacing,
+					y: height,
 					radius: radius,
-					eccentricity: eccentricity,
+					scale_x: face.pupil_scale_x,
+					scale_y: face.pupil_scale_y,
 					color: '#black'
 	});
+
+};
+
+FacePainter.prototype.drawOval = function (settings) {
 	
-//		xFillOval(g, eye_left_x - (int)((p7 - 0.5) * 10), eye_y, pupil_size, pupil_size);
-//		xFillOval(g, eye_right_x + (int)((p7 - 0.5) * 10), eye_y, pupil_size, pupil_size);
+	// We keep the center fixed
+	var x = settings.x / settings.scale_x;
+	var y = settings.y / settings.scale_y;
+
+	var radius = settings.radius || 100;
+	
+	
+	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
+	var color = settings.color || '#000000';
+	
+	console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
+	
+	this.ctx.lineWidth = lineWidth;
+	this.ctx.strokeStyle = color;
+	
+	this.ctx.save();
+	this.ctx.scale(settings.scale_x, settings.scale_y);
+	this.ctx.beginPath();
+	this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
+	this.ctx.stroke();
+	this.ctx.closePath();
+	this.ctx.restore();
 }
 	
+//FacePainter.prototype.drawLine = function (settings) {
+//		
+//	var from_x = settings.from_x;
+//	var from_y = settings.from_y;
+//
+//	var to_x = settings.to_x;
+//	var to_y = settings.to_y;
+//	
+//	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
+//	var color = settings.color || '#000000';
+//	
+//	console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
+//	
+//	this.ctx.lineWidth = lineWidth;
+//	this.ctx.strokeStyle = color;
+//	
+//	this.ctx.save();
+//	this.ctx.beginPath();
+//	this.ctx.moveTo(from_x,from_y);
+//	this.ctx.lineTo(to_x,to_y);
+//	this.ctx.stroke();
+//	this.ctx.closePath();
+//	this.ctx.restore();
+//}
 
-//	protected void draw_eyebrow (Graphics g, double p4) {
-//		int y1 = eyebrow_y + (int)((p4 - 0.5) * 10);
-//		int y2 = eyebrow_y - (int)((p4 - 0.5) * 10);
-//		
-//		xLine(g, eyebrow_l_l_x, y1, eyebrow_l_r_x, y2);
-//		xLine(g, eyebrow_r_l_x, y2, eyebrow_r_r_x, y1);
-//	}
-//
-//
-//	protected void draw_nose (Graphics g, double p5) {
-//		int y = 55 + (int)(((p5 - 0.5) / 2.0) * 10);
-//		
-//		xLine(g, nose_apex_x, nose_apex_y, nose_apex_x - (nose_width / 2), y);
-//		xLine(g, nose_apex_x - (nose_width / 2), y, nose_apex_x + (nose_width / 2), y);
-//		xLine(g, nose_apex_x + (nose_width / 2), y, nose_apex_x, nose_apex_y);
-//	}
+FacePainter.prototype.drawLine = function (settings) {
+	
+	var from_x = settings.x;
+	var from_y = settings.y;
+
+	var length = settings.length;
+	var angle = settings.angle;
+		
+	// Rotation
+	var to_x = - Math.cos(angle) * length + settings.x;
+	var to_y =  Math.sin(angle) * length + settings.y;
+	//console.log('aa ' + to_x + ' ' + to_y);
+	
+	
+	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
+	var color = settings.color || '#000000';
+	
+	console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
+	console.log('Length: ' + length + ', Angle: ' + angle );
+	
+	this.ctx.lineWidth = lineWidth;
+	this.ctx.strokeStyle = color;
+	
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.moveTo(from_x,from_y);
+	this.ctx.lineTo(to_x,to_y);
+	this.ctx.stroke();
+	this.ctx.closePath();
+	this.ctx.restore();
+}
+
+FacePainter.computeEyebrowOffset = function (face) {
+	return FacePainter.computeFaceOffset(face, face.eye_height) + ((face.eye_radius / 2) * face.eye_scale_y) + face.eyebrow_height;
+};
+
+FacePainter.prototype.drawEyebrow = function (face, x, y) {
+	
+	var height = y - FacePainter.computeEyebrowOffset(face);
+	var spacing = face.eyebrow_spacing;
+	var length = face.eyebrow_length;
+	var angle = face.eyebrow_angle;
+	
+	this.drawLine({
+					x: x - spacing,
+					y: height,
+					length: length,
+					angle: angle
+					
+					// color: 'red',
+					// lineWidth: 5
+					
+	});
+	
+	this.drawLine({
+					x: x + spacing,
+					y: height,
+					length: 0-length,
+					angle: -angle
+	});
+	
+};
+
+
+FacePainter.prototype.drawNose = function (face, x, y) {
+	
+	var height = y - FacePainter.computeFaceOffset(face, face.nose_height);
+	var nastril_r_x = x + face.nose_width / 2;
+	var nastril_r_y = height + face.nose_length;
+	var nastril_l_x = nastril_r_x - face.nose_width;
+	var nastril_l_y = nastril_r_y; 
+	
+	//var lineWidth = settings.lineWidth = settings.lineWidth || 1;
+	//var color = settings.color || '#000000';
+	
+	// log
+	
+	//this.ctx.lineWidth = lineWidth;
+	//this.ctx.strokeStyle = color;
+	
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.moveTo(x,height);
+	this.ctx.lineTo(nastril_r_x,nastril_r_y);
+	this.ctx.lineTo(nastril_l_x,nastril_l_y);
+	//this.ctx.closePath();
+	this.ctx.stroke();
+	this.ctx.restore();
+
+};
 //	
 //
 //	protected void draw_lip (Graphics g, double x1, double y1, double x2, double y2, double x3, double y3) {
@@ -293,26 +405,35 @@ function FaceVector (faceVector) {
 	var faceVector = faceVector || {};
 		
 	this.head_radius = faceVector.head_radius || 30;
-	this.head_eccentricity = faceVector.head_radius || 0.75;
+	this.head_scale_x = faceVector.head_scale_x || 1;
+	this.head_scale_y = faceVector.head_scale_y || 1;
 	
-	this.eye_height = faceVector.eye_height || 3; // TODO: Here
+	this.eye_height = faceVector.eye_height || 0.75; 
 	this.eye_radius = faceVector.eye_radius || 5;
 	this.eye_left_x = faceVector.eye_left_x || 40;
 	this.eye_right_x = faceVector.eye_right_x || 60;
 	this.eye_spacing = faceVector.eye_spacing || 10;
-	this.eye_eccentricity = faceVector.eye_eccentricity || 1;
+	this.eye_scale_x = faceVector.eye_scale_x || 1;
+	this.eye_scale_y = faceVector.eye_scale_y || 1;
 	
 	this.pupil_radius = faceVector.pupil_radius || 0.2 * this.eye_radius;
+	this.pupil_scale_x = faceVector.pupil_scale_x || 1;
+	this.pupil_scale_y = faceVector.pupil_scale_y || 1;
 	
-	this.eyebrow_l_l_x = faceVector.eyebrow_l_l_x || 35;
-	this.eyebrow_r_l_x = faceVector.eyebrow_r_l_x || 55;
-	this.eyebrow_l_r_x = faceVector.eyebrow_l_r_x || 45;
-	this.eyebrow_r_r_x = faceVector.eyebrow_r_r_x || 65;
-	this.eyebrow_y = faceVector.eyebrow_y || 30;
+	this.eyebrow_length = faceVector.eyebrow_length || 10;
+	this.eyebrow_height = faceVector.eyebrow_height || 6;
+	this.eyebrow_angle = faceVector.eyebrow_angle || -0.5; // Math.PI , 1
+	this.eyebrow_spacing = faceVector.eyebrow_spacing || 5;
 	
-	this.nose_apex_x = faceVector.nose_apex_x || 50;
-	this.nose_apex_y = faceVector.nose_apex_y || 45;
-	this.nose_height = faceVector.nose_height || 16;
+//	this.eyebrow_r_l_x = faceVector.eyebrow_r_l_x || 55;
+//	this.eyebrow_l_r_x = faceVector.eyebrow_l_r_x || 45;
+//	this.eyebrow_r_r_x = faceVector.eyebrow_r_r_x || 65;
+
+//	this.nose_apex_x = faceVector.nose_apex_x || 50;
+//	this.nose_apex_y = faceVector.nose_apex_y || 45;
+	
+	this.nose_height = faceVector.nose_height || 0.9;
+	this.nose_length = faceVector.nose_length || 16;
 	this.nose_width = faceVector.nose_width || 8;
 	
 	this.mouth_y = faceVector.mouth_y || 65;
