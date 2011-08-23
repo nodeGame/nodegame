@@ -2,7 +2,10 @@
  * nodeGame
  */
 
-// Inheriting EventListener
+if (typeof(WebSocket) === 'undefined') {
+	alert('Sorry, Web Sockets are not supported in this browser. Aborting...');
+	return;
+}
 
 nodeGame.prototype = new EventListener();
 nodeGame.prototype.constructor = nodeGame;

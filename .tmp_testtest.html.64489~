@@ -1,0 +1,37 @@
+<!doctype html>
+<title>Canvas Test</title>
+<body>
+<div id="root"></div>
+<!-- <script src="client/build/0.3/nodegame-all-0.3.js" charset="utf-8"></script> -->
+<!-- <script src="games/testgame/TestGame.js" charset="utf-8"></script> -->
+<style>
+  canvas {
+  	border: 1px #CCC solid;
+  }
+</style>
+<script>
+    window.onload = function(){
+  
+    var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
+		
+		if (!context) {
+			alert('Canvas is not supported');
+		}
+//		else {
+//			alert('OK');
+//		}
+		
+		var root = document.getElementById('root');
+		root.appendChild(canvas);
+		
+		context.beginPath();
+		context.moveTo(70,140);
+		context.lineTo(140,70);
+		
+		//Stroke the line into the canvas
+		context.stroke();
+    
+  }
+</script>
+</body>

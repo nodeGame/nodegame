@@ -1,24 +1,60 @@
 <!doctype html>
-<title>Test Game</title>
+<title>Canvas Test</title>
 <body>
 <div id="root"></div>
-<script src="client/build/0.2/nodegame-all-0.2.js" charset="utf-8"></script>
-<script src="games/testgame/TestGame.js" charset="utf-8"></script>
-
+<!-- <script src="client/build/0.3/nodegame-all-0.3.js" charset="utf-8"></script> -->
+<script src="gadgets/cf_java.js" charset="utf-8"></script>
+<style>
+  canvas {
+  	border: 1px #CCC solid;
+  }
+</style>
 <script>
     window.onload = function(){
   
-    // Create the Client
-      
-    var net = {
-      name: "P_" + Math.floor(Math.random()*100),
-      host: "localhost",
-      port: 8005 // 8000 Admin Port
-    };
-    
-    
-    node.play(net, new Test());
-    
+    var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
+		
+		if (!context) {
+			alert('Canvas is not supported');
+		}
+		
+		var root = document.getElementById('root');
+		root.appendChild(canvas);
+		
+		window.canvas = canvas;
+//		
+//		context.beginPath();
+//		context.moveTo(30,30);
+//		context.lineTo(30,60);
+//		context.lineTo(60,60);
+//		context.lineTo(60,30);
+//		
+//		// close it to the start point
+//		context.closePath();
+//		
+//		context.lineWidth = 4;
+//		context.strokeStyle = '#663300';
+//		
+//		context.save();
+//		
+//		
+//		
+//		//Stroke the line into the canvas
+//		context.stroke();
+//    
+//		context.traslate(100,100);
+//		
+//		context.stroke();
+//    
+//		//context.restore();
+		
+		
+		var fp = new FacePainter(canvas);
+		var fv = new FaceVector();
+		
+		fp.draw(fv);
+		
   }
 </script>
 </body>

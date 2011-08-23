@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 8. Aug 19:54:47 CEST 2011
+ * Built on Mo 22. Aug 17:35:46 CEST 2011
  *
  */
  
@@ -1048,6 +1048,10 @@ GameState.stringify = function (gs) {
  */
 
 // Inheriting EventListener
+
+if (typeof(WebSocket) === 'undefined') {
+	alert('Sorry, Web Sockets are not supported in this browser. Aborting...');
+}
 
 nodeGame.prototype = new EventListener();
 nodeGame.prototype.constructor = nodeGame;
