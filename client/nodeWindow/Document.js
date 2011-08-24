@@ -33,6 +33,15 @@ Document.prototype.addTextInput = function (root, id, attributes) {
 	return mt;
 };
 
+Document.prototype.addSlider = function (root, id, attributes) {
+	var slider = document.createElement('input');
+	slider.id = id;
+	slider.setAttribute('type', 'range');
+	this.addAttributes2Elem(mt, attributes);
+	root.appendChild(mt);
+	return slider;
+};
+
 Document.prototype.addSelect = function (root, id, attributes) {
 	return this.addElement('select', root, id, attributes);
 };

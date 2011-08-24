@@ -12,27 +12,9 @@ function FacePainter (canvas, settings) {
 	// Used for scaling and translating face.
 	this.x_factor = null, 
 	this.y_factor = null;
-	
-	this.x_origin = null;
-	this.y_origin = null;
-	
-	this.setCanvas(canvas);
-	
-};
-
-FacePainter.prototype.setCanvas = function(canvas) {
-	this.canvas = canvas;
-	// 2D Canvas Context 
-	this.ctx = canvas.getContext('2d');
-	
-	this.centerX = canvas.width / 2;
-	this.centerY = canvas.height / 2;
-	
-	console.log(canvas.width);
-	console.log(canvas.height);
-	
-	
-	this.headRadius = Math.min(canvas.width,canvas.height) * 0.4;
+		
+	this.canvas = new Canvas(canvas);
+		
 };
 
 // Draws a Chernoff face.
@@ -41,8 +23,8 @@ FacePainter.prototype.setCanvas = function(canvas) {
 // scales it to the actual size specified by width and height.
 FacePainter.prototype.draw = function (face, x, y) {
 	
-	var x = x || this.centerX;
-	var y = y || this.centerY;
+	var x = x || this.canvas.centerX;
+	var y = y || this.canvas.centerY;
 	
 	this.drawHead(face, x, y);
 		
@@ -54,23 +36,44 @@ FacePainter.prototype.draw = function (face, x, y) {
 
 	this.drawNose(face, x, y);
 	
-//	this.draw_mouth(g, face.p[6], face.p[9], face.p[10]);
+	this.drawMouth(face, x, y);
 };		
-		
+	
+FacePainter.prototype.redraw = function (face, x, y) {
+	this.canvas.clear();
+	this.draw(face,x,y);
+}
+FacePainter.prototype.fit2Canvas = function() {
+	if (!this.canvas) {
+		console.log('No canvas found');
+		return;
+	}
+	
+	// TODO
+	//this.canvas.
+}
+
+//FacePainter.prototype.scale_x = function (x) {
+//	return x * x_factor;
+//};
+//
+//FacePainter.prototype.scale_y = function (y) {
+//	return y * y_factor;
+//};
+
 FacePainter.prototype.drawHead = function (face, x, y) {
 	
 	var radius = face.head_radius;
 	var eccentricity = 1 || face.head_eccentricity;
 	
-	this.drawOval({
+	this.canvas.drawOval({
 				   x: x, 
 				   y: y,
 				   radius: radius,
 				   scale_x: face.head_scale_x,
-				   scale_y: face.head_scale_y
-				   
-				   //lineWidth: 4,
-				   //color: '#FF0000'
+				   scale_y: face.head_scale_y,
+				   color: face.color,
+				   lineWidth: face.lineWidth
 	});
 };
 
@@ -78,29 +81,29 @@ FacePainter.prototype.drawEyes = function (face, x, y) {
 
 	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
 	var spacing = face.eye_spacing;
-	
-	// Not used now
-	// If eye_l and eye_r are set spacing will be ignored
-//	var eye_l = face.eye_left_x;
-//	var eye_r = face.eye_right_x;
-	
+		
 	var radius = face.eye_radius;
 
 
-	this.drawOval({
+	this.canvas.drawOval({
 					x: x - spacing,
 					y: height,
 					radius: radius,
 					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y
+					scale_y: face.eye_scale_y,
+					color: face.color,
+					lineWidth: face.lineWidth
+					
 	});
 	
-	this.drawOval({
+	this.canvas.drawOval({
 					x: x + spacing,
 					y: height,
 					radius: radius,
 					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y
+					scale_y: face.eye_scale_y,
+					color: face.color,
+					lineWidth: face.lineWidth
 	});
 }
 
@@ -115,108 +118,28 @@ FacePainter.prototype.drawPupils = function (face, x, y) {
 	var spacing = face.eye_spacing;
 	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
 	
-	this.drawOval({
+	this.canvas.drawOval({
 					x: x - spacing,
 					y: height,
 					radius: radius,
 					scale_x: face.pupil_scale_x,
 					scale_y: face.pupil_scale_y,
-					color: '#black'
+					color: face.color,
+					lineWidth: face.lineWidth
 	});
 	
-	this.drawOval({
+	this.canvas.drawOval({
 					x: x + spacing,
 					y: height,
 					radius: radius,
 					scale_x: face.pupil_scale_x,
 					scale_y: face.pupil_scale_y,
-					color: '#black'
+					color: face.color,
+					lineWidth: face.lineWidth
 	});
 
 };
 
-FacePainter.prototype.drawOval = function (settings) {
-	
-	// We keep the center fixed
-	var x = settings.x / settings.scale_x;
-	var y = settings.y / settings.scale_y;
-
-	var radius = settings.radius || 100;
-	
-	
-	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
-	var color = settings.color || '#000000';
-	
-	console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
-	
-	this.ctx.lineWidth = lineWidth;
-	this.ctx.strokeStyle = color;
-	
-	this.ctx.save();
-	this.ctx.scale(settings.scale_x, settings.scale_y);
-	this.ctx.beginPath();
-	this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore();
-}
-	
-//FacePainter.prototype.drawLine = function (settings) {
-//		
-//	var from_x = settings.from_x;
-//	var from_y = settings.from_y;
-//
-//	var to_x = settings.to_x;
-//	var to_y = settings.to_y;
-//	
-//	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
-//	var color = settings.color || '#000000';
-//	
-//	console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
-//	
-//	this.ctx.lineWidth = lineWidth;
-//	this.ctx.strokeStyle = color;
-//	
-//	this.ctx.save();
-//	this.ctx.beginPath();
-//	this.ctx.moveTo(from_x,from_y);
-//	this.ctx.lineTo(to_x,to_y);
-//	this.ctx.stroke();
-//	this.ctx.closePath();
-//	this.ctx.restore();
-//}
-
-FacePainter.prototype.drawLine = function (settings) {
-	
-	var from_x = settings.x;
-	var from_y = settings.y;
-
-	var length = settings.length;
-	var angle = settings.angle;
-		
-	// Rotation
-	var to_x = - Math.cos(angle) * length + settings.x;
-	var to_y =  Math.sin(angle) * length + settings.y;
-	//console.log('aa ' + to_x + ' ' + to_y);
-	
-	
-	var lineWidth = settings.lineWidth = settings.lineWidth || 1;
-	var color = settings.color || '#000000';
-	
-	console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
-	console.log('Length: ' + length + ', Angle: ' + angle );
-	
-	this.ctx.lineWidth = lineWidth;
-	this.ctx.strokeStyle = color;
-	
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo(from_x,from_y);
-	this.ctx.lineTo(to_x,to_y);
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore();
-}
 
 FacePainter.computeEyebrowOffset = function (face) {
 	return FacePainter.computeFaceOffset(face, face.eye_height) + ((face.eye_radius / 2) * face.eye_scale_y) + face.eyebrow_height;
@@ -229,26 +152,27 @@ FacePainter.prototype.drawEyebrow = function (face, x, y) {
 	var length = face.eyebrow_length;
 	var angle = face.eyebrow_angle;
 	
-	this.drawLine({
+	this.canvas.drawLine({
 					x: x - spacing,
 					y: height,
 					length: length,
-					angle: angle
-					
-					// color: 'red',
-					// lineWidth: 5
+					angle: angle,
+					color: face.color,
+					lineWidth: face.lineWidth
+				
 					
 	});
 	
-	this.drawLine({
+	this.canvas.drawLine({
 					x: x + spacing,
 					y: height,
 					length: 0-length,
-					angle: -angle
+					angle: -angle,	
+					color: face.color,
+					lineWidth: face.lineWidth
 	});
 	
 };
-
 
 FacePainter.prototype.drawNose = function (face, x, y) {
 	
@@ -263,132 +187,127 @@ FacePainter.prototype.drawNose = function (face, x, y) {
 	
 	// log
 	
-	//this.ctx.lineWidth = lineWidth;
-	//this.ctx.strokeStyle = color;
+	this.canvas.ctx.lineWidth = face.lineWidth;
+	this.canvas.ctx.strokeStyle = face.color;
 	
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo(x,height);
-	this.ctx.lineTo(nastril_r_x,nastril_r_y);
-	this.ctx.lineTo(nastril_l_x,nastril_l_y);
-	//this.ctx.closePath();
-	this.ctx.stroke();
-	this.ctx.restore();
+	this.canvas.ctx.save();
+	this.canvas.ctx.beginPath();
+	this.canvas.ctx.moveTo(x,height);
+	this.canvas.ctx.lineTo(nastril_r_x,nastril_r_y);
+	this.canvas.ctx.lineTo(nastril_l_x,nastril_l_y);
+	//this.canvas.ctx.closePath();
+	this.canvas.ctx.stroke();
+	this.canvas.ctx.restore();
 
 };
-//	
-//
-//	protected void draw_lip (Graphics g, double x1, double y1, double x2, double y2, double x3, double y3) {
-//		int i, new_x, new_y, last_x, last_y;
-//
-//		// This is some nasty parabolic stuff.  It doesn't look that good because of the stupid
-//		// way we scale to non- 100x100 displays.
-//		double denom =     (Math.pow(x1, 2) * (x2 - x3))
-//					    +  (x1 * (Math.pow(x3, 2) - Math.pow(x2, 2)))
-//					    +  (Math.pow(x2, 2) * x3)
-//					    + -(Math.pow(x3, 2) * x2);
-//					    
-//		double a     = (   (y1 * (x2 - x3))
-//					    +  (x1 * (y3 - y2))
-//					    +  (y2 * x3)
-//					    + -(y3 * x2))
-//					   / denom;
-//					   
-//		double bb    = (   (Math.pow(x1, 2) * (y2 - y3))
-//						+  (y1 * (Math.pow(x3, 2) - Math.pow(x2, 2)))
-//						+  (Math.pow(x2, 2) * y3)
-//						+ -(Math.pow(x3, 2) * y2))
-//					   / denom;
-//					 
-//		double c     = (   (Math.pow(x1, 2) * ((x2 * y3) - (x3 * y2)))
-//						+  (x1 * ((Math.pow(x3, 2) * y2) - (Math.pow(x2, 2) * y3)))
-//						+  (y1 * ((Math.pow(x2, 2) * x3) - (Math.pow(x3, 2) * x2))))
-//					   / denom;
-//		
-//		for(i = (int)x1, last_x = (int)x1, last_y = (int)y1; i <= x2; i++) {
-//			new_x = i;
-//			new_y = (int)((a * Math.pow(i, 2)) + (bb * i) + c);
-//			xLine(g, last_x, last_y, new_x, new_y);
-//			last_x = new_x;
-//			last_y = new_y;
-//		}
-//	}
-//		
-//
-//	protected void draw_mouth(Graphics g, double p6, double p9, double p10) {
-//		double mouth_size = ((p9 - 0.5) * 10);
-//		double x1 = 40 - mouth_size;
-//		double y1 = mouth_y;
-//		double x2 = 60 + mouth_size;
-//		double y2 = mouth_y;
-//		double x3 = ((x2 - x1) / 2) + x1;
-//		double y3 = ((p6 - 0.5) * 10) + mouth_y;
-//
-//		draw_lip(g, x1, y1, x2, y2, x3, y3);
-//		draw_lip(g, x1, y1, x2, y2, x3, y3 + ((p10 / 2.0) * 10));
-//	}
-//
-//	
-//	/** Draws a scaled and translated circle. */
-//	protected void xCircle(Graphics g, int x, int y, int radius) {
-//		g.drawOval(scale_x(x - radius) + x_origin, scale_y(y - radius) + y_origin,
-//		           scale_x(radius * 2), scale_y(radius * 2));
-//	}
-//	
-//	/** Draws a scaled and translated oval. */
-//	protected void xOval(Graphics g, int x, int y, int height_r, int width_r) {
-//		g.drawOval(scale_x(x - width_r) + x_origin, scale_y(y - height_r) + y_origin,
-//				   scale_x(width_r * 2), scale_y(height_r * 2));
-//	}
-//
-//	/** Draw a scaled, translated and filled oval. */
-//	protected void xFillOval(Graphics g, int x, int y, int height_r, int width_r) {
-//		g.fillOval(scale_x(x - width_r) + x_origin, scale_y(y - height_r) + y_origin,
-//				   scale_x(width_r * 2), scale_y(height_r * 2) );
-//	}
-//	
-//	/** Draws a scaled and translated line. */
-//	protected void xLine(Graphics g, int x1, int y1, int x2, int y2) {
-//		g.drawLine(scale_x(x1) + x_origin, scale_y(y1) + x_origin,
-//							 scale_x(x2) + x_origin, scale_y(y2) + x_origin);
-//	}
+		
+FacePainter.prototype.drawMouth = function (face, x, y) {
 	
-// Computes and stores the scaling factors and origin used by xCircle, xOval,
-//	    xFillOval & xLine.
-FacePainter.prototype.calc_xform_factors = function (x, y, width, height) {
-	this.x_factor = width / 100.0;
-	this.y_factor = height / 100.0;
-	this.x_origin = x;
-	this.y_origin = y;
-};
+	var height = y + FacePainter.computeFaceOffset(face, face.mouth_height);
+	var startX = x - face.mouth_width / 2;
+    var endX = x + face.mouth_width / 2;
 	
+	var top_y = height - face.mouth_top_y;
+	var bottom_y = height + face.mouth_top_y;
 	
-FacePainter.prototype.scale_x = function (x) {
-	return x * x_factor;
+	// Upper Lip
+	this.canvas.ctx.moveTo(startX,height);
+    this.canvas.ctx.quadraticCurveTo(x, top_y, endX, height);
+    this.canvas.ctx.stroke();
+	
+    //Lowe Lip
+    this.canvas.ctx.moveTo(startX,height);
+    this.canvas.ctx.quadraticCurveTo(x, bottom_y, endX, height);
+    this.canvas.ctx.stroke();
+    
+};	
+
+// Canvas
+
+function Canvas(canvas) {
+	this.canvas = canvas;
+	// 2D Canvas Context 
+	this.ctx = canvas.getContext('2d');
+	
+	this.centerX = canvas.width / 2;
+	this.centerY = canvas.height / 2;
+	
+	this.width = canvas.width;
+	this.height = canvas.height;
+	
+	console.log(canvas.width);
+	console.log(canvas.height);		
 };
 
-FacePainter.prototype.scale_y = function (y) {
-	return y * y_factor;
+Canvas.prototype = {
+			
+	constructor: Canvas,
+	
+	drawOval: function (settings) {
+	
+		// We keep the center fixed
+		var x = settings.x / settings.scale_x;
+		var y = settings.y / settings.scale_y;
+	
+		var radius = settings.radius || 100;
+		
+		console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
+		
+		this.ctx.lineWidth = settings.lineWidth || 1;
+		this.ctx.strokeStyle = settings.color || '#000000';
+		
+		this.ctx.save();
+		this.ctx.scale(settings.scale_x, settings.scale_y);
+		this.ctx.beginPath();
+		this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+		this.ctx.restore();
+	},
+	
+	drawLine: function (settings) {
+	
+		var from_x = settings.x;
+		var from_y = settings.y;
+	
+		var length = settings.length;
+		var angle = settings.angle;
+			
+		// Rotation
+		var to_x = - Math.cos(angle) * length + settings.x;
+		var to_y =  Math.sin(angle) * length + settings.y;
+		//console.log('aa ' + to_x + ' ' + to_y);
+		
+		console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
+		console.log('Length: ' + length + ', Angle: ' + angle );
+		
+		this.ctx.lineWidth = settings.lineWidth || 1;
+		this.ctx.strokeStyle = settings.color || '#000000';
+		
+		this.ctx.save();
+		this.ctx.beginPath();
+		this.ctx.moveTo(from_x,from_y);
+		this.ctx.lineTo(to_x,to_y);
+		this.ctx.stroke();
+		this.ctx.closePath();
+		this.ctx.restore();
+	},
+	
+	clear: function() {
+		this.ctx.clearRect(0, 0, this.width, this.height);
+		// For IE
+		var w = this.canvas.width;
+		this.canvas.width = 1;
+		canvas.width = w;
+	}
+	
 };
+
+FacePainter.prototype.control = function() {
 	
 	
-//	/** Takes a number between 0 and 1 and returns a 2-vector that should be added to the
-//	    dimensions of a circle to create an oval. */
-//	protected int[] eccentricities(double p) {
-//		int[] a = new int[2];
-//		
-//		if (p > .5) {
-//			a[0] = (int)((p - 0.5) * 20.0);
-//			a[1] = 0;
-//			return a;
-//		} else {
-//			a[0] = 0;
-//			a[1] = (int)(Math.abs(p - 0.5) * 20.0);
-//			return a;
-//		}
-//	}
-//}
-	
+}
+
 
 /*!
  * 
@@ -403,7 +322,10 @@ function FaceVector (faceVector) {
 	//if (typeof(faceVector) !== 'undefined') {
 	
 	var faceVector = faceVector || {};
-		
+	
+	this.color = faceVector.color || 'green';
+	this.lineWidth = faceVector.lineWidth || 1;
+	
 	this.head_radius = faceVector.head_radius || 30;
 	this.head_scale_x = faceVector.head_scale_x || 1;
 	this.head_scale_y = faceVector.head_scale_y || 1;
@@ -425,18 +347,15 @@ function FaceVector (faceVector) {
 	this.eyebrow_angle = faceVector.eyebrow_angle || -0.5; // Math.PI , 1
 	this.eyebrow_spacing = faceVector.eyebrow_spacing || 5;
 	
-//	this.eyebrow_r_l_x = faceVector.eyebrow_r_l_x || 55;
-//	this.eyebrow_l_r_x = faceVector.eyebrow_l_r_x || 45;
-//	this.eyebrow_r_r_x = faceVector.eyebrow_r_r_x || 65;
-
-//	this.nose_apex_x = faceVector.nose_apex_x || 50;
-//	this.nose_apex_y = faceVector.nose_apex_y || 45;
+	this.nose_height = faceVector.nose_height || 0.8;
+	this.nose_length = faceVector.nose_length || 15;
+	this.nose_width = faceVector.nose_width || 10;
 	
-	this.nose_height = faceVector.nose_height || 0.9;
-	this.nose_length = faceVector.nose_length || 16;
-	this.nose_width = faceVector.nose_width || 8;
+	this.mouth_height = faceVector.mouth_height || 1;
+	this.mouth_width = faceVector.mouth_width || 20;
+	this.mouth_top_y = faceVector.mouth_top_y || 10;
+	this.mouth_bottom_y = faceVector.mouth_bottom_y || 10;
 	
-	this.mouth_y = faceVector.mouth_y || 65;
 	
 	// TODO: random init;
 		
@@ -445,8 +364,11 @@ function FaceVector (faceVector) {
 // Constructs a random face vector.
 FaceVector.prototype.shuffle = function () {
 	for (var key in this) {
-		if (this[key].hasOwnProperty(key)) {
-			this[key] = Math.random();
+		if (this.hasOwnProperty(key)) {
+			
+			if (key !== 'color') {
+				this[key] = Math.random();
+			}
 		}
 	}
 };

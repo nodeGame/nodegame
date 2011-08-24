@@ -24,36 +24,18 @@
 		
 		window.canvas = canvas;
 		
-//		context.beginPath();
-//		context.moveTo(30,30);
-//		context.lineTo(30,60);
-//		context.lineTo(60,60);
-//		context.lineTo(60,30);
-//		
-//		// close it to the start point
-//		context.closePath();
-//		
-//		context.lineWidth = 4;
-//		context.strokeStyle = '#663300';
-//		
-//		context.save();
-//		
-//		
-//		
-//		//Stroke the line into the canvas
-//		context.stroke();
-//    
-//		context.traslate(100,100);
-//		
-//		context.stroke();
-//    
-//		//context.restore();
-		
-		
 		var fp = new FacePainter(canvas);
 		var fv = new FaceVector();
 		
 		fp.draw(fv);
+		
+		setInterval(function() {
+      fv.shuffle();
+			fp.redraw(fv);
+		}, 1000);
+			
+		
+		
 		
   }
 </script>
