@@ -2,8 +2,8 @@
 <title>Canvas Test</title>
 <body>
 <div id="root"></div>
-<!-- <script src="client/build/0.3/nodegame-all-0.3.js" charset="utf-8"></script> -->
-<script src="gadgets/cf_java.js" charset="utf-8"></script>
+<script src="client/build/0.3.1/nodegame-all-0.3.1.js" charset="utf-8"></script>
+<!-- <script src="gadgets/cf_java.js" charset="utf-8"></script> -->
 <style>
   canvas {
   	border: 1px #CCC solid;
@@ -11,28 +11,32 @@
 </style>
 <script>
     window.onload = function(){
+			
+    var root = document.getElementById('root');
+			
+		var cf = new ChernoffFaces();
+		cf.append(root);
   
-    var canvas = document.createElement('canvas');
-		var context = canvas.getContext('2d');
+//    var canvas = document.createElement('canvas');
+//		var context = canvas.getContext('2d');
+//		
+//		if (!context) {
+//			alert('Canvas is not supported');
+//		}
+//		
+//    var root = document.getElementById('root');
+//    root.appendChild(canvas);
+//		window.canvas = canvas;
+//		
+//		var fp = new FacePainter(canvas);
+//		var fv = new FaceVector();
+//		
+//		fp.draw(fv);
 		
-		if (!context) {
-			alert('Canvas is not supported');
-		}
-		
-		var root = document.getElementById('root');
-		root.appendChild(canvas);
-		
-		window.canvas = canvas;
-		
-		var fp = new FacePainter(canvas);
-		var fv = new FaceVector();
-		
-		fp.draw(fv);
-		
-		setInterval(function() {
-      fv.shuffle();
-			fp.redraw(fv);
-		}, 1000);
+//		setInterval(function() {
+//      fv.shuffle();
+//			fp.redraw(fv);
+//		}, 1000);
 			
 		
 		

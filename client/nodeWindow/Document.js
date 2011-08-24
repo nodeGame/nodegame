@@ -33,12 +33,27 @@ Document.prototype.addTextInput = function (root, id, attributes) {
 	return mt;
 };
 
+Document.prototype.addCanvas = function (root, id, attributes) {
+	var canvas = document.createElement('canvas');
+	var context = canvas.getContext('2d');
+		
+	if (!context) {
+		alert('Canvas is not supported');
+		return false;
+	}
+	
+	canvas.id = id;
+	this.addAttributes2Elem(canvas, attributes);
+	root.appendChild(canvas);
+	return canvas;
+};
+
 Document.prototype.addSlider = function (root, id, attributes) {
 	var slider = document.createElement('input');
 	slider.id = id;
 	slider.setAttribute('type', 'range');
-	this.addAttributes2Elem(mt, attributes);
-	root.appendChild(mt);
+	this.addAttributes2Elem(slider, attributes);
+	root.appendChild(slider);
 	return slider;
 };
 

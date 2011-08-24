@@ -5,6 +5,12 @@
 GameWindow.prototype = new Document();
 GameWindow.prototype.constructor = GameWindow;
 
+GameWindow.prototype.create = {};
+
+GameWindow.prototype.create.Canvas = function(canvas){
+	return new Canvas(canvas);
+};
+
 function GameWindow() {
 	
 	Document.call(this);
@@ -255,3 +261,6 @@ GameWindow.prototype.addStateSelector = function (root, id) {
 	var stateSelector = this.addTextInput(root,id);
 	return stateSelector;
 };
+
+
+//
