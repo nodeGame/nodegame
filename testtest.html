@@ -8,13 +8,25 @@
   canvas {
   	border: 1px #CCC solid;
   }
+	
+label {
+  display: block;
+  float: left;
+  min-width: 200px;
+}
+
+input[type="range"]{
+    margin-bottom: 5px;
+    margin-left: 5px
+}	
+
 </style>
 <script>
     window.onload = function(){
 			
     var root = document.getElementById('root');
 			
-		var cf = new ChernoffFaces();
+		var cf = new ChernoffFaces('cf', {width: 200, height:200});
 		cf.append(root);
   
 //    var canvas = document.createElement('canvas');

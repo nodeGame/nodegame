@@ -11,6 +11,10 @@ GameWindow.prototype.create.Canvas = function(canvas){
 	return new Canvas(canvas);
 };
 
+GameWindow.prototype.create.List = function(id){
+	return new List(id);
+};
+
 function GameWindow() {
 	
 	Document.call(this);

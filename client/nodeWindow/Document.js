@@ -57,6 +57,28 @@ Document.prototype.addSlider = function (root, id, attributes) {
 	return slider;
 };
 
+Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
+	var label = document.createElement('label');
+	label.id = id;
+	label.appendChild(document.createTextNode(labelText));	
+	label.setAttribute('for', forElem);
+	this.addAttributes2Elem(label, attributes);
+	
+	var root = document.getElementById(forElem);
+	root.parentNode.insertBefore(label,root);
+	return label;
+	
+	// Add the label immediately before if no root elem has been provided
+	if (!root) {
+		var root = document.getElementById(forElem);
+		root.insertBefore(label);
+	}
+	else {
+		root.appendChild(label);
+	}
+	return label;
+};
+
 Document.prototype.addSelect = function (root, id, attributes) {
 	return this.addElement('select', root, id, attributes);
 };
@@ -94,8 +116,9 @@ Document.prototype.addIFrame = function (root, id, attributes) {
 
 // BR
 
-Document.prototype.addBr = function (root, id, attributes) {
-	return this.addElement('br', root, id, attributes);
+Document.prototype.addBr = function (root) {
+	var br = document.createElement('br');
+	return this.insertAfter(br,root);
 };
 
 // CSS
@@ -170,7 +193,9 @@ Document.prototype.loadFile = function (container,file) {
 
 Document.prototype.addElement = function (elem, root, id, attributes) {
 	var e = document.createElement(elem);
-	e.id = id;
+	if (id) {
+		e.id = id;
+	}
 	this.addAttributes2Elem(e, attributes);
 	
 	root.appendChild(e);
@@ -200,3 +225,8 @@ Document.prototype.removeChildrenFromNode = function (e) {
     }
     return true;
 };
+
+Document.prototype.insertAfter = function (node, referenceNode) {
+	  referenceNode.insertBefore(node, referenceNode.nextSibling);
+};
+

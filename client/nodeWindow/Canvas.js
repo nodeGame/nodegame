@@ -72,6 +72,12 @@ Canvas.prototype = {
 		this.ctx.restore();
 	},
 	
+	scale: function (x,y) {
+		this.ctx.scale(x,y);
+		this.centerX = this.canvas.width / 2 / x;
+		this.centerY = this.canvas.height / 2 / y;
+	},
+	
 	clear: function() {
 		this.ctx.clearRect(0, 0, this.width, this.height);
 		// For IE

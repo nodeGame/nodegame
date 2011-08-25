@@ -7,7 +7,10 @@
  * 
  */
 
-function ChernoffFaces(id) {
+ChernoffFaces.defaultWidth = 100;
+ChernoffFaces.defaultHeigth = 100;
+
+function ChernoffFaces(id, dims) {
 	
 	this.game = nodeGame.game;
 	this.id = id || 'ChernoffFaces';
@@ -18,6 +21,11 @@ function ChernoffFaces(id) {
 	this.root = null;
 	
 	this.recipient = null;
+	
+	this.dims = {
+				width: (dims) ? dims.width : ChernoffFaces.defaultWidth, 
+				height:(dims) ? dims.height : ChernoffFaces.defaultHeigth
+	};
 };
 
 ChernoffFaces.prototype.append = function (root, ids) {
@@ -35,12 +43,46 @@ ChernoffFaces.prototype.append = function (root, ids) {
 	
 	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box');
 	
-	var canvas = nodeWindow.addCanvas(fieldset, idCanvas);
+	var canvas = nodeWindow.addCanvas(fieldset, idCanvas, this.dims);
 	
 	var fp = new FacePainter(canvas);
 	var fv = new FaceVector();
 	
 	fp.draw(fv);
+	
+	var features = {
+					head_radius: {
+							// id can be specified otherwise is taken head_radius
+							min: 10,
+							max: 100,
+							label: {
+									id: 'label_head_radius',
+									text: 'Face radius'
+							}
+					},
+					head_scale_x: {
+						min: 0.2,
+						max: 2,
+						label: {
+								id: 'label_head_scale_x',
+								text: 'Scale head horizontally'
+						}
+					},
+					head_scale_y: {
+						min: 0.2,
+						max: 2,
+						label: {
+								id: 'label_head_scale_y',
+								text: 'Scale head vertically'
+						}
+					},
+					
+					
+	};
+									
+	
+	var sc = new SliderControls('cf_controls',features);
+	sc.append(fieldset);
 	
 	var that = this;
 
@@ -90,6 +132,11 @@ function FacePainter (canvas, settings) {
 	this.y_factor = null;
 		
 	this.canvas = nodeWindow.create.Canvas(canvas);
+	
+	this.scaleX = canvas.width / ChernoffFaces.defaultWidth;
+	this.scaleY = canvas.height / ChernoffFaces.defaultHeigth;
+	
+	console.log(this.scaleX + ' ' + this.scaleY);
 		
 };
 
@@ -98,6 +145,11 @@ function FacePainter (canvas, settings) {
 //This code draws the face into a logical space with dimensions 100x100, and
 //scales it to the actual size specified by width and height.
 FacePainter.prototype.draw = function (face, x, y) {
+			
+	this.fit2Canvas(face);
+	this.canvas.scale(face.scaleX, face.scaleY);
+	
+	console.log('aa ' + face.scaleY + ' ' + face.scaleX );
 	
 	var x = x || this.canvas.centerX;
 	var y = y || this.canvas.centerY;
@@ -113,20 +165,34 @@ FacePainter.prototype.draw = function (face, x, y) {
 	this.drawNose(face, x, y);
 	
 	this.drawMouth(face, x, y);
+	
 };		
 	
 FacePainter.prototype.redraw = function (face, x, y) {
 	this.canvas.clear();
 	this.draw(face,x,y);
 }
-FacePainter.prototype.fit2Canvas = function() {
+
+FacePainter.prototype.scale = function (x, y) {
+	this.canvas.scale(this.scaleX, this.scaleY);
+}
+
+// TODO: Improve. It eats a bit of the margins
+FacePainter.prototype.fit2Canvas = function(face) {
 	if (!this.canvas) {
 		console.log('No canvas found');
 		return;
 	}
 	
-	// TODO
-	//this.canvas.
+	if (this.canvas.width > this.canvas.height) {
+		var ratio = this.canvas.width / face.head_radius * face.head_scale_x;
+	}
+	else {
+		var ratio = this.canvas.height / face.head_radius * face.head_scale_y;
+	}
+	
+	face.scaleX = ratio / 2;
+	face.scaleY = ratio / 2;
 }
 
 FacePainter.prototype.drawHead = function (face, x, y) {
@@ -271,7 +337,7 @@ FacePainter.prototype.drawMouth = function (face, x, y) {
     var endX = x + face.mouth_width / 2;
 	
 	var top_y = height - face.mouth_top_y;
-	var bottom_y = height + face.mouth_top_y;
+	var bottom_y = height + face.mouth_bottom_y;
 	
 	// Upper Lip
 	this.canvas.ctx.moveTo(startX,height);
@@ -286,8 +352,37 @@ FacePainter.prototype.drawMouth = function (face, x, y) {
 };	
 
 
-FacePainter.prototype.controls = function() {
+function SliderControls (id, features) {
+	this.id = id;
+	this.features = features;
+	
+	this.list = nodeWindow.create.List();
 };
+
+SliderControls.prototype.append = function(root) {
+	
+	var listRoot = this.list.getRoot();
+	root.appendChild(listRoot);
+	
+	for (var key in this.features) {
+		if (this.features.hasOwnProperty(key)) {
+			
+			var f = this.features[key];
+			var id = f.id || key;
+			
+			var item = this.list.getItem();
+			listRoot.appendChild(item);
+			
+			var slider = nodeWindow.addSlider(item, id, {min: f.min, max: f.max});
+			if (f.label) {
+				nodeWindow.addLabel(slider, f.label.id, f.label.text, id);
+			}
+			
+			
+		}
+	}
+};
+
 
 
 /*!
@@ -304,11 +399,14 @@ function FaceVector (faceVector) {
 	
 	var faceVector = faceVector || {};
 	
+	this.scaleX = faceVector.scaleX || 2;
+	this.scaleY = faceVector.scaleY || 2;
+	
 	this.color = faceVector.color || 'green';
 	this.lineWidth = faceVector.lineWidth || 1;
 	
 	this.head_radius = faceVector.head_radius || 30;
-	this.head_scale_x = faceVector.head_scale_x || 1;
+	this.head_scale_x = faceVector.head_scale_x || 0.5;
 	this.head_scale_y = faceVector.head_scale_y || 1;
 	
 	this.eye_height = faceVector.eye_height || 0.75; 
@@ -334,8 +432,8 @@ function FaceVector (faceVector) {
 	
 	this.mouth_height = faceVector.mouth_height || 1;
 	this.mouth_width = faceVector.mouth_width || 20;
-	this.mouth_top_y = faceVector.mouth_top_y || 10;
-	this.mouth_bottom_y = faceVector.mouth_bottom_y || 10;
+	this.mouth_top_y = faceVector.mouth_top_y || -2;
+	this.mouth_bottom_y = faceVector.mouth_bottom_y || 20;
 	
 	
 	// TODO: random init;
