@@ -7,8 +7,10 @@
  * 
  */
 
-ChernoffFaces.defaultWidth = 100;
-ChernoffFaces.defaultHeigth = 100;
+ChernoffFaces.defaults = {};
+ChernoffFaces.defaults.canvas = {};
+ChernoffFaces.defaults.canvas.width = 100;
+ChernoffFaces.defaults.canvas.heigth = 100;
 
 function ChernoffFaces(id, dims) {
 	
@@ -23,8 +25,8 @@ function ChernoffFaces(id, dims) {
 	this.recipient = null;
 	
 	this.dims = {
-				width: (dims) ? dims.width : ChernoffFaces.defaultWidth, 
-				height:(dims) ? dims.height : ChernoffFaces.defaultHeigth
+				width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
+				height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
 	};
 };
 
@@ -43,9 +45,9 @@ ChernoffFaces.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('button')) idButton = ids.button;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box');
+	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
 	
-	var canvas = nodeWindow.addCanvas(fieldset, idCanvas, this.dims);
+	var canvas = nodeWindow.addCanvas(root, idCanvas, this.dims);
 	
 	var fp = new FacePainter(canvas);
 	var fv = new FaceVector();
@@ -53,160 +55,15 @@ ChernoffFaces.prototype.append = function (root, ids) {
 	fp.draw(fv);
 	
 	var button = nodeWindow.addButton(fieldset,idButton);
-	
-	var features = {
-					// Head
-					head_radius: {
-						// id can be specified otherwise is taken head_radius
-						min: 10,
-						max: 100,
-						step: 5,
-						label: 'Face radius'
-					},
-					head_scale_x: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale head horizontally'
-					},
-					head_scale_y: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale head vertically'
-					},
-					// Eye
-					eye_height: {
-						min: 0.3,
-						max: 0.9,
-						step: 0.1,
-						label: 'Eye height'
-					},
-					eye_radius: {
-						min: 10,
-						max: 50,
-						step: 2,
-						label: 'Eye radius'
-					},
-					eye_spacing: {
-						min: 0,
-						max: 50,
-						label: 'Eye spacing'
-					},
-					eye_scale_x: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale eyes horizontally'
-					},
-					eye_scale_y: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale eyes vertically'
-					},
-					// Pupil
-					pupil_radius: {
-						min: 1,
-						max: 9,
-						label: 'Pupil radius'
-					},
-					pupil_scale_x: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale pupils horizontally'
-					},
-					pupil_scale_y: {
-						min: 0.2,
-						max: 2,
-						step: 0.2,
-						label: 'Scale pupils vertically'
-					},
-					// Eyebrow
-					eyebrow_length: {
-						min: 1,
-						max: 30,
-						step: 1,
-						label: 'Eyebrow length'
-					},
-					eyebrow_height: {
-						min: 0.3,
-						max: 1,
-						step: 0.1,
-						label: 'Eyebrow height'
-					},
-					eyebrow_angle: {
-						min: -2,
-						max: 2,
-						step: 0.2,
-						label: 'Eyebrow angle'
-					},
-					eyebrow_spacing: {
-						min: 0,
-						max: 20,
-						step: 1,
-						label: 'Eyebrow spacing'
-					},
-					// Nose
-					nose_length: {
-						min: 0.2,
-						max: 30,
-						step: 0.2,
-						label: 'Nose length'
-					},
-					nose_height: {
-						min: 0.4,
-						max: 1,
-						step: 0.1,
-						label: 'Nose height'
-					},
-					nose_width: {
-						min: 0,
-						max: 30,
-						step: 2,
-						label: 'Nose width'
-					},
-					// Mouth
-					mouth_height: {
-						min: 0.2,
-						max: 0.8,
-						step: 0.1,
-						label: 'Mouth height'
-					},
-					mouth_width: {
-						min: 2,
-						max: 100,
-						step: 2,
-						label: 'Mouth width'
-					},
-					mouth_top_y: {
-						min: -10,
-						max: 30,
-						step: 0.5,
-						label: 'Upper lip'
-					},
-					mouth_bottom_y: {
-						min: -10,
-						max: 30,
-						step: 0.5,
-						label: 'Lower lip'
-					}					
-	};
 									
-	
-	var sc = new SliderControls('cf_controls',features);
-	sc.append(fieldset);
-	
-	
+	// Add Gadget
+	var sc = new SliderControls('cf_controls',FaceVector.defaults);
+	nodeWindow.addGadget(fieldset,sc);
 	
 	var that = this;
 
 	button.onclick = function() {		
 		var fv = new FaceVector(sc.getAllValues());
-		console.log('aaa');
-		console.log(sc.getAllValues());
-		console.log('bbb');
 		fp.redraw(fv);
 	};
 	
@@ -215,11 +72,11 @@ ChernoffFaces.prototype.append = function (root, ids) {
 };
 
 ChernoffFaces.prototype.listeners = function () {
-//	var that = this;
-//	var PREFIX = 'in.';
+	var that = this;
 //	
-//	node.onPLIST( function(msg) {
-//			nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+//	node.on( 'input', function(msg) {
+//			var fv = new FaceVector(sc.getAllValues());
+//			fp.redraw(fv);
 //		}); 
 };
 
@@ -235,17 +92,10 @@ function FacePainter (canvas, settings) {
 	
 	this.canvas = canvas;
 	
-	// Used for scaling and translating face.
-	this.x_factor = null, 
-	this.y_factor = null;
-		
 	this.canvas = nodeWindow.create.Canvas(canvas);
 	
-	this.scaleX = canvas.width / ChernoffFaces.defaultWidth;
-	this.scaleY = canvas.height / ChernoffFaces.defaultHeigth;
-	
-	console.log(this.scaleX + ' ' + this.scaleY);
-		
+	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
+	this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;
 };
 
 //Draws a Chernoff face.
@@ -254,10 +104,10 @@ function FacePainter (canvas, settings) {
 //scales it to the actual size specified by width and height.
 FacePainter.prototype.draw = function (face, x, y) {
 			
-	this.fit2Canvas(face);
-	this.canvas.scale(face.scaleX, face.scaleY);
+//	this.fit2Canvas(face);
+//	this.canvas.scale(face.scaleX, face.scaleY);
 	
-	console.log('aa ' + face.scaleY + ' ' + face.scaleX );
+	console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
 	
 	var x = x || this.canvas.centerX;
 	var y = y || this.canvas.centerY;
@@ -306,7 +156,6 @@ FacePainter.prototype.fit2Canvas = function(face) {
 FacePainter.prototype.drawHead = function (face, x, y) {
 	
 	var radius = face.head_radius;
-	var eccentricity = 1 || face.head_eccentricity;
 	
 	this.canvas.drawOval({
 				   x: x, 
@@ -320,13 +169,12 @@ FacePainter.prototype.drawHead = function (face, x, y) {
 };
 
 FacePainter.prototype.drawEyes = function (face, x, y) {
-
-	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
+	
+	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
 	var spacing = face.eye_spacing;
 		
 	var radius = face.eye_radius;
-
-
+	console.log(face);
 	this.canvas.drawOval({
 					x: x - spacing,
 					y: height,
@@ -337,7 +185,7 @@ FacePainter.prototype.drawEyes = function (face, x, y) {
 					lineWidth: face.lineWidth
 					
 	});
-	
+	console.log(face);
 	this.canvas.drawOval({
 					x: x + spacing,
 					y: height,
@@ -349,16 +197,11 @@ FacePainter.prototype.drawEyes = function (face, x, y) {
 	});
 }
 
-//TODO Scaling ?
-FacePainter.computeFaceOffset = function (face, offset) {
-	return face.head_radius/2 * offset;
-};
-
 FacePainter.prototype.drawPupils = function (face, x, y) {
 		
 	var radius = face.pupil_radius;
 	var spacing = face.eye_spacing;
-	var height = y - FacePainter.computeFaceOffset(face, face.eye_height);
+	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
 	
 	this.canvas.drawOval({
 					x: x - spacing,
@@ -382,14 +225,9 @@ FacePainter.prototype.drawPupils = function (face, x, y) {
 
 };
 
-
-FacePainter.computeEyebrowOffset = function (face) {
-	return FacePainter.computeFaceOffset(face, face.eye_height) + ((face.eye_radius / 2) * face.eye_scale_y) + face.eyebrow_height;
-};
-
 FacePainter.prototype.drawEyebrow = function (face, x, y) {
 	
-	var height = y - FacePainter.computeEyebrowOffset(face);
+	var height = FacePainter.computeEyebrowOffset(face,y);
 	var spacing = face.eyebrow_spacing;
 	var length = face.eyebrow_length;
 	var angle = face.eyebrow_angle;
@@ -418,7 +256,7 @@ FacePainter.prototype.drawEyebrow = function (face, x, y) {
 
 FacePainter.prototype.drawNose = function (face, x, y) {
 	
-	var height = y - FacePainter.computeFaceOffset(face, face.nose_height);
+	var height = FacePainter.computeFaceOffset(face, face.nose_height, y);
 	var nastril_r_x = x + face.nose_width / 2;
 	var nastril_r_y = height + face.nose_length;
 	var nastril_l_x = nastril_r_x - face.nose_width;
@@ -440,7 +278,7 @@ FacePainter.prototype.drawNose = function (face, x, y) {
 		
 FacePainter.prototype.drawMouth = function (face, x, y) {
 	
-	var height = y + FacePainter.computeFaceOffset(face, face.mouth_height);
+	var height = FacePainter.computeFaceOffset(face, face.mouth_height, y);
 	var startX = x - face.mouth_width / 2;
     var endX = x + face.mouth_width / 2;
 	
@@ -460,63 +298,16 @@ FacePainter.prototype.drawMouth = function (face, x, y) {
 };	
 
 
-function SliderControls (id, features) {
-	this.id = id;
-	this.features = features;
-	
-	this.list = nodeWindow.create.List();
+//TODO Scaling ?
+FacePainter.computeFaceOffset = function (face, offset, y) {
+	var y = y || 0;
+	return y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
 };
 
-SliderControls.prototype.append = function(root) {
-	
-	var listRoot = this.list.getRoot();
-	root.appendChild(listRoot);
-	
-	for (var key in this.features) {
-		if (this.features.hasOwnProperty(key)) {
-			
-			var f = this.features[key];
-			var id = f.id || key;
-			
-			var item = this.list.getItem();
-			listRoot.appendChild(item);
-			
-			var attributes = {min: f.min, max: f.max, step: f.step};
-			var slider = nodeWindow.addSlider(item, id, attributes);
-			
-			// If a label element is present it checks whether it is an
-			// object literal or a string.
-			// In the former case it scans the obj for additional properties
-			if (f.label) {
-				var labelId = 'label_' + id;
-				var labelText = f.label;
-				
-				if (typeof(f.label) === 'object') {
-					var labelText = f.label.text;
-					if (f.label.id) {
-						labelId = f.label.id; 
-					}
-				}
-				
-				nodeWindow.addLabel(slider, labelId, labelText, id);
-			}
-			
-			
-		}
-	}
-};
-
-SliderControls.prototype.getAllValues = function() {
-	var out = {};
-	for (var key in this.features) {
-		
-		if (this.features.hasOwnProperty(key)) {
-			console.log(key);
-			out[key] = document.getElementById(key).value;
-		}
-	}
-	
-	return out;
+FacePainter.computeEyebrowOffset = function (face, y) {
+	var y = y || 0;
+	var eyemindistance = 2;
+	return FacePainter.computeFaceOffset(face, face.eye_height, y) - eyemindistance - face.eyebrow_eyedistance;
 };
 
 
@@ -528,50 +319,198 @@ SliderControls.prototype.getAllValues = function() {
 * describe a Chernoff face.  
 *
 */
+
+FaceVector.defaults = {
+		// Head
+		head_radius: {
+			// id can be specified otherwise is taken head_radius
+			min: 10,
+			max: 100,
+			step: 5,
+			value: 30,
+			label: 'Face radius'
+		},
+		head_scale_x: {
+			min: 0.2,
+			max: 2,
+			step: 0.1,
+			value: 0.5,
+			label: 'Scale head horizontally'
+		},
+		head_scale_y: {
+			min: 0.2,
+			max: 2,
+			step: 0.1,
+			value: 1,
+			label: 'Scale head vertically'
+		},
+		// Eye
+		eye_height: {
+			min: 0.1,
+			max: 0.9,
+			step: 0.1,
+			value: 0.4,
+			label: 'Eye height'
+		},
+		eye_radius: {
+			min: 2,
+			max: 30,
+			step: 1,
+			value: 5,
+			label: 'Eye radius'
+		},
+		eye_spacing: {
+			min: 0,
+			max: 50,
+			step: 2,
+			value: 10,
+			label: 'Eye spacing'
+		},
+		eye_scale_x: {
+			min: 0.2,
+			max: 2,
+			step: 0.2,
+			value: 1,
+			label: 'Scale eyes horizontally'
+		},
+		eye_scale_y: {
+			min: 0.2,
+			max: 2,
+			step: 0.2,
+			value: 1,
+			label: 'Scale eyes vertically'
+		},
+		// Pupil
+		pupil_radius: {
+			min: 1,
+			max: 9,
+			step: 1,
+			value: 1,  //this.eye_radius;
+			label: 'Pupil radius'
+		},
+		pupil_scale_x: {
+			min: 0.2,
+			max: 2,
+			step: 0.2,
+			value: 1,
+			label: 'Scale pupils horizontally'
+		},
+		pupil_scale_y: {
+			min: 0.2,
+			max: 2,
+			step: 0.2,
+			value: 1,
+			label: 'Scale pupils vertically'
+		},
+		// Eyebrow
+		eyebrow_length: {
+			min: 1,
+			max: 30,
+			step: 1,
+			value: 10,
+			label: 'Eyebrow length'
+		},
+		eyebrow_eyedistance: {
+			min: 0.3,
+			max: 10,
+			step: 0.2,
+			value: 3, // From the top of the eye
+			label: 'Eyebrow from eye'
+		},
+		eyebrow_angle: {
+			min: -2,
+			max: 2,
+			step: 0.2,
+			value: -0.5,
+			label: 'Eyebrow angle'
+		},
+		eyebrow_spacing: {
+			min: 0,
+			max: 20,
+			step: 1,
+			value: 5,
+			label: 'Eyebrow spacing'
+		},
+		// Nose
+		nose_height: {
+			min: 0.4,
+			max: 1,
+			step: 0.1,
+			value: 0.4,
+			label: 'Nose height'
+		},
+		nose_length: {
+			min: 0.2,
+			max: 30,
+			step: 0.2,
+			value: 15,
+			label: 'Nose length'
+		},
+		nose_width: {
+			min: 0,
+			max: 30,
+			step: 2,
+			value: 10,
+			label: 'Nose width'
+		},
+		// Mouth
+		mouth_height: {
+			min: 0.2,
+			max: 2,
+			step: 0.1,
+			value: 0.75, 
+			label: 'Mouth height'
+		},
+		mouth_width: {
+			min: 2,
+			max: 100,
+			step: 2,
+			value: 20,
+			label: 'Mouth width'
+		},
+		mouth_top_y: {
+			min: -10,
+			max: 30,
+			step: 0.5,
+			value: -2,
+			label: 'Upper lip'
+		},
+		mouth_bottom_y: {
+			min: -10,
+			max: 30,
+			step: 0.5,
+			value: 20,
+			label: 'Lower lip'
+		}					
+};
+
+
 function FaceVector (faceVector) {
 	
 	//if (typeof(faceVector) !== 'undefined') {
 	
 	var faceVector = faceVector || {};
 	
-	this.scaleX = faceVector.scaleX || 2;
-	this.scaleY = faceVector.scaleY || 2;
+	this.scaleX = faceVector.scaleX || 1;
+	this.scaleY = faceVector.scaleY || 1;
 	
 	this.color = faceVector.color || 'green';
 	this.lineWidth = faceVector.lineWidth || 1;
 	
-	this.head_radius = faceVector.head_radius || 30;
-	this.head_scale_x = faceVector.head_scale_x || 0.5;
-	this.head_scale_y = faceVector.head_scale_y || 1;
+	// Merge on key
+	for (var key in FaceVector.defaults) {
+		if (FaceVector.defaults.hasOwnProperty(key)){
+			if (faceVector.hasOwnProperty(key)){
+				this[key] = faceVector[key];
+			}
+			else {
+				this[key] = FaceVector.defaults[key].value;
+			}
+		}
+	}
+		
+	delete this.faceVector;
 	
-	this.eye_height = faceVector.eye_height || 0.75; 
-	this.eye_radius = faceVector.eye_radius || 5;
-	this.eye_spacing = faceVector.eye_spacing || 10;
-	this.eye_scale_x = faceVector.eye_scale_x || 1;
-	this.eye_scale_y = faceVector.eye_scale_y || 1;
-//	this.eye_left_x = faceVector.eye_left_x || 40;
-//	this.eye_right_x = faceVector.eye_right_x || 60;
-	
-	this.pupil_radius = faceVector.pupil_radius || 0.2 * this.eye_radius;
-	this.pupil_scale_x = faceVector.pupil_scale_x || 1;
-	this.pupil_scale_y = faceVector.pupil_scale_y || 1;
-	
-	this.eyebrow_length = faceVector.eyebrow_length || 10;
-	this.eyebrow_height = faceVector.eyebrow_height || 6;
-	this.eyebrow_angle = faceVector.eyebrow_angle || -0.5; // Math.PI , 1
-	this.eyebrow_spacing = faceVector.eyebrow_spacing || 5;
-	
-	this.nose_height = faceVector.nose_height || 0.8;
-	this.nose_length = faceVector.nose_length || 15;
-	this.nose_width = faceVector.nose_width || 10;
-	
-	this.mouth_height = faceVector.mouth_height || 1;
-	this.mouth_width = faceVector.mouth_width || 20;
-	this.mouth_top_y = faceVector.mouth_top_y || -2;
-	this.mouth_bottom_y = faceVector.mouth_bottom_y || 20;
-	
-	
-	// TODO: random init;
 		
 };
 

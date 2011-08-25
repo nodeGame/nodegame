@@ -29,7 +29,7 @@ Canvas.prototype = {
 		var y = settings.y / settings.scale_y;
 	
 		var radius = settings.radius || 100;
-		
+		//console.log(settings);
 		console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
 		
 		this.ctx.lineWidth = settings.lineWidth || 1;
