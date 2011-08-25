@@ -83,7 +83,7 @@ Canvas.prototype = {
 		// For IE
 		var w = this.canvas.width;
 		this.canvas.width = 1;
-		canvas.width = w;
+		this.canvas.width = w;
 	}
 	
 };

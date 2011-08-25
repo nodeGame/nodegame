@@ -34,11 +34,13 @@ ChernoffFaces.prototype.append = function (root, ids) {
 	
 	var idFieldset = PREF + 'fieldset'; 
 	var idCanvas = PREF + 'canvas';
+	var idButton = PREF + 'button';
 
 	
 	if (ids !== null && ids !== undefined) {
 		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvs;
+		if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+		if (ids.hasOwnProperty('button')) idButton = ids.button;
 	}
 	
 	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box');
@@ -50,57 +52,163 @@ ChernoffFaces.prototype.append = function (root, ids) {
 	
 	fp.draw(fv);
 	
+	var button = nodeWindow.addButton(fieldset,idButton);
+	
 	var features = {
+					// Head
 					head_radius: {
-							// id can be specified otherwise is taken head_radius
-							min: 10,
-							max: 100,
-							label: {
-									id: 'label_head_radius',
-									text: 'Face radius'
-							}
+						// id can be specified otherwise is taken head_radius
+						min: 10,
+						max: 100,
+						step: 5,
+						label: 'Face radius'
 					},
 					head_scale_x: {
 						min: 0.2,
 						max: 2,
-						label: {
-								id: 'label_head_scale_x',
-								text: 'Scale head horizontally'
-						}
+						step: 0.2,
+						label: 'Scale head horizontally'
 					},
 					head_scale_y: {
 						min: 0.2,
 						max: 2,
-						label: {
-								id: 'label_head_scale_y',
-								text: 'Scale head vertically'
-						}
+						step: 0.2,
+						label: 'Scale head vertically'
 					},
-					
-					
+					// Eye
+					eye_height: {
+						min: 0.3,
+						max: 0.9,
+						step: 0.1,
+						label: 'Eye height'
+					},
+					eye_radius: {
+						min: 10,
+						max: 50,
+						step: 2,
+						label: 'Eye radius'
+					},
+					eye_spacing: {
+						min: 0,
+						max: 50,
+						label: 'Eye spacing'
+					},
+					eye_scale_x: {
+						min: 0.2,
+						max: 2,
+						step: 0.2,
+						label: 'Scale eyes horizontally'
+					},
+					eye_scale_y: {
+						min: 0.2,
+						max: 2,
+						step: 0.2,
+						label: 'Scale eyes vertically'
+					},
+					// Pupil
+					pupil_radius: {
+						min: 1,
+						max: 9,
+						label: 'Pupil radius'
+					},
+					pupil_scale_x: {
+						min: 0.2,
+						max: 2,
+						step: 0.2,
+						label: 'Scale pupils horizontally'
+					},
+					pupil_scale_y: {
+						min: 0.2,
+						max: 2,
+						step: 0.2,
+						label: 'Scale pupils vertically'
+					},
+					// Eyebrow
+					eyebrow_length: {
+						min: 1,
+						max: 30,
+						step: 1,
+						label: 'Eyebrow length'
+					},
+					eyebrow_height: {
+						min: 0.3,
+						max: 1,
+						step: 0.1,
+						label: 'Eyebrow height'
+					},
+					eyebrow_angle: {
+						min: -2,
+						max: 2,
+						step: 0.2,
+						label: 'Eyebrow angle'
+					},
+					eyebrow_spacing: {
+						min: 0,
+						max: 20,
+						step: 1,
+						label: 'Eyebrow spacing'
+					},
+					// Nose
+					nose_length: {
+						min: 0.2,
+						max: 30,
+						step: 0.2,
+						label: 'Nose length'
+					},
+					nose_height: {
+						min: 0.4,
+						max: 1,
+						step: 0.1,
+						label: 'Nose height'
+					},
+					nose_width: {
+						min: 0,
+						max: 30,
+						step: 2,
+						label: 'Nose width'
+					},
+					// Mouth
+					mouth_height: {
+						min: 0.2,
+						max: 0.8,
+						step: 0.1,
+						label: 'Mouth height'
+					},
+					mouth_width: {
+						min: 2,
+						max: 100,
+						step: 2,
+						label: 'Mouth width'
+					},
+					mouth_top_y: {
+						min: -10,
+						max: 30,
+						step: 0.5,
+						label: 'Upper lip'
+					},
+					mouth_bottom_y: {
+						min: -10,
+						max: 30,
+						step: 0.5,
+						label: 'Lower lip'
+					}					
 	};
 									
 	
 	var sc = new SliderControls('cf_controls',features);
 	sc.append(fieldset);
 	
+	
+	
 	var that = this;
 
-//	sendButton.onclick = function() {
-//		
-//		var to = that.recipient.value;
-//
-//		//try {
-//			//var data = JSON.parse(dataInput.value);
-//			data = dataInput.value;
-//			console.log('Parsed Data: ' + JSON.stringify(data));
-//			
-//			node.fire(node.OUT + node.actions.SAY + '.DATA',data,to);
-////			}
-////			catch(e) {
-////				console.log('Impossible to parse the data structure');
-////			}
-//	};
+	button.onclick = function() {		
+		var fv = new FaceVector(sc.getAllValues());
+		console.log('aaa');
+		console.log(sc.getAllValues());
+		console.log('bbb');
+		fp.redraw(fv);
+	};
 	
 	return fieldset;
 	
@@ -373,9 +481,24 @@ SliderControls.prototype.append = function(root) {
 			var item = this.list.getItem();
 			listRoot.appendChild(item);
 			
-			var slider = nodeWindow.addSlider(item, id, {min: f.min, max: f.max});
+			var attributes = {min: f.min, max: f.max, step: f.step};
+			var slider = nodeWindow.addSlider(item, id, attributes);
+			
+			// If a label element is present it checks whether it is an
+			// object literal or a string.
+			// In the former case it scans the obj for additional properties
 			if (f.label) {
-				nodeWindow.addLabel(slider, f.label.id, f.label.text, id);
+				var labelId = 'label_' + id;
+				var labelText = f.label;
+				
+				if (typeof(f.label) === 'object') {
+					var labelText = f.label.text;
+					if (f.label.id) {
+						labelId = f.label.id; 
+					}
+				}
+				
+				nodeWindow.addLabel(slider, labelId, labelText, id);
 			}
 			
 			
@@ -383,6 +506,18 @@ SliderControls.prototype.append = function(root) {
 	}
 };
 
+SliderControls.prototype.getAllValues = function() {
+	var out = {};
+	for (var key in this.features) {
+		
+		if (this.features.hasOwnProperty(key)) {
+			console.log(key);
+			out[key] = document.getElementById(key).value;
+		}
+	}
+	
+	return out;
+};
 
 
 /*!
@@ -411,11 +546,11 @@ function FaceVector (faceVector) {
 	
 	this.eye_height = faceVector.eye_height || 0.75; 
 	this.eye_radius = faceVector.eye_radius || 5;
-	this.eye_left_x = faceVector.eye_left_x || 40;
-	this.eye_right_x = faceVector.eye_right_x || 60;
 	this.eye_spacing = faceVector.eye_spacing || 10;
 	this.eye_scale_x = faceVector.eye_scale_x || 1;
 	this.eye_scale_y = faceVector.eye_scale_y || 1;
+//	this.eye_left_x = faceVector.eye_left_x || 40;
+//	this.eye_right_x = faceVector.eye_right_x || 60;
 	
 	this.pupil_radius = faceVector.pupil_radius || 0.2 * this.eye_radius;
 	this.pupil_scale_x = faceVector.pupil_scale_x || 1;
@@ -470,4 +605,14 @@ FaceVector.distance = function (face1, face2) {
 	}
 	
 	return Math.sqrt(sum);
+};
+
+FaceVector.prototype.toString = function() {
+	var out = 'Face: ';
+	for (var key in this) {
+		if (this.hasOwnProperty(key)) {
+			out += key + ' ' + this[key];
+		}
+	};
+	return out;
 };
