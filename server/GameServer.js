@@ -32,6 +32,7 @@ GameServer.prototype.setPartner = function(node) {
  */
 GameServer.prototype.listen = function() {
 	
+	// server was actually created somewhere else
 	this.server.listen(this.port);
 	this.attachListeners();
 }; 

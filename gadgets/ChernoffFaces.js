@@ -63,7 +63,10 @@ ChernoffFaces.prototype.append = function (root, ids) {
 	var that = this;
 
 	button.onclick = function() {		
-		var fv = new FaceVector(sc.getAllValues());
+		var fv = sc.getAllValues();
+		console.log(fv);
+		var fv = new FaceVector(fv);
+		console.log(fv);
 		fp.redraw(fv);
 	};
 	
@@ -89,9 +92,7 @@ ChernoffFaces.prototype.listeners = function () {
 */
 
 function FacePainter (canvas, settings) {
-	
-	this.canvas = canvas;
-	
+		
 	this.canvas = nodeWindow.create.Canvas(canvas);
 	
 	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
@@ -99,13 +100,10 @@ function FacePainter (canvas, settings) {
 };
 
 //Draws a Chernoff face.
-//
-//This code draws the face into a logical space with dimensions 100x100, and
-//scales it to the actual size specified by width and height.
 FacePainter.prototype.draw = function (face, x, y) {
 			
-//	this.fit2Canvas(face);
-//	this.canvas.scale(face.scaleX, face.scaleY);
+	this.fit2Canvas(face);
+	this.canvas.scale(face.scaleX, face.scaleY);
 	
 	console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
 	
@@ -174,7 +172,7 @@ FacePainter.prototype.drawEyes = function (face, x, y) {
 	var spacing = face.eye_spacing;
 		
 	var radius = face.eye_radius;
-	console.log(face);
+	//console.log(face);
 	this.canvas.drawOval({
 					x: x - spacing,
 					y: height,
@@ -185,7 +183,7 @@ FacePainter.prototype.drawEyes = function (face, x, y) {
 					lineWidth: face.lineWidth
 					
 	});
-	console.log(face);
+	//console.log(face);
 	this.canvas.drawOval({
 					x: x + spacing,
 					y: height,
@@ -301,7 +299,10 @@ FacePainter.prototype.drawMouth = function (face, x, y) {
 //TODO Scaling ?
 FacePainter.computeFaceOffset = function (face, offset, y) {
 	var y = y || 0;
-	return y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
+	//var pos = y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
+	var pos = y - face.head_radius + face.head_radius * 2 * offset;
+	//console.log('POS: ' + pos);
+	return pos;
 };
 
 FacePainter.computeEyebrowOffset = function (face, y) {
@@ -320,27 +321,191 @@ FacePainter.computeEyebrowOffset = function (face, y) {
 *
 */
 
+//FaceVector.defaults = {
+//		// Head
+//		head_radius: {
+//			// id can be specified otherwise is taken head_radius
+//			min: 10,
+//			max: 100,
+//			step: 0.01,
+//			value: 30,
+//			label: 'Face radius'
+//		},
+//		head_scale_x: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.1,
+//			value: 0.5,
+//			label: 'Scale head horizontally'
+//		},
+//		head_scale_y: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.1,
+//			value: 1,
+//			label: 'Scale head vertically'
+//		},
+//		// Eye
+//		eye_height: {
+//			min: 0.1,
+//			max: 0.9,
+//			step: 0.1,
+//			value: 0.4,
+//			label: 'Eye height'
+//		},
+//		eye_radius: {
+//			min: 2,
+//			max: 30,
+//			step: 1,
+//			value: 5,
+//			label: 'Eye radius'
+//		},
+//		eye_spacing: {
+//			min: 0,
+//			max: 50,
+//			step: 2,
+//			value: 10,
+//			label: 'Eye spacing'
+//		},
+//		eye_scale_x: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.2,
+//			value: 1,
+//			label: 'Scale eyes horizontally'
+//		},
+//		eye_scale_y: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.2,
+//			value: 1,
+//			label: 'Scale eyes vertically'
+//		},
+//		// Pupil
+//		pupil_radius: {
+//			min: 1,
+//			max: 9,
+//			step: 1,
+//			value: 1,  //this.eye_radius;
+//			label: 'Pupil radius'
+//		},
+//		pupil_scale_x: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.2,
+//			value: 1,
+//			label: 'Scale pupils horizontally'
+//		},
+//		pupil_scale_y: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.2,
+//			value: 1,
+//			label: 'Scale pupils vertically'
+//		},
+//		// Eyebrow
+//		eyebrow_length: {
+//			min: 1,
+//			max: 30,
+//			step: 1,
+//			value: 10,
+//			label: 'Eyebrow length'
+//		},
+//		eyebrow_eyedistance: {
+//			min: 0.3,
+//			max: 10,
+//			step: 0.2,
+//			value: 3, // From the top of the eye
+//			label: 'Eyebrow from eye'
+//		},
+//		eyebrow_angle: {
+//			min: -2,
+//			max: 2,
+//			step: 0.2,
+//			value: -0.5,
+//			label: 'Eyebrow angle'
+//		},
+//		eyebrow_spacing: {
+//			min: 0,
+//			max: 20,
+//			step: 1,
+//			value: 5,
+//			label: 'Eyebrow spacing'
+//		},
+//		// Nose
+//		nose_height: {
+//			min: 0.4,
+//			max: 1,
+//			step: 0.1,
+//			value: 0.4,
+//			label: 'Nose height'
+//		},
+//		nose_length: {
+//			min: 0.2,
+//			max: 30,
+//			step: 0.2,
+//			value: 15,
+//			label: 'Nose length'
+//		},
+//		nose_width: {
+//			min: 0,
+//			max: 30,
+//			step: 2,
+//			value: 10,
+//			label: 'Nose width'
+//		},
+//		// Mouth
+//		mouth_height: {
+//			min: 0.2,
+//			max: 2,
+//			step: 0.1,
+//			value: 0.75, 
+//			label: 'Mouth height'
+//		},
+//		mouth_width: {
+//			min: 2,
+//			max: 100,
+//			step: 2,
+//			value: 20,
+//			label: 'Mouth width'
+//		},
+//		mouth_top_y: {
+//			min: -10,
+//			max: 30,
+//			step: 0.5,
+//			value: -2,
+//			label: 'Upper lip'
+//		},
+//		mouth_bottom_y: {
+//			min: -10,
+//			max: 30,
+//			step: 0.5,
+//			value: 20,
+//			label: 'Lower lip'
+//		}					
+//};
+
 FaceVector.defaults = {
 		// Head
 		head_radius: {
 			// id can be specified otherwise is taken head_radius
 			min: 10,
 			max: 100,
-			step: 5,
+			step: 0.01,
 			value: 30,
 			label: 'Face radius'
 		},
 		head_scale_x: {
 			min: 0.2,
 			max: 2,
-			step: 0.1,
+			step: 0.01,
 			value: 0.5,
 			label: 'Scale head horizontally'
 		},
 		head_scale_y: {
 			min: 0.2,
 			max: 2,
-			step: 0.1,
+			step: 0.01,
 			value: 1,
 			label: 'Scale head vertically'
 		},
@@ -348,35 +513,35 @@ FaceVector.defaults = {
 		eye_height: {
 			min: 0.1,
 			max: 0.9,
-			step: 0.1,
+			step: 0.01,
 			value: 0.4,
 			label: 'Eye height'
 		},
 		eye_radius: {
 			min: 2,
 			max: 30,
-			step: 1,
+			step: 0.01,
 			value: 5,
 			label: 'Eye radius'
 		},
 		eye_spacing: {
 			min: 0,
 			max: 50,
-			step: 2,
+			step: 0.01,
 			value: 10,
 			label: 'Eye spacing'
 		},
 		eye_scale_x: {
 			min: 0.2,
 			max: 2,
-			step: 0.2,
+			step: 0.01,
 			value: 1,
 			label: 'Scale eyes horizontally'
 		},
 		eye_scale_y: {
 			min: 0.2,
 			max: 2,
-			step: 0.2,
+			step: 0.01,
 			value: 1,
 			label: 'Scale eyes vertically'
 		},
@@ -384,21 +549,21 @@ FaceVector.defaults = {
 		pupil_radius: {
 			min: 1,
 			max: 9,
-			step: 1,
+			step: 0.01,
 			value: 1,  //this.eye_radius;
 			label: 'Pupil radius'
 		},
 		pupil_scale_x: {
 			min: 0.2,
 			max: 2,
-			step: 0.2,
+			step: 0.01,
 			value: 1,
 			label: 'Scale pupils horizontally'
 		},
 		pupil_scale_y: {
 			min: 0.2,
 			max: 2,
-			step: 0.2,
+			step: 0.01,
 			value: 1,
 			label: 'Scale pupils vertically'
 		},
@@ -406,28 +571,28 @@ FaceVector.defaults = {
 		eyebrow_length: {
 			min: 1,
 			max: 30,
-			step: 1,
+			step: 0.01,
 			value: 10,
 			label: 'Eyebrow length'
 		},
 		eyebrow_eyedistance: {
 			min: 0.3,
 			max: 10,
-			step: 0.2,
+			step: 0.01,
 			value: 3, // From the top of the eye
 			label: 'Eyebrow from eye'
 		},
 		eyebrow_angle: {
 			min: -2,
 			max: 2,
-			step: 0.2,
+			step: 0.01,
 			value: -0.5,
 			label: 'Eyebrow angle'
 		},
 		eyebrow_spacing: {
 			min: 0,
 			max: 20,
-			step: 1,
+			step: 0.01,
 			value: 5,
 			label: 'Eyebrow spacing'
 		},
@@ -435,21 +600,21 @@ FaceVector.defaults = {
 		nose_height: {
 			min: 0.4,
 			max: 1,
-			step: 0.1,
+			step: 0.01,
 			value: 0.4,
 			label: 'Nose height'
 		},
 		nose_length: {
 			min: 0.2,
 			max: 30,
-			step: 0.2,
+			step: 0.01,
 			value: 15,
 			label: 'Nose length'
 		},
 		nose_width: {
 			min: 0,
 			max: 30,
-			step: 2,
+			step: 0.01,
 			value: 10,
 			label: 'Nose width'
 		},
@@ -457,33 +622,32 @@ FaceVector.defaults = {
 		mouth_height: {
 			min: 0.2,
 			max: 2,
-			step: 0.1,
+			step: 0.01,
 			value: 0.75, 
 			label: 'Mouth height'
 		},
 		mouth_width: {
 			min: 2,
 			max: 100,
-			step: 2,
+			step: 0.01,
 			value: 20,
 			label: 'Mouth width'
 		},
 		mouth_top_y: {
 			min: -10,
 			max: 30,
-			step: 0.5,
+			step: 0.01,
 			value: -2,
 			label: 'Upper lip'
 		},
 		mouth_bottom_y: {
 			min: -10,
 			max: 30,
-			step: 0.5,
+			step: 0.01,
 			value: 20,
 			label: 'Lower lip'
 		}					
 };
-
 
 function FaceVector (faceVector) {
 	

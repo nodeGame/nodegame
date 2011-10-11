@@ -28,7 +28,7 @@ SliderControls.prototype.append = function(root) {
 			listRoot.appendChild(item);
 			
 			var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-			var slider = nodeWindow.addSlider(item, id, attributes);
+			var slider = nodeWindow.addJQuerySlider(item, id, attributes);
 			
 			// If a label element is present it checks whether it is an
 			// object literal or a string.
@@ -61,7 +61,7 @@ SliderControls.prototype.getAllValues = function() {
 	for (var key in this.features) {
 		
 		if (this.features.hasOwnProperty(key)) {
-			console.log(key);
+			console.log('STE ' + key + ' ' + document.getElementById(key).value);
 			out[key] = Number(document.getElementById(key).value);
 		}
 	}

@@ -30,7 +30,7 @@ Canvas.prototype = {
 	
 		var radius = settings.radius || 100;
 		//console.log(settings);
-		console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
+		//console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
 		
 		this.ctx.lineWidth = settings.lineWidth || 1;
 		this.ctx.strokeStyle = settings.color || '#000000';
@@ -57,8 +57,8 @@ Canvas.prototype = {
 		var to_y =  Math.sin(angle) * length + settings.y;
 		//console.log('aa ' + to_x + ' ' + to_y);
 		
-		console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
-		console.log('Length: ' + length + ', Angle: ' + angle );
+		//console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
+		//console.log('Length: ' + length + ', Angle: ' + angle );
 		
 		this.ctx.lineWidth = settings.lineWidth || 1;
 		this.ctx.strokeStyle = settings.color || '#000000';

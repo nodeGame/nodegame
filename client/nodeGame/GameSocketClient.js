@@ -11,7 +11,7 @@ function GameSocketClient(options,nodeGame) {
 	this.host = options.host;
 	this.port = options.port;
 		
-	this.w = this.connect();
+	this.socket = this.connect();
 	
 	this.game = null;
 }
@@ -20,13 +20,27 @@ GameSocketClient.prototype.setGame = function(game) {
 	this.game = game;
 };
 
-
 GameSocketClient.prototype.connect = function() {
-	var url = "ws://" + this.host + ":" + this.port;
-    var w = new WebSocket(url);
-    this.attachFirstListeners(w);
-    return w;
+	// TODO: add check if http:// is already in
+	var url = "http://" + this.host + ":" + this.port;
+	var socket = io.connect(url);
+	
+	if(socket) {
+		var connString = 'nodeGame: connection open';
+        console.log(connString); 
+	}
+	
+    this.attachFirstListeners(socket);
+    return socket;
 };
+
+
+//GameSocketClient.prototype.connect = function() {
+//	var url = "ws://" + this.host + ":" + this.port;
+//    var w = new WebSocket(url);
+//    this.attachFirstListeners(w);
+//    return w;
+//};
 
 /*
 
@@ -53,18 +67,14 @@ GameSocketClient.prototype.secureParse = function (e) {
 	return msg;
 };
 
-// Websocket is waiting for the HI msg from the Server
-GameSocketClient.prototype.attachFirstListeners = function (w) {
+// TODO CHANGE HERE
+
+// Waiting for HI from Server
+GameSocketClient.prototype.attachFirstListeners = function (s) {
 	
 	var that = this;
 	
-    // Registering Event Listeners
-    w.onopen = function() {
-    	var connString = 'nodeGame: connection open';
-        console.log(connString); 
-    };
-
-    w.onmessage = function(e) {
+    s.on(function(e) {
 
     	var msg = that.secureParse(e);
     	
@@ -91,6 +101,45 @@ GameSocketClient.prototype.attachFirstListeners = function (w) {
     	console.log("closed");
     };
 };
+
+// Websocket is waiting for the HI msg from the Server
+//GameSocketClient.prototype.attachFirstListeners = function (w) {
+//	
+//	var that = this;
+//	
+//    // Registering Event Listeners
+//    w.onopen = function() {
+//    	var connString = 'nodeGame: connection open';
+//        console.log(connString); 
+//    };
+//
+//    w.onmessage = function(e) {
+//
+//    	var msg = that.secureParse(e);
+//    	
+//		if (msg.target === 'HI'){
+//			that.player = new Player(msg.data,that.name);
+//			console.log('HI: ' + that.player);
+//			
+//			
+//			// Get Ready to play
+//			that.attachMsgListeners(w,msg.session,this.msgClientListeners);
+//			
+//			// Send own name to all
+//			that.sendHI(that.player,'ALL');
+//			
+//			// Confirmation of reception was required
+//			if (msg.reliable) {
+//				that.sendACK(msg);
+//			}
+//	   	 } 
+//    };
+//
+//    w.onclose = function(e) {
+//    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
+//    	console.log("closed");
+//    };
+//};
 
 GameSocketClient.prototype.attachMsgListeners = function(w, session, func) {   
 
@@ -155,6 +204,7 @@ GameSocketClient.prototype.sendDATA = function (data,to,msg) {
 };
 
 GameSocketClient.prototype.send = function (msg, to) {
+	// TODO CHANGE HERE
 	this.w.send(msg.stringify());
 	console.log('S: ' + msg);
 	node.fire('LOG', 'S: ' + msg.toSMS());

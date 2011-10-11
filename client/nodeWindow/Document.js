@@ -57,6 +57,15 @@ Document.prototype.addSlider = function (root, id, attributes) {
 	return slider;
 };
 
+Document.prototype.addJQuerySlider = function (root, id, attributes) {
+	var slider = document.createElement('div');
+	slider.id = id;
+	slider.slider(attributes);
+	root.appendChild(slider);
+	return slider;
+};
+
+
 Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
 	var label = document.createElement('label');
 	label.id = id;
