@@ -34,6 +34,7 @@ GameServer.prototype.listen = function() {
 	
 	// server was actually created somewhere else
 	this.server.listen(this.port);
+	this.log.log(this.server);
 	this.attachListeners();
 }; 
 

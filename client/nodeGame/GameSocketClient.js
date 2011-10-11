@@ -24,12 +24,6 @@ GameSocketClient.prototype.connect = function() {
 	// TODO: add check if http:// is already in
 	var url = "http://" + this.host + ":" + this.port;
 	var socket = io.connect(url);
-	
-	if(socket) {
-		var connString = 'nodeGame: connection open';
-        console.log(connString); 
-	}
-	
     this.attachFirstListeners(socket);
     return socket;
 };
@@ -70,11 +64,16 @@ GameSocketClient.prototype.secureParse = function (e) {
 // TODO CHANGE HERE
 
 // Waiting for HI from Server
-GameSocketClient.prototype.attachFirstListeners = function (s) {
+GameSocketClient.prototype.attachFirstListeners = function (socket) {
 	
 	var that = this;
 	
-    s.on(function(e) {
+	socket.on('connection', function (msg) {
+		var connString = 'nodeGame: connection open';
+	    console.log(connString); 
+	});
+	
+	socket.on('message', function (msg) {
 
     	var msg = that.secureParse(e);
     	
@@ -84,7 +83,7 @@ GameSocketClient.prototype.attachFirstListeners = function (s) {
 			
 			
 			// Get Ready to play
-			that.attachMsgListeners(w,msg.session,this.msgClientListeners);
+			that.attachMsgListeners(socket, msg.session, this.msgClientListeners);
 			
 			// Send own name to all
 			that.sendHI(that.player,'ALL');
@@ -96,7 +95,7 @@ GameSocketClient.prototype.attachFirstListeners = function (s) {
 	   	 } 
     };
 
-    w.onclose = function(e) {
+    socket.on('disconnect', function() {
     	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
     	console.log("closed");
     };
@@ -141,20 +140,19 @@ GameSocketClient.prototype.attachFirstListeners = function (s) {
 //    };
 //};
 
-GameSocketClient.prototype.attachMsgListeners = function(w, session, func) {   
+GameSocketClient.prototype.attachMsgListeners = function(socket, session, func) {   
 
 	console.log('nodeGame: Attaching FULL listeners');
-	w.removeEventListener('message',this.w.onmessage,false);
+	socket.removeEventListener('message',this.socket.onmessage,false);
 	
 	this.gmg = new GameMsgGenerator(session,this.player.getConnid(),new GameState());
 	
     //w.onmessage = func.call;
 
 	var that = this;
-	
-	w.onmessage = function(e) {
+	socket.onmessage = function(msg) {
 		
-		var msg = that.secureParse(e);
+		var msg = that.secureParse(msg);
 		node.fire(msg.toInEvent(), msg);
 		
 		// Confirmation of reception was required
@@ -205,7 +203,7 @@ GameSocketClient.prototype.sendDATA = function (data,to,msg) {
 
 GameSocketClient.prototype.send = function (msg, to) {
 	// TODO CHANGE HERE
-	this.w.send(msg.stringify());
+	this.socket.send(msg.stringify());
 	console.log('S: ' + msg);
 	node.fire('LOG', 'S: ' + msg.toSMS());
 };
