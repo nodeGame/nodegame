@@ -1,11 +1,5 @@
 module.exports = PlayerServer;
 
-// Old implementation
-//var ws = require("websocket-server");
-
-//SOCKET.IO
-var io = require('socket.io');
-
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
@@ -32,9 +26,6 @@ function PlayerServer(options) {
 	
 	var dumpmsg = options.dumpmsg || true;
 	
-	//this.server = ws.createServer();
-	this.server = io;
-	
 	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
 	
 	this.gmm = new GameMsgManager(this);
@@ -52,7 +43,7 @@ PlayerServer.prototype.attachListeners = function() {
 	
 	log.log('Listening for connections');
 	
-	
+	// Created in GameServer
 	this.server.sockets.on('connection', function (socket) {
 		
 		var thatServer = this;

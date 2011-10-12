@@ -7,6 +7,9 @@
 
 module.exports = GameServer;
 
+//SOCKET.IO
+var io = require('socket.io');
+
 var util = require('util');
 var ws = require("websocket-server");
 var EventEmitter = require('events').EventEmitter;
@@ -20,7 +23,9 @@ var GameMsgManager = require('./GameMsgManager');
 var PlayerList = require('./PlayerList').PlayerList;
 var Player = require('./PlayerList').Player;
 
-function GameServer() {}
+function GameServer() {
+	this.io = io;
+}
 
 
 GameServer.prototype.setPartner = function(node) {
@@ -31,9 +36,7 @@ GameServer.prototype.setPartner = function(node) {
  * Creates a new WS server and adds it to the Arraylist of servers
  */
 GameServer.prototype.listen = function() {
-	
-	// server was actually created somewhere else
-	this.server.listen(this.port);
+	this.server = io.listen(this.port);
 	this.log.log(this.server);
 	this.attachListeners();
 }; 

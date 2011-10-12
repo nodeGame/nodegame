@@ -3,9 +3,6 @@ module.exports = AdminServer;
 //Old implementation
 //var ws = require("websocket-server");
 
-//SOCKET.IO
-var io = require('socket.io');
-
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
@@ -30,10 +27,6 @@ function AdminServer(options) {
 	this.name = options.name;
 	
 	var dumpmsg = options.dumpmsg || true;
-	
-	// OLD
-	//this.server = ws.createServer();
-	this.server = io;
 		
 	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
 	
@@ -48,8 +41,8 @@ AdminServer.prototype.attachListeners = function() {
 	
 	var that = this;
 	var log = this.log;
-			
-	// Handle WebSocket Requests
+
+	// Created in GameServer
 	this.server.sockets.on("connection", function(socket){
 		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
@@ -132,7 +125,6 @@ AdminServer.prototype.attachListeners = function() {
 		
 	});
 
-	
 };
 
 

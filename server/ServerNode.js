@@ -1,7 +1,7 @@
 
 module.exports = ServerNode;
 
-var ws = require("websocket-server");
+//var ws = require("websocket-server");
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var nodemailer = require("nodemailer");
