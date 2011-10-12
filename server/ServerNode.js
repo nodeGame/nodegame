@@ -1,7 +1,9 @@
 
 module.exports = ServerNode;
 
-//var ws = require("websocket-server");
+//SOCKET.IO
+var io = require('socket.io');
+
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var nodemailer = require("nodemailer");
@@ -43,16 +45,23 @@ function ServerNode (options) {
 	this.name = options.name;
 	
 	var dumpmsg = options.dumpmsg || true;
-	
+		
 	this.createServers();
 	
 }
 
 ServerNode.prototype.createServers = function() {
-	this.adminServer = new AdminServer ({port: this.adminPort, name: '[Admin]'});
-	this.playerServer = new PlayerServer ({port: this.playerPort, name: '[Player]'});
-
+	this.server = io.listen(this.adminPort);
 	
+	this.adminServer = new AdminServer ({server: this.server,
+										 port: this.adminPort,
+										 name: '[Admin]'});
+	
+	this.playerServer = new PlayerServer ({server: this.server,
+										   port: this.playerPort, 
+										   name: '[Player]'});
+	
+	// TODO: probably we do not need this
 	this.adminServer.setPartner(this.playerServer);
 	this.playerServer.setPartner(this.adminServer);
 };

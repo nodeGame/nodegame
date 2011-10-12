@@ -28,6 +28,8 @@ function PlayerServer(options) {
 	
 	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
 	
+	this.server = options.server;
+	
 	this.gmm = new GameMsgManager(this);
 	
 	this.pl = new PlayerList();
@@ -43,8 +45,9 @@ PlayerServer.prototype.attachListeners = function() {
 	
 	log.log('Listening for connections');
 	
-	// Created in GameServer
-	this.server.sockets.on('connection', function (socket) {
+	var playerServer = this.server
+	  .of('/player')
+	  .on('connection', function (socket) {
 		
 		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
@@ -56,7 +59,7 @@ PlayerServer.prototype.attachListeners = function() {
 		log.log(connStr);
 		
 		// Send HI msg to the newly connected client
-		that.gmm.sendHI(connStr,conn.id);
+		that.gmm.sendHI(connStr,socket.id);
 		
 		// Tell everybody a new player is connected;
 		that.gmm.sendTXT(connStr,'ALL');

@@ -93,12 +93,12 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 				that.sendACK(msg);
 			}
 	   	 } 
-    };
+    });
 
     socket.on('disconnect', function() {
     	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
     	console.log("closed");
-    };
+    });
 };
 
 // Websocket is waiting for the HI msg from the Server
@@ -146,11 +146,9 @@ GameSocketClient.prototype.attachMsgListeners = function(socket, session, func) 
 	socket.removeEventListener('message',this.socket.onmessage,false);
 	
 	this.gmg = new GameMsgGenerator(session,this.player.getConnid(),new GameState());
-	
-    //w.onmessage = func.call;
 
 	var that = this;
-	socket.onmessage = function(msg) {
+	socket.on('message', function(msg) {
 		
 		var msg = that.secureParse(msg);
 		node.fire(msg.toInEvent(), msg);
@@ -159,7 +157,7 @@ GameSocketClient.prototype.attachMsgListeners = function(socket, session, func) 
 		if (msg.reliable) {
 			that.sendACK(msg);
 		}
-	};
+	});
 };
 
 // MSGs

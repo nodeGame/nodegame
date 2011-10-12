@@ -30,9 +30,12 @@ function AdminServer(options) {
 		
 	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
 	
+	this.server = options.server;
+	
 	this.gmm = new GameMsgManager(this);
 	
 	this.pl = new PlayerList();
+	
 	
 	this.partner = null;
 }
@@ -42,8 +45,13 @@ AdminServer.prototype.attachListeners = function() {
 	var that = this;
 	var log = this.log;
 
+	log.log('Listening for connections');
 	// Created in GameServer
-	this.server.sockets.on("connection", function(socket){
+	
+	var adminServer = this.server
+	  .of('/admin')
+	  .on('connection', function (socket) {
+	    
 		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
@@ -76,7 +84,7 @@ AdminServer.prototype.attachListeners = function() {
 			
 			var msg = that.secureParse(message);
 			//that.log.log('JUST RECEIVED ' + util.inspect(msg));
-			console.log('A About to emit ' + msg.toEvent());
+			//console.log('A About to emit ' + msg.toEvent());
 			// TODO: improve this
 			if (msg.target === 'ACK' || msg.to !== 'SERVER') {
 				console.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);

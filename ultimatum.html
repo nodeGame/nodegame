@@ -2,9 +2,9 @@
 <title>Test Game</title>
 <body>
 <div id="root"></div>
-<script src="client/build/0.3/nodegame-all-0.3.js" charset="utf-8"></script>
+<script src="client/build/0.4/nodegame-all-0.4.js" charset="utf-8"></script>
 <script src="games/ultimatum/Ultimatum.js" charset="utf-8"></script>
-
+<script src="http://localhost:8004/socket.io/socket.io.js"></script>
 <script>
   	window.onload = function(){
 	
@@ -13,9 +13,8 @@
 		var net = {
 			name: "P_" + Math.floor(Math.random()*100),
 			host: "localhost",
-			port: 8005 // 8000 Admin Port
+			port: '8004/player' // 8004 Admin Port
 		};
-		
 		
     node.play(net, new Ultimatum());
     

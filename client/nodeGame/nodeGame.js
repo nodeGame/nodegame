@@ -2,10 +2,6 @@
  * nodeGame
  */
 
-if (typeof(WebSocket) === 'undefined') {
-	alert('Sorry, Web Sockets are not supported in this browser.');
-}
-
 nodeGame.prototype = new EventListener();
 nodeGame.prototype.constructor = nodeGame;
 

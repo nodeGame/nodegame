@@ -19,6 +19,9 @@ function GameMsgManager(node) {
 	this.log = node.log;
 	this.server = node.server;
 	
+	//TODO: find a way to access node.server when it is ready
+	//this.server = this.node.server;
+	
 	this.gmg = new GameMsgGenerator(this.session,this.name,this.currentState);	// TODO: Check what is best to init
 	this.types = this.gmg.types;
 }
@@ -60,14 +63,16 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	}
 	
 	// Debug
-	//console.log('How many?? ' + this.server.manager.length);
+	//console.log('How many?? ' + this.node.server.manager.length);
 	
 	if (gameMsg.to === 'ALL') { 
-		this.server.broadcast(gameMsg.stringify());
+		this.server.sockets.json.send(gameMsg);
+		//this.node.server.broadcast.emit(gameMsg.stringify());
 		this.log.msg('B, ' + gameMsg);
 	}
 	else {
-		this.server.send(gameMsg.to, gameMsg.stringify());
+		this.server.sockets.sockets[gameMsg.to].json.send(gameMsg);
+		//this.node.server.emit(gameMsg.to, gameMsg.stringify());
 		this.log.msg('S, ' + gameMsg);
 	}
 };
@@ -96,7 +101,7 @@ GameMsgManager.prototype.sendReliable = function(gameMsg) {
 GameMsgManager.prototype.broadcastReliable = function(gameMsg) {
 	
 	var that = this;
-	var allCons = this.node.getConnections(this.server);
+	var allCons = this.node.getConnections(this.node.server);
 	var i;
 	//this.log.msg('B: ' + gameMsg);
 	for (i=0; i< allCons.length;i++) {
