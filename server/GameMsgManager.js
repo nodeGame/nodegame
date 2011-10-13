@@ -18,6 +18,7 @@ function GameMsgManager(node) {
 	this.node = node;
 	this.log = node.log;
 	this.server = node.server;
+	this.socket = node.socket;
 	
 	//TODO: find a way to access node.server when it is ready
 	//this.server = this.node.server;
@@ -59,19 +60,32 @@ GameMsgManager.prototype.sendDATA = function (data,to,text) {
 GameMsgManager.prototype.send = function(gameMsg) {
 		
 	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
+		console.log('Trying to send msg to nobody.')
 		return false;
+	}
+
+	for (var i in this.server.sockets.sockets){
+		if (this.server.sockets.sockets.hasOwnProperty(i)){
+			console.log(i + this.server.sockets.sockets[i]);
+		}
 	}
 	
 	// Debug
 	//console.log('How many?? ' + this.node.server.manager.length);
 	
-	if (gameMsg.to === 'ALL') { 
-		this.server.sockets.json.send(gameMsg);
+	//console.log(this.socket);
+	
+	
+	if (gameMsg.to === 'ALL') {
+		this.node.socket.send(gameMsg.stringify());
+		//this.server.sockets.json.send(gameMsg);
+		//this.server.sockets.json.send(gameMsg);
 		//this.node.server.broadcast.emit(gameMsg.stringify());
 		this.log.msg('B, ' + gameMsg);
 	}
 	else {
-		this.server.sockets.sockets[gameMsg.to].json.send(gameMsg);
+		this.node.server.sockets.send(gameMsg.stringify());
+		//this.server.sockets.sockets[gameMsg.to].json.send(gameMsg);
 		//this.node.server.emit(gameMsg.to, gameMsg.stringify());
 		this.log.msg('S, ' + gameMsg);
 	}

@@ -52,6 +52,8 @@ AdminServer.prototype.attachListeners = function() {
 	  .of('/admin')
 	  .on('connection', function (socket) {
 	    
+		that.socket = socket;
+		  
 		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
@@ -59,6 +61,11 @@ AdminServer.prototype.attachListeners = function() {
 		
 		var connStr = "Welcome <" + socket.id + ">";
 		log.log(connStr);
+		
+
+		//adminServer.emit('HI');
+		//socket.json.send('HI');
+		//socket.emit({"a":"b"});
 		
 		// Send HI msg to the newly connected client
 		that.gmm.sendHI(connStr,socket.id);

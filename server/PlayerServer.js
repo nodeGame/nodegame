@@ -49,6 +49,8 @@ PlayerServer.prototype.attachListeners = function() {
 	  .of('/player')
 	  .on('connection', function (socket) {
 		
+		that.socket = socket;  
+		  
 		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
