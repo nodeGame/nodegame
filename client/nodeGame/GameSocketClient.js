@@ -80,9 +80,9 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 				that.sendHI(that.player,'ALL');
 				
 				// Confirmation of reception was required
-				if (msg.reliable) {
-					that.sendACK(msg);
-				}
+//				if (msg.reliable) {
+//					that.sendACK(msg);
+//				}
 		   	 } 
 	    });
 	    

@@ -55,13 +55,15 @@ GameMsgManager.prototype.sendSTATE = function(action,state,to) {
 	var recipient = to || 'ALL';
 	// TODO: set/get/say choose carefully
 	var stateMsg = this.gmg.createSTATE(action, state, recipient);
-	this.sendReliable(stateMsg);
+	//this.sendReliable(stateMsg);
+	this.send(stateMsg);
 };
 
 GameMsgManager.prototype.sendDATA = function (data,to,text) {
 	var recipient = to || 'ALL';
 	var dataMsg = this.gmg.createDATA(data, recipient,text);
-	this.sendReliable(dataMsg); 
+	//this.sendReliable(dataMsg);
+	this.send(dataMsg);
 };
 
 GameMsgManager.prototype.send = function(gameMsg) {
@@ -72,32 +74,12 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	}
 	
 	if (gameMsg.to === 'ALL') {
-		
 		this.node.channel.json.send(gameMsg.stringify());
-		
-		// WORKING
-		//this.node.channel.send(gameMsg.stringify());
-		
-		
-		
-		//this.node.socket.broadcast.send(gameMsg.stringify());
-		//this.node.socket.send(gameMsg.stringify());
-		//this.server.sockets.json.send(gameMsg);
-		//this.server.sockets.json.send(gameMsg);
-		//this.node.server.broadcast.emit(gameMsg.stringify());
 		this.log.msg('B, ' + gameMsg);
 	}
 	else {
-		
-		// This should send to the specific client
+		// Send to a specific client
 		this.node.channel.sockets[gameMsg.to].json.send(gameMsg.stringify());
-		
-		// WORKING
-		//this.node.socket.send(gameMsg.stringify());
-		
-		//this.node.server.sockets.send(gameMsg.stringify());
-		//this.server.sockets.sockets[gameMsg.to].json.send(gameMsg);
-		//this.node.server.emit(gameMsg.to, gameMsg.stringify());
 		this.log.msg('S, ' + gameMsg);
 	}
 };
@@ -105,8 +87,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 GameMsgManager.prototype.sendReliable = function(gameMsg) {
 	
 	
-	this.send(gameMsg);
-	
+	this.send(gameMsg);	
 	// WHAT FOLLOWS IS DISABLE FOR NOW
 	
 	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
@@ -131,7 +112,6 @@ GameMsgManager.prototype.sendReliable = function(gameMsg) {
 GameMsgManager.prototype.broadcastReliable = function(gameMsg) {
 	
 	this.send(gameMsg);
-	
 	// WHAT FOLLOWS IS DISABLE FOR NOW
 	
 	var that = this;
@@ -169,13 +149,15 @@ GameMsgManager.prototype.forwardPLIST = function(node,to) {
 GameMsgManager.prototype.forwardSTATE = function(action,state,to) {
 	var recipient = to || 'ALL';
 	var stateMsg = this.gmg.createSTATE(action, state, recipient);
-	this.forwardReliable(stateMsg);
+	//this.forwardReliable(stateMsg);
+	this.forward(stateMsg);
 };
 
 GameMsgManager.prototype.forwardDATA = function (data,to,text) {
 	var recipient = to || 'ALL';
 	var dataMsg = this.gmg.createDATA(data, recipient,text);
-	this.forwardReliable(dataMsg); 
+	//this.forwardReliable(dataMsg);
+	this.forward(dataMsg);
 };
 
 GameMsgManager.prototype.forward = function (gameMsg, to) {
@@ -206,12 +188,12 @@ GameMsgManager.prototype.forward = function (gameMsg, to) {
 		}
 		gameMsg.forward = 1;
 		
-		if (gameMsg.reliable) {
-			this.node.partner.gmm.sendReliable(gameMsg);
-		}
-		else {
+//		if (gameMsg.reliable) {
+//			this.node.partner.gmm.sendReliable(gameMsg);
+//		}
+//		else {
 			this.node.partner.gmm.send(gameMsg);
-		}
+//		}
 		
 		this.log.msg('F, ' + gameMsg);
 		this.log.log('Msg ' + gameMsg.toSMS() + ' forwarded to ' + this.node.partner.name);

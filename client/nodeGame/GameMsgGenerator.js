@@ -57,7 +57,8 @@ GameMsgGenerator.prototype.getSTATE = function(target,plist,to,reliable) {
 
 GameMsgGenerator.prototype.createSTATE = function(action,state,to,reliable) {
 	
-	var rel = reliable || 1;
+	//var rel = reliable || 1;
+	var rel = reliable || 0;
 	
 	return new GameMsg(
 						this.session,
@@ -138,7 +139,8 @@ GameMsgGenerator.prototype.createTXT = function(text,to,reliable) {
 
 GameMsgGenerator.prototype.createDATA = function(data,to,text, reliable) {
 	
-	var rel = reliable || 1;
+	//var rel = reliable || 1;
+	var rel = reliable || 0;
 	var text = text || 'data';
 	
 	return new GameMsg(
