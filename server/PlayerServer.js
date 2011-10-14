@@ -14,27 +14,31 @@ var Player = require('./PlayerList').Player;
 var GameServer = require('./GameServer');
 
 
-PlayerServer.prototype = new GameServer();
+//TODO: Check it
+PlayerServer.prototype.__proto__ = GameServer.prototype;
+//PlayerServer.prototype = new GameServer();
+
+//PlayerServer.prototype = new GameServer();
 PlayerServer.prototype.constructor = PlayerServer;
 
 function PlayerServer(options) {
-	GameServer.call(this);
+	GameServer.call(this,options);
 	
-	this.port = options.port;
-	//this.type = options.type || 'PLAYER';
-	this.name = options.name;
-	
-	var dumpmsg = options.dumpmsg || true;
-	
-	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
-	
-	this.server = options.server;
-	
-	this.gmm = new GameMsgManager(this);
-	
-	this.pl = new PlayerList();
-	
-	this.partner = null;
+//	this.port = options.port;
+//	//this.type = options.type || 'PLAYER';
+//	this.name = options.name;
+//	
+//	var dumpmsg = options.dumpmsg || true;
+//	
+//	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
+//	
+//	this.server = options.server;
+//	
+//	this.gmm = new GameMsgManager(this);
+//	
+//	this.pl = new PlayerList();
+//	
+//	this.partner = null;
 }
 
 
@@ -45,13 +49,11 @@ PlayerServer.prototype.attachListeners = function() {
 	
 	log.log('Listening for connections');
 	
-	var playerServer = this.server
-	  .of('/player')
+	this.channel = this.server
+	  .of(this.channel)
 	  .on('connection', function (socket) {
-		
 		that.socket = socket;  
-		  
-		var thatServer = this;
+		
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
 		var get = GameMsg.actions.GET + '.'; 
@@ -66,7 +68,7 @@ PlayerServer.prototype.attachListeners = function() {
 		// Tell everybody a new player is connected;
 		that.gmm.sendTXT(connStr,'ALL');
 		
-		socket.on("close", function(){
+		socket.on('close', function(){
 			that.gmm.sendTXT("<"+socket.id+"> closed");
 			log.log("<"+socket.id+"> closed");
 			that.gmm.resetMsgQueue(socket.id);
@@ -77,7 +79,7 @@ PlayerServer.prototype.attachListeners = function() {
 		});
 		
 		
-		socket.on("message", function(message){
+		socket.on('message', function(message){
 			
 			var msg = that.secureParse(message);
 			//that.log.log('JUST RECEIVED P ' + util.inspect(msg));
@@ -89,12 +91,13 @@ PlayerServer.prototype.attachListeners = function() {
 			// Notice: ACK must be fired otherwise the queue does not get cleaned
 			if (msg.target === 'ACK' || msg.to !== 'SERVER') {
 				console.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
-				socket.emit(msg.toEvent(),msg);
+				//socket.emit(msg.toEvent(),msg);
+				that.emit(msg.toEvent(),msg);
 			}
 
 		});
 
-        socket.on(say+'HI', function(msg) {
+        that.on(say+'HI', function(msg) {
         	that.pl.addPlayer(msg.data);
             // TODO: check if this is secure
         	that.gmm.sendPLIST(that); // Send the list of players to all the clients
@@ -104,7 +107,7 @@ PlayerServer.prototype.attachListeners = function() {
             that.gmm.forwardPLIST(that);
  		});
 
-		socket.on(say+'ACK', function(msg) {
+        that.on(say+'ACK', function(msg) {
 //			console.log('PIF? ' + msg.forward);
 //			console.log(msg);
 //			var id2clear = (msg.forward) ? msg.to : msg.from;		
@@ -113,7 +116,7 @@ PlayerServer.prototype.attachListeners = function() {
 			that.gmm.clearMsg(msg.from, msg.data);		
 		});
 		
-		socket.on(say+'TXT', function(msg) {
+        that.on(say+'TXT', function(msg) {
 			// Personal msg
 			// TODO: maybe checked before?
 			if (msg.to !== null || msg.to || 'SERVER'){
@@ -124,7 +127,7 @@ PlayerServer.prototype.attachListeners = function() {
 			//that.gmm.forwardTXT(msg.text, msg.to);
 		});
 				
-		socket.on(say+'DATA', function(msg) {
+        that.on(say+'DATA', function(msg) {
 			// Personal msg
 			// TODO: maybe checked before?
 			if (msg.to !== null || msg.to || 'SERVER'){
@@ -132,7 +135,7 @@ PlayerServer.prototype.attachListeners = function() {
 			}
 		});
 		
-		socket.on(say+'STATE', function(msg) {
+        that.on(say+'STATE', function(msg) {
 			
 			//that.log.log('onSTATE P ' + util.inspect(msg));
 			var player = that.pl.get(msg.from);
@@ -147,6 +150,7 @@ PlayerServer.prototype.attachListeners = function() {
 		
 	});
 	
+	// TODO: Check this
 	this.server.sockets.on("shutdown", function(message) {
 		log.log("Server is shutting down.");
 		that.pl.pl = {};

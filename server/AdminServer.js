@@ -1,8 +1,5 @@
 module.exports = AdminServer;
 
-//Old implementation
-//var ws = require("websocket-server");
-
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
@@ -16,57 +13,53 @@ var PlayerList = require('./PlayerList').PlayerList;
 var Player = require('./PlayerList').Player;
 var GameServer = require('./GameServer');
 
-AdminServer.prototype = new GameServer();
+// TODO: Check it
+AdminServer.prototype.__proto__ = GameServer.prototype;
+//AdminServer.prototype = new GameServer();
+
 AdminServer.prototype.constructor = AdminServer;
 
 function AdminServer(options) {
-	GameServer.call(this);
+	GameServer.call(this,options);
 	
-	this.port = options.port;
-	//this.type = options.type || 'PLAYER';
-	this.name = options.name;
+//	this.port = options.port;
+//	this.name = options.name;
+//	
+//	var dumpmsg = options.dumpmsg || true;
+//		
+//	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
+//	
+//	this.server = options.server;
+//	
+//	this.gmm = new GameMsgManager(this);
+//	
+//	this.pl = new PlayerList();
+//	
+//	
+//	this.partner = null;
 	
-	var dumpmsg = options.dumpmsg || true;
-		
-	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
-	
-	this.server = options.server;
-	
-	this.gmm = new GameMsgManager(this);
-	
-	this.pl = new PlayerList();
-	
-	
-	this.partner = null;
 }
 
-AdminServer.prototype.attachListeners = function() {
-	
+AdminServer.prototype.attachListeners = function() {	
 	var that = this;
 	var log = this.log;
 
 	log.log('Listening for connections');
-	// Created in GameServer
 	
-	var adminServer = this.server
-	  .of('/admin')
+	this.channel = this.server
+	  .of(this.channel)
 	  .on('connection', function (socket) {
 	    
+		// Register the socket as a class variable
 		that.socket = socket;
 		  
-		var thatServer = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
 		var get = GameMsg.actions.GET + '.'; 
 		
 		var connStr = "Welcome <" + socket.id + ">";
 		log.log(connStr);
-		
-
-		//adminServer.emit('HI');
-		//socket.json.send('HI');
-		//socket.emit({"a":"b"});
-		
+				
 		// Send HI msg to the newly connected client
 		that.gmm.sendHI(connStr,socket.id);
 		
@@ -95,17 +88,20 @@ AdminServer.prototype.attachListeners = function() {
 			// TODO: improve this
 			if (msg.target === 'ACK' || msg.to !== 'SERVER') {
 				console.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
-				socket.emit(msg.toEvent(),msg);
+				
+				// HOW TO FIRE EVENT
+				that.emit(msg.toEvent(),msg);
+				console.log('Emitted local event');
 			}
 			
 		});
 	
-		socket.on(say+'HI', function(msg) {
+		that.on(say+'HI', function(msg) {
         	// TODO: check this
 			//that.pl.addPlayer(msg.data);
  		});
 		
-		socket.on(say+'ACK', function(msg) {
+		that.on(say+'ACK', function(msg) {
 //			console.log('AIF? ' + msg.forward);
 //			console.log(msg);
 //			var id2clear = (msg.forward) ? msg.to : msg.from;
@@ -113,12 +109,12 @@ AdminServer.prototype.attachListeners = function() {
 			that.gmm.clearMsg(msg.from, msg.data);
 		});
 		
-		socket.on(say+'TXT', function(msg) {
+		that.on(say+'TXT', function(msg) {
 			that.gmm.forwardTXT (msg.text, msg.to);
 			that.gmm.sendTXT(msg.from + ' sent MSG to ' + msg.to, 'ALL');
 		});
 
-		socket.on(say+'DATA', function(msg) { 
+		that.on(say+'DATA', function(msg) { 
 			that.gmm.forwardDATA (msg.data, msg.to, msg.text);
 			that.gmm.sendTXT(msg.from + ' sent DATA to ' + msg.to, 'ALL');
 		});
@@ -126,12 +122,12 @@ AdminServer.prototype.attachListeners = function() {
 		
 		// SET
 		
-		socket.on(set+'STATE', function(msg){
+		that.on(set+'STATE', function(msg){
 			if (!that.checkSync) {
 				that.gmm.sendTXT('**Not possible to change state: some players are not ready**', msg.from);
 			}
 			else {
-				//that.log.log('onSTATE.ADMIN: ' + util.inspect(msg));
+				//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 				// Send it to players and other monitors
 				that.gmm.forwardSTATE (GameMsg.actions.SET,msg.data, msg.to);
 				that.gmm.sendSTATE (GameMsg.actions.SET,msg.data, msg.to);

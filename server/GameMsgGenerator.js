@@ -20,27 +20,6 @@ GameMsgGenerator.prototype.getCurrentState = function () {
 
 // HI
 
-
-GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
-
-	  var rel = reliable || 0;
-
-	  return new GameMsg(
-	            this.session,
-	            this.currentState,
-	            this.types.HI,
-	            this.sender,
-	            to,
-	            'Player: ' + player.name + '(' + player.connid + ') ready.',
-	            null,
-	            player,
-	            null,
-	            rel
-	            );
-
-
-	};
-
 GameMsgGenerator.prototype.createHI = function(text,to,reliable) {
 	
 	var rel = reliable || 0;
@@ -57,8 +36,6 @@ GameMsgGenerator.prototype.createHI = function(text,to,reliable) {
 						null,
 						rel // Should be reliable
 						);
-	
-	
 };
 
 

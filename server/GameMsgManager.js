@@ -2,6 +2,13 @@ module.exports = GameMsgManager;
 
 var util = require('util');
 
+//SOCKET.IO
+var io = require('socket.io');
+
+// TODO: Does Socket.io provides reliable sending? 
+// Reliable is disable for now.
+
+
 var GameState = require('./GameState');
 var GameMsg = require('./GameMsg');
 var GameMsgGenerator = require('./GameMsgGenerator');
@@ -63,28 +70,32 @@ GameMsgManager.prototype.send = function(gameMsg) {
 		console.log('Trying to send msg to nobody.')
 		return false;
 	}
-
-	for (var i in this.server.sockets.sockets){
-		if (this.server.sockets.sockets.hasOwnProperty(i)){
-			console.log(i + this.server.sockets.sockets[i]);
-		}
-	}
-	
-	// Debug
-	//console.log('How many?? ' + this.node.server.manager.length);
-	
-	//console.log(this.socket);
-	
 	
 	if (gameMsg.to === 'ALL') {
-		this.node.socket.send(gameMsg.stringify());
+		
+		this.node.channel.json.send(gameMsg.stringify());
+		
+		// WORKING
+		//this.node.channel.send(gameMsg.stringify());
+		
+		
+		
+		//this.node.socket.broadcast.send(gameMsg.stringify());
+		//this.node.socket.send(gameMsg.stringify());
 		//this.server.sockets.json.send(gameMsg);
 		//this.server.sockets.json.send(gameMsg);
 		//this.node.server.broadcast.emit(gameMsg.stringify());
 		this.log.msg('B, ' + gameMsg);
 	}
 	else {
-		this.node.server.sockets.send(gameMsg.stringify());
+		
+		// This should send to the specific client
+		this.node.channel.sockets[gameMsg.to].json.send(gameMsg.stringify());
+		
+		// WORKING
+		//this.node.socket.send(gameMsg.stringify());
+		
+		//this.node.server.sockets.send(gameMsg.stringify());
 		//this.server.sockets.sockets[gameMsg.to].json.send(gameMsg);
 		//this.node.server.emit(gameMsg.to, gameMsg.stringify());
 		this.log.msg('S, ' + gameMsg);
@@ -92,6 +103,11 @@ GameMsgManager.prototype.send = function(gameMsg) {
 };
 
 GameMsgManager.prototype.sendReliable = function(gameMsg) {
+	
+	
+	this.send(gameMsg);
+	
+	// WHAT FOLLOWS IS DISABLE FOR NOW
 	
 	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
 		return false;
@@ -113,6 +129,10 @@ GameMsgManager.prototype.sendReliable = function(gameMsg) {
 };
 
 GameMsgManager.prototype.broadcastReliable = function(gameMsg) {
+	
+	this.send(gameMsg);
+	
+	// WHAT FOLLOWS IS DISABLE FOR NOW
 	
 	var that = this;
 	var allCons = this.node.getConnections(this.node.server);
@@ -159,9 +179,23 @@ GameMsgManager.prototype.forwardDATA = function (data,to,text) {
 };
 
 GameMsgManager.prototype.forward = function (gameMsg, to) {
+
+	// TODO: how the get the number of connected clients?
+	
+//	console.log('PARTNER ' + this.node.partner.socket.sockets.sockets);// + this.node.partner.server.clients());
+//	
+//	for (var i in this.node.partner.server.sockets.manager) {
+//		if (this.node.partner.server.sockets.manager.hasOwnProperty(i)){
+//			console.log(i + this.node.partner.server.sockets.manager[i]);
+//		}
+//	}
+//	
+	
+	//console.log(io.of('/admin').clients());
+	//console.log(this.node.partner.server.clients());
 	
 	// If somebody is connected to the other server
-	if (this.node.partner.server.manager.length > 0){
+	//if (this.node.partner.server.manager.length > 0){
 		
 		// Create a copy of the msg;
 		var gameMsg = GameMsg.parse(gameMsg);
@@ -181,17 +215,21 @@ GameMsgManager.prototype.forward = function (gameMsg, to) {
 		
 		this.log.msg('F, ' + gameMsg);
 		this.log.log('Msg ' + gameMsg.toSMS() + ' forwarded to ' + this.node.partner.name);
-	}
-	else{
-		var noListeners = 'Nobody to forward the msg to in ' + this.node.partner.name;
-		//this.sendTXT(noListeners);
-		this.log.log(noListeners);
-		// Inform that there are no listeners
-		this.sendTXT(noListeners, 'ALL');
-	}
+//	}
+//	else{
+//		var noListeners = 'Nobody to forward the msg to in ' + this.node.partner.name;
+//		//this.sendTXT(noListeners);
+//		this.log.log(noListeners);
+//		// Inform that there are no listeners
+//		this.sendTXT(noListeners, 'ALL');
+//	}
 };
 
 GameMsgManager.prototype.forwardReliable = function(gameMsg) {
+	
+	this.forward(gameMsg);
+	// WHAT FOLLOWS IS DISABLE FOR NOW
+	
 	gameMsg.reliable = 1;	
 	this.forward(gameMsg);	
 };

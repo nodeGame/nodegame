@@ -37,22 +37,21 @@ I/O Functions
 */
 
 //Parse the message newly received in the Socket
-GameSocketClient.prototype.secureParse = function (e) {
+GameSocketClient.prototype.secureParse = function (msg) {
 	
-	var msg = new GameMsg(null); // the newly received msg
+	var gameMsg = new GameMsg(null); // the newly received msg
 	
 	try {
-		msg.clone(JSON.parse(e));
-		console.log('R ' + msg);
-		node.fire('LOG', 'R: ' + msg.toSMS());
+		gameMsg.clone(JSON.parse(msg));
+		console.log('R ' + gameMsg);
+		node.fire('LOG', 'R: ' + gameMsg.toSMS());
 	}
 	catch(e) {
 		var error = "Malformed msg received: " + e;
 		node.fire('LOG', 'E: ' + error);
-		//alert(error);
 	}
 	
-	return msg;
+	return gameMsg;
 };
 
 // TODO CHANGE HERE
@@ -67,8 +66,6 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 	    console.log(connString); 
 	    
 	    socket.on('message', function (msg) {	
-			
-			console.log(msg);
 			
 	    	var msg = that.secureParse(msg);
 	    	
@@ -91,28 +88,28 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 	    
 	});
 	
-	socket.on('message', function (msg) {	
-		
-		console.log('msg!2');
-		
-    	var msg = that.secureParse(msg);
-    	
-		if (msg.target === 'HI'){
-			that.player = new Player(msg.data,that.name);
-			console.log('HI: ' + that.player);
-			
-			// Get Ready to play
-			that.attachMsgListeners(socket, msg.session);
-			
-			// Send own name to all
-			that.sendHI(that.player,'ALL');
-			
-			// Confirmation of reception was required
-			if (msg.reliable) {
-				that.sendACK(msg);
-			}
-	   	 } 
-    });
+//	socket.on('message', function (msg) {	
+//		
+//		console.log('msg!2');
+//		
+//    	var msg = that.secureParse(msg);
+//    	
+//		if (msg.target === 'HI'){
+//			that.player = new Player(msg.data,that.name);
+//			console.log('HI: ' + that.player);
+//			
+//			// Get Ready to play
+//			that.attachMsgListeners(socket, msg.session);
+//			
+//			// Send own name to all
+//			that.sendHI(that.player,'ALL');
+//			
+//			// Confirmation of reception was required
+//			if (msg.reliable) {
+//				that.sendACK(msg);
+//			}
+//	   	 } 
+//    });
 	
     socket.on('disconnect', function() {
     	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
@@ -195,6 +192,7 @@ GameSocketClient.prototype.sendACK = function (gm,to) {
 
 
 GameSocketClient.prototype.sendHI = function (state,to) {
+	console.log('steeeeeee');
 	var to = to || 'SERVER';
 	var msg = this.gmg.createHI(this.player);
 	this.game.player = this.player;

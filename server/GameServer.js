@@ -9,6 +9,7 @@ module.exports = GameServer;
 
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+util.inherits(GameServer,EventEmitter);
 
 
 var Utils = require('./Utils');
@@ -19,8 +20,30 @@ var GameMsgManager = require('./GameMsgManager');
 var PlayerList = require('./PlayerList').PlayerList;
 var Player = require('./PlayerList').Player;
 
-function GameServer() {}
-
+function GameServer(options) {
+	
+	EventEmitter.call(this);
+	
+	this.io = options.io;
+	this.channel = '/' +  options.channel;
+	this.socket = null; // to be init after a connection is created
+	
+	this.port = options.port;
+	
+	this.name = options.name;
+	
+	var dumpmsg = options.dumpmsg || true;
+	
+	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
+	
+	this.server = options.server;
+	
+	this.gmm = new GameMsgManager(this);
+	
+	this.pl = new PlayerList();
+	
+	this.partner = null;
+}
 
 GameServer.prototype.setPartner = function(node) {
 	this.partner = node;
@@ -35,20 +58,23 @@ GameServer.prototype.listen = function() {
 	this.attachListeners();
 }; 
 
-//Parse the message newly received in the Socket
-GameServer.prototype.secureParse = function (e) {
+//Parse the newly received message
+GameServer.prototype.secureParse = function (msg) {
 	
-	var msg = new GameMsg(null); // the newly received msg
+	//this.log.msg('BEFORE PARSING ' + gameMsg);
+	
+	var gameMsg = new GameMsg(null);
 	
 	try {	
-		msg.clone(JSON.parse(e));
-		this.log.msg('R, ' + msg);
+		// TODO: use a static method or GameMsg.parse ?
+		gameMsg.clone(JSON.parse(msg));
+		this.log.msg('R, ' + gameMsg);
 	}
 	catch(e) {
 		this.log.log("Malformed msg received: " + e, 'ERR');
 	}
 	
-	return msg;
+	return gameMsg;
 };
 
 GameServer.prototype.checkSync = function() {
@@ -59,11 +85,13 @@ GameServer.prototype.checkSync = function() {
 };
 
 GameServer.prototype.getConnections = function() {
-	var list =  this.server.manager.map( function(client) {
-		//console.log('STATE CONN ' + client.id + ' : '+ client._state);
-		if (client._state < 5) {// connected
-			return client.id;
+
+	var clientids = [];
+	for (var i in this.channel.sockets) {
+		if (this.channel.sockets.hasOwnProperty(i)) {
+			clientids.push(i);
+			console.log(i);
 		}
-	});
-	return list;
+	}
+	return clientids;
 }; 
