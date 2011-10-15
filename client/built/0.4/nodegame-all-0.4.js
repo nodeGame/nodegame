@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 18:04:51 CEST 2011
+ * Built on Sat Oct 15 18:59:29 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 18:04:51 CEST 2011
+ * Built on Sat Oct 15 18:59:29 CEST 2011
  *
  */
  
@@ -259,9 +259,8 @@ function Game (settings,gamesocketclient) {
 			node.gsc.sendDATA(data,to,msg);
 		});
 		
-		node.on("DONE", function(msg){
+		node.on('DONE', function(msg){
 			that.is(GameState.iss.DONE);
-			that.publishState();
 		});
 		
 		node.on('WAIT', function(msg){
@@ -307,8 +306,8 @@ Game.prototype.previous = function() {
 Game.prototype.is = function(is) {
 	//console.log('IS ' + is);
 	this.gameState.is = is;
-	// TODO Check whether we should publish the state automatically.
-	//this.publishState();
+	// TODO Check whether we should do it here or no
+	this.publishState();
 };
 
 Game.prototype.publishState = function() {
@@ -334,8 +333,6 @@ Game.prototype.updateState = function(state) {
 		node.fire('TXT','State was not updated');
 		this.publishState(); // Notify anyway what happened
 	}
-	
-	
 };
 
 
@@ -487,6 +484,145 @@ GameLoop.prototype.previous = function (gameState) {
 GameLoop.prototype.getFunction = function(gameState) {
 	return this.loop[gameState.state]['loop'][gameState.step];
 }; 
+ 
+/*
+ * JSON Data Format for nodeGame Apps.
+ */
+GameMsg.actions = {};
+GameMsg.targets = {};
+
+GameMsg.actions.SET 	= 'set'; 	// Changes properties of the receiver
+GameMsg.actions.GET 	= 'get'; 	// Ask a properties of the receiver
+GameMsg.actions.SAY		= 'say'; 	// Announce properties of the sender
+
+GameMsg.targets.HI		= 'HI';		// Introduction
+GameMsg.targets.STATE	= 'STATE';	// STATE
+GameMsg.targets.PLIST 	= 'PLIST';	// PLIST
+GameMsg.targets.TXT 	= 'TXT';	// Text msg
+GameMsg.targets.DATA	= 'DATA';	// Contains a data-structure in the data field
+
+GameMsg.targets.ACK		= 'ACK';	// A reliable msg was received correctly
+
+GameMsg.targets.WARN 	= 'WARN';	// To do.
+GameMsg.targets.ERR		= 'ERR';	// To do.
+
+GameMsg.IN				= 'in.';	// Prefix for incoming msgs
+GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
+		
+
+function GameMsg (session, currentState, action, target, from, to, text, data,
+					priority, reliable) {
+		
+	this.id = Math.floor(Math.random()*1000000);
+
+	this.action = action; 
+	this.target = target;
+	
+	this.session = session;
+	this.currentState = currentState;
+	
+	this.from = from;
+	this.to = to;
+	this.text = text;
+	this.data = data;
+	
+	this.priority = priority;
+	this.reliable = reliable;
+
+	this.created = Utils.getDate();
+	this.forward = 0; // is this msg just a forward?	
+	
+};
+// Does not change the msg ID
+GameMsg.prototype.import = function(jsonMsg) {
+	
+	this.session = jsonMsg.session;
+	this.currentState = jsonMsg.currentState;
+	this.target = jsonMsg.target; // was action
+	this.from = jsonMsg.from;
+	this.to = jsonMsg.to;
+	this.text = jsonMsg.text;
+	this.action = jsonMsg.action; 
+	this.data = jsonMsg.data;
+	this.priority = jsonMsg.priority;
+	this.reliable = jsonMsg.reliable;
+	this.forward = jsonMsg.forward;
+	
+};
+
+// Copy everything
+GameMsg.prototype.clone = function(jsonMsg) {
+	
+	this.import(jsonMsg);
+	this.id = jsonMsg.id;
+};
+
+GameMsg.prototype.stringify = function() {
+	return JSON.stringify(this);
+};
+
+GameMsg.prototype.toString = function() {
+	
+	var SPT = ",\t";
+	var SPTend = "\n";
+	var DLM = "\"";
+	
+	var gm = new GameState();
+	gm.import(this.currentState);
+	
+	var line = this.created + SPT;
+		line += this.id + SPT;
+		line += this.session + SPT;
+		line += this.action + SPT;
+		line += this.target + SPT;
+		line +=	this.from + SPT;
+		line += this.to + SPT;
+		line += DLM + this.text + DLM + SPT;
+		line += DLM + this.data + DLM + SPT; // maybe to remove
+		line += this.reliable + SPT;
+		line += this.priority + SPTend;
+		
+		
+	return line;
+	
+};
+
+GameMsg.prototype.toSMS = function () {
+	
+	var parseDate = /\w+/; // Select the second word;
+	var results = parseDate.exec(this.created);
+	//var d = new Date(this.created);
+	//var line = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+	//var line = results[0];
+	var line = '[' + this.from + ']->[' + this.to + ']\t';
+	line += '|' + this.action + '.' + this.target + '|'+ '\t';
+	line += ' ' + this.text + ' ';
+	
+	return line;
+};
+
+GameMsg.parse = function(msg) {
+	try {
+		var gm = new GameMsg();
+		gm.import(msg);
+		return gm;
+	}
+	catch(e){
+		throw 'Error while trying to parse GameMsg ' + e.message;
+	}
+};
+
+GameMsg.prototype.toInEvent = function() {
+	return 'in.' + this.toEvent();
+};
+
+GameMsg.prototype.toOutEvent = function() {
+	return 'out.' + this.toEvent();
+};
+
+GameMsg.prototype.toEvent = function () {
+	return this.action + '.' + this.target;
+};  
  
 /*
  * GameMsgGenerator
@@ -674,145 +810,6 @@ GameMsgGenerator.prototype.createACK = function(gm,to,reliable) {
 	}
 	
 	return newgm;
-};  
- 
-/*
- * JSON Data Format for nodeGame Apps.
- */
-GameMsg.actions = {};
-GameMsg.targets = {};
-
-GameMsg.actions.SET 	= 'set'; 	// Changes properties of the receiver
-GameMsg.actions.GET 	= 'get'; 	// Ask a properties of the receiver
-GameMsg.actions.SAY		= 'say'; 	// Announce properties of the sender
-
-GameMsg.targets.HI		= 'HI';		// Introduction
-GameMsg.targets.STATE	= 'STATE';	// STATE
-GameMsg.targets.PLIST 	= 'PLIST';	// PLIST
-GameMsg.targets.TXT 	= 'TXT';	// Text msg
-GameMsg.targets.DATA	= 'DATA';	// Contains a data-structure in the data field
-
-GameMsg.targets.ACK		= 'ACK';	// A reliable msg was received correctly
-
-GameMsg.targets.WARN 	= 'WARN';	// To do.
-GameMsg.targets.ERR		= 'ERR';	// To do.
-
-GameMsg.IN				= 'in.';	// Prefix for incoming msgs
-GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
-		
-
-function GameMsg (session, currentState, action, target, from, to, text, data,
-					priority, reliable) {
-		
-	this.id = Math.floor(Math.random()*1000000);
-
-	this.action = action; 
-	this.target = target;
-	
-	this.session = session;
-	this.currentState = currentState;
-	
-	this.from = from;
-	this.to = to;
-	this.text = text;
-	this.data = data;
-	
-	this.priority = priority;
-	this.reliable = reliable;
-
-	this.created = Utils.getDate();
-	this.forward = 0; // is this msg just a forward?	
-	
-};
-// Does not change the msg ID
-GameMsg.prototype.import = function(jsonMsg) {
-	
-	this.session = jsonMsg.session;
-	this.currentState = jsonMsg.currentState;
-	this.target = jsonMsg.target; // was action
-	this.from = jsonMsg.from;
-	this.to = jsonMsg.to;
-	this.text = jsonMsg.text;
-	this.action = jsonMsg.action; 
-	this.data = jsonMsg.data;
-	this.priority = jsonMsg.priority;
-	this.reliable = jsonMsg.reliable;
-	this.forward = jsonMsg.forward;
-	
-};
-
-// Copy everything
-GameMsg.prototype.clone = function(jsonMsg) {
-	
-	this.import(jsonMsg);
-	this.id = jsonMsg.id;
-};
-
-GameMsg.prototype.stringify = function() {
-	return JSON.stringify(this);
-};
-
-GameMsg.prototype.toString = function() {
-	
-	var SPT = ",\t";
-	var SPTend = "\n";
-	var DLM = "\"";
-	
-	var gm = new GameState();
-	gm.import(this.currentState);
-	
-	var line = this.created + SPT;
-		line += this.id + SPT;
-		line += this.session + SPT;
-		line += this.action + SPT;
-		line += this.target + SPT;
-		line +=	this.from + SPT;
-		line += this.to + SPT;
-		line += DLM + this.text + DLM + SPT;
-		line += DLM + this.data + DLM + SPT; // maybe to remove
-		line += this.reliable + SPT;
-		line += this.priority + SPTend;
-		
-		
-	return line;
-	
-};
-
-GameMsg.prototype.toSMS = function () {
-	
-	var parseDate = /\w+/; // Select the second word;
-	var results = parseDate.exec(this.created);
-	//var d = new Date(this.created);
-	//var line = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-	//var line = results[0];
-	var line = '[' + this.from + ']->[' + this.to + ']\t';
-	line += '|' + this.action + '.' + this.target + '|'+ '\t';
-	line += ' ' + this.text + ' ';
-	
-	return line;
-};
-
-GameMsg.parse = function(msg) {
-	try {
-		var gm = new GameMsg();
-		gm.import(msg);
-		return gm;
-	}
-	catch(e){
-		throw 'Error while trying to parse GameMsg ' + e.message;
-	}
-};
-
-GameMsg.prototype.toInEvent = function() {
-	return 'in.' + this.toEvent();
-};
-
-GameMsg.prototype.toOutEvent = function() {
-	return 'out.' + this.toEvent();
-};
-
-GameMsg.prototype.toEvent = function () {
-	return this.action + '.' + this.target;
 };  
  
 /*
@@ -1044,160 +1041,6 @@ GameState.parse = function(gamestate) {
 GameState.stringify = function (gs) {
 	return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
 };  
- 
-/*!
- * nodeGame
- */
-
-nodeGame.prototype = new EventListener();
-nodeGame.prototype.constructor = nodeGame;
-
-// Exposing classes
-
-nodeGame.prototype.create = {};
-
-nodeGame.prototype.create.GameLoop = function(loop){
-	return new GameLoop(loop);
-};
-
-nodeGame.prototype.create.GameMsgGenerator = function(session,sender,currentState){
-	return new GameMsgGenerator(session,sender,currentState);
-};
-
-nodeGame.prototype.create.GameMsg = function(session, currentState, action, 
-											target, from, to, text, data,
-											priority, reliable) {
-	
-	return new GameMsg(session, currentState, action, target, from, to, text, data,
-			priority, reliable);
-};
-
-nodeGame.prototype.create.GameState = function(state,step,round){
-	return new GameState(state,step,round);
-};
-
-nodeGame.prototype.create.PlayerList = function(list){
-	return new PlayerList(list);
-};
-
-// Exposing Costants
-
-nodeGame.prototype.actions = GameMsg.actions;
-
-nodeGame.prototype.IN = GameMsg.IN;
-nodeGame.prototype.OUT = GameMsg.OUT;
-
-nodeGame.prototype.targets = GameMsg.targets;
-			
-nodeGame.prototype.states = GameState.iss;
-
-// Constructor
-
-function nodeGame() {
-	EventListener.call(this);
-
-	this.gsc = null;
-	this.game = null;
-	var that = this;
-
-	this.state = function() {
-		return (this.game) ? this.game.gameState : false;
-	};
-	
-	this.on = function(event,listener) {
-		var state = this.state();
-		//console.log(state);
-		
-		// It is in the init function;
-		if (!state || (GameState.compare(state, new GameState(), true) === 0 )) {
-			that.addListener(event, listener);
-			//console.log('global');
-		}
-		else {
-			that.addLocalListener(event, listener);
-			//console.log('local');
-		}
-		
-		
-	};
-	
-	this.play = function (net,game) {	
-		that.gsc = new GameSocketClient(net);
-		
-		that.game = new Game(game, that.gsc);
-		that.game.init();
-		
-		that.gsc.setGame(that.game);
-		
-		console.log('nodeGame: game loaded...');
-		console.log('nodeGame: ready.');
-	};	
-	
-	
-	
-	// *Aliases*
-	//
-	// Conventions:
-	//
-	// - Direction:
-	// 		'in' for all
-	//
-	// - Target:
-	// 		DATA and TXT are 'say' as default
-	// 		STATE and PLIST are 'set' as default
-	
-	
-	// Sending
-	
-	// Send a GameMsg to the recipient
-	// gameMSg must be a valid GameMsg
-	this.send = function(gameMsg,to) {
-		that.gsc.send(gameMsg,to);
-	};
-	
-//	this.setSTATE = function(action,state,to){	
-//		var stateEvent = GameMsg.OUT + action + '.STATE'; 
-//		fire(stateEvent,action,state,to);
-//	};
-	
-	// Receiving
-	
-	// Say
-	
-	this.onTXT = this.onTXTin = function(func) {
-		that.on("in.say.TXT", function(msg) {
-			func.call(that.game,msg);
-		});
-	};
-	
-	this.onDATA = this.onDATAin = function(func) {
-		that.on("in.say.DATA", function(msg) {
-			func.call(that.game,msg);
-		});
-	};
-	
-	// Set
-	
-	this.onSTATE = this.onSTATEin = function(func) {
-		that.on("in.set.STATE", function(msg) {
-			func.call(that.game,msg);
-		});
-	};
-	
-	this.onPLIST = this.onPLISTin = function(func) {
-		that.on("in.set.PLIST", function(msg) {
-			func.call(that.game,msg);
-		});
-		
-		that.on("in.say.PLIST", function(msg) {
-			func.call(that.game,msg);
-		});
-	};
-	
-	this.DONE = function(text){
-		node.fire("DONE",text);
-	};
-}; 
  
 /*
  * Holds information about the list of players.
@@ -1550,6 +1393,160 @@ Utils.print_r = function (array) {
 
  
  
+/*!
+ * nodeGame
+ */
+
+nodeGame.prototype = new EventListener();
+nodeGame.prototype.constructor = nodeGame;
+
+// Exposing classes
+
+nodeGame.prototype.create = {};
+
+nodeGame.prototype.create.GameLoop = function(loop){
+	return new GameLoop(loop);
+};
+
+nodeGame.prototype.create.GameMsgGenerator = function(session,sender,currentState){
+	return new GameMsgGenerator(session,sender,currentState);
+};
+
+nodeGame.prototype.create.GameMsg = function(session, currentState, action, 
+											target, from, to, text, data,
+											priority, reliable) {
+	
+	return new GameMsg(session, currentState, action, target, from, to, text, data,
+			priority, reliable);
+};
+
+nodeGame.prototype.create.GameState = function(state,step,round){
+	return new GameState(state,step,round);
+};
+
+nodeGame.prototype.create.PlayerList = function(list){
+	return new PlayerList(list);
+};
+
+// Exposing Costants
+
+nodeGame.prototype.actions = GameMsg.actions;
+
+nodeGame.prototype.IN = GameMsg.IN;
+nodeGame.prototype.OUT = GameMsg.OUT;
+
+nodeGame.prototype.targets = GameMsg.targets;
+			
+nodeGame.prototype.states = GameState.iss;
+
+// Constructor
+
+function nodeGame() {
+	EventListener.call(this);
+
+	this.gsc = null;
+	this.game = null;
+	var that = this;
+
+	this.state = function() {
+		return (this.game) ? this.game.gameState : false;
+	};
+	
+	this.on = function(event,listener) {
+		var state = this.state();
+		//console.log(state);
+		
+		// It is in the init function;
+		if (!state || (GameState.compare(state, new GameState(), true) === 0 )) {
+			that.addListener(event, listener);
+			//console.log('global');
+		}
+		else {
+			that.addLocalListener(event, listener);
+			//console.log('local');
+		}
+		
+		
+	};
+	
+	this.play = function (net,game) {	
+		that.gsc = new GameSocketClient(net);
+		
+		that.game = new Game(game, that.gsc);
+		that.game.init();
+		
+		that.gsc.setGame(that.game);
+		
+		console.log('nodeGame: game loaded...');
+		console.log('nodeGame: ready.');
+	};	
+	
+	
+	
+	// *Aliases*
+	//
+	// Conventions:
+	//
+	// - Direction:
+	// 		'in' for all
+	//
+	// - Target:
+	// 		DATA and TXT are 'say' as default
+	// 		STATE and PLIST are 'set' as default
+	
+	
+	// Sending
+	
+	// Send a GameMsg to the recipient
+	// gameMSg must be a valid GameMsg
+	this.send = function(gameMsg,to) {
+		that.gsc.send(gameMsg,to);
+	};
+	
+//	this.setSTATE = function(action,state,to){	
+//		var stateEvent = GameMsg.OUT + action + '.STATE'; 
+//		fire(stateEvent,action,state,to);
+//	};
+	
+	// Receiving
+	
+	// Say
+	
+	this.onTXT = this.onTXTin = function(func) {
+		that.on("in.say.TXT", function(msg) {
+			func.call(that.game,msg);
+		});
+	};
+	
+	this.onDATA = this.onDATAin = function(func) {
+		that.on("in.say.DATA", function(msg) {
+			func.call(that.game,msg);
+		});
+	};
+	
+	// Set
+	
+	this.onSTATE = this.onSTATEin = function(func) {
+		that.on("in.set.STATE", function(msg) {
+			func.call(that.game,msg);
+		});
+	};
+	
+	this.onPLIST = this.onPLISTin = function(func) {
+		that.on("in.set.PLIST", function(msg) {
+			func.call(that.game,msg);
+		});
+		
+		that.on("in.say.PLIST", function(msg) {
+			func.call(that.game,msg);
+		});
+	};
+	
+	this.DONE = function(text){
+		node.fire("DONE",text);
+	};
+}; 
+ 
 
 //Expose nodeGame and Utils to the global object
 window.nodeGame = window.node = new nodeGame();
@@ -1566,7 +1563,7 @@ window.Utils = Utils;
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 18:04:51 CEST 2011
+ * Built on Sat Oct 15 18:59:29 CEST 2011
  *
  */
  
@@ -3035,7 +3032,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 18:04:51 CEST 2011
+ * Built on Sat Oct 15 18:59:29 CEST 2011
  *
  */
  

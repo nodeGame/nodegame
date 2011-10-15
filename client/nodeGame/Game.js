@@ -173,8 +173,6 @@ Game.prototype.updateState = function(state) {
 		node.fire('TXT','State was not updated');
 		this.publishState(); // Notify anyway what happened
 	}
-	
-	
 };
 
 

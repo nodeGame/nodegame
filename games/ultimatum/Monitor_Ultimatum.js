@@ -35,23 +35,23 @@ function Monitor_Ultimatum () {
 				// Bidder
 				var bidder = g.getRandom();
 				//console.log(bidder);
-				g.remove(bidder.connid);				
-				node.fire('out.say.DATA', 'BIDDER', bidder.connid);
+				g.remove(bidder.id);				
+				node.fire('out.say.DATA', 'BIDDER', bidder.id);
 				
 				// Respondent
 				var respondent = g.getRandom();
 				//console.log(respondent);
-				node.fire('out.say.DATA', 'RESPONDENT', respondent.connid);
+				node.fire('out.say.DATA', 'RESPONDENT', respondent.id);
 
 				// Make each other aware
-				node.fire('out.say.DATA', 'OTHER', bidder.connid, respondent.connid);
-				node.fire('out.say.DATA', 'OTHER', respondent.connid, bidder.connid);
+				node.fire('out.say.DATA', 'OTHER', bidder.id, respondent.id);
+				node.fire('out.say.DATA', 'OTHER', respondent.id, bidder.id);
 
 			}
 			else {
 				var solo =  g.getRandom();
 				console.log(solo);
-				node.fire('out.say.DATA', 'SOLO',respondent.connid);
+				node.fire('out.say.DATA', 'SOLO',respondent.id);
 			}	
 		}
 		console.log('Game1');

@@ -30,7 +30,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
     	console.log(that.name + ' ----------------- Got ' + msg.toEvent());
     	that.pl.addPlayer(msg.data);
         // TODO: check if we need to do it
-    	// that.gmm.sendPLIST(that); // Send the list of players to all the clients
+    	that.gmm.sendPLIST(that); // Send the list of players to all the clients
     	
     	// Send PL to monitors
         that.gmm.forwardPLIST(that);

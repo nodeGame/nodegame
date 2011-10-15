@@ -34,7 +34,7 @@ function Ultimatum () {
 					var button = nodeWindow.addButton(root, 'sendb');
 
 					button.onclick = function() {
-						node.fire('DONE','User ready to start the experiment.');
+						node.fire('DONE', 'User ready to start the experiment.');
 						node.fire('WAIT');
 					};
 				}
