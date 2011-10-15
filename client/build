@@ -3,7 +3,7 @@
 NAME="nodegame-all"
 VERSION="0.4"
 
-BUILD="./build/"$VERSION"/"
+BUILD="./built/"$VERSION"/"
 EXT=".js"
 MIN="-min"
 

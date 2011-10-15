@@ -3,7 +3,7 @@
 NAME="nodegame-client"
 VERSION="0.3"
 
-BUILD="./build/"
+BUILD="./built/"
 
 # Check if a particular sub-directory for build was required
 if [ "$#" -eq 1 ]
