@@ -87,6 +87,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 			this.node.channel.volatile.json.send(msg);
 			//this.node.channel.broadcast.volatile.json.send(msg);
 		}
+		this.log.log('Msg ' + gameMsg.toSMS() + ' broadcasted to ' + to);
 		this.log.msg('B, ' + gameMsg);
 	}
 	// Send to a specific client
@@ -97,6 +98,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 		else {
 			this.node.channel.sockets[to].volatile.json.send(msg);
 		}
+		this.log.log('Msg ' + gameMsg.toSMS() + ' sent to ' + to);
 		this.log.msg('S, ' + gameMsg);
 	}
 };

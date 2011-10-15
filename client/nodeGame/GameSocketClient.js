@@ -95,7 +95,6 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 	var that = this;
 	
 	console.log('nodeGame: Attaching FULL listeners');
-	//socket.removeListener('message',this.socket.onmessage,false);
 	socket.removeAllListeners('message');
 		
 	this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());

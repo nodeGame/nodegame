@@ -29,8 +29,8 @@ PlayerServer.prototype.attachCustomListeners = function() {
     this.on(say+'HI', function(msg) {
     	console.log(that.name + ' ----------------- Got ' + msg.toEvent());
     	that.pl.addPlayer(msg.data);
-        // TODO: check if this is secure
-    	that.gmm.sendPLIST(that); // Send the list of players to all the clients
+        // TODO: check if we need to do it
+    	// that.gmm.sendPLIST(that); // Send the list of players to all the clients
     	
     	// Send PL to monitors
         that.gmm.forwardPLIST(that);
@@ -42,9 +42,6 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		if (msg.to !== null || msg.to || 'SERVER'){
 			that.gmm.sendTXT (msg.text, msg.to);
 		}
-		// Send it the Monitor anyway
-		// Already forwarded
-		//that.gmm.forwardTXT(msg.text, msg.to);
 	});
 			
     this.on(say+'DATA', function(msg) {
@@ -59,7 +56,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		
 		//that.log.log('onSTATE P ' + util.inspect(msg));
 		var player = that.pl.get(msg.from);
-		if(player){
+		if (player){
 			player.updateState(msg.data);
 
 			that.gmm.sendPLIST(that);

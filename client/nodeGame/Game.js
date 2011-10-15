@@ -147,7 +147,8 @@ Game.prototype.previous = function() {
 Game.prototype.is = function(is) {
 	//console.log('IS ' + is);
 	this.gameState.is = is;
-	this.publishState();
+	// TODO Check whether we should publish the state automatically.
+	//this.publishState();
 };
 
 Game.prototype.publishState = function() {

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:57:52 CEST 2011
+ * Built on Sa 15. Okt 18:04:51 CEST 2011
  *
  */
  
@@ -296,7 +296,8 @@ Game.prototype.previous = function() {
 Game.prototype.is = function(is) {
 	//console.log('IS ' + is);
 	this.gameState.is = is;
-	this.publishState();
+	// TODO Check whether we should publish the state automatically.
+	//this.publishState();
 };
 
 Game.prototype.publishState = function() {
@@ -900,7 +901,6 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 	var that = this;
 	
 	console.log('nodeGame: Attaching FULL listeners');
-	//socket.removeListener('message',this.socket.onmessage,false);
 	socket.removeAllListeners('message');
 		
 	this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
