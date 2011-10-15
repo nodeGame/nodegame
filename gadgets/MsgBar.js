@@ -8,7 +8,7 @@ function MsgBar(id){
 	this.game = nodeGame.game;
 	this.id = id || 'msgbar';
 	this.name = 'Msg Bar';
-	this.version = '0.2';
+	this.version = '0.2.1';
 	
 	this.recipient = null;
 }
@@ -41,7 +41,7 @@ MsgBar.prototype.append = function (root, ids) {
 		// Should be within the range of valid values
 		// but we should add a check
 		var to = that.recipient.value;
-		var msg = that.game.MSG(msgText.value,to);
+		var msg = node.TXT(msgText.value,to);
 		//console.log(msg.stringify());
 	};
 

@@ -26,8 +26,6 @@ function Game (settings,gamesocketclient) {
 	// TODO: Check this
 	this.init = settings.init || this.init;
 	
-	//this._localListeners = {};
-	
 	this.gsc = gamesocketclient;
 	
 	this.pl = new PlayerList();

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Oct 15 18:59:29 CEST 2011
+ * Built on Sat Oct 15 19:24:08 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Oct 15 18:59:29 CEST 2011
+ * Built on Sat Oct 15 19:24:08 CEST 2011
  *
  */
  
@@ -185,8 +185,6 @@ function Game (settings,gamesocketclient) {
 	
 	// TODO: Check this
 	this.init = settings.init || this.init;
-	
-	//this._localListeners = {};
 	
 	this.gsc = gamesocketclient;
 	
@@ -813,7 +811,6 @@ GameMsgGenerator.prototype.createACK = function(gm,to,reliable) {
 };  
  
 /*
- * GameSocketClient
  *
  *
  */
@@ -949,12 +946,15 @@ GameSocketClient.prototype.sendDATA = function (data, to, msg) {
  * The msg is actually received by the client itself as well.
  */
 GameSocketClient.prototype.send = function (msg) {
-	if (msg.reliable) {
+	
+	// TODO: Check Do volatile msgs exist for clients?
+	
+	//if (msg.reliable) {
 		this.socket.send(msg.stringify());
-	}
-	else {
-		this.socket.volatile.send(msg.stringify());
-	}
+	//}
+	//else {
+	//	this.socket.volatile.send(msg.stringify());
+	//}
 	console.log('S: ' + msg);
 	node.fire('LOG', 'S: ' + msg.toSMS());
 }; 
@@ -1542,9 +1542,14 @@ function nodeGame() {
 		});
 	};
 	
-	this.DONE = function(text){
+	this.DONE = function (text) {
 		node.fire("DONE",text);
 	};
+	
+	this.TXT = function (text, to) {
+		node.fire('out.say.TXT', text, to);
+	};
+	
 }; 
  
 
@@ -1563,7 +1568,7 @@ window.Utils = Utils;
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Oct 15 18:59:29 CEST 2011
+ * Built on Sat Oct 15 19:24:08 CEST 2011
  *
  */
  
@@ -2529,7 +2534,7 @@ function MsgBar(id){
 	this.game = nodeGame.game;
 	this.id = id || 'msgbar';
 	this.name = 'Msg Bar';
-	this.version = '0.2';
+	this.version = '0.2.1';
 	
 	this.recipient = null;
 }
@@ -2562,7 +2567,7 @@ MsgBar.prototype.append = function (root, ids) {
 		// Should be within the range of valid values
 		// but we should add a check
 		var to = that.recipient.value;
-		var msg = that.game.MSG(msgText.value,to);
+		var msg = node.TXT(msgText.value,to);
 		//console.log(msg.stringify());
 	};
 
@@ -3032,7 +3037,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Oct 15 18:59:29 CEST 2011
+ * Built on Sat Oct 15 19:24:08 CEST 2011
  *
  */
  

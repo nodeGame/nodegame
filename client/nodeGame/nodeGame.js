@@ -147,7 +147,12 @@ function nodeGame() {
 		});
 	};
 	
-	this.DONE = function(text){
+	this.DONE = function (text) {
 		node.fire("DONE",text);
 	};
+	
+	this.TXT = function (text, to) {
+		node.fire('out.say.TXT', text, to);
+	};
+	
 };

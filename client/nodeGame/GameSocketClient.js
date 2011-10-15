@@ -1,5 +1,4 @@
 /*
- * GameSocketClient
  *
  *
  */
@@ -135,12 +134,15 @@ GameSocketClient.prototype.sendDATA = function (data, to, msg) {
  * The msg is actually received by the client itself as well.
  */
 GameSocketClient.prototype.send = function (msg) {
-	if (msg.reliable) {
+	
+	// TODO: Check Do volatile msgs exist for clients?
+	
+	//if (msg.reliable) {
 		this.socket.send(msg.stringify());
-	}
-	else {
-		this.socket.volatile.send(msg.stringify());
-	}
+	//}
+	//else {
+	//	this.socket.volatile.send(msg.stringify());
+	//}
 	console.log('S: ' + msg);
 	node.fire('LOG', 'S: ' + msg.toSMS());
 };
