@@ -52,6 +52,11 @@ function ServerNode (options, io) {
 ServerNode.prototype.createServers = function() {
 	
 	this.server = this.io.listen(this.port);
+	
+	//io.configure('production', function(){
+	  this.server.enable('browser client etag');
+	  this.server.set('log level', 1);
+	//});
 		
 	this.adminServer = new AdminServer ({
 										 io: 		this.io,

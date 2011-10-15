@@ -27,9 +27,6 @@ function GameMsgManager(node) {
 	this.server = node.server;
 	this.socket = node.socket;
 	
-	//TODO: find a way to access node.server when it is ready
-	//this.server = this.node.server;
-	
 	this.gmg = new GameMsgGenerator(this.session,this.name,this.currentState);	// TODO: Check what is best to init
 	this.types = this.gmg.types;
 }
@@ -67,65 +64,84 @@ GameMsgManager.prototype.sendDATA = function (data,to,text) {
 };
 
 GameMsgManager.prototype.send = function(gameMsg) {
-		
-	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
-		console.log('Trying to send msg to nobody.')
+	
+	var to = gameMsg.to;
+	var rel = gameMsg.reliable;
+	var gameMsg = gameMsg.stringify();
+	
+//	console.log(gameMsg);
+//	console.log(this.node.name);
+//	console.log('TOOOOOOOO: ' +  to);
+	
+	if (to === 'SERVER' || to === null) {
+		this.log.log('E, Trying to send msg to nobody.')
 		return false;
 	}
 	
-	if (gameMsg.to === 'ALL') {
-		this.node.channel.json.send(gameMsg.stringify());
+	// Broadcast
+	if (to === 'ALL') {
+		if (rel) {
+			this.node.channel.json.send(gameMsg);
+		} 
+		else {
+			this.node.channel.volatile.json.send(gameMsg);
+		}
 		this.log.msg('B, ' + gameMsg);
 	}
+	// Send to a specific client
 	else {
-		// Send to a specific client
-		this.node.channel.sockets[gameMsg.to].json.send(gameMsg.stringify());
+		if (rel) {
+			this.node.channel.sockets[to].json.send(gameMsg);
+		}
+		else {
+			this.node.channel.sockets[to].volatile.json.send(gameMsg);
+		}
 		this.log.msg('S, ' + gameMsg);
 	}
 };
 
-GameMsgManager.prototype.sendReliable = function(gameMsg) {
-	
-	
-	this.send(gameMsg);	
-	// WHAT FOLLOWS IS DISABLE FOR NOW
-	
-	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
-		return false;
-	}
-
-	//this.log.log('Sending Reliably ' +  util.inspect(gameMsg));
-	
-	gameMsg.reliable = 1;
-	
-	// Breaks down the recipients
-	if (gameMsg.to === 'ALL') {
-		this.broadcastReliable(gameMsg);
-	}
-	else { 
-		// Send one msg immediately and then resend it in case of missing ACK
-		this.send(gameMsg);	
-		this.add2Queue(gameMsg);	
-	}
-};
-
-GameMsgManager.prototype.broadcastReliable = function(gameMsg) {
-	
-	this.send(gameMsg);
-	// WHAT FOLLOWS IS DISABLE FOR NOW
-	
-	var that = this;
-	var allCons = this.node.getConnections(this.node.server);
-	var i;
-	//this.log.msg('B: ' + gameMsg);
-	for (i=0; i< allCons.length;i++) {
-		var player = allCons[i];
-		gameMsg.to = player; 
-		this.sendReliable(gameMsg);
-	}
-	this.log.log('B, ' + gameMsg.id + ': ' + 'executed correctly.');
-	
-};
+//GameMsgManager.prototype.sendReliable = function(gameMsg) {
+//	
+//	
+//	this.send(gameMsg);	
+//	// WHAT FOLLOWS IS DISABLE FOR NOW
+//	
+//	if (gameMsg.to === 'SERVER' ||  gameMsg.to === null) {
+//		return false;
+//	}
+//
+//	//this.log.log('Sending Reliably ' +  util.inspect(gameMsg));
+//	
+//	gameMsg.reliable = 1;
+//	
+//	// Breaks down the recipients
+//	if (gameMsg.to === 'ALL') {
+//		this.broadcastReliable(gameMsg);
+//	}
+//	else { 
+//		// Send one msg immediately and then resend it in case of missing ACK
+//		this.send(gameMsg);	
+//		this.add2Queue(gameMsg);	
+//	}
+//};
+//
+//GameMsgManager.prototype.broadcastReliable = function(gameMsg) {
+//	
+//	this.send(gameMsg);
+//	// WHAT FOLLOWS IS DISABLE FOR NOW
+//	
+//	var that = this;
+//	var allCons = this.node.getConnections(this.node.server);
+//	var i;
+//	//this.log.msg('B: ' + gameMsg);
+//	for (i=0; i< allCons.length;i++) {
+//		var player = allCons[i];
+//		gameMsg.to = player; 
+//		this.sendReliable(gameMsg);
+//	}
+//	this.log.log('B, ' + gameMsg.id + ': ' + 'executed correctly.');
+//	
+//};
 
 // FORWARD
 
@@ -207,74 +223,72 @@ GameMsgManager.prototype.forward = function (gameMsg, to) {
 //	}
 };
 
-GameMsgManager.prototype.forwardReliable = function(gameMsg) {
-	
-	this.forward(gameMsg);
-	// WHAT FOLLOWS IS DISABLE FOR NOW
-	
-	gameMsg.reliable = 1;	
-	this.forward(gameMsg);	
-};
+//GameMsgManager.prototype.forwardReliable = function(gameMsg) {
+//	
+//	this.forward(gameMsg);
+//	// WHAT FOLLOWS IS DISABLE FOR NOW
+//	
+//	gameMsg.reliable = 1;	
+//	this.forward(gameMsg);	
+//};
 
 
 //Clear Msg from Queue
-GameMsgManager.prototype.add2Queue = function (gameMsg) {	
-	
-	var that = this;
-	var id2store = (gameMsg.forward) ? gameMsg.to : gameMsg.from;
-	var id2store = gameMsg.to;
-	
-	//this.log.log(util.inspect(gameMsg));
-	//this.log.log('Added to clear: ' + id2store);
-	
-	if (!this.msgQueue.hasOwnProperty(id2store)) {
-		this.msgQueue[id2store] = {};
-	}
-	
-	this.msgQueue[id2store][gameMsg.id] = setInterval( function() {
-		that.send(gameMsg);	
-	},this.timeout);
-	
-	//this.log.log(util.inspect(this.msgQueue));
-	
-};
+//GameMsgManager.prototype.add2Queue = function (gameMsg) {	
+//	
+//	var that = this;
+//	var id2store = (gameMsg.forward) ? gameMsg.to : gameMsg.from;
+//	var id2store = gameMsg.to;
+//	
+//	//this.log.log(util.inspect(gameMsg));
+//	//this.log.log('Added to clear: ' + id2store);
+//	
+//	if (!this.msgQueue.hasOwnProperty(id2store)) {
+//		this.msgQueue[id2store] = {};
+//	}
+//	
+//	this.msgQueue[id2store][gameMsg.id] = setInterval( function() {
+//		that.send(gameMsg);	
+//	},this.timeout);
+//	
+//	//this.log.log(util.inspect(this.msgQueue));
+//	
+//};
 
 
 //Clear Msg from Queue
-GameMsgManager.prototype.clearMsg = function (connid, msgid) {	
-	if (this.msgQueue[connid]) {
-		if (this.msgQueue[connid][msgid]) {
-			clearInterval(this.msgQueue[connid][msgid]);
-			delete this.msgQueue[connid][msgid];	
-		}
-		else {
-			this.log.log('Attempt to clear unexisting reliable msg: ' + connid + '.' + msgid, 'ERR');
-			console.log(util.inspect(this.msgQueue));
-		}
-	}
-	else {
-		this.log.log('Attempt to access unexisting player in the Msg Queue: ' + connid, 'ERR');
-		//console.log(util.inspect(this.msgQueue));
-	}
-};
+//GameMsgManager.prototype.clearMsg = function (connid, msgid) {	
+//	if (this.msgQueue[connid]) {
+//		if (this.msgQueue[connid][msgid]) {
+//			clearInterval(this.msgQueue[connid][msgid]);
+//			delete this.msgQueue[connid][msgid];	
+//		}
+//		else {
+//			this.log.log('Attempt to clear unexisting reliable msg: ' + connid + '.' + msgid, 'ERR');
+//			console.log(util.inspect(this.msgQueue));
+//		}
+//	}
+//	else {
+//		this.log.log('Attempt to access unexisting player in the Msg Queue: ' + connid, 'ERR');
+//		//console.log(util.inspect(this.msgQueue));
+//	}
+//};
 
 //Reset the Queue of messages with reliable support
-GameMsgManager.prototype.resetMsgQueue = function (connid) {
-		
-	if (this.msgQueue[connid]) {
-		for (var key in this.msgQueue) {
-		    if (this.msgQueue[connid].hasOwnProperty(key)) {
-		    	this.log.log('Msg ' + key + ' could not be delivered to ' + connid, 'ERR');
-		    	clearInterval(this.msgQueue[connid][key]);
-		    	delete this.msgQueue[connid];
-		    }
-		}
-		delete this.msgQueue[connid];
-		this.log.log('Cleaned the queue ' + connid );
-	}
-	else {
-		this.log.log('Attempt to reset unexisting player in the Msg Queue: ' + connid, 'ERR');
-	}
-	
-	
-};
+//GameMsgManager.prototype.resetMsgQueue = function (connid) {
+//		
+//	if (this.msgQueue[connid]) {
+//		for (var key in this.msgQueue) {
+//		    if (this.msgQueue[connid].hasOwnProperty(key)) {
+//		    	this.log.log('Msg ' + key + ' could not be delivered to ' + connid, 'ERR');
+//		    	clearInterval(this.msgQueue[connid][key]);
+//		    	delete this.msgQueue[connid];
+//		    }
+//		}
+//		delete this.msgQueue[connid];
+//		this.log.log('Cleaned the queue ' + connid );
+//	}
+//	else {
+//		this.log.log('Attempt to reset unexisting player in the Msg Queue: ' + connid, 'ERR');
+//	}
+//};

@@ -10,7 +10,8 @@ function GameSocketClient(options,nodeGame) {
 	
 	this.host = options.host;
 	this.port = options.port;
-		
+	this.servername = null;
+	
 	this.socket = this.connect();
 	
 	this.game = null;
@@ -71,13 +72,14 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 	    	
 			if (msg.target === 'HI'){
 				that.player = new Player(msg.data,that.name);
-				console.log('HI: ' + that.player);
+				that.servername = msg.from;
+				//console.log('HI: ' + that.player);
 				
 				// Get Ready to play
 				that.attachMsgListeners(socket, msg.session);
 				
-				// Send own name to all
-				that.sendHI(that.player,'ALL');
+				// Send own name to SERVER
+				that.sendHI(that.player);
 				
 				// Confirmation of reception was required
 //				if (msg.reliable) {
@@ -170,55 +172,64 @@ GameSocketClient.prototype.attachMsgListeners = function(socket, session) {
 		node.fire(msg.toInEvent(), msg);
 		
 		// Confirmation of reception was required
-		if (msg.reliable) {
-			that.sendACK(msg);
-		}
+//		if (msg.reliable) {
+//			that.sendACK(msg);
+//		}
 	});
 };
 
 // MSGs
 
-GameSocketClient.prototype.sendACK = function (gm,to) {
+//GameSocketClient.prototype.sendACK = function (gm, to) {
+//
+//	//console.log('ACK: ' + gm.data);
+//
+//	if (to === undefined || to === null) {
+//		to = 'SERVER';
+//	}
+//	var msgACK = this.gmg.createACK(gm,to);	
+//	//console.log('CREATED ACK: FROM' + msgACK.from + ' TO: ' + msgACK.to);
+//	this.send(msgACK, to);
+//};
 
-	//console.log('ACK: ' + gm.data);
-
-	if (to === undefined || to === null) {
-		to = 'SERVER';
-	}
-	var msgACK = this.gmg.createACK(gm,to);	
-	//console.log('CREATED ACK: FROM' + msgACK.from + ' TO: ' + msgACK.to);
-	this.send(msgACK, to);
-};
-
-
-GameSocketClient.prototype.sendHI = function (state,to) {
-	console.log('steeeeeee');
+GameSocketClient.prototype.sendHI = function (state, to) {
 	var to = to || 'SERVER';
-	var msg = this.gmg.createHI(this.player);
+	var msg = this.gmg.createHI(this.player, to);
 	this.game.player = this.player;
-	this.send(msg, to);
+	this.send(msg);
 };
 
 // TODO: other things rely on this methods which has changed
-GameSocketClient.prototype.sendSTATE = function(action, state,to) {	
+GameSocketClient.prototype.sendSTATE = function(action, state, to) {	
 	var msg = this.gmg.createSTATE(action,state,to);
-	this.send(msg, to);
+	this.send(msg);
 };
 
-GameSocketClient.prototype.sendTXT = function(text,to) {	
+GameSocketClient.prototype.sendTXT = function(text, to) {	
 	var msg = this.gmg.createTXT(text,to);
-	this.send(msg, to);
+	this.send(msg);
 };
 
-GameSocketClient.prototype.sendDATA = function (data,to,msg) {
+GameSocketClient.prototype.sendDATA = function (data, to, msg) {
 	var to = to || 'SERVER';
 	var msg = this.gmg.createDATA(data,to,msg);
-	this.send(msg, to);
+	//this.send(msg, to);
+	//Removed to from the send function. Should be already in the message
+	this.send(msg);
 };
 
-GameSocketClient.prototype.send = function (msg, to) {
-	// TODO CHANGE HERE
-	this.socket.send(msg.stringify());
+/**
+ * Write a msg into the socket. 
+ * 
+ * The msg is actually received by the client itself as well.
+ */
+GameSocketClient.prototype.send = function (msg) {
+	if (msg.reliable) {
+		this.socket.send(msg.stringify());
+	}
+	else {
+		this.socket.volatile.send(msg.stringify());
+	}
 	console.log('S: ' + msg);
 	node.fire('LOG', 'S: ' + msg.toSMS());
 };

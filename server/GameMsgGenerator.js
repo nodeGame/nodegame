@@ -22,7 +22,7 @@ GameMsgGenerator.prototype.getCurrentState = function () {
 
 GameMsgGenerator.prototype.createHI = function(text,to,reliable) {
 	
-	var rel = reliable || 0;
+	var rel = reliable || 1;
 	
 	return new GameMsg(
 						this.session,
@@ -55,8 +55,7 @@ GameMsgGenerator.prototype.getSTATE = function(plist,to,reliable) {
 
 GameMsgGenerator.prototype.createSTATE = function(action,state,to,reliable) {
 	
-	//var rel = reliable || 1;
-	var rel = reliable || 0;
+	var rel = reliable || 1;
 	
 	return new GameMsg(
 						this.session,
@@ -91,7 +90,7 @@ GameMsgGenerator.prototype.createPLIST = function(target,plist,to,reliable) {
 	
 	//console.log('Creating plist msg ' + plist + ' ' + plist.size());
 	
-	var rel = reliable || 0;
+	var rel = reliable || 1;
 	
 	return new GameMsg(
 						this.session, 
@@ -135,10 +134,9 @@ GameMsgGenerator.prototype.createTXT = function(text,to,reliable) {
 
 // DATA
 
-GameMsgGenerator.prototype.createDATA = function(data,to,text, reliable) {
+GameMsgGenerator.prototype.createDATA = function(data, to, text, reliable) {
 	
-	// var rel = reliable || 1;
-	var rel = reliable || 0;
+	var rel = reliable || 1;
 	var text = text || 'data';
 	
 	return new GameMsg(
@@ -158,7 +156,7 @@ GameMsgGenerator.prototype.createDATA = function(data,to,text, reliable) {
 
 // ACK
 
-GameMsgGenerator.prototype.createACK = function(gm,to,reliable) {
+GameMsgGenerator.prototype.createACK = function(gm, to, reliable) {
 	
 	var rel = reliable || 0;
 	

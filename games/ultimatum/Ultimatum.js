@@ -68,7 +68,7 @@ function Ultimatum () {
 		var that = this;		
 		nodeWindow.loadFrame('games/ultimatum/solo.html');
 				
-		node.onDATA( function(msg){
+		node.onDATA (function(msg){
 					
 			if (msg.data === 'BIDDER') {
 				
@@ -85,7 +85,7 @@ function Ultimatum () {
 					
 					//node.printAllListeners();
 					
-					node.onDATA( function(msg) {
+					node.onDATA (function(msg) {
 						
 						if (msg.data === 'ACCEPT') {
 							nodeWindow.write(root, 'Your offer was accepted');

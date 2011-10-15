@@ -41,114 +41,60 @@ function PlayerServer(options) {
 //	this.partner = null;
 }
 
-
-PlayerServer.prototype.attachListeners = function() {
-	
+PlayerServer.prototype.attachCustomListeners = function() {
 	var that = this;
 	var log = this.log;
+	var say = GameMsg.actions.SAY + '.';
+	var set = GameMsg.actions.SET + '.';
+	var get = GameMsg.actions.GET + '.'; 
+
+    this.on(say+'HI', function(msg) {
+    	console.log(that.name + ' ----------------- Got ' + msg.toEvent());
+    	that.pl.addPlayer(msg.data);
+        // TODO: check if this is secure
+    	that.gmm.sendPLIST(that); // Send the list of players to all the clients
+    	
+    	// Send PL to monitors
+        that.gmm.forwardPLIST(that);
+	});
 	
-	log.log('Listening for connections');
+    this.on(say+'TXT', function(msg) {
+		// Personal msg
+		// TODO: maybe checked before?
+		if (msg.to !== null || msg.to || 'SERVER'){
+			that.gmm.sendTXT (msg.text, msg.to);
+		}
+		// Send it the Monitor anyway
+		// Already forwarded
+		//that.gmm.forwardTXT(msg.text, msg.to);
+	});
+			
+    this.on(say+'DATA', function(msg) {
+		// Personal msg
+		// TODO: maybe checked before?
+		if (msg.to !== null || msg.to || 'SERVER'){
+			that.gmm.sendDATA (msg.data, msg.to, msg.text);
+		}
+	});
 	
-	this.channel = this.server
-	  .of(this.channel)
-	  .on('connection', function (socket) {
-		that.socket = socket;  
+    this.on(say+'STATE', function(msg) {
 		
-		var say = GameMsg.actions.SAY + '.';
-		var set = GameMsg.actions.SET + '.';
-		var get = GameMsg.actions.GET + '.'; 
-		
-		// TODO: get connid from socket?
-		var connStr = "Welcome <" + socket.id + ">";
-		log.log(connStr);
-		
-		// Send HI msg to the newly connected client
-		that.gmm.sendHI(connStr,socket.id);
-		
-		// Tell everybody a new player is connected;
-		that.gmm.sendTXT(connStr,'ALL');
-		
-		socket.on('close', function(){
-			that.gmm.sendTXT("<"+socket.id+"> closed");
-			log.log("<"+socket.id+"> closed");
-			that.gmm.resetMsgQueue(socket.id);
-			that.pl.remove(socket.id);
+		//that.log.log('onSTATE P ' + util.inspect(msg));
+		var player = that.pl.get(msg.from);
+		if(player){
+			player.updateState(msg.data);
+
 			that.gmm.sendPLIST(that);
 			
-			// TODO: add checking for not having enough players
-		});
-		
-		
-		socket.on('message', function(message){
-			
-			var msg = that.secureParse(message);
-			//that.log.log('JUST RECEIVED P ' + util.inspect(msg));
-			
-			that.gmm.forward(msg);
-			console.log('P About to emit ' + msg.toEvent());
-			
-			// TODO: improve this
-			// Notice: ACK must be fired otherwise the queue does not get cleaned
-			if (msg.target === 'ACK' || msg.to !== 'SERVER') {
-				console.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
-				//socket.emit(msg.toEvent(),msg);
-				that.emit(msg.toEvent(),msg);
-			}
-
-		});
-
-        that.on(say+'HI', function(msg) {
-        	that.pl.addPlayer(msg.data);
-            // TODO: check if this is secure
-        	that.gmm.sendPLIST(that); // Send the list of players to all the clients
-        	
-        	that.log.log('Player is forwarding the PL');
-        	// Send PL to monitors
-            that.gmm.forwardPLIST(that);
- 		});
-
-        that.on(say+'ACK', function(msg) {
-//			console.log('PIF? ' + msg.forward);
-//			console.log(msg);
-//			var id2clear = (msg.forward) ? msg.to : msg.from;		
-//			console.log(msg.to + ' ' + msg.from);
-			
-			that.gmm.clearMsg(msg.from, msg.data);		
-		});
-		
-        that.on(say+'TXT', function(msg) {
-			// Personal msg
-			// TODO: maybe checked before?
-			if (msg.to !== null || msg.to || 'SERVER'){
-				that.gmm.sendTXT (msg.text, msg.to);
-			}
-			// Send it the Monitor anyway
-			// Already forwarded
-			//that.gmm.forwardTXT(msg.text, msg.to);
-		});
-				
-        that.on(say+'DATA', function(msg) {
-			// Personal msg
-			// TODO: maybe checked before?
-			if (msg.to !== null || msg.to || 'SERVER'){
-				that.gmm.sendDATA (msg.data, msg.to, msg.text);
-			}
-		});
-		
-        that.on(say+'STATE', function(msg) {
-			
-			//that.log.log('onSTATE P ' + util.inspect(msg));
-			var player = that.pl.get(msg.from);
-			if(player){
-				player.updateState(msg.data);
-
-				that.gmm.sendPLIST(that);
-				
-				that.gmm.forwardPLIST(that);
-			}
-		});	
-		
-	});
+			that.gmm.forwardPLIST(that);
+		}
+	});	
+	
+    this.on('closed', function(id) {
+      	console.log(that.name + ' ----------------- Got ' + msg.toEvent());
+    	that.pl.remove(id);
+    	that.gmm.sendPLIST(that);
+    });
 	
 	// TODO: Check this
 	this.server.sockets.on("shutdown", function(message) {

@@ -36,16 +36,16 @@ function Monitor_Ultimatum () {
 				var bidder = g.getRandom();
 				//console.log(bidder);
 				g.remove(bidder.connid);				
-				node.fire('out.say.DATA', 'BIDDER',bidder.connid);
+				node.fire('out.say.DATA', 'BIDDER', bidder.connid);
 				
 				// Respondent
 				var respondent = g.getRandom();
 				//console.log(respondent);
-				node.fire('out.say.DATA', 'RESPONDENT',respondent.connid);
+				node.fire('out.say.DATA', 'RESPONDENT', respondent.connid);
 
 				// Make each other aware
-				node.fire('out.say.DATA','OTHER', bidder.connid,respondent.connid);
-				node.fire('out.say.DATA','OTHER', respondent.connid, bidder.connid);
+				node.fire('out.say.DATA', 'OTHER', bidder.connid, respondent.connid);
+				node.fire('out.say.DATA', 'OTHER', respondent.connid, bidder.connid);
 
 			}
 			else {
