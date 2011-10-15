@@ -49,7 +49,7 @@ PlayerList.prototype.importIDS = function(arrayIDS) {
 // Check Here!!! 
 
 PlayerList.prototype.addPlayer = function (player) {
-	return this.add(player.connid, player.name);
+	return this.add(player.id, player.name);
 };
 
 PlayerList.prototype.add = function (connid,name) {	
@@ -100,7 +100,7 @@ PlayerList.prototype.getRandom = function () {
 PlayerList.prototype.getAllIDs = function () {	
 	
      return this.map(function(o){
-    	 return o.getConnid();
+    	 return o.getId();
      	});
 //     
 //	 var result = new Array();
@@ -116,17 +116,17 @@ PlayerList.prototype.getAllIDs = function () {
 
 PlayerList.prototype.updatePlayer = function (player) {
 	
-	if (typeof(this.pl[player.connid]) !== 'undefined') {
+	if (typeof(this.pl[player.id]) !== 'undefined') {
 		this.pl[connid] = player;
 		return true;
 	}
 	
-	console.log('W: Attempt to access a non-existing player from the the player list ' + player.connid);
+	console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
 	return false;
 };
 
 
-// Returns an array of array of n groups of players {connid: name}
+// Returns an array of array of n groups of players {id: name}
 //The last group could have less elements.
 PlayerList.prototype.getNGroups = function (n) {
 	
@@ -155,7 +155,7 @@ PlayerList.prototype.getNGroups = function (n) {
 		// Get a random idx between 0 and array length
 		idx = Math.floor(Math.random()*copy.length);
 		
-		result[gid].add(copy[idx].getConnid(),copy[idx]);
+		result[gid].add(copy[idx].getId(),copy[idx]);
 		copy.splice(idx,1);
 		count++;
 	}
@@ -163,7 +163,7 @@ PlayerList.prototype.getNGroups = function (n) {
 	return result;
 };
 
-// Returns an array of array of groups of n players {connid: name};
+// Returns an array of array of groups of n players {id: name};
 // The last group could have less elements.
 PlayerList.prototype.getGroupsSizeN = function (n) {
 	// TODO: getGroupsSizeN
@@ -246,16 +246,16 @@ PlayerList.prototype.toString = function () {
 
 //Player
 
-function Player(connid, name, state) {
+function Player(id, name, state) {
 	
 	// PRIVATE variables
-	this.connid = connid;
+	this.id = id;
 	this.name = name;
 	this.state = state || new GameState();
 }
 
-Player.prototype.getConnid = function() {
-	return this.connid;
+Player.prototype.getId = function() {
+	return this.id;
 };
 
 Player.prototype.getName = function() {
@@ -263,7 +263,7 @@ Player.prototype.getName = function() {
 };
 
 Player.prototype.import = function (player) {
-	this.connid = player.connid;
+	this.id = player.id;
 	this.name = player.name;
 	this.state = player.state;
 };
@@ -272,27 +272,18 @@ Player.prototype.updateState = function (state) {
 	this.state = state;
 };
 
-
-// With Private Variables: not working!
-
-//function Player(connid, name) {
-//	
-//	// PRIVATE variables
-//	var connid = connid;
-//	var name = name;
-//	
-//	// PRIVILEGED methods;
-//	this.getConnid = function() { 
-//		return connid;
-//		};
-//    this.getName = function() {
-//    	return name;
-//    };
-//}
-
-
-Player.prototype.toString = function() {
-	var out = this.getConnid() + ": " + this.getName() + ", " + this.state;
-	return out;
+Player.parse = function(player) {
+	try {
+		var p = new Player();
+		p.import(player);
+		return p;
+	}
+	catch(e){
+		throw 'Error while trying to parse Player ' + e.message;
+	}
 };
 
+Player.prototype.toString = function() {
+	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
+	return out;
+};

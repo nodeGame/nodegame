@@ -35,7 +35,7 @@ GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
             GameMsg.targets.HI,
             this.sender,
             to,
-            'Player: ' + player.name + '(' + player.connid + ') ready.',
+            Player.parse(player) + ' ready.',
             player,
             null,
             rel

@@ -89,32 +89,31 @@ GameServer.prototype.attachListeners = function() {
 				
 		// Send Welcome Msg and notify others
 		that.welcomeClient(socket.id);		
-		
-		socket.on('close', function(){
-			that.gmm.sendTXT("<"+socket.id+"> closed");
-			log.log("<"+socket.id+"> closed");
-			// Notify all server
-			that.emit('closed', socket.id);
-		});
-		
-		
+			
 		socket.on('message', function(message){
 			
 			var msg = that.secureParse(message);
 			//that.log.log('JUST RECEIVED P ' + util.inspect(msg));
 			
-			// TODO: KEEP THE FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// TODO: KEEP THE FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ?
 			//that.gmm.forward(msg);
 			console.log(that.name + ' About to emit ' + msg.toEvent());
 			
-			if (msg.to !== 'SERVER') {
-				that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);	
-				that.emit(msg.toEvent(),msg);
-			}
-
+			that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);	
+			that.emit(msg.toEvent(), msg);
+		});
+	
+		
+		socket.on('disconnect', function() {
+			that.gmm.sendTXT("<"+socket.id+"> closed", 'ALL');
+			log.log("<"+socket.id+"> closed");
+			// Notify all server
+			that.emit('closed', socket.id);
 		});
 		
 	});
+	
+	
 	
 	// TODO: Check this
 	this.server.sockets.on("shutdown", function(message) {
@@ -131,9 +130,6 @@ GameServer.prototype.welcomeClient = function(client) {
 	
 	// Send HI msg to the newly connected client
 	this.gmm.sendHI(connStr, client);
-	
-	// Tell everybody a new player is connected;
-	this.gmm.sendTXT(connStr,'ALL');
 }
 
 GameServer.prototype.checkSync = function() {

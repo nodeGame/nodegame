@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 12:00:01 CEST 2011
+ * Built on Sa 15. Okt 15:02:26 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 12:00:01 CEST 2011
+ * Built on Sa 15. Okt 15:02:26 CEST 2011
  *
  */
  
@@ -523,7 +523,7 @@ GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
             GameMsg.targets.HI,
             this.sender,
             to,
-            'Player: ' + player.name + '(' + player.connid + ') ready.',
+            Player.parse(player) + ' ready.',
             player,
             null,
             rel
@@ -859,7 +859,7 @@ GameSocketClient.prototype.secureParse = function (msg) {
 	
 	try {
 		gameMsg.clone(JSON.parse(msg));
-		console.log('R ' + gameMsg);
+		console.log('R: ' + gameMsg);
 		node.fire('LOG', 'R: ' + gameMsg.toSMS());
 	}
 	catch(e) {
@@ -870,9 +870,10 @@ GameSocketClient.prototype.secureParse = function (msg) {
 	return gameMsg;
 };
 
-// TODO CHANGE HERE
-
-// Waiting for HI from Server
+/**
+ * Nothing is done until the SERVER send an HI msg. All the others msgs will 
+ * be ignored otherwise.
+ */
 GameSocketClient.prototype.attachFirstListeners = function (socket) {
 	
 	var that = this;
@@ -888,99 +889,33 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 			if (msg.target === 'HI'){
 				that.player = new Player(msg.data,that.name);
 				that.servername = msg.from;
-				//console.log('HI: ' + that.player);
 				
 				// Get Ready to play
 				that.attachMsgListeners(socket, msg.session);
 				
-				// Send own name to all
-				that.sendHI(that.player,that.servername);
-				
-				// Confirmation of reception was required
-//				if (msg.reliable) {
-//					that.sendACK(msg);
-//				}
+				// Send own name to SERVER
+				that.sendHI(that.player);
 		   	 } 
 	    });
 	    
 	});
 	
-//	socket.on('message', function (msg) {	
-//		
-//		console.log('msg!2');
-//		
-//    	var msg = that.secureParse(msg);
-//    	
-//		if (msg.target === 'HI'){
-//			that.player = new Player(msg.data,that.name);
-//			console.log('HI: ' + that.player);
-//			
-//			// Get Ready to play
-//			that.attachMsgListeners(socket, msg.session);
-//			
-//			// Send own name to all
-//			that.sendHI(that.player,'ALL');
-//			
-//			// Confirmation of reception was required
-//			if (msg.reliable) {
-//				that.sendACK(msg);
-//			}
-//	   	 } 
-//    });
-	
     socket.on('disconnect', function() {
     	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
-    	console.log("closed");
+    	console.log('closed');
     });
 };
 
-// Websocket is waiting for the HI msg from the Server
-//GameSocketClient.prototype.attachFirstListeners = function (w) {
-//	
-//	var that = this;
-//	
-//    // Registering Event Listeners
-//    w.onopen = function() {
-//    	var connString = 'nodeGame: connection open';
-//        console.log(connString); 
-//    };
-//
-//    w.onmessage = function(e) {
-//
-//    	var msg = that.secureParse(e);
-//    	
-//		if (msg.target === 'HI'){
-//			that.player = new Player(msg.data,that.name);
-//			console.log('HI: ' + that.player);
-//			
-//			
-//			// Get Ready to play
-//			that.attachMsgListeners(w,msg.session,this.msgClientListeners);
-//			
-//			// Send own name to all
-//			that.sendHI(that.player,'ALL');
-//			
-//			// Confirmation of reception was required
-//			if (msg.reliable) {
-//				that.sendACK(msg);
-//			}
-//	   	 } 
-//    };
-//
-//    w.onclose = function(e) {
-//    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
-//    	console.log("closed");
-//    };
-//};
-
-GameSocketClient.prototype.attachMsgListeners = function(socket, session) {   
-
-	console.log('nodeGame: Attaching FULL listeners');
-	socket.removeListener('message',this.socket.onmessage,false);
-	
-	this.gmg = new GameMsgGenerator(session,this.player.getConnid(),new GameState());
-
+GameSocketClient.prototype.attachMsgListeners = function (socket, session) {   
 	var that = this;
+	
+	console.log('nodeGame: Attaching FULL listeners');
+	//socket.removeListener('message',this.socket.onmessage,false);
+	socket.removeListener('message');
+	
+	
+	this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
+
 	socket.on('message', function(msg) {
 		
 		var msg = that.secureParse(msg);
@@ -992,20 +927,6 @@ GameSocketClient.prototype.attachMsgListeners = function(socket, session) {
 //		}
 	});
 };
-
-// MSGs
-
-//GameSocketClient.prototype.sendACK = function (gm, to) {
-//
-//	//console.log('ACK: ' + gm.data);
-//
-//	if (to === undefined || to === null) {
-//		to = 'SERVER';
-//	}
-//	var msgACK = this.gmg.createACK(gm,to);	
-//	//console.log('CREATED ACK: FROM' + msgACK.from + ' TO: ' + msgACK.to);
-//	this.send(msgACK, to);
-//};
 
 GameSocketClient.prototype.sendHI = function (state, to) {
 	var to = to || 'SERVER';
@@ -1028,8 +949,6 @@ GameSocketClient.prototype.sendTXT = function(text, to) {
 GameSocketClient.prototype.sendDATA = function (data, to, msg) {
 	var to = to || 'SERVER';
 	var msg = this.gmg.createDATA(data,to,msg);
-	//this.send(msg, to);
-	//Removed to from the send function. Should be already in the message
 	this.send(msg);
 };
 
@@ -1331,7 +1250,7 @@ PlayerList.prototype.importIDS = function(arrayIDS) {
 // Check Here!!! 
 
 PlayerList.prototype.addPlayer = function (player) {
-	return this.add(player.connid, player.name);
+	return this.add(player.id, player.name);
 };
 
 PlayerList.prototype.add = function (connid,name) {	
@@ -1342,7 +1261,7 @@ PlayerList.prototype.add = function (connid,name) {
 		return true;
 	}
 		
-	console.log('E: Attempt to add a new player already in the player list' + this.pl.connid);//[connid]);
+	console.log('E: Attempt to add a new player already in the player list' + this.pl.id);//[connid]);
 	return false;
 };
 
@@ -1381,7 +1300,7 @@ PlayerList.prototype.getRandom = function () {
 PlayerList.prototype.getAllIDs = function () {	
 	
      return this.map(function(o){
-    	 return o.getConnid();
+    	 return o.getId();
      	});
 //     
 //	 var result = new Array();
@@ -1398,12 +1317,12 @@ PlayerList.prototype.getAllIDs = function () {
 
 PlayerList.prototype.updatePlayer = function (player) {
 	
-	if (typeof(this.pl[player.connid]) !== 'undefined') {
+	if (typeof(this.pl[player.id]) !== 'undefined') {
 		this.pl[connid] = player;
 		return true;
 	}
 	
-	console.log('W: Attempt to access a non-existing player from the the player list ' + player.connid);
+	console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
 	return false;
 };
 
@@ -1436,7 +1355,7 @@ PlayerList.prototype.getNGroups = function (n) {
 		// Get a random idx between 0 and array length
 		idx = Math.floor(Math.random()*copy.length);
 		
-		result[gid].add(copy[idx].connid,copy[idx].name);
+		result[gid].add(copy[idx].id,copy[idx].name);
 		copy.splice(idx,1);
 		count++;
 	}
@@ -1541,16 +1460,16 @@ PlayerList.prototype.toString = function (eol) {
 
 //Player
 
-function Player(connid, name, state) {
+function Player(id, name, state) {
 	
 	// PRIVATE variables
-	this.connid = connid;
+	this.id = id;
 	this.name = name;
 	this.state = state || new GameState();
 }
 
-Player.prototype.getConnid = function() {
-	return this.connid;
+Player.prototype.getId = function() {
+	return this.id;
 };
 
 Player.prototype.getName = function() {
@@ -1558,7 +1477,7 @@ Player.prototype.getName = function() {
 };
 
 Player.prototype.import = function (player) {
-	this.connid = player.connid;
+	this.id = player.id;
 	this.name = player.name;
 	this.state = player.state;
 };
@@ -1567,26 +1486,19 @@ Player.prototype.updateState = function (state) {
 	this.state = player.state;
 };
 
-//With Private Variables: not working!
-
-//function Player(connid, name) {
-//	
-//	// PRIVATE variables
-//	var connid = connid;
-//	var name = name;
-//	
-//	// PRIVILEGED methods;
-//	this.getConnid = function() { 
-//		return connid;
-//		};
-//  this.getName = function() {
-//  	return name;
-//  };
-//}
-
+Player.parse = function(player) {
+	try {
+		var p = new Player();
+		p.import(player);
+		return p;
+	}
+	catch(e){
+		throw 'Error while trying to parse Player ' + e.message;
+	}
+};
 
 Player.prototype.toString = function() {
-	var out = this.getConnid() + ": " + this.getName() + ", " + this.state;
+	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
 	return out;
 }; 
  
@@ -1662,7 +1574,7 @@ window.Utils = Utils;
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 12:00:02 CEST 2011
+ * Built on Sa 15. Okt 15:02:26 CEST 2011
  *
  */
  
@@ -3131,7 +3043,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 12:00:01 CEST 2011
+ * Built on Sa 15. Okt 15:02:26 CEST 2011
  *
  */
  
