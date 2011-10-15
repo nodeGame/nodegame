@@ -74,9 +74,7 @@ function nodeGame() {
 		
 	};
 	
-	this.play = function (net,game) {
-
-		console.log('nodeGame: connecting to server...');		
+	this.play = function (net,game) {	
 		that.gsc = new GameSocketClient(net);
 		
 		that.game = new Game(game, that.gsc);

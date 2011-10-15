@@ -2,25 +2,17 @@
 <title>WebSocket Monitor</title>
 <link href="gs.css" rel="stylesheet" type="text/css" />
 <body>
-  <div id="root"></div>
-<!--
-<script src="client/build/nodegame-w-0.1.js" charset="utf-8"></script>
-<script src="client/build/nodewindow-0.2.js" charset="utf-8"></script>
-<script src="client/build/nodegame-gadgets-new-0.2.js" charset="utf-8"></script>
--->
-<script src="client/build/0.3/nodegame-all-0.3.js" charset="utf-8"></script>
-
+  <div id="root"></div>	
+<script src="client/built/0.4/nodegame-all-0.4.js" charset="utf-8"></script>
 <script src="games/example/Monitor_Example.js" charset="utf-8"></script>
-<script src="games/ultimatum/Monitor_Ultimatum.js" charset="utf-8"></script>
-
-
+<script src="http://localhost:8004/socket.io/socket.io.js"></script>
 <script>
     window.onload = function(){
    
 		var net = { 
         name: "Monitor",
         host: "localhost",
-        port: 8004 // Admin Port
+        port: '8004/admin'
       };
 			
     node.play(net, new Monitor_Example());

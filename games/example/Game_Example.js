@@ -140,9 +140,7 @@ function Game_Example () {
 				nodeWindow.addDiv(root,div);
 				document.body.appendChild(n);
 				console.log('all this done');
-				
-				
-				
+					
 				nodeWindow.frame.innerHTML += d.data;
 				nodeWindow.addDiv(nodeWindow.frame,div);
 				

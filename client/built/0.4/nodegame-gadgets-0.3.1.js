@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:13:01 CEST 2011
+ * Built on Sa 15. Okt 15:57:52 CEST 2011
  *
  */
  
@@ -1314,7 +1314,7 @@ StateDisplay.prototype.append = function (root, ids) {
 
 StateDisplay.prototype.updateAll = function(idState,idPlayer) {
 	var pName = document.createTextNode('Name: ' + this.game.player.name);
-	var pId = document.createTextNode('Connid: ' + this.game.player.id);
+	var pId = document.createTextNode('Id: ' + this.game.player.id);
 	
 	this.playerDiv.appendChild(pName);
 	this.playerDiv.appendChild(document.createElement('br'));

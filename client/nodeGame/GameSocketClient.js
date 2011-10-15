@@ -24,7 +24,7 @@ GameSocketClient.prototype.setGame = function(game) {
 GameSocketClient.prototype.connect = function() {
 	// TODO: add check if http:// is already in
 	var url = "http://" + this.host + ":" + this.port;
-	console.log('Connecting to ' + url);
+	console.log('nodeGame: connecting to ' + url);
 	var socket = io.connect(url);
     this.attachFirstListeners(socket);
     return socket;
@@ -96,20 +96,13 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 	
 	console.log('nodeGame: Attaching FULL listeners');
 	//socket.removeListener('message',this.socket.onmessage,false);
-	socket.removeListener('message');
-	
-	
+	socket.removeAllListeners('message');
+		
 	this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
 
 	socket.on('message', function(msg) {
-		
 		var msg = that.secureParse(msg);
 		node.fire(msg.toInEvent(), msg);
-		
-		// Confirmation of reception was required
-//		if (msg.reliable) {
-//			that.sendACK(msg);
-//		}
 	});
 };
 

@@ -4,13 +4,14 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:13:00 CEST 2011
+ * Built on Sa 15. Okt 15:57:52 CEST 2011
  *
  */
  
  
 (function( window ) {
 
+  console.log('nodeGame v.0.4'); // TODO: Where to save the version number?
   console.log('nodeGame: loading...');
   
 // All the Functions
@@ -828,7 +829,7 @@ GameSocketClient.prototype.setGame = function(game) {
 GameSocketClient.prototype.connect = function() {
 	// TODO: add check if http:// is already in
 	var url = "http://" + this.host + ":" + this.port;
-	console.log('Connecting to ' + url);
+	console.log('nodeGame: connecting to ' + url);
 	var socket = io.connect(url);
     this.attachFirstListeners(socket);
     return socket;
@@ -900,20 +901,13 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 	
 	console.log('nodeGame: Attaching FULL listeners');
 	//socket.removeListener('message',this.socket.onmessage,false);
-	socket.removeListener('message');
-	
-	
+	socket.removeAllListeners('message');
+		
 	this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
 
 	socket.on('message', function(msg) {
-		
 		var msg = that.secureParse(msg);
 		node.fire(msg.toInEvent(), msg);
-		
-		// Confirmation of reception was required
-//		if (msg.reliable) {
-//			that.sendACK(msg);
-//		}
 	});
 };
 
@@ -1116,9 +1110,7 @@ function nodeGame() {
 		
 	};
 	
-	this.play = function (net,game) {
-
-		console.log('nodeGame: connecting to server...');		
+	this.play = function (net,game) {	
 		that.gsc = new GameSocketClient(net);
 		
 		that.game = new Game(game, that.gsc);
