@@ -124,6 +124,9 @@ GameServer.prototype.attachListeners = function() {
 	});
 };
 
+// Will be overwritten
+GameServer.prototype.attachCustomListeners = function() {}
+
 GameServer.prototype.welcomeClient = function(client) {
 	var connStr = "Welcome <" + client + ">";
 	this.log.log(connStr);

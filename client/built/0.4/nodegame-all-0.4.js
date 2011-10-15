@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:02:26 CEST 2011
+ * Built on Sa 15. Okt 15:13:00 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:02:26 CEST 2011
+ * Built on Sa 15. Okt 15:13:00 CEST 2011
  *
  */
  
@@ -1574,7 +1574,7 @@ window.Utils = Utils;
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:02:26 CEST 2011
+ * Built on Sa 15. Okt 15:13:01 CEST 2011
  *
  */
  
@@ -2427,7 +2427,7 @@ GameBoard.prototype.listeners = function() {
 			that.board.innerHTML = '';
 			pl.forEach( function(p) {
 				//console.log(p);
-				var line = '[' + p.connid + "|" + p.name + "]> \t"; 
+				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
 				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
 				pState += ' ';
@@ -2884,7 +2884,7 @@ StateDisplay.prototype.append = function (root, ids) {
 
 StateDisplay.prototype.updateAll = function(idState,idPlayer) {
 	var pName = document.createTextNode('Name: ' + this.game.player.name);
-	var pId = document.createTextNode('Connid: ' + this.game.player.connid);
+	var pId = document.createTextNode('Connid: ' + this.game.player.id);
 	
 	this.playerDiv.appendChild(pName);
 	this.playerDiv.appendChild(document.createElement('br'));
@@ -3043,7 +3043,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 15. Okt 15:02:26 CEST 2011
+ * Built on Sa 15. Okt 15:13:00 CEST 2011
  *
  */
  

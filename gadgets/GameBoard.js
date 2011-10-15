@@ -44,7 +44,7 @@ GameBoard.prototype.listeners = function() {
 			that.board.innerHTML = '';
 			pl.forEach( function(p) {
 				//console.log(p);
-				var line = '[' + p.connid + "|" + p.name + "]> \t"; 
+				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
 				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
 				pState += ' ';

@@ -48,7 +48,7 @@ StateDisplay.prototype.append = function (root, ids) {
 
 StateDisplay.prototype.updateAll = function(idState,idPlayer) {
 	var pName = document.createTextNode('Name: ' + this.game.player.name);
-	var pId = document.createTextNode('Connid: ' + this.game.player.connid);
+	var pId = document.createTextNode('Id: ' + this.game.player.id);
 	
 	this.playerDiv.appendChild(pName);
 	this.playerDiv.appendChild(document.createElement('br'));
