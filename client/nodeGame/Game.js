@@ -99,9 +99,8 @@ function Game (settings,gamesocketclient) {
 			node.gsc.sendDATA(data,to,msg);
 		});
 		
-		node.on("DONE", function(msg){
+		node.on('DONE', function(msg){
 			that.is(GameState.iss.DONE);
-			that.publishState();
 		});
 		
 		node.on('WAIT', function(msg){
@@ -147,8 +146,8 @@ Game.prototype.previous = function() {
 Game.prototype.is = function(is) {
 	//console.log('IS ' + is);
 	this.gameState.is = is;
-	// TODO Check whether we should publish the state automatically.
-	//this.publishState();
+	// TODO Check whether we should do it here or no
+	this.publishState();
 };
 
 Game.prototype.publishState = function() {
