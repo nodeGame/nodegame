@@ -2,6 +2,7 @@
 
 var sys = require("sys");
 var fs = require('fs');
+var path = require('path');
 
 var Utils = require('./Utils');
 
@@ -10,11 +11,14 @@ module.exports = ServerLog;
 function ServerLog(options) {
 	
 	this.name = options.name || 'Noname';
-	
 	this.dumpmsg = options.dumpmsg || 0;
+	this.logdir = path.normalize(options.logdir || 'log');
+	this.logdir = path.resolve(this.logdir);
+		
+	this.checkLogDir();
 	
-	this.sysfile = options.sysfile || 'log/syslog';
-	this.msgfile = options.msgfile || 'log/messages';
+	this.sysfile = path.normalize(options.sysfile || this.logdir + '/syslog');
+	this.msgfile = path.normalize(options.msgfile || this.logdir + '/messages');
 	
 	try {
 		this.logSysStream = fs.createWriteStream( this.sysfile, {'flags': 'a'});
@@ -34,6 +38,17 @@ function ServerLog(options) {
 	}
 	
 };
+
+/**
+ * Creates the log directory if not existing.
+ * 
+ */
+ServerLog.prototype.checkLogDir = function() {
+	//console.log('logdir ' + this.logdir);
+	if (!path.existsSync(this.logdir)) {
+		fs.mkdirSync('log/', 0755);
+	}
+}
 
 ServerLog.prototype.log = function (text, type) {	
 	this.console(text,type);

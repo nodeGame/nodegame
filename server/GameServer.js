@@ -34,7 +34,7 @@ function GameServer(options) {
 	
 	var dumpmsg = options.dumpmsg || true;
 	
-	this.log = new ServerLog ({name: this.name, "dumpmsg": dumpmsg});
+	this.log = new ServerLog ({name: this.name, dumpmsg: dumpmsg});
 	
 	this.server = options.server;
 	
