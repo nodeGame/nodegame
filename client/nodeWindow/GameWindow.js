@@ -234,7 +234,7 @@ GameWindow.prototype.populateRecipientSelector = function (toSelector, playerLis
 	try {
 		pl.forEach( function(p) {
 			opt = document.createElement('option');
-			opt.value = p.connid;
+			opt.value = p.id;
 			opt.appendChild(document.createTextNode(p.name));
 			toSelector.appendChild(opt);
 			}, 

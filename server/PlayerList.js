@@ -186,7 +186,7 @@ PlayerList.prototype.getGroupsSizeN = function (n) {
 PlayerList.prototype.isStateDone = function(gameState) {
 	
 	this.forEach(function(p){
-		var gs = new GameState.parse(p.state);
+		var gs = new GameState(p.state);
 		
 		console.log('Going to compare ' + gs);
 		
@@ -296,7 +296,7 @@ Player.prototype.updateState = function (state) {
 //};
 
 Player.prototype.toString = function() {
-	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
+	var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
 	return out;
 };
 //

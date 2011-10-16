@@ -7,29 +7,41 @@
 
 module.exports = GameState; 
 
-GameState.UNKNOWN = 0;
-GameState.STARTING = 10;
-GameState.PLAYING = 50;
-GameState.DONE = 100;
+GameState.iss = {};
 
-function GameState (state,step,round) {
-	
-	// TODO: add checkings
-	this.state = state || 0;
-	this.step = step || 0;
-	this.round = round || 0;
-	
-	this.is = GameState.UNKNOWN;
+GameState.iss.UNKNOWN = 0;
+GameState.iss.STARTING = 10;
+GameState.iss.PLAYING = 50;
+GameState.iss.DONE = 100;
 
-	this.paused = false;
+function GameState (gs) {
+	
+	// TODO: The check for gs is done many times. Change it.
+	this.state = 	(gs) ? gs.state : 0;
+	this.step = 	(gs) ? gs.step : 0;
+	this.round = 	(gs) ? gs.round : 0;
+	this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
+	this.paused = 	(gs) ? gs.paused : false;
 }
+
+//function GameState (state,step,round) {
+//	
+//	// TODO: add checkings
+//	this.state = state || 0;
+//	this.step = step || 0;
+//	this.round = round || 0;
+//	
+//	this.is = GameState.UNKNOWN;
+//
+//	this.paused = false;
+//}
  
-GameState.prototype.import = function (gamestate) {
-	this.state = gamestate.state;
-	this.step = gamestate.step;
-	this.round = gamestate.round;
-	this.is = gamestate.is;
-};
+//GameState.prototype.import = function (gamestate) {
+//	this.state = gamestate.state;
+//	this.step = gamestate.step;
+//	this.round = gamestate.round;
+//	this.is = gamestate.is;
+//};
 
 GameState.prototype.toString = function () {
 	var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
@@ -65,16 +77,16 @@ GameState.compare = function (gs1, gs2, strict) {
 	return result;
 };
 
-GameState.parse = function(gamestate) {
-	try {
-		var gs = new GameState();
-		gs.import(gamestate);
-		return gs;
-	}
-	catch(e){
-		throw 'Error while trying to parsing GameState ' + e.message;
-	}
-};
+//GameState.parse = function(gamestate) {
+//	try {
+//		var gs = new GameState();
+//		gs.import(gamestate);
+//		return gs;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parsing GameState ' + e.message;
+//	}
+//};
 
 GameState.stringify = function (gs) {
 	return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;

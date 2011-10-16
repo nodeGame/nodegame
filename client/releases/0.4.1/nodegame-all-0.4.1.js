@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 12:09:41 CEST 2011
+ * Built on So 16. Okt 12:19:13 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 12:09:41 CEST 2011
+ * Built on So 16. Okt 12:19:13 CEST 2011
  *
  */
  
@@ -1664,7 +1664,7 @@ window.Utils = Utils;
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 12:09:42 CEST 2011
+ * Built on So 16. Okt 12:19:13 CEST 2011
  *
  */
  
@@ -3137,7 +3137,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 12:09:42 CEST 2011
+ * Built on So 16. Okt 12:19:13 CEST 2011
  *
  */
  
@@ -3725,7 +3725,7 @@ GameWindow.prototype.populateRecipientSelector = function (toSelector, playerLis
 	try {
 		pl.forEach( function(p) {
 			opt = document.createElement('option');
-			opt.value = p.connid;
+			opt.value = p.id;
 			opt.appendChild(document.createTextNode(p.name));
 			toSelector.appendChild(opt);
 			}, 

@@ -121,8 +121,7 @@ GameMsg.prototype.toString = function() {
 	var SPTend = "\n";
 	var DLM = "\"";
 	
-	var gm = new GameState();
-	gm.import(this.state);
+	var gm = new GameState(this.state);
 	
 	var line = this.created + SPT;
 		line += this.id + SPT;
