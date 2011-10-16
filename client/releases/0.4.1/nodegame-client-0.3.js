@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 09:35:12 CEST 2011
+ * Built on So 16. Okt 10:26:50 CEST 2011
  *
  */
  
@@ -485,19 +485,19 @@ GameLoop.prototype.getFunction = function(gameState) {
  * 
  */
 
-function GameMsgGenerator (session,sender,currentState) {	
+function GameMsgGenerator (session, sender, state) {	
 	this.session = session;
 	this.sender = sender;
-	this.currentState = currentState;
+	this.state = state;
 };
 
-GameMsgGenerator.prototype.setCurrentState = function (state) {
-	this.currentState = state;
-};
-
-GameMsgGenerator.prototype.getCurrentState = function () {
-	return this.currentState;
-};
+//GameMsgGenerator.prototype.setCurrentState = function (state) {
+//	this.state = state;
+//};
+//
+//GameMsgGenerator.prototype.getCurrentState = function () {
+//	return this.state;
+//};
 
 
 // HI
@@ -506,112 +506,112 @@ GameMsgGenerator.prototype.getCurrentState = function () {
 GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
 
   var rel = reliable || 1;
-
-  return new GameMsg(
-            this.session,
-            this.currentState,
-            GameMsg.actions.SAY,
-            GameMsg.targets.HI,
-            this.sender,
-            to,
-            Player.parse(player) + ' ready.',
-            player,
-            null,
-            rel
-            );
+  
+  return new GameMsg( {
+            			session: this.session,
+            			state: this.state,
+            			action: GameMsg.actions.SAY,
+            			target: GameMsg.targets.HI,
+            			from: this.sender,
+            			to: to,
+            			text: Player.parse(player) + ' ready.',
+            			data: player,
+            			priority: null,
+            			reliable: rel
+  });
 
 
 };
 
 // STATE
 
-GameMsgGenerator.prototype.saySTATE = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.saySTATE = function (plist, to, reliable) {
 	return this.createSTATE(GameMsg.SAY, plist, to,reliable);
 };
 
-GameMsgGenerator.prototype.setSTATE = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.setSTATE = function (plist, to, reliable) {
 	return this.createSTATE(GameMsg.SET, plist, to,reliable);
 };
 
-GameMsgGenerator.prototype.getSTATE = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.getSTATE = function (plist, to, reliable) {
 	return this.createSTATE(GameMsg.GET, plist, to,reliable);
 };
 
-GameMsgGenerator.prototype.createSTATE = function(action,state,to,reliable) {
+GameMsgGenerator.prototype.createSTATE = function (action, state, to, reliable) {
 	
 	var rel = reliable || 1;
 	
 	
-	return new GameMsg(
-						this.session,
-						this.currentState,
-						action,
-						GameMsg.targets.STATE,
-						this.sender,
-						to,
-						'New State: ' + GameState.stringify(state),
-						state,
-						null,
-						rel
-						);
+	return new GameMsg({
+						session: this.session,
+						state: this.state,
+						action: action,
+						target: GameMsg.targets.STATE,
+						from: this.sender,
+						to: to,
+						text: 'New State: ' + GameState.stringify(state),
+						data: state,
+						priority: null,
+						reliable: rel
+	});
 };
 
 
 // PLIST
 
-GameMsgGenerator.prototype.sayPLIST = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.sayPLIST = function (plist, to, reliable) {
 	return this.createPLIST(GameMsg.SAY, plist, to,reliable);
 };
 
-GameMsgGenerator.prototype.setPLIST = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.setPLIST = function (plist, to, reliable) {
 	return this.createPLIST(GameMsg.SET, plist, to,reliable);
 };
 
-GameMsgGenerator.prototype.getPLIST = function(target,plist,to,reliable) {
-	return this.createPLIST(GameMsg.GET, plist, to,reliable);
+GameMsgGenerator.prototype.getPLIST = function (plist, to, reliable) {
+	return this.createPLIST(GameMsg.GET, plist, to, reliable);
 };
 
-GameMsgGenerator.prototype.createPLIST = function(target,plist,to,reliable) {
+GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
 	
 	//console.log('Creating plist msg ' + plist + ' ' + plist.size());
 	
 	var rel = reliable || 1;
 	
-	return new GameMsg(
-						this.session, 
-						this.currentState,
-						target,
-						GameMsg.targets.PLIST,
-						this.sender,
-						to,
-						'List of Players: ' + plist.size(),
-						plist.pl,
-						null,
-						rel
-						);
+	return new GameMsg({
+						session: this.session, 
+						state: this.state,
+						action: action,
+						target: GameMsg.targets.PLIST,
+						from: this.sender,
+						to: to,
+						text: 'List of Players: ' + plist.size(),
+						data: plist.pl,
+						priority: null,
+						reliable: rel
+	});
 };
 
 
 //MSG
 
-GameMsgGenerator.prototype.createTXT = function(text,to,reliable) {
+GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 	
 	//console.log("STE: " + text);
 	
 	var rel = reliable || 0;
 	
-	return new GameMsg(
-						this.session,
-						this.currentState,
-						GameMsg.actions.SAY,
-						GameMsg.targets.TXT,
-						this.sender,
-						to,
-						text,
-						null,
-						null,
-						rel
-						);
+	return new GameMsg({
+						session: this.session,
+						state: this.state,
+						action: GameMsg.actions.SAY,
+						target: GameMsg.targets.TXT,
+						from: this.sender,
+						to: to,
+						text: text,
+						data: null,
+						priority: null,
+						reliable: rel
+	});
 	
 	
 };
@@ -619,44 +619,44 @@ GameMsgGenerator.prototype.createTXT = function(text,to,reliable) {
 
 // DATA
 
-GameMsgGenerator.prototype.createDATA = function(data,to,text, reliable) {
+GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
 	
 	var rel = reliable || 1;
 	var text = text || 'data';
 	
-	return new GameMsg(
-						this.session, 
-						this.currentState,
-						GameMsg.actions.SAY,
-						GameMsg.targets.DATA,
-						this.sender,
-						to,
-						text,
-						data,
-						null,
-						rel
-						);
+	return new GameMsg({
+						session: this.session, 
+						state: this.state,
+						action: GameMsg.actions.SAY,
+						target: GameMsg.targets.DATA,
+						from: this.sender,
+						to: to,
+						text: text,
+						data: data,
+						priority: null,
+						reliable: rel
+	});
 };
 
 
 // ACK
 
-GameMsgGenerator.prototype.createACK = function(gm,to,reliable) {
+GameMsgGenerator.prototype.createACK = function (gm, to, reliable) {
 	
 	var rel = reliable || 0;
 	
-	var newgm = new GameMsg(
-							this.session, 
-							this.currentState,
-							GameMsg.actions.SAY,
-							GameMsg.targets.ACK,
-							this.sender,
-							to,
-							'Msg ' + gm.id + ' correctly received',
-							gm.id,
-							null,
-							rel
-							);
+	var newgm = new GameMsg({
+							session: this.session, 
+							state: this.state,
+							action: GameMsg.actions.SAY,
+							target: GameMsg.targets.ACK,
+							from: this.sender,
+							to: to,
+							text: 'Msg ' + gm.id + ' correctly received',
+							data: gm.id,
+							priority: null,
+							reliable: rel
+	});
 	
 	if (gm.forward) {
 		newgm.forward = 1;
@@ -690,52 +690,85 @@ GameMsg.IN				= 'in.';	// Prefix for incoming msgs
 GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
 		
 
-function GameMsg (session, currentState, action, target, from, to, text, data,
-					priority, reliable) {
-		
+function GameMsg (gm) {
+
 	this.id = Math.floor(Math.random()*1000000);
-
-	this.action = action; 
-	this.target = target;
 	
-	this.session = session;
-	this.currentState = currentState;
+	this.session = gm.session;
+	this.state = gm.state;
+	this.target = gm.target; // was action
+	this.from = gm.from;
+	this.to = gm.to;
+	this.text = gm.text;
+	this.action = gm.action; 
+	this.data = gm.data;
+	this.priority = gm.priority;
+	this.reliable = gm.reliable;
 	
-	this.from = from;
-	this.to = to;
-	this.text = text;
-	this.data = data;
-	
-	this.priority = priority;
-	this.reliable = reliable;
-
 	this.created = Utils.getDate();
 	this.forward = 0; // is this msg just a forward?	
-	
 };
-// Does not change the msg ID
-GameMsg.prototype.import = function(jsonMsg) {
+
+//function GameMsg (session, currentState, action, target, from, to, text, data,
+//					priority, reliable) {
+//		
+//	this.id = Math.floor(Math.random()*1000000);
+//
+//	this.action = action; 
+//	this.target = target;
+//	
+//	this.session = session;
+//	this.currentState = currentState;
+//	
+//	this.from = from;
+//	this.to = to;
+//	this.text = text;
+//	this.data = data;
+//	
+//	this.priority = priority;
+//	this.reliable = reliable;
+//
+//	this.created = Utils.getDate();
+//	this.forward = 0; // is this msg just a forward?	
+//	
+//};
+//
+//// Does not change the msg ID
+//GameMsg.prototype.import = function(jsonMsg) {
+//	
+//	this.session = jsonMsg.session;
+//	this.currentState = jsonMsg.currentState;
+//	this.target = jsonMsg.target; // was action
+//	this.from = jsonMsg.from;
+//	this.to = jsonMsg.to;
+//	this.text = jsonMsg.text;
+//	this.action = jsonMsg.action; 
+//	this.data = jsonMsg.data;
+//	this.priority = jsonMsg.priority;
+//	this.reliable = jsonMsg.reliable;
+//	this.forward = jsonMsg.forward;
+//	
+//};
+
+// Copy everything
+GameMsg.clone = function (gameMsg) {
 	
-	this.session = jsonMsg.session;
-	this.currentState = jsonMsg.currentState;
-	this.target = jsonMsg.target; // was action
-	this.from = jsonMsg.from;
-	this.to = jsonMsg.to;
-	this.text = jsonMsg.text;
-	this.action = jsonMsg.action; 
-	this.data = jsonMsg.data;
-	this.priority = jsonMsg.priority;
-	this.reliable = jsonMsg.reliable;
-	this.forward = jsonMsg.forward;
+	var gm = new GameMsg(gameMsg);
 	
+	gm.id = gameMsg.id;
+	gm.forward = gameMsg.forward;
+	// TODO: Check also created ?
+	gm.created = gameMsg.created;
+	
+	return gm;
 };
 
 // Copy everything
-GameMsg.prototype.clone = function(jsonMsg) {
-	
-	this.import(jsonMsg);
-	this.id = jsonMsg.id;
-};
+//GameMsg.prototype.clone = function(jsonMsg) {
+//	
+//	this.import(jsonMsg);
+//	this.id = jsonMsg.id;
+//};
 
 GameMsg.prototype.stringify = function() {
 	return JSON.stringify(this);
@@ -748,7 +781,7 @@ GameMsg.prototype.toString = function() {
 	var DLM = "\"";
 	
 	var gm = new GameState();
-	gm.import(this.currentState);
+	gm.import(this.state);
 	
 	var line = this.created + SPT;
 		line += this.id + SPT;
@@ -781,16 +814,16 @@ GameMsg.prototype.toSMS = function () {
 	return line;
 };
 
-GameMsg.parse = function(msg) {
-	try {
-		var gm = new GameMsg();
-		gm.import(msg);
-		return gm;
-	}
-	catch(e){
-		throw 'Error while trying to parse GameMsg ' + e.message;
-	}
-};
+//GameMsg.parse = function(msg) {
+//	try {
+//		var gm = new GameMsg();
+//		gm.import(msg);
+//		return gm;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parse GameMsg ' + e.message;
+//	}
+//};
 
 GameMsg.prototype.toInEvent = function() {
 	return 'in.' + this.toEvent();
@@ -842,22 +875,21 @@ I/O Functions
 
 */
 
-//Parse the message newly received in the Socket
+//Parse the message received in the Socket
 GameSocketClient.prototype.secureParse = function (msg) {
 	
-	var gameMsg = new GameMsg(null); // the newly received msg
-	
 	try {
-		gameMsg.clone(JSON.parse(msg));
+		var gameMsg = GameMsg.clone(JSON.parse(msg));
 		console.log('R: ' + gameMsg);
 		node.fire('LOG', 'R: ' + gameMsg.toSMS());
+		return gameMsg;
 	}
 	catch(e) {
 		var error = "Malformed msg received: " + e;
 		node.fire('LOG', 'E: ' + error);
+		return false;
 	}
 	
-	return gameMsg;
 };
 
 /**
@@ -876,16 +908,18 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 			
 	    	var msg = that.secureParse(msg);
 	    	
-			if (msg.target === 'HI'){
-				that.player = new Player(msg.data,that.name);
-				that.servername = msg.from;
-				
-				// Get Ready to play
-				that.attachMsgListeners(socket, msg.session);
-				
-				// Send own name to SERVER
-				that.sendHI(that.player);
-		   	 } 
+	    	if (msg) { // Parsing successful
+				if (msg.target === 'HI') {
+					that.player = new Player(msg.data,that.name);
+					that.servername = msg.from;
+					
+					// Get Ready to play
+					that.attachMsgListeners(socket, msg.session);
+					
+					// Send own name to SERVER
+					that.sendHI(that.player);
+			   	 } 
+	    	}
 	    });
 	    
 	});
@@ -906,7 +940,10 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 
 	socket.on('message', function(msg) {
 		var msg = that.secureParse(msg);
-		node.fire(msg.toInEvent(), msg);
+		
+		if (msg) { // Parsing successful
+			node.fire(msg.toInEvent(), msg);
+		}
 	});
 };
 

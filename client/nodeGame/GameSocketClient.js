@@ -36,22 +36,21 @@ I/O Functions
 
 */
 
-//Parse the message newly received in the Socket
+//Parse the message received in the Socket
 GameSocketClient.prototype.secureParse = function (msg) {
 	
-	var gameMsg = new GameMsg(null); // the newly received msg
-	
 	try {
-		gameMsg.clone(JSON.parse(msg));
+		var gameMsg = GameMsg.clone(JSON.parse(msg));
 		console.log('R: ' + gameMsg);
 		node.fire('LOG', 'R: ' + gameMsg.toSMS());
+		return gameMsg;
 	}
 	catch(e) {
 		var error = "Malformed msg received: " + e;
 		node.fire('LOG', 'E: ' + error);
+		return false;
 	}
 	
-	return gameMsg;
 };
 
 /**
@@ -70,16 +69,18 @@ GameSocketClient.prototype.attachFirstListeners = function (socket) {
 			
 	    	var msg = that.secureParse(msg);
 	    	
-			if (msg.target === 'HI'){
-				that.player = new Player(msg.data,that.name);
-				that.servername = msg.from;
-				
-				// Get Ready to play
-				that.attachMsgListeners(socket, msg.session);
-				
-				// Send own name to SERVER
-				that.sendHI(that.player);
-		   	 } 
+	    	if (msg) { // Parsing successful
+				if (msg.target === 'HI') {
+					that.player = new Player(msg.data,that.name);
+					that.servername = msg.from;
+					
+					// Get Ready to play
+					that.attachMsgListeners(socket, msg.session);
+					
+					// Send own name to SERVER
+					that.sendHI(that.player);
+			   	 } 
+	    	}
 	    });
 	    
 	});
@@ -100,7 +101,10 @@ GameSocketClient.prototype.attachMsgListeners = function (socket, session) {
 
 	socket.on('message', function(msg) {
 		var msg = that.secureParse(msg);
-		node.fire(msg.toInEvent(), msg);
+		
+		if (msg) { // Parsing successful
+			node.fire(msg.toInEvent(), msg);
+		}
 	});
 };
 
