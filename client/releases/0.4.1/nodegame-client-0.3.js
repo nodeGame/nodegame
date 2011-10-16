@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 12:19:13 CEST 2011
+ * Built on So 16. Okt 19:45:46 CEST 2011
  *
  */
  
@@ -886,17 +886,15 @@ GameMsg.prototype.toEvent = function () {
  *
  */
 
-function GameSocketClient(options,nodeGame) {
+function GameSocketClient (options, nodeGame) {
 	
 	this.name = options.name;
+	this.url = options.url;
 	
-	this.host = options.host;
-	this.port = options.port;
 	this.servername = null;
+	this.game = null;
 	
 	this.socket = this.connect();
-	
-	this.game = null;
 }
 
 GameSocketClient.prototype.setGame = function(game) {
@@ -905,9 +903,8 @@ GameSocketClient.prototype.setGame = function(game) {
 
 GameSocketClient.prototype.connect = function() {
 	// TODO: add check if http:// is already in
-	var url = "http://" + this.host + ":" + this.port;
-	console.log('nodeGame: connecting to ' + url);
-	var socket = io.connect(url);
+	console.log('nodeGame: connecting to ' + this.url);
+	var socket = io.connect(this.url);
     this.attachFirstListeners(socket);
     return socket;
 };
@@ -1215,8 +1212,8 @@ function nodeGame() {
 		
 	};
 	
-	this.play = function (net,game) {	
-		that.gsc = new GameSocketClient(net);
+	this.play = function (conf, game) {	
+		that.gsc = new GameSocketClient(conf);
 		
 		that.game = new Game(game, that.gsc);
 		that.game.init();

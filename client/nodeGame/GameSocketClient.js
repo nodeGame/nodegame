@@ -3,17 +3,15 @@
  *
  */
 
-function GameSocketClient(options,nodeGame) {
+function GameSocketClient (options, nodeGame) {
 	
 	this.name = options.name;
+	this.url = options.url;
 	
-	this.host = options.host;
-	this.port = options.port;
 	this.servername = null;
+	this.game = null;
 	
 	this.socket = this.connect();
-	
-	this.game = null;
 }
 
 GameSocketClient.prototype.setGame = function(game) {
@@ -22,9 +20,8 @@ GameSocketClient.prototype.setGame = function(game) {
 
 GameSocketClient.prototype.connect = function() {
 	// TODO: add check if http:// is already in
-	var url = "http://" + this.host + ":" + this.port;
-	console.log('nodeGame: connecting to ' + url);
-	var socket = io.connect(url);
+	console.log('nodeGame: connecting to ' + this.url);
+	var socket = io.connect(this.url);
     this.attachFirstListeners(socket);
     return socket;
 };

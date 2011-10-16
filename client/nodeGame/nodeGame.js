@@ -86,8 +86,8 @@ function nodeGame() {
 		
 	};
 	
-	this.play = function (net,game) {	
-		that.gsc = new GameSocketClient(net);
+	this.play = function (conf, game) {	
+		that.gsc = new GameSocketClient(conf);
 		
 		that.game = new Game(game, that.gsc);
 		that.game.init();
