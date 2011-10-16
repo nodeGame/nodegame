@@ -55,13 +55,25 @@ PlayerList.prototype.addPlayer = function (player) {
 PlayerList.prototype.add = function (connid,name) {	
 	// Check if the id is unique
 	if (typeof(this.pl[connid]) === 'undefined') {
-		this.pl[connid] = new Player(connid,name);
+		this.pl[connid] = new Player({id: connid, name: name});
+		console.log('Added Player ' + this.pl[connid]);
 		return true;
 	}
 		
-	console.log('E: Attempt to add a new player already in the player list ' + connid + '-' + name);//[connid]);
+	console.log('E: Attempt to add a new player already in the player list' + this.pl.id);//[connid]);
 	return false;
 };
+
+//PlayerList.prototype.add = function (connid,name) {	
+//	// Check if the id is unique
+//	if (typeof(this.pl[connid]) === 'undefined') {
+//		this.pl[connid] = new Player(connid,name);
+//		return true;
+//	}
+//		
+//	console.log('E: Attempt to add a new player already in the player list ' + connid + '-' + name);//[connid]);
+//	return false;
+//};
 
 PlayerList.prototype.remove = function (connid) {	
 	// Check if the id exists
@@ -246,12 +258,12 @@ PlayerList.prototype.toString = function () {
 
 //Player
 
-function Player(id, name, state) {
+function Player (pl) {
 	
 	// PRIVATE variables
-	this.id = id;
-	this.name = name;
-	this.state = state || new GameState();
+	this.id = pl.id;
+	this.name = pl.name;
+	this.state = pl.state || new GameState();
 }
 
 Player.prototype.getId = function() {
@@ -262,28 +274,70 @@ Player.prototype.getName = function() {
 	return this.name;
 };
 
-Player.prototype.import = function (player) {
-	this.id = player.id;
-	this.name = player.name;
-	this.state = player.state;
-};
+//Player.prototype.import = function (player) {
+//	this.id = player.id;
+//	this.name = player.name;
+//	this.state = player.state;
+//};
 
 Player.prototype.updateState = function (state) {
 	this.state = state;
 };
 
-Player.parse = function(player) {
-	try {
-		var p = new Player();
-		p.import(player);
-		return p;
-	}
-	catch(e){
-		throw 'Error while trying to parse Player ' + e.message;
-	}
-};
+//Player.parse = function(player) {
+//	try {
+//		var p = new Player();
+//		p.import(player);
+//		return p;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parse Player ' + e.message;
+//	}
+//};
 
 Player.prototype.toString = function() {
 	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
 	return out;
 };
+//
+//function Player(id, name, state) {
+//	
+//	// PRIVATE variables
+//	this.id = id;
+//	this.name = name;
+//	this.state = state || new GameState();
+//}
+//
+//Player.prototype.getId = function() {
+//	return this.id;
+//};
+//
+//Player.prototype.getName = function() {
+//	return this.name;
+//};
+//
+//Player.prototype.import = function (player) {
+//	this.id = player.id;
+//	this.name = player.name;
+//	this.state = player.state;
+//};
+//
+//Player.prototype.updateState = function (state) {
+//	this.state = state;
+//};
+//
+//Player.parse = function(player) {
+//	try {
+//		var p = new Player();
+//		p.import(player);
+//		return p;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parse Player ' + e.message;
+//	}
+//};
+//
+//Player.prototype.toString = function() {
+//	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
+//	return out;
+//};

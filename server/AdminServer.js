@@ -32,7 +32,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 		// Add the player to to the list
 		that.pl.addPlayer(msg.data);
 		// Tell everybody a new player is connected;
-		var connected = Player.parse(msg.data) + ' connected.';
+		var connected = new Player(msg.data) + ' connected.';
 		this.gmm.sendTXT(connected,'ALL');
 		// Send the list of connected partners
 		that.gmm.sendPLIST(that.partner, msg.from);
