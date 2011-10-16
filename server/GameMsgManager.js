@@ -137,7 +137,7 @@ GameMsgManager.prototype.forwardDATA = function (data,to,text) {
 GameMsgManager.prototype.forward = function (gameMsg, to) {
 
 	// Create a copy of the msg and prepare the attributes
-	var gameMsg = GameMsg.parse(gameMsg);
+	var gameMsg = new GameMsg(gameMsg);
 	gameMsg.from = this.node.name;
 	gameMsg.forward = 1;
 	

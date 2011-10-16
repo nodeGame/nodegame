@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 10:26:50 CEST 2011
+ * Built on So 16. Okt 10:58:41 CEST 2011
  *
  */
  
@@ -303,7 +303,7 @@ Game.prototype.is = function(is) {
 };
 
 Game.prototype.publishState = function() {
-	this.gsc.gmg.setCurrentState(this.gameState);
+	this.gsc.gmg.state = this.gameState;
 	// Important: SAY
 	//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 	var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
@@ -560,15 +560,15 @@ GameMsgGenerator.prototype.createSTATE = function (action, state, to, reliable) 
 // PLIST
 
 GameMsgGenerator.prototype.sayPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.SAY, plist, to,reliable);
+	return this.createPLIST(GameMsg.actions.SAY, plist, to,reliable);
 };
 
 GameMsgGenerator.prototype.setPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.SET, plist, to,reliable);
+	return this.createPLIST(GameMsg.actions.SET, plist, to,reliable);
 };
 
 GameMsgGenerator.prototype.getPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.GET, plist, to, reliable);
+	return this.createPLIST(GameMsg.actions.GET, plist, to, reliable);
 };
 
 GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
@@ -592,7 +592,7 @@ GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) 
 };
 
 
-//MSG
+// TXT
 
 GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 	
@@ -879,6 +879,7 @@ I/O Functions
 GameSocketClient.prototype.secureParse = function (msg) {
 	
 	try {
+		//console.log(msg);
 		var gameMsg = GameMsg.clone(JSON.parse(msg));
 		console.log('R: ' + gameMsg);
 		node.fire('LOG', 'R: ' + gameMsg.toSMS());

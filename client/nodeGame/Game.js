@@ -149,7 +149,7 @@ Game.prototype.is = function(is) {
 };
 
 Game.prototype.publishState = function() {
-	this.gsc.gmg.setCurrentState(this.gameState);
+	this.gsc.gmg.state = this.gameState;
 	// Important: SAY
 	//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 	var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 

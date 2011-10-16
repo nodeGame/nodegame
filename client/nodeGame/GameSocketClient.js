@@ -40,6 +40,7 @@ I/O Functions
 GameSocketClient.prototype.secureParse = function (msg) {
 	
 	try {
+		//console.log(msg);
 		var gameMsg = GameMsg.clone(JSON.parse(msg));
 		console.log('R: ' + gameMsg);
 		node.fire('LOG', 'R: ' + gameMsg.toSMS());

@@ -81,15 +81,15 @@ GameMsgGenerator.prototype.createSTATE = function (action, state, to, reliable) 
 // PLIST
 
 GameMsgGenerator.prototype.sayPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.SAY, plist, to,reliable);
+	return this.createPLIST(GameMsg.actions.SAY, plist, to,reliable);
 };
 
 GameMsgGenerator.prototype.setPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.SET, plist, to,reliable);
+	return this.createPLIST(GameMsg.actions.SET, plist, to,reliable);
 };
 
 GameMsgGenerator.prototype.getPLIST = function (plist, to, reliable) {
-	return this.createPLIST(GameMsg.GET, plist, to, reliable);
+	return this.createPLIST(GameMsg.actions.GET, plist, to, reliable);
 };
 
 GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
@@ -113,7 +113,7 @@ GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) 
 };
 
 
-//MSG
+// TXT
 
 GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 	

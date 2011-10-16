@@ -61,19 +61,35 @@ GameServer.prototype.listen = function() {
 //Parse the newly received message
 GameServer.prototype.secureParse = function (msg) {
 	
-	var gameMsg = new GameMsg(null);
-	
-	try {	
-		// TODO: use a static method or GameMsg.parse ?
-		gameMsg.clone(JSON.parse(msg));
+	try {
+		var gameMsg = GameMsg.clone(JSON.parse(msg));
 		this.log.msg('R, ' + gameMsg);
+		return gameMsg;
 	}
 	catch(e) {
 		this.log.log("Malformed msg received: " + e, 'ERR');
+		return false;
 	}
 	
-	return gameMsg;
 };
+
+//GameServer.prototype.secureParse = function (msg) {
+//	
+//	var gameMsg = new GameMsg(null);
+//	
+//	try {	
+//		// TODO: use a static method or GameMsg.parse ?
+//		gameMsg.clone(JSON.parse(msg));
+//		this.log.msg('R, ' + gameMsg);
+//	}
+//	catch(e) {
+//		this.log.log("Malformed msg received: " + e, 'ERR');
+//	}
+//	
+//	return gameMsg;
+//};
+
+
 
 GameServer.prototype.attachListeners = function() {
 	var that = this;
@@ -93,14 +109,17 @@ GameServer.prototype.attachListeners = function() {
 		socket.on('message', function(message){
 			
 			var msg = that.secureParse(message);
-			//that.log.log('JUST RECEIVED P ' + util.inspect(msg));
 			
-			// TODO: KEEP THE FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ?
-			//that.gmm.forward(msg);
-			console.log(that.name + ' About to emit ' + msg.toEvent());
-			
-			that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);	
-			that.emit(msg.toEvent(), msg);
+			if (msg) { // Parsing Successful
+				//that.log.log('JUST RECEIVED P ' + util.inspect(msg));
+				
+				// TODO: KEEP THE FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ?
+				//that.gmm.forward(msg);
+				console.log(that.name + ' About to emit ' + msg.toEvent());
+				
+				that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);	
+				that.emit(msg.toEvent(), msg);
+			}
 		});
 	
 		
