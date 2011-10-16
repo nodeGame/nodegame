@@ -9,24 +9,36 @@ nodeGame.prototype.constructor = nodeGame;
 
 nodeGame.prototype.create = {};
 
-nodeGame.prototype.create.GameLoop = function(loop){
+nodeGame.prototype.create.GameLoop = function (loop) {
 	return new GameLoop(loop);
 };
 
-nodeGame.prototype.create.GameMsgGenerator = function(session,sender,currentState){
-	return new GameMsgGenerator(session,sender,currentState);
+nodeGame.prototype.create.GameMsgGenerator = function (session, sender, state) {
+	return new GameMsgGenerator(session, sender, state);
 };
 
-nodeGame.prototype.create.GameMsg = function(session, currentState, action, 
-											target, from, to, text, data,
-											priority, reliable) {
+nodeGame.prototype.create.GameMsg = function(gm) {
 	
-	return new GameMsg(session, currentState, action, target, from, to, text, data,
-			priority, reliable);
+	return new GameMsg({ 
+						session: gm.session, 
+						state: gm.state, 
+						action: gm.action, 
+						target: gm.target,
+						from: gm.from,
+						to: gm.to, 
+						text: gm.text, 
+						data: gm.data,
+						priority: gm.priority, 
+						reliable: gm.reliable
+	});
 };
 
-nodeGame.prototype.create.GameState = function(state,step,round){
-	return new GameState(state,step,round);
+nodeGame.prototype.create.GameState = function(gs){
+	return new GameState({
+							state: gs.state,
+							step: gs.step,
+							round: gs.round
+	});
 };
 
 nodeGame.prototype.create.PlayerList = function(list){

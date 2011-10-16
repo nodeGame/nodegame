@@ -159,7 +159,7 @@ Game.prototype.publishState = function() {
 
 Game.prototype.updateState = function(state) {
 	
-	console.log('New state is going to be ' + state);
+	console.log('New state is going to be ' + new GameState(state));
 	
 	if (this.step(state) !== false){
 		this.paused = false;
@@ -180,7 +180,12 @@ Game.prototype.step = function(state) {
 	var nextState = state.state || this.gameState.state;
 	var nextRound = state.round || this.gameState.round;
 	var nextStep = state.step || this.gameState.step++;
-	var gameState = new GameState(nextState,nextStep,nextRound);
+	
+	var gameState = new GameState({state: nextState,
+								   step: nextStep,
+								   round: nextRound
+								  });
+	
 	if (this.gameLoop.exist(gameState)) {			
 		this.gameState = gameState;
 		

@@ -155,7 +155,7 @@ PlayerList.prototype.getGroupsSizeN = function (n) {
 PlayerList.prototype.isStateDone = function(gameState) {
 	
 	var result = this.map(function(p){
-		var gs = GameState.parse(p.state);
+		var gs = new GameState(p.state);
 		
 		//console.log('Going to compare ' + gs + ' and ' + gameState);
 		
@@ -226,8 +226,7 @@ PlayerList.prototype.toString = function (eol) {
 	for (var key in this.pl) {
 	    if (this.pl.hasOwnProperty(key)) {
 	    	out += key + ': ' + this.pl[key].name;
-	    	var state = new GameState();
-	    	state.import(this.pl[key].state);
+	    	var state = new GameState(this.pl[key].state);
 	    	//console.log('STATE: ' + this.pl[key].state.state);
 	    	
 	    	out += ': ' + state + EOL;
@@ -278,6 +277,6 @@ Player.prototype.updateState = function (state) {
 //};
 
 Player.prototype.toString = function() {
-	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
+	var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
 	return out;
 };

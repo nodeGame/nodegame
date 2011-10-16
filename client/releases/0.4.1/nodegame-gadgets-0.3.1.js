@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 11:17:46 CEST 2011
+ * Built on So 16. Okt 12:09:42 CEST 2011
  *
  */
  
@@ -1233,7 +1233,11 @@ StateBar.prototype.append = function (root, ids) {
 			var round = result[3] || 1;
 			console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
 			
-			var state = node.create.GameState(state,step,round);
+			var state = node.create.GameState({
+												state: state,
+												step: step,
+												round: round
+			});
 			
 			var stateEvent = node.OUT + that.actionSel.value + '.STATE';
 			node.fire(stateEvent,state,to);

@@ -29,7 +29,7 @@ function Ultimatum () {
 				if (msg.data === 'READY') {
 					var root = nodeWindow.frame.getElementById('root');
 					var root = window.frames['mainframe'].document.getElementById('root');
-					console.log('Root' + root);
+					//console.log('Root' + root);
 					nodeWindow.write(root,'Press the button to start the experiment');
 					var button = nodeWindow.addButton(root, 'sendb');
 

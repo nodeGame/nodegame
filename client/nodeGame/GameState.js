@@ -12,25 +12,34 @@ GameState.iss.STARTING = 10;
 GameState.iss.PLAYING = 50;
 GameState.iss.DONE = 100;
 
-function GameState (state,step,round) {
+function GameState (gs) {
 	
-	// TODO: add checkings
-	this.state = state || 0;
-	this.step = step || 0;
-	this.round = round || 0;
-	
-	this.is = GameState.iss.UNKNOWN;
-
-	this.paused = false;
+	// TODO: The check for gs is done many times. Change it.
+	this.state = 	(gs) ? gs.state : 0;
+	this.step = 	(gs) ? gs.step : 0;
+	this.round = 	(gs) ? gs.round : 0;
+	this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
+	this.paused = 	(gs) ? gs.paused : false;
 }
  
-GameState.prototype.import = function (gamestate) {
-	this.state = gamestate.state;
-	this.step = gamestate.step;
-	this.round = gamestate.round;
-	this.is = gamestate.is;
-	this.paused = gamestate.paused;
-};
+//GameState.clone = function (gamestate) {
+//	var gs = new GameState();
+//	gs.state = gamestate.state;
+//	gs.step = gamestate.step;
+//	gs.round = gamestate.round;
+//	gs.is = gamestate.is;
+//	gs.paused = gamestate.paused;	
+//	
+//	return gs;
+//}
+
+//GameState.prototype.import = function (gamestate) {
+//	this.state = gamestate.state;
+//	this.step = gamestate.step;
+//	this.round = gamestate.round;
+//	this.is = gamestate.is;
+//	this.paused = gamestate.paused;
+//};
 
 GameState.prototype.toString = function () {
 	var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
@@ -66,16 +75,16 @@ GameState.compare = function (gs1, gs2, strict) {
 	return result;
 };
 
-GameState.parse = function(gamestate) {
-	try {
-		var gs = new GameState();
-		gs.import(gamestate);
-		return gs;
-	}
-	catch(e){
-		throw 'Error while trying to parsing GameState ' + e.message;
-	}
-};
+//GameState.parse = function(gamestate) {
+//	try {
+//		var gs = new GameState();
+//		gs.import(gamestate);
+//		return gs;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parsing GameState ' + e.message;
+//	}
+//};
 
 GameState.stringify = function (gs) {
 	return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;

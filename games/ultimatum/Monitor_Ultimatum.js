@@ -29,8 +29,8 @@ function Monitor_Ultimatum () {
 		var g = null;
 		for(i=0;i<groups.length;i++){
 			g = groups[i];
-			console.log(g);
-			console.log(g.size());
+//			console.log(g);
+//			console.log(g.size());
 			if (g.size() > 1) {
 				// Bidder
 				var bidder = g.getRandom();

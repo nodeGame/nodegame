@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 16. Okt 11:17:46 CEST 2011
+ * Built on So 16. Okt 12:09:41 CEST 2011
  *
  */
  
@@ -313,7 +313,7 @@ Game.prototype.publishState = function() {
 
 Game.prototype.updateState = function(state) {
 	
-	console.log('New state is going to be ' + state);
+	console.log('New state is going to be ' + new GameState(state));
 	
 	if (this.step(state) !== false){
 		this.paused = false;
@@ -334,7 +334,12 @@ Game.prototype.step = function(state) {
 	var nextState = state.state || this.gameState.state;
 	var nextRound = state.round || this.gameState.round;
 	var nextStep = state.step || this.gameState.step++;
-	var gameState = new GameState(nextState,nextStep,nextRound);
+	
+	var gameState = new GameState({state: nextState,
+								   step: nextStep,
+								   round: nextRound
+								  });
+	
 	if (this.gameLoop.exist(gameState)) {			
 		this.gameState = gameState;
 		
@@ -415,7 +420,11 @@ GameLoop.prototype.next = function (gameState) {
 	// Game has not started yet, do it!
 	if (gameState.state === 0) {
 		console.log('NEXT: NEW');
-		return new GameState(1,1,1);
+		return new GameState({
+							 state: 1,
+							 step: 1,
+							 round: 1
+		});
 	}
 	
 	if (!this.exist(gameState)) {
@@ -426,21 +435,42 @@ GameLoop.prototype.next = function (gameState) {
 	
 	if (this.limits[idxLimit]['steps'] > gameState.step){
 		var newStep = Number(gameState.step)+1;
-		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-		console.log('NEXT STEP: '  + new GameState(gameState.state,newStep,gameState.round));
-		return new GameState(gameState.state,gameState.step+1,gameState.round);
+//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
+		console.log('NEXT STEP: '  + new GameState({
+													state: gameState.state,
+													step: newStep,
+													round: gameState.round
+		}));
+		
+//		return new GameState(gameState.state,gameState.step+1,gameState.round);
+		
+		return new GameState({
+			state: gameState.state,
+			step: newStep,
+			round: gameState.round
+		});
 	}
 	
 	if (this.limits[idxLimit]['rounds'] > gameState.round){
 		var newRound = Number(gameState.round)+1;
-		console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
-		return new GameState(gameState.state,1,newRound);
+		//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
+		//return new GameState(gameState.state,1,newRound);
+		return new GameState({
+			state: gameState.state,
+			step: 1,
+			round: newRound
+		});
 	}
 	
 	if (this.nStates > gameState.state){		
 		var newState = Number(gameState.state)+1;
-		console.log('NEXT STATE: ' + new GameState(newState,1,1));
-		return new GameState(newState,1,1);
+		//console.log('NEXT STATE: ' + new GameState(newState,1,1));
+		//return new GameState(newState,1,1);
+		return new GameState({
+			state: newState,
+			step: 1,
+			round: 1
+		});
 	}
 	
 	return false; // game over
@@ -456,18 +486,33 @@ GameLoop.prototype.previous = function (gameState) {
 	
 	if (gameState.step > 1){
 		var oldStep = Number(gameState.step)-1;
-		return new GameState(gameState.state,oldStep,gameState.round);
+		//return new GameState(gameState.state,oldStep,gameState.round);
+		return new GameState({
+			state: gameState.state,
+			step: oldStep,
+			round: gameState.round
+		});
 	}
 	else if (gameState.round > 1){
 		var oldRound = Number(gameState.round)-1;
 		var oldStep = this.limits[idxLimit]['steps'];
-		return new GameState(gameState.state,oldStep,oldRound);
+		//return new GameState(gameState.state,oldStep,oldRound);
+		return new GameState({
+			state: gameState.state,
+			step: oldStep,
+			round: oldRound
+		});
 	}
 	else if (gameState.state > 1){
 		var oldRound = this.limits[idxLimit-1]['rounds'];
 		var oldStep = this.limits[idxLimit-1]['steps'];
 		var oldState = idxLimit;
-		return new GameState(oldState,oldStep,oldRound);
+		//return new GameState(oldState,oldStep,oldRound);
+		return new GameState({
+			state: oldState,
+			step: oldStep,
+			round: oldRound
+		});
 	}
 	
 	return false; // game init
@@ -780,8 +825,7 @@ GameMsg.prototype.toString = function() {
 	var SPTend = "\n";
 	var DLM = "\"";
 	
-	var gm = new GameState();
-	gm.import(this.state);
+	var gs = new GameState(this.state);
 	
 	var line = this.created + SPT;
 		line += this.id + SPT;
@@ -1005,25 +1049,34 @@ GameState.iss.STARTING = 10;
 GameState.iss.PLAYING = 50;
 GameState.iss.DONE = 100;
 
-function GameState (state,step,round) {
+function GameState (gs) {
 	
-	// TODO: add checkings
-	this.state = state || 0;
-	this.step = step || 0;
-	this.round = round || 0;
-	
-	this.is = GameState.iss.UNKNOWN;
-
-	this.paused = false;
+	// TODO: The check for gs is done many times. Change it.
+	this.state = 	(gs) ? gs.state : 0;
+	this.step = 	(gs) ? gs.step : 0;
+	this.round = 	(gs) ? gs.round : 0;
+	this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
+	this.paused = 	(gs) ? gs.paused : false;
 }
  
-GameState.prototype.import = function (gamestate) {
-	this.state = gamestate.state;
-	this.step = gamestate.step;
-	this.round = gamestate.round;
-	this.is = gamestate.is;
-	this.paused = gamestate.paused;
-};
+//GameState.clone = function (gamestate) {
+//	var gs = new GameState();
+//	gs.state = gamestate.state;
+//	gs.step = gamestate.step;
+//	gs.round = gamestate.round;
+//	gs.is = gamestate.is;
+//	gs.paused = gamestate.paused;	
+//	
+//	return gs;
+//}
+
+//GameState.prototype.import = function (gamestate) {
+//	this.state = gamestate.state;
+//	this.step = gamestate.step;
+//	this.round = gamestate.round;
+//	this.is = gamestate.is;
+//	this.paused = gamestate.paused;
+//};
 
 GameState.prototype.toString = function () {
 	var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
@@ -1059,16 +1112,16 @@ GameState.compare = function (gs1, gs2, strict) {
 	return result;
 };
 
-GameState.parse = function(gamestate) {
-	try {
-		var gs = new GameState();
-		gs.import(gamestate);
-		return gs;
-	}
-	catch(e){
-		throw 'Error while trying to parsing GameState ' + e.message;
-	}
-};
+//GameState.parse = function(gamestate) {
+//	try {
+//		var gs = new GameState();
+//		gs.import(gamestate);
+//		return gs;
+//	}
+//	catch(e){
+//		throw 'Error while trying to parsing GameState ' + e.message;
+//	}
+//};
 
 GameState.stringify = function (gs) {
 	return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
@@ -1085,24 +1138,36 @@ nodeGame.prototype.constructor = nodeGame;
 
 nodeGame.prototype.create = {};
 
-nodeGame.prototype.create.GameLoop = function(loop){
+nodeGame.prototype.create.GameLoop = function (loop) {
 	return new GameLoop(loop);
 };
 
-nodeGame.prototype.create.GameMsgGenerator = function(session,sender,currentState){
-	return new GameMsgGenerator(session,sender,currentState);
+nodeGame.prototype.create.GameMsgGenerator = function (session, sender, state) {
+	return new GameMsgGenerator(session, sender, state);
 };
 
-nodeGame.prototype.create.GameMsg = function(session, currentState, action, 
-											target, from, to, text, data,
-											priority, reliable) {
+nodeGame.prototype.create.GameMsg = function(gm) {
 	
-	return new GameMsg(session, currentState, action, target, from, to, text, data,
-			priority, reliable);
+	return new GameMsg({ 
+						session: gm.session, 
+						state: gm.state, 
+						action: gm.action, 
+						target: gm.target,
+						from: gm.from,
+						to: gm.to, 
+						text: gm.text, 
+						data: gm.data,
+						priority: gm.priority, 
+						reliable: gm.reliable
+	});
 };
 
-nodeGame.prototype.create.GameState = function(state,step,round){
-	return new GameState(state,step,round);
+nodeGame.prototype.create.GameState = function(gs){
+	return new GameState({
+							state: gs.state,
+							step: gs.step,
+							round: gs.round
+	});
 };
 
 nodeGame.prototype.create.PlayerList = function(list){
@@ -1390,7 +1455,7 @@ PlayerList.prototype.getGroupsSizeN = function (n) {
 PlayerList.prototype.isStateDone = function(gameState) {
 	
 	var result = this.map(function(p){
-		var gs = GameState.parse(p.state);
+		var gs = new GameState(p.state);
 		
 		//console.log('Going to compare ' + gs + ' and ' + gameState);
 		
@@ -1461,8 +1526,7 @@ PlayerList.prototype.toString = function (eol) {
 	for (var key in this.pl) {
 	    if (this.pl.hasOwnProperty(key)) {
 	    	out += key + ': ' + this.pl[key].name;
-	    	var state = new GameState();
-	    	state.import(this.pl[key].state);
+	    	var state = new GameState(this.pl[key].state);
 	    	//console.log('STATE: ' + this.pl[key].state.state);
 	    	
 	    	out += ': ' + state + EOL;
@@ -1513,7 +1577,7 @@ Player.prototype.updateState = function (state) {
 //};
 
 Player.prototype.toString = function() {
-	var out = this.getName() + ' (' + this.getId() + ') ' + GameState.parse(this.state);
+	var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
 	return out;
 }; 
  
