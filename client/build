@@ -1,9 +1,9 @@
 #!/bin/bash
 
 NAME="nodegame-all"
-VERSION="0.4"
+VERSION="0.4.1"
 
-BUILD="./built/"$VERSION"/"
+BUILD="./releases/"$VERSION"/"
 EXT=".js"
 MIN="-min"
 

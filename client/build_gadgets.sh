@@ -4,7 +4,7 @@ NAME="nodegame-gadgets"
 VERSION="0.3.1"
 
 
-BUILD="./built/"
+BUILD="./releases/"
 
 # Check if a particular sub-directory for build was required
 if [ "$#" -eq 1 ]

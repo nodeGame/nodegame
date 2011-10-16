@@ -1,11 +1,11 @@
-function EventListener(){
+function EventEmitter(){
     this._listeners = {};
     this._localListeners = {};
 }
 
-EventListener.prototype = {
+EventEmitter.prototype = {
 
-    constructor: EventListener,
+    constructor: EventEmitter,
 
 //    on: function(type, listener){
 //        if (typeof this._listeners[type] == "undefined"){
@@ -31,9 +31,9 @@ EventListener.prototype = {
         this._localListeners[type].push(listener);
     },
 
-    fire: function(event,p1, p2, p3){ // Up to 3 parameters
+    emit: function(event, p1, p2, p3) { // Up to 3 parameters
     	
-    	if (typeof event == "string"){
+    	if (typeof event == "string") {
             event = { type: event };
         }
         if (!event.target){
@@ -48,7 +48,7 @@ EventListener.prototype = {
         
         
         //Global Listeners
-        if (this._listeners[event.type] instanceof Array){
+        if (this._listeners[event.type] instanceof Array) {
             var listeners = this._listeners[event.type];
             for (var i=0, len=listeners.length; i < len; i++){
                 // TODO: Check why fire the event name as well??
@@ -58,9 +58,9 @@ EventListener.prototype = {
         }
         
         // Local Listeners
-        if (this._localListeners[event.type] instanceof Array){
+        if (this._localListeners[event.type] instanceof Array) {
             var listeners = this._localListeners[event.type];
-            for (var i=0, len=listeners.length; i < len; i++){
+            for (var i=0, len=listeners.length; i < len; i++) {
                 // TODO: Check why fire the event name as well??
             	//listeners[i].call(this, event, p1, p2, p3);
                 listeners[i].call(this, p1, p2, p3);
@@ -68,12 +68,17 @@ EventListener.prototype = {
         }
         
     },
+    
+    // TODO: remove fire when all the code has been updated
+    fire: function(event, p1, p2, p3) { // Up to 3 parameters
+    	this.emit(event, p1, p2, p3);
+    },
 
-    removeListener: function(type, listener){
+    removeListener: function(type, listener) {
     	
     	//console.log('Trying to remove ' + type + ' ' + listener);
     	
-        if (this._listeners[type] instanceof Array){
+        if (this._listeners[type] instanceof Array) {
         	
         	if (listener === null || listener === undefined) {
         		delete this._listeners[type];
@@ -83,7 +88,7 @@ EventListener.prototype = {
         	
         	
             var listeners = this._listeners[type];
-            for (var i=0, len=listeners.length; i < len; i++){
+            for (var i=0, len=listeners.length; i < len; i++) {
             	
             	//console.log(listeners[i]);
             	

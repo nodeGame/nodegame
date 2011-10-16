@@ -2,7 +2,7 @@
  * nodeGame
  */
 
-nodeGame.prototype = new EventListener();
+nodeGame.prototype = new EventEmitter();
 nodeGame.prototype.constructor = nodeGame;
 
 // Exposing classes
@@ -47,7 +47,7 @@ nodeGame.prototype.states = GameState.iss;
 // Constructor
 
 function nodeGame() {
-	EventListener.call(this);
+	EventEmitter.call(this);
 
 	this.gsc = null;
 	this.game = null;
