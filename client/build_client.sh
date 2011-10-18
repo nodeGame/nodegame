@@ -61,8 +61,9 @@ addBlanks 2 $NODEGAME
 
 # Add header
 
-echo "Writing header:" $HEADER  
-`cat $HEADER >> $NODEGAME`
+# Not using the header now...
+# echo "Writing header:" $HEADER  
+# `cat $HEADER >> $NODEGAME`
 
 # Add all the classes
 
@@ -83,9 +84,10 @@ for f in $FILES	; do
 
 done
 
+# Not for now
 # Adding bottom
-echo "Writing closure:" $BOTTOM  
-`cat $BOTTOM >> $NODEGAME`
+# echo "Writing closure:" $BOTTOM  
+# `cat $BOTTOM >> $NODEGAME`
 
 
 `chmod +x $NODEGAME`
