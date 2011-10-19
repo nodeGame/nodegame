@@ -7,7 +7,7 @@
 
 function DataBar(id) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'databar';
 	this.name = 'Data Bar';
 	this.version = '0.2.1';

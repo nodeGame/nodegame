@@ -9,7 +9,7 @@
 
 function WaitScreen(id) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'waiting';
 	this.name = 'WaitingScreen';
 	this.version = '0.2.1';

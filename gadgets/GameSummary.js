@@ -6,7 +6,7 @@
 
 function GameSummary(id) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'gamesummary';
 	this.name = 'Game Summary';
 	this.version = '0.2.1';

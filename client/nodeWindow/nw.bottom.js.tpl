@@ -3,4 +3,4 @@
 	window.nodeGameWindow = window.nodeWindow = new GameWindow();
 	
 
-})(window.nodeGame);
+})(window.node);

@@ -6,7 +6,7 @@
 
 function StateDisplay(id) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'statedisplay';
 	this.name = 'State Display';
 	this.version = '0.2.1';

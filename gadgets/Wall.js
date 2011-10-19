@@ -7,7 +7,7 @@
 
 
 function Wall(id) {
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'wall';
 	this.name = 'Wall';
 	this.version = '0.2.1';

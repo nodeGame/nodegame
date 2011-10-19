@@ -37,7 +37,7 @@ GameWindow.prototype.setup = function (type){
 	
 	case 'MONITOR':
 		
-		nodeGame.removeListener('in.STATE');
+		node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
 		try {

@@ -5,7 +5,7 @@
 
 function MsgBar(id){
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'msgbar';
 	this.name = 'Msg Bar';
 	this.version = '0.2.1';

@@ -4,7 +4,7 @@
 
 function GameBoard (id) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'gboard';
 	this.name = 'GameBoard';
 	

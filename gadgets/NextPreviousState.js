@@ -6,7 +6,7 @@
  */
 
 function NextPreviousState(id) {
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'nextprevious';
 	this.name = 'Next,Previous State';
 	this.version = '0.2.1';

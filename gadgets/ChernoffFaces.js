@@ -14,7 +14,7 @@ ChernoffFaces.defaults.canvas.heigth = 100;
 
 function ChernoffFaces(id, dims) {
 	
-	this.game = nodeGame.game;
+	this.game = node.game;
 	this.id = id || 'ChernoffFaces';
 	this.name = 'Chernoff Faces';
 	this.version = '0.1';

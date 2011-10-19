@@ -6,7 +6,7 @@
 
 function StateBar(id) {
 	
-	this.game = nodeGame.game;;
+	this.game = node.game;;
 	this.id = id || 'statebar';
 	this.name = 'State Bar';
 	this.version = '0.2.1';
