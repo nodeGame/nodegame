@@ -1,5 +1,11 @@
 (function (exports) {
 
+	var GameState = exports.GameState;
+	var Utils = exports.Utils;
+	
+	/**
+	 * Exposing constructor
+	 */
 	exports.GameMsg = GameMsg;
 	
 	/*

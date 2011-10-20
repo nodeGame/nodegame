@@ -69,19 +69,24 @@ addBlanks 2 $NODEGAME
 
 FILES=$DIR"*"
 
-for f in $FILES	; do
 
-	if [ -f "$f" ]
-	then
-    EXT1=${f##*.}
-		if [ ${f##*.} == "js" ]
-			then
-			echo "Processing $f file..."
-				`cat $f >> $NODEGAME`
-				addBlanks 2 $NODEGAME
-		 	fi
-		fi
+FILES[0]='EventEmitter.js'
+FILES[1]='Utils.js'
+FILES[2]='GameState.js'
+FILES[3]='PlayerList.js'
+FILES[4]='GameMsg.js'
+FILES[5]='GameLoop.js'
+FILES[6]='GameMsgGenerator.js'
+FILES[7]='GameSocketClient.js'
+FILES[8]='Game.js'
+FILES[9]='nodeGame.js'
 
+for f in ${FILES[*]}
+do
+	F=$DIR$f
+	echo "Processing $F file..."
+	`cat $F >> $NODEGAME`
+	addBlanks 2 $NODEGAME
 done
 
 # Not for now

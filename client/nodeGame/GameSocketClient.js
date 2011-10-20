@@ -49,6 +49,7 @@
 		
 		try {
 			//console.log(msg);
+			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
 			console.log('R: ' + gameMsg);
 			node.fire('LOG', 'R: ' + gameMsg.toSMS());
@@ -56,6 +57,7 @@
 		}
 		catch(e) {
 			var error = "Malformed msg received: " + e;
+			console.log(error);
 			node.fire('LOG', 'E: ' + error);
 			return false;
 		}
@@ -75,7 +77,7 @@
 		    console.log(connString); 
 		    
 		    socket.on('message', function (msg) {	
-				
+		    	
 		    	var msg = that.secureParse(msg);
 		    	
 		    	if (msg) { // Parsing successful

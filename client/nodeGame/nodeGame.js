@@ -158,32 +158,32 @@
 	
 	// Say
 	
-	node.onTXT = this.onTXTin = function(func) {
-		that.on("in.say.TXT", function(msg) {
+	node.onTXT = node.onTXTin = function(func) {
+		node.on("in.say.TXT", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onDATA = this.onDATAin = function(func) {
-		that.on("in.say.DATA", function(msg) {
+	node.onDATA = node.onDATAin = function(func) {
+		node.on("in.say.DATA", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
 	// Set
 	
-	node.onSTATE = this.onSTATEin = function(func) {
-		that.on("in.set.STATE", function(msg) {
+	node.onSTATE = node.onSTATEin = function(func) {
+		node.on("in.set.STATE", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onPLIST = this.onPLISTin = function(func) {
-		that.on("in.set.PLIST", function(msg) {
+	node.onPLIST = node.onPLISTin = function(func) {
+		node.on("in.set.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
 		
-		that.on("in.say.PLIST", function(msg) {
+		node.on("in.say.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
 	};

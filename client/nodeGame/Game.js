@@ -93,22 +93,22 @@
 			// SET
 			
 			node.on( OUT + set + 'STATE', function(state,to){
-				node.gsc.sendSTATE('set',state,to);
+				that.gsc.sendSTATE('set',state,to);
 			});		
 		
 			// SAY
 			
 			node.on( OUT + say + 'STATE', function(state,to){
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
-				node.gsc.sendSTATE('say',state,to);
+				that.gsc.sendSTATE('say',state,to);
 			});	
 			
 			node.on( OUT + say + 'TXT', function(text,to){
-				node.gsc.sendTXT(text,to);
+				that.gsc.sendTXT(text,to);
 			});
 			
 			node.on( OUT + say + 'DATA', function(data,to,msg){
-				node.gsc.sendDATA(data,to,msg);
+				that.gsc.sendDATA(data,to,msg);
 			});
 			
 			node.on('DONE', function(msg){
@@ -205,7 +205,7 @@
 			
 			// Local Listeners from previous state are erased before proceeding
 			// to next one
-			node.clearLocalListeners();
+			node.node.clearLocalListeners();
 			return this.gameLoop.getFunction(this.gameState).call(this);
 		}
 	

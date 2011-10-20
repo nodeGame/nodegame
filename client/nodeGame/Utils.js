@@ -4,7 +4,9 @@
 	 * Expose constructor
 	 * 
 	 */
-	exports.Utils = Utils = {};
+	exports.Utils = Utils;
+	
+	function Utils(){};
 	
 	Utils.getDate = function() {
 		var d = new Date();

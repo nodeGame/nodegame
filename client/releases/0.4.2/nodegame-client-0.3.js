@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 19. Okt 16:51:37 CEST 2011
+ * Built on Do 20. Okt 13:26:28 CEST 2011
  *
  */
  
@@ -162,7 +162,9 @@
 	 * Expose constructor
 	 * 
 	 */
-	exports.Utils = Utils = {};
+	exports.Utils = Utils;
+	
+	function Utils(){};
 	
 	Utils.getDate = function() {
 		var d = new Date();
@@ -217,720 +219,6 @@
 	};
 
 })('undefined' != typeof node ? node : module.exports); 
- 
-(function (exports) {
-	
-	var node = exports;
-	var GameState = node.GameState;
-	var Utils = node.Utils;
-	
-	/*
-	 * GameLoop
-	 * 
-	 * Handle the states of the game
-	 * 
-	 */
-	
-	/**
-	 * Expose constructor
-	 */
-	
-	exports.GameLoop = GameLoop;
-	
-	function GameLoop (loop) {
-		this.loop = loop;
-		
-		this.limits = Array();
-		
-		for (var key in this.loop) {
-			if (this.loop.hasOwnProperty(key)) {
-				var round = loop[key].rounds || 1;
-				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
-			}
-		}
-		
-		this.nStates = this.limits.length;
-		
-	}
-	
-	
-	GameLoop.prototype.exist = function (gameState) {
-	
-		if (typeof(this.loop[gameState.state]) === 'undefined') {
-			console.log('(E): Unexisting state: ' + gameState.state);
-			return false;
-		}
-		
-		if (typeof(this.loop[gameState.state]['loop'][gameState.step]) === 'undefined'){
-			console.log('(E): Unexisting step: ' + gameState.step);
-			return false;
-		}
-		// States are 1 based, arrays are 0-based => -1
-		if(gameState.round > this.limits[gameState.state-1]['rounds']) {
-			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
-			return false;
-		}
-		
-			
-		return true;
-	};
-			
-	GameLoop.prototype.next = function (gameState) {
-		
-		console.log('NEXT OF THIS ' + gameState);
-		//console.log(this.limits);
-		
-		// Game has not started yet, do it!
-		if (gameState.state === 0) {
-			console.log('NEXT: NEW');
-			return new GameState({
-								 state: 1,
-								 step: 1,
-								 round: 1
-			});
-		}
-		
-		if (!this.exist(gameState)) {
-			console.log('No next state of non-existing state: ' + gameState);
-		}
-		
-		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
-		
-		if (this.limits[idxLimit]['steps'] > gameState.step){
-			var newStep = Number(gameState.step)+1;
-	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-			console.log('NEXT STEP: '  + new GameState({
-														state: gameState.state,
-														step: newStep,
-														round: gameState.round
-			}));
-			
-	//		return new GameState(gameState.state,gameState.step+1,gameState.round);
-			
-			return new GameState({
-				state: gameState.state,
-				step: newStep,
-				round: gameState.round
-			});
-		}
-		
-		if (this.limits[idxLimit]['rounds'] > gameState.round){
-			var newRound = Number(gameState.round)+1;
-			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
-			//return new GameState(gameState.state,1,newRound);
-			return new GameState({
-				state: gameState.state,
-				step: 1,
-				round: newRound
-			});
-		}
-		
-		if (this.nStates > gameState.state){		
-			var newState = Number(gameState.state)+1;
-			//console.log('NEXT STATE: ' + new GameState(newState,1,1));
-			//return new GameState(newState,1,1);
-			return new GameState({
-				state: newState,
-				step: 1,
-				round: 1
-			});
-		}
-		
-		return false; // game over
-	};
-	
-	GameLoop.prototype.previous = function (gameState) {
-		
-		if (!this.exist(gameState)) {
-			console.log('No previous state of non-existing state: ' + gameState);
-		}
-		
-		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
-		
-		if (gameState.step > 1){
-			var oldStep = Number(gameState.step)-1;
-			//return new GameState(gameState.state,oldStep,gameState.round);
-			return new GameState({
-				state: gameState.state,
-				step: oldStep,
-				round: gameState.round
-			});
-		}
-		else if (gameState.round > 1){
-			var oldRound = Number(gameState.round)-1;
-			var oldStep = this.limits[idxLimit]['steps'];
-			//return new GameState(gameState.state,oldStep,oldRound);
-			return new GameState({
-				state: gameState.state,
-				step: oldStep,
-				round: oldRound
-			});
-		}
-		else if (gameState.state > 1){
-			var oldRound = this.limits[idxLimit-1]['rounds'];
-			var oldStep = this.limits[idxLimit-1]['steps'];
-			var oldState = idxLimit;
-			//return new GameState(oldState,oldStep,oldRound);
-			return new GameState({
-				state: oldState,
-				step: oldStep,
-				round: oldRound
-			});
-		}
-		
-		return false; // game init
-	};
-	
-	GameLoop.prototype.getFunction = function(gameState) {
-		return this.loop[gameState.state]['loop'][gameState.step];
-	};
-
-})('undefined' != typeof node ? node : module.exports); 
- 
-(function (exports) {
-	
-	var node = exports;
-	var GameMsg = node.GameMsg;
-	var GameState = node.GameState;
-	var Player = node.Player;
-	
-	/*
-	 * GameMsgGenerator
-	 * 
-	 * 
-	 * All message are reliable, but TXT messages.
-	 * 
-	 */
-	
-	/**
-	 * Expose constructor
-	 */
-	
-	exports.GameMsgGenerator = GameMsgGenerator; 
-	
-	function GameMsgGenerator (session, sender, state) {	
-		this.session = session;
-		this.sender = sender;
-		this.state = state;
-	};
-	
-	//GameMsgGenerator.prototype.setCurrentState = function (state) {
-	//	this.state = state;
-	//};
-	//
-	//GameMsgGenerator.prototype.getCurrentState = function () {
-	//	return this.state;
-	//};
-	
-	
-	// HI
-	
-	//Notice: this is different from the server;
-	GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
-	
-	  var rel = reliable || 1;
-	  
-	  return new GameMsg( {
-	            			session: this.session,
-	            			state: this.state,
-	            			action: GameMsg.actions.SAY,
-	            			target: GameMsg.targets.HI,
-	            			from: this.sender,
-	            			to: to,
-	            			text: new Player(player) + ' ready.',
-	            			data: player,
-	            			priority: null,
-	            			reliable: rel
-	  });
-	
-	
-	};
-	
-	// STATE
-	
-	GameMsgGenerator.prototype.saySTATE = function (plist, to, reliable) {
-		return this.createSTATE(GameMsg.SAY, plist, to,reliable);
-	};
-	
-	GameMsgGenerator.prototype.setSTATE = function (plist, to, reliable) {
-		return this.createSTATE(GameMsg.SET, plist, to,reliable);
-	};
-	
-	GameMsgGenerator.prototype.getSTATE = function (plist, to, reliable) {
-		return this.createSTATE(GameMsg.GET, plist, to,reliable);
-	};
-	
-	GameMsgGenerator.prototype.createSTATE = function (action, state, to, reliable) {
-		
-		var rel = reliable || 1;
-		
-		
-		return new GameMsg({
-							session: this.session,
-							state: this.state,
-							action: action,
-							target: GameMsg.targets.STATE,
-							from: this.sender,
-							to: to,
-							text: 'New State: ' + GameState.stringify(state),
-							data: state,
-							priority: null,
-							reliable: rel
-		});
-	};
-	
-	
-	// PLIST
-	
-	GameMsgGenerator.prototype.sayPLIST = function (plist, to, reliable) {
-		return this.createPLIST(GameMsg.actions.SAY, plist, to,reliable);
-	};
-	
-	GameMsgGenerator.prototype.setPLIST = function (plist, to, reliable) {
-		return this.createPLIST(GameMsg.actions.SET, plist, to,reliable);
-	};
-	
-	GameMsgGenerator.prototype.getPLIST = function (plist, to, reliable) {
-		return this.createPLIST(GameMsg.actions.GET, plist, to, reliable);
-	};
-	
-	GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
-		
-		//console.log('Creating plist msg ' + plist + ' ' + plist.size());
-		
-		var rel = reliable || 1;
-		
-		return new GameMsg({
-							session: this.session, 
-							state: this.state,
-							action: action,
-							target: GameMsg.targets.PLIST,
-							from: this.sender,
-							to: to,
-							text: 'List of Players: ' + plist.size(),
-							data: plist.pl,
-							priority: null,
-							reliable: rel
-		});
-	};
-	
-	
-	// TXT
-	
-	GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
-		
-		//console.log("STE: " + text);
-		
-		var rel = reliable || 0;
-		
-		return new GameMsg({
-							session: this.session,
-							state: this.state,
-							action: GameMsg.actions.SAY,
-							target: GameMsg.targets.TXT,
-							from: this.sender,
-							to: to,
-							text: text,
-							data: null,
-							priority: null,
-							reliable: rel
-		});
-		
-		
-	};
-	
-	
-	// DATA
-	
-	GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
-		
-		var rel = reliable || 1;
-		var text = text || 'data';
-		
-		return new GameMsg({
-							session: this.session, 
-							state: this.state,
-							action: GameMsg.actions.SAY,
-							target: GameMsg.targets.DATA,
-							from: this.sender,
-							to: to,
-							text: text,
-							data: data,
-							priority: null,
-							reliable: rel
-		});
-	};
-	
-	
-	// ACK
-	
-	GameMsgGenerator.prototype.createACK = function (gm, to, reliable) {
-		
-		var rel = reliable || 0;
-		
-		var newgm = new GameMsg({
-								session: this.session, 
-								state: this.state,
-								action: GameMsg.actions.SAY,
-								target: GameMsg.targets.ACK,
-								from: this.sender,
-								to: to,
-								text: 'Msg ' + gm.id + ' correctly received',
-								data: gm.id,
-								priority: null,
-								reliable: rel
-		});
-		
-		if (gm.forward) {
-			newgm.forward = 1;
-		}
-		
-		return newgm;
-	}; 
-
-})('undefined' != typeof node ? node : module.exports); 
- 
-(function (exports) {
-
-	exports.GameMsg = GameMsg;
-	
-	/*
-	 * JSON Data Format for nodeGame Apps.
-	 */
-	GameMsg.actions = {};
-	GameMsg.targets = {};
-	
-	GameMsg.actions.SET 	= 'set'; 	// Changes properties of the receiver
-	GameMsg.actions.GET 	= 'get'; 	// Ask a properties of the receiver
-	GameMsg.actions.SAY		= 'say'; 	// Announce properties of the sender
-	
-	GameMsg.targets.HI		= 'HI';		// Introduction
-	GameMsg.targets.STATE	= 'STATE';	// STATE
-	GameMsg.targets.PLIST 	= 'PLIST';	// PLIST
-	GameMsg.targets.TXT 	= 'TXT';	// Text msg
-	GameMsg.targets.DATA	= 'DATA';	// Contains a data-structure in the data field
-	
-	GameMsg.targets.ACK		= 'ACK';	// A reliable msg was received correctly
-	
-	GameMsg.targets.WARN 	= 'WARN';	// To do.
-	GameMsg.targets.ERR		= 'ERR';	// To do.
-	
-	GameMsg.IN				= 'in.';	// Prefix for incoming msgs
-	GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
-			
-	
-	function GameMsg (gm) {
-		this.id = Math.floor(Math.random()*1000000);
-		
-		this.session = gm.session;
-		this.state = gm.state;
-		this.target = gm.target; // was action
-		this.from = gm.from;
-		this.to = gm.to;
-		this.text = gm.text;
-		this.action = gm.action; 
-		this.data = gm.data;
-		this.priority = gm.priority;
-		this.reliable = gm.reliable;
-		
-		this.created = Utils.getDate();
-		this.forward = 0; // is this msg just a forward?	
-	};
-	
-	//function GameMsg (session, currentState, action, target, from, to, text, data,
-	//					priority, reliable) {
-	//		
-	//	this.id = Math.floor(Math.random()*1000000);
-	//
-	//	this.action = action; 
-	//	this.target = target;
-	//	
-	//	this.session = session;
-	//	this.currentState = currentState;
-	//	
-	//	this.from = from;
-	//	this.to = to;
-	//	this.text = text;
-	//	this.data = data;
-	//	
-	//	this.priority = priority;
-	//	this.reliable = reliable;
-	//
-	//	this.created = Utils.getDate();
-	//	this.forward = 0; // is this msg just a forward?	
-	//	
-	//};
-	//
-	//// Does not change the msg ID
-	//GameMsg.prototype.import = function(jsonMsg) {
-	//	
-	//	this.session = jsonMsg.session;
-	//	this.currentState = jsonMsg.currentState;
-	//	this.target = jsonMsg.target; // was action
-	//	this.from = jsonMsg.from;
-	//	this.to = jsonMsg.to;
-	//	this.text = jsonMsg.text;
-	//	this.action = jsonMsg.action; 
-	//	this.data = jsonMsg.data;
-	//	this.priority = jsonMsg.priority;
-	//	this.reliable = jsonMsg.reliable;
-	//	this.forward = jsonMsg.forward;
-	//	
-	//};
-	
-	// Copy everything
-	GameMsg.clone = function (gameMsg) {
-		
-		var gm = new GameMsg(gameMsg);
-		
-		gm.id = gameMsg.id;
-		gm.forward = gameMsg.forward;
-		// TODO: Check also created ?
-		gm.created = gameMsg.created;
-		
-		return gm;
-	};
-	
-	// Copy everything
-	//GameMsg.prototype.clone = function(jsonMsg) {
-	//	
-	//	this.import(jsonMsg);
-	//	this.id = jsonMsg.id;
-	//};
-	
-	GameMsg.prototype.stringify = function() {
-		return JSON.stringify(this);
-	};
-	
-	GameMsg.prototype.toString = function() {
-		
-		var SPT = ",\t";
-		var SPTend = "\n";
-		var DLM = "\"";
-		
-		var gs = new GameState(this.state);
-		
-		var line = this.created + SPT;
-			line += this.id + SPT;
-			line += this.session + SPT;
-			line += this.action + SPT;
-			line += this.target + SPT;
-			line +=	this.from + SPT;
-			line += this.to + SPT;
-			line += DLM + this.text + DLM + SPT;
-			line += DLM + this.data + DLM + SPT; // maybe to remove
-			line += this.reliable + SPT;
-			line += this.priority + SPTend;
-			
-			
-		return line;
-		
-	};
-	
-	GameMsg.prototype.toSMS = function () {
-		
-		var parseDate = /\w+/; // Select the second word;
-		var results = parseDate.exec(this.created);
-		//var d = new Date(this.created);
-		//var line = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-		//var line = results[0];
-		var line = '[' + this.from + ']->[' + this.to + ']\t';
-		line += '|' + this.action + '.' + this.target + '|'+ '\t';
-		line += ' ' + this.text + ' ';
-		
-		return line;
-	};
-	
-	//GameMsg.parse = function(msg) {
-	//	try {
-	//		var gm = new GameMsg();
-	//		gm.import(msg);
-	//		return gm;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parse GameMsg ' + e.message;
-	//	}
-	//};
-	
-	GameMsg.prototype.toInEvent = function() {
-		return 'in.' + this.toEvent();
-	};
-	
-	GameMsg.prototype.toOutEvent = function() {
-		return 'out.' + this.toEvent();
-	};
-	
-	GameMsg.prototype.toEvent = function () {
-		return this.action + '.' + this.target;
-	}; 
-
-})('undefined' != typeof node ? node : module.exports); 
- 
-(function (exports, io) {
-		
-	var node = exports;
-	var GameMsg = node.GameMsg;
-	var GameState = node.GameState;
-	var Player = node.Player;
-	var GameMsgGenerator = node.GameMsgGenerator;
-	
-	/**
-	 * Expose constructor;
-	 *
-	 */
-	exports.GameSocketClient = GameSocketClient;
-	
-	
-	
-	function GameSocketClient (options, nodeGame) {
-		
-		this.name = options.name;
-		this.url = options.url;
-		
-		this.servername = null;
-		this.game = null;
-		
-		this.socket = this.connect();
-	}
-	
-	GameSocketClient.prototype.setGame = function(game) {
-		this.game = game;
-	};
-	
-	GameSocketClient.prototype.connect = function() {
-		// TODO: add check if http:// is already in
-		console.log('nodeGame: connecting to ' + this.url);
-		var socket = io.connect(this.url);
-	    this.attachFirstListeners(socket);
-	    return socket;
-	};
-	
-	
-	/*
-	
-	I/O Functions
-	
-	*/
-	
-	//Parse the message received in the Socket
-	GameSocketClient.prototype.secureParse = function (msg) {
-		
-		try {
-			//console.log(msg);
-			var gameMsg = GameMsg.clone(JSON.parse(msg));
-			console.log('R: ' + gameMsg);
-			node.fire('LOG', 'R: ' + gameMsg.toSMS());
-			return gameMsg;
-		}
-		catch(e) {
-			var error = "Malformed msg received: " + e;
-			node.fire('LOG', 'E: ' + error);
-			return false;
-		}
-		
-	};
-	
-	/**
-	 * Nothing is done until the SERVER send an HI msg. All the others msgs will 
-	 * be ignored otherwise.
-	 */
-	GameSocketClient.prototype.attachFirstListeners = function (socket) {
-		
-		var that = this;
-		
-		socket.on('connect', function (msg) {
-			var connString = 'nodeGame: connection open';
-		    console.log(connString); 
-		    
-		    socket.on('message', function (msg) {	
-				
-		    	var msg = that.secureParse(msg);
-		    	
-		    	if (msg) { // Parsing successful
-					if (msg.target === 'HI') {
-						that.player = new Player({id:msg.data,name:that.name});
-						that.servername = msg.from;
-						
-						// Get Ready to play
-						that.attachMsgListeners(socket, msg.session);
-						
-						// Send own name to SERVER
-						that.sendHI(that.player);
-				   	 } 
-		    	}
-		    });
-		    
-		});
-		
-	    socket.on('disconnect', function() {
-	    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
-	    	console.log('closed');
-	    });
-	};
-	
-	GameSocketClient.prototype.attachMsgListeners = function (socket, session) {   
-		var that = this;
-		
-		console.log('nodeGame: Attaching FULL listeners');
-		socket.removeAllListeners('message');
-			
-		this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
-	
-		socket.on('message', function(msg) {
-			var msg = that.secureParse(msg);
-			
-			if (msg) { // Parsing successful
-				node.fire(msg.toInEvent(), msg);
-			}
-		});
-	};
-	
-	GameSocketClient.prototype.sendHI = function (state, to) {
-		var to = to || 'SERVER';
-		var msg = this.gmg.createHI(this.player, to);
-		this.game.player = this.player;
-		this.send(msg);
-	};
-	
-	// TODO: other things rely on this methods which has changed
-	GameSocketClient.prototype.sendSTATE = function(action, state, to) {	
-		var msg = this.gmg.createSTATE(action,state,to);
-		this.send(msg);
-	};
-	
-	GameSocketClient.prototype.sendTXT = function(text, to) {	
-		var msg = this.gmg.createTXT(text,to);
-		this.send(msg);
-	};
-	
-	GameSocketClient.prototype.sendDATA = function (data, to, msg) {
-		var to = to || 'SERVER';
-		var msg = this.gmg.createDATA(data,to,msg);
-		this.send(msg);
-	};
-	
-	/**
-	 * Write a msg into the socket. 
-	 * 
-	 * The msg is actually received by the client itself as well.
-	 */
-	GameSocketClient.prototype.send = function (msg) {
-		
-		// TODO: Check Do volatile msgs exist for clients?
-		
-		//if (msg.reliable) {
-			this.socket.send(msg.stringify());
-		//}
-		//else {
-		//	this.socket.volatile.send(msg.stringify());
-		//}
-		console.log('S: ' + msg);
-		node.fire('LOG', 'S: ' + msg.toSMS());
-	};
-
-})(
-		'undefined' != typeof node ? node : module.exports,
-		'undefined' != typeof io ? io : module.parent.exports); 
  
 (function (exports) {
 	
@@ -1335,6 +623,728 @@
 })('undefined' != typeof node ? node : module.exports); 
  
 (function (exports) {
+
+	var GameState = exports.GameState;
+	var Utils = exports.Utils;
+	
+	/**
+	 * Exposing constructor
+	 */
+	exports.GameMsg = GameMsg;
+	
+	/*
+	 * JSON Data Format for nodeGame Apps.
+	 */
+	GameMsg.actions = {};
+	GameMsg.targets = {};
+	
+	GameMsg.actions.SET 	= 'set'; 	// Changes properties of the receiver
+	GameMsg.actions.GET 	= 'get'; 	// Ask a properties of the receiver
+	GameMsg.actions.SAY		= 'say'; 	// Announce properties of the sender
+	
+	GameMsg.targets.HI		= 'HI';		// Introduction
+	GameMsg.targets.STATE	= 'STATE';	// STATE
+	GameMsg.targets.PLIST 	= 'PLIST';	// PLIST
+	GameMsg.targets.TXT 	= 'TXT';	// Text msg
+	GameMsg.targets.DATA	= 'DATA';	// Contains a data-structure in the data field
+	
+	GameMsg.targets.ACK		= 'ACK';	// A reliable msg was received correctly
+	
+	GameMsg.targets.WARN 	= 'WARN';	// To do.
+	GameMsg.targets.ERR		= 'ERR';	// To do.
+	
+	GameMsg.IN				= 'in.';	// Prefix for incoming msgs
+	GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
+			
+	
+	function GameMsg (gm) {
+		this.id = Math.floor(Math.random()*1000000);
+		
+		this.session = gm.session;
+		this.state = gm.state;
+		this.target = gm.target; // was action
+		this.from = gm.from;
+		this.to = gm.to;
+		this.text = gm.text;
+		this.action = gm.action; 
+		this.data = gm.data;
+		this.priority = gm.priority;
+		this.reliable = gm.reliable;
+		
+		this.created = Utils.getDate();
+		this.forward = 0; // is this msg just a forward?	
+	};
+	
+	//function GameMsg (session, currentState, action, target, from, to, text, data,
+	//					priority, reliable) {
+	//		
+	//	this.id = Math.floor(Math.random()*1000000);
+	//
+	//	this.action = action; 
+	//	this.target = target;
+	//	
+	//	this.session = session;
+	//	this.currentState = currentState;
+	//	
+	//	this.from = from;
+	//	this.to = to;
+	//	this.text = text;
+	//	this.data = data;
+	//	
+	//	this.priority = priority;
+	//	this.reliable = reliable;
+	//
+	//	this.created = Utils.getDate();
+	//	this.forward = 0; // is this msg just a forward?	
+	//	
+	//};
+	//
+	//// Does not change the msg ID
+	//GameMsg.prototype.import = function(jsonMsg) {
+	//	
+	//	this.session = jsonMsg.session;
+	//	this.currentState = jsonMsg.currentState;
+	//	this.target = jsonMsg.target; // was action
+	//	this.from = jsonMsg.from;
+	//	this.to = jsonMsg.to;
+	//	this.text = jsonMsg.text;
+	//	this.action = jsonMsg.action; 
+	//	this.data = jsonMsg.data;
+	//	this.priority = jsonMsg.priority;
+	//	this.reliable = jsonMsg.reliable;
+	//	this.forward = jsonMsg.forward;
+	//	
+	//};
+	
+	// Copy everything
+	GameMsg.clone = function (gameMsg) {
+		
+		var gm = new GameMsg(gameMsg);
+		
+		gm.id = gameMsg.id;
+		gm.forward = gameMsg.forward;
+		// TODO: Check also created ?
+		gm.created = gameMsg.created;
+		
+		return gm;
+	};
+	
+	// Copy everything
+	//GameMsg.prototype.clone = function(jsonMsg) {
+	//	
+	//	this.import(jsonMsg);
+	//	this.id = jsonMsg.id;
+	//};
+	
+	GameMsg.prototype.stringify = function() {
+		return JSON.stringify(this);
+	};
+	
+	GameMsg.prototype.toString = function() {
+		
+		var SPT = ",\t";
+		var SPTend = "\n";
+		var DLM = "\"";
+		
+		var gs = new GameState(this.state);
+		
+		var line = this.created + SPT;
+			line += this.id + SPT;
+			line += this.session + SPT;
+			line += this.action + SPT;
+			line += this.target + SPT;
+			line +=	this.from + SPT;
+			line += this.to + SPT;
+			line += DLM + this.text + DLM + SPT;
+			line += DLM + this.data + DLM + SPT; // maybe to remove
+			line += this.reliable + SPT;
+			line += this.priority + SPTend;
+			
+			
+		return line;
+		
+	};
+	
+	GameMsg.prototype.toSMS = function () {
+		
+		var parseDate = /\w+/; // Select the second word;
+		var results = parseDate.exec(this.created);
+		//var d = new Date(this.created);
+		//var line = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+		//var line = results[0];
+		var line = '[' + this.from + ']->[' + this.to + ']\t';
+		line += '|' + this.action + '.' + this.target + '|'+ '\t';
+		line += ' ' + this.text + ' ';
+		
+		return line;
+	};
+	
+	//GameMsg.parse = function(msg) {
+	//	try {
+	//		var gm = new GameMsg();
+	//		gm.import(msg);
+	//		return gm;
+	//	}
+	//	catch(e){
+	//		throw 'Error while trying to parse GameMsg ' + e.message;
+	//	}
+	//};
+	
+	GameMsg.prototype.toInEvent = function() {
+		return 'in.' + this.toEvent();
+	};
+	
+	GameMsg.prototype.toOutEvent = function() {
+		return 'out.' + this.toEvent();
+	};
+	
+	GameMsg.prototype.toEvent = function () {
+		return this.action + '.' + this.target;
+	}; 
+
+})('undefined' != typeof node ? node : module.exports); 
+ 
+(function (exports) {
+	
+	var node = exports;
+	var GameState = node.GameState;
+	var Utils = node.Utils;
+	
+	/*
+	 * GameLoop
+	 * 
+	 * Handle the states of the game
+	 * 
+	 */
+	
+	/**
+	 * Expose constructor
+	 */
+	
+	exports.GameLoop = GameLoop;
+	
+	function GameLoop (loop) {
+		this.loop = loop;
+		
+		this.limits = Array();
+		
+		for (var key in this.loop) {
+			if (this.loop.hasOwnProperty(key)) {
+				var round = loop[key].rounds || 1;
+				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
+			}
+		}
+		
+		this.nStates = this.limits.length;
+		
+	}
+	
+	
+	GameLoop.prototype.exist = function (gameState) {
+	
+		if (typeof(this.loop[gameState.state]) === 'undefined') {
+			console.log('(E): Unexisting state: ' + gameState.state);
+			return false;
+		}
+		
+		if (typeof(this.loop[gameState.state]['loop'][gameState.step]) === 'undefined'){
+			console.log('(E): Unexisting step: ' + gameState.step);
+			return false;
+		}
+		// States are 1 based, arrays are 0-based => -1
+		if(gameState.round > this.limits[gameState.state-1]['rounds']) {
+			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
+			return false;
+		}
+		
+			
+		return true;
+	};
+			
+	GameLoop.prototype.next = function (gameState) {
+		
+		console.log('NEXT OF THIS ' + gameState);
+		//console.log(this.limits);
+		
+		// Game has not started yet, do it!
+		if (gameState.state === 0) {
+			console.log('NEXT: NEW');
+			return new GameState({
+								 state: 1,
+								 step: 1,
+								 round: 1
+			});
+		}
+		
+		if (!this.exist(gameState)) {
+			console.log('No next state of non-existing state: ' + gameState);
+		}
+		
+		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
+		
+		if (this.limits[idxLimit]['steps'] > gameState.step){
+			var newStep = Number(gameState.step)+1;
+	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
+			console.log('NEXT STEP: '  + new GameState({
+														state: gameState.state,
+														step: newStep,
+														round: gameState.round
+			}));
+			
+	//		return new GameState(gameState.state,gameState.step+1,gameState.round);
+			
+			return new GameState({
+				state: gameState.state,
+				step: newStep,
+				round: gameState.round
+			});
+		}
+		
+		if (this.limits[idxLimit]['rounds'] > gameState.round){
+			var newRound = Number(gameState.round)+1;
+			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
+			//return new GameState(gameState.state,1,newRound);
+			return new GameState({
+				state: gameState.state,
+				step: 1,
+				round: newRound
+			});
+		}
+		
+		if (this.nStates > gameState.state){		
+			var newState = Number(gameState.state)+1;
+			//console.log('NEXT STATE: ' + new GameState(newState,1,1));
+			//return new GameState(newState,1,1);
+			return new GameState({
+				state: newState,
+				step: 1,
+				round: 1
+			});
+		}
+		
+		return false; // game over
+	};
+	
+	GameLoop.prototype.previous = function (gameState) {
+		
+		if (!this.exist(gameState)) {
+			console.log('No previous state of non-existing state: ' + gameState);
+		}
+		
+		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
+		
+		if (gameState.step > 1){
+			var oldStep = Number(gameState.step)-1;
+			//return new GameState(gameState.state,oldStep,gameState.round);
+			return new GameState({
+				state: gameState.state,
+				step: oldStep,
+				round: gameState.round
+			});
+		}
+		else if (gameState.round > 1){
+			var oldRound = Number(gameState.round)-1;
+			var oldStep = this.limits[idxLimit]['steps'];
+			//return new GameState(gameState.state,oldStep,oldRound);
+			return new GameState({
+				state: gameState.state,
+				step: oldStep,
+				round: oldRound
+			});
+		}
+		else if (gameState.state > 1){
+			var oldRound = this.limits[idxLimit-1]['rounds'];
+			var oldStep = this.limits[idxLimit-1]['steps'];
+			var oldState = idxLimit;
+			//return new GameState(oldState,oldStep,oldRound);
+			return new GameState({
+				state: oldState,
+				step: oldStep,
+				round: oldRound
+			});
+		}
+		
+		return false; // game init
+	};
+	
+	GameLoop.prototype.getFunction = function(gameState) {
+		return this.loop[gameState.state]['loop'][gameState.step];
+	};
+
+})('undefined' != typeof node ? node : module.exports); 
+ 
+(function (exports) {
+	
+	var node = exports;
+	var GameMsg = node.GameMsg;
+	var GameState = node.GameState;
+	var Player = node.Player;
+	
+	/*
+	 * GameMsgGenerator
+	 * 
+	 * 
+	 * All message are reliable, but TXT messages.
+	 * 
+	 */
+	
+	/**
+	 * Expose constructor
+	 */
+	
+	exports.GameMsgGenerator = GameMsgGenerator; 
+	
+	function GameMsgGenerator (session, sender, state) {	
+		this.session = session;
+		this.sender = sender;
+		this.state = state;
+	};
+	
+	//GameMsgGenerator.prototype.setCurrentState = function (state) {
+	//	this.state = state;
+	//};
+	//
+	//GameMsgGenerator.prototype.getCurrentState = function () {
+	//	return this.state;
+	//};
+	
+	
+	// HI
+	
+	//Notice: this is different from the server;
+	GameMsgGenerator.prototype.createHI = function(player,to,reliable) {
+	
+	  var rel = reliable || 1;
+	  
+	  return new GameMsg( {
+	            			session: this.session,
+	            			state: this.state,
+	            			action: GameMsg.actions.SAY,
+	            			target: GameMsg.targets.HI,
+	            			from: this.sender,
+	            			to: to,
+	            			text: new Player(player) + ' ready.',
+	            			data: player,
+	            			priority: null,
+	            			reliable: rel
+	  });
+	
+	
+	};
+	
+	// STATE
+	
+	GameMsgGenerator.prototype.saySTATE = function (plist, to, reliable) {
+		return this.createSTATE(GameMsg.SAY, plist, to,reliable);
+	};
+	
+	GameMsgGenerator.prototype.setSTATE = function (plist, to, reliable) {
+		return this.createSTATE(GameMsg.SET, plist, to,reliable);
+	};
+	
+	GameMsgGenerator.prototype.getSTATE = function (plist, to, reliable) {
+		return this.createSTATE(GameMsg.GET, plist, to,reliable);
+	};
+	
+	GameMsgGenerator.prototype.createSTATE = function (action, state, to, reliable) {
+		
+		var rel = reliable || 1;
+		
+		
+		return new GameMsg({
+							session: this.session,
+							state: this.state,
+							action: action,
+							target: GameMsg.targets.STATE,
+							from: this.sender,
+							to: to,
+							text: 'New State: ' + GameState.stringify(state),
+							data: state,
+							priority: null,
+							reliable: rel
+		});
+	};
+	
+	
+	// PLIST
+	
+	GameMsgGenerator.prototype.sayPLIST = function (plist, to, reliable) {
+		return this.createPLIST(GameMsg.actions.SAY, plist, to,reliable);
+	};
+	
+	GameMsgGenerator.prototype.setPLIST = function (plist, to, reliable) {
+		return this.createPLIST(GameMsg.actions.SET, plist, to,reliable);
+	};
+	
+	GameMsgGenerator.prototype.getPLIST = function (plist, to, reliable) {
+		return this.createPLIST(GameMsg.actions.GET, plist, to, reliable);
+	};
+	
+	GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
+		
+		//console.log('Creating plist msg ' + plist + ' ' + plist.size());
+		
+		var rel = reliable || 1;
+		
+		return new GameMsg({
+							session: this.session, 
+							state: this.state,
+							action: action,
+							target: GameMsg.targets.PLIST,
+							from: this.sender,
+							to: to,
+							text: 'List of Players: ' + plist.size(),
+							data: plist.pl,
+							priority: null,
+							reliable: rel
+		});
+	};
+	
+	
+	// TXT
+	
+	GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
+		
+		//console.log("STE: " + text);
+		
+		var rel = reliable || 0;
+		
+		return new GameMsg({
+							session: this.session,
+							state: this.state,
+							action: GameMsg.actions.SAY,
+							target: GameMsg.targets.TXT,
+							from: this.sender,
+							to: to,
+							text: text,
+							data: null,
+							priority: null,
+							reliable: rel
+		});
+		
+		
+	};
+	
+	
+	// DATA
+	
+	GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
+		
+		var rel = reliable || 1;
+		var text = text || 'data';
+		
+		return new GameMsg({
+							session: this.session, 
+							state: this.state,
+							action: GameMsg.actions.SAY,
+							target: GameMsg.targets.DATA,
+							from: this.sender,
+							to: to,
+							text: text,
+							data: data,
+							priority: null,
+							reliable: rel
+		});
+	};
+	
+	
+	// ACK
+	
+	GameMsgGenerator.prototype.createACK = function (gm, to, reliable) {
+		
+		var rel = reliable || 0;
+		
+		var newgm = new GameMsg({
+								session: this.session, 
+								state: this.state,
+								action: GameMsg.actions.SAY,
+								target: GameMsg.targets.ACK,
+								from: this.sender,
+								to: to,
+								text: 'Msg ' + gm.id + ' correctly received',
+								data: gm.id,
+								priority: null,
+								reliable: rel
+		});
+		
+		if (gm.forward) {
+			newgm.forward = 1;
+		}
+		
+		return newgm;
+	}; 
+
+})('undefined' != typeof node ? node : module.exports); 
+ 
+(function (exports, io) {
+		
+	var node = exports;
+	var GameMsg = node.GameMsg;
+	var GameState = node.GameState;
+	var Player = node.Player;
+	var GameMsgGenerator = node.GameMsgGenerator;
+	
+	/**
+	 * Expose constructor;
+	 *
+	 */
+	exports.GameSocketClient = GameSocketClient;
+	
+	
+	
+	function GameSocketClient (options, nodeGame) {
+		
+		this.name = options.name;
+		this.url = options.url;
+		
+		this.servername = null;
+		this.game = null;
+		
+		this.socket = this.connect();
+	}
+	
+	GameSocketClient.prototype.setGame = function(game) {
+		this.game = game;
+	};
+	
+	GameSocketClient.prototype.connect = function() {
+		// TODO: add check if http:// is already in
+		console.log('nodeGame: connecting to ' + this.url);
+		var socket = io.connect(this.url);
+	    this.attachFirstListeners(socket);
+	    return socket;
+	};
+	
+	
+	/*
+	
+	I/O Functions
+	
+	*/
+	
+	//Parse the message received in the Socket
+	GameSocketClient.prototype.secureParse = function (msg) {
+		
+		try {
+			//console.log(msg);
+			//debugger;
+			var gameMsg = GameMsg.clone(JSON.parse(msg));
+			console.log('R: ' + gameMsg);
+			node.fire('LOG', 'R: ' + gameMsg.toSMS());
+			return gameMsg;
+		}
+		catch(e) {
+			var error = "Malformed msg received: " + e;
+			console.log(error);
+			node.fire('LOG', 'E: ' + error);
+			return false;
+		}
+		
+	};
+	
+	/**
+	 * Nothing is done until the SERVER send an HI msg. All the others msgs will 
+	 * be ignored otherwise.
+	 */
+	GameSocketClient.prototype.attachFirstListeners = function (socket) {
+		
+		var that = this;
+		
+		socket.on('connect', function (msg) {
+			var connString = 'nodeGame: connection open';
+		    console.log(connString); 
+		    
+		    socket.on('message', function (msg) {	
+		    	
+		    	var msg = that.secureParse(msg);
+		    	
+		    	if (msg) { // Parsing successful
+					if (msg.target === 'HI') {
+						that.player = new Player({id:msg.data,name:that.name});
+						that.servername = msg.from;
+						
+						// Get Ready to play
+						that.attachMsgListeners(socket, msg.session);
+						
+						// Send own name to SERVER
+						that.sendHI(that.player);
+				   	 } 
+		    	}
+		    });
+		    
+		});
+		
+	    socket.on('disconnect', function() {
+	    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
+	    	console.log('closed');
+	    });
+	};
+	
+	GameSocketClient.prototype.attachMsgListeners = function (socket, session) {   
+		var that = this;
+		
+		console.log('nodeGame: Attaching FULL listeners');
+		socket.removeAllListeners('message');
+			
+		this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
+	
+		socket.on('message', function(msg) {
+			var msg = that.secureParse(msg);
+			
+			if (msg) { // Parsing successful
+				node.fire(msg.toInEvent(), msg);
+			}
+		});
+	};
+	
+	GameSocketClient.prototype.sendHI = function (state, to) {
+		var to = to || 'SERVER';
+		var msg = this.gmg.createHI(this.player, to);
+		this.game.player = this.player;
+		this.send(msg);
+	};
+	
+	// TODO: other things rely on this methods which has changed
+	GameSocketClient.prototype.sendSTATE = function(action, state, to) {	
+		var msg = this.gmg.createSTATE(action,state,to);
+		this.send(msg);
+	};
+	
+	GameSocketClient.prototype.sendTXT = function(text, to) {	
+		var msg = this.gmg.createTXT(text,to);
+		this.send(msg);
+	};
+	
+	GameSocketClient.prototype.sendDATA = function (data, to, msg) {
+		var to = to || 'SERVER';
+		var msg = this.gmg.createDATA(data,to,msg);
+		this.send(msg);
+	};
+	
+	/**
+	 * Write a msg into the socket. 
+	 * 
+	 * The msg is actually received by the client itself as well.
+	 */
+	GameSocketClient.prototype.send = function (msg) {
+		
+		// TODO: Check Do volatile msgs exist for clients?
+		
+		//if (msg.reliable) {
+			this.socket.send(msg.stringify());
+		//}
+		//else {
+		//	this.socket.volatile.send(msg.stringify());
+		//}
+		console.log('S: ' + msg);
+		node.fire('LOG', 'S: ' + msg.toSMS());
+	};
+
+})(
+		'undefined' != typeof node ? node : module.exports,
+		'undefined' != typeof io ? io : module.parent.exports); 
+ 
+(function (exports) {
 	
 	var node = exports;
 	var GameState = node.GameState;
@@ -1429,22 +1439,22 @@
 			// SET
 			
 			node.on( OUT + set + 'STATE', function(state,to){
-				node.gsc.sendSTATE('set',state,to);
+				that.gsc.sendSTATE('set',state,to);
 			});		
 		
 			// SAY
 			
 			node.on( OUT + say + 'STATE', function(state,to){
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
-				node.gsc.sendSTATE('say',state,to);
+				that.gsc.sendSTATE('say',state,to);
 			});	
 			
 			node.on( OUT + say + 'TXT', function(text,to){
-				node.gsc.sendTXT(text,to);
+				that.gsc.sendTXT(text,to);
 			});
 			
 			node.on( OUT + say + 'DATA', function(data,to,msg){
-				node.gsc.sendDATA(data,to,msg);
+				that.gsc.sendDATA(data,to,msg);
 			});
 			
 			node.on('DONE', function(msg){
@@ -1541,7 +1551,7 @@
 			
 			// Local Listeners from previous state are erased before proceeding
 			// to next one
-			node.clearLocalListeners();
+			node.node.clearLocalListeners();
 			return this.gameLoop.getFunction(this.gameState).call(this);
 		}
 	
@@ -1723,32 +1733,32 @@
 	
 	// Say
 	
-	node.onTXT = this.onTXTin = function(func) {
-		that.on("in.say.TXT", function(msg) {
+	node.onTXT = node.onTXTin = function(func) {
+		node.on("in.say.TXT", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onDATA = this.onDATAin = function(func) {
-		that.on("in.say.DATA", function(msg) {
+	node.onDATA = node.onDATAin = function(func) {
+		node.on("in.say.DATA", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
 	// Set
 	
-	node.onSTATE = this.onSTATEin = function(func) {
-		that.on("in.set.STATE", function(msg) {
+	node.onSTATE = node.onSTATEin = function(func) {
+		node.on("in.set.STATE", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onPLIST = this.onPLISTin = function(func) {
-		that.on("in.set.PLIST", function(msg) {
+	node.onPLIST = node.onPLISTin = function(func) {
+		node.on("in.set.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
 		
-		that.on("in.say.PLIST", function(msg) {
+		node.on("in.say.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
