@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 13:26:28 CEST 2011
+ * Built on Do 20. Okt 18:13:27 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 13:26:28 CEST 2011
+ * Built on Do 20. Okt 18:13:27 CEST 2011
  *
  */
  
@@ -333,9 +333,8 @@
 
 })('undefined' != typeof node ? node : module.exports); 
  
-(function (exports) {
+(function (exports, node) {
 	
-	var node = exports;
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
@@ -631,12 +630,15 @@
 		return out;
 	};
 
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+); 
  
-(function (exports) {
+(function (exports, node) {
 
-	var GameState = exports.GameState;
-	var Utils = exports.Utils;
+	var GameState = node.GameState;
+	var Utils = node.Utils;
 	
 	/**
 	 * Exposing constructor
@@ -813,11 +815,13 @@
 		return this.action + '.' + this.target;
 	}; 
 
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+); 
  
-(function (exports) {
+(function (exports, node) {
 	
-	var node = exports;
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
@@ -982,11 +986,13 @@
 		return this.loop[gameState.state]['loop'][gameState.step];
 	};
 
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+); 
  
-(function (exports) {
+(function (exports, node) {
 	
-	var node = exports;
 	var GameMsg = node.GameMsg;
 	var GameState = node.GameState;
 	var Player = node.Player;
@@ -1185,11 +1191,13 @@
 		return newgm;
 	}; 
 
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+); 
  
-(function (exports, io) {
+(function (exports, node, io) {
 		
-	var node = exports;
 	var GameMsg = node.GameMsg;
 	var GameState = node.GameState;
 	var Player = node.Player;
@@ -1240,7 +1248,7 @@
 			//console.log(msg);
 			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
-			console.log('R: ' + gameMsg);
+			console.log('R: ' + gameMsg);			
 			node.fire('LOG', 'R: ' + gameMsg.toSMS());
 			return gameMsg;
 		}
@@ -1352,12 +1360,13 @@
 	};
 
 })(
-		'undefined' != typeof node ? node : module.exports,
-		'undefined' != typeof io ? io : module.parent.exports); 
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+  , 'undefined' != typeof io ? io : module.parent.exports.io
+); 
  
-(function (exports) {
+(function (exports, node) {
 	
-	var node = exports;
 	var GameState = node.GameState;
 	var GameMsg = node.GameMsg;
 	var PlayerList = node.PlayerList;
@@ -1582,15 +1591,118 @@
 	//	};
 	}; 
 
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+);
+ 
  
 /*!
  * nodeGame
  */
 
-(function (exports) {
+(function (exports, io) {
 	
 	var node = exports;
+
+	// if node
+	
+	if ('object' === typeof module && 'function' === typeof require) {
+	
+		/**
+	     * Expose Socket.io-client
+	     *
+	     * @api public
+	     */
+	
+	    node.io = require('socket.io-client');
+		
+		/**
+	     * Expose EventEmitter
+	     *
+	     * @api public
+	     */
+	
+	    node.EventEmitter = require('./EventEmitter').EventEmitter;
+		
+	    /**
+	     * Expose Utils
+	     *
+	     * @api public
+	     */
+	
+	    node.Utils = require('./Utils').Utils;
+	
+	    /**
+	     * Expose GameState.
+	     *
+	     * @api public
+	     */
+	
+	    node.GameState = require('./GameState').GameState;
+	
+	    /**
+	     * Expose PlayerList.
+	     *
+	     * @api public
+	     */
+	
+	    node.PlayerList = require('./PlayerList').PlayerList;
+	    
+	    /**
+	     * Expose Player.
+	     *
+	     * @api public
+	     */
+	
+	    node.Player = require('./PlayerList').Player;
+	
+	    
+	    /**
+	     * Expose GameMsg
+	     *
+	     * @api public
+	     */
+	
+	     node.GameMsg = require('./GameMsg').GameMsg;
+	
+	    /**
+	     * Expose GameLoop
+	     *
+	     * @api public
+	     */
+	
+	    node.GameLoop = require('./GameLoop').GameLoop;
+	
+	    
+	    /**
+	     * Expose GameMsgGenerator
+	     *
+	     * @api public
+	     */
+	
+	    node.GameMsgGenerator = require('./GameMsgGenerator').GameMsgGenerator;
+	    
+	    /**
+	     * Expose GameSocketClient
+	     *
+	     * @api public
+	     */
+	
+	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
+	    
+	    /**
+	     * Expose Game
+	     *
+	     * @api public
+	     */
+	
+	    node.Game = require('./Game').Game;
+	
+	  }
+	  // end node
+		
+	
 	var EventEmitter = node.EventEmitter;
 	var GameSocketClient = node.GameSocketClient;
 	var GameState = node.GameState;
@@ -1605,46 +1717,6 @@
 	
 	nodeGame.prototype.__proto__ = EventEmitter.prototype;
 	nodeGame.prototype.constructor = nodeGame;
-	
-	// Exposing classes
-	
-//	exports.nodeGame.prototype.create = {};
-//	
-//	nodeGame.prototype.create.GameLoop = function (loop) {
-//		return new GameLoop(loop);
-//	};
-//	
-//	nodeGame.prototype.create.GameMsgGenerator = function (session, sender, state) {
-//		return new GameMsgGenerator(session, sender, state);
-//	};
-//	
-//	nodeGame.prototype.create.GameMsg = function(gm) {
-//		
-//		return new GameMsg({ 
-//							session: gm.session, 
-//							state: gm.state, 
-//							action: gm.action, 
-//							target: gm.target,
-//							from: gm.from,
-//							to: gm.to, 
-//							text: gm.text, 
-//							data: gm.data,
-//							priority: gm.priority, 
-//							reliable: gm.reliable
-//		});
-//	};
-//	
-//	nodeGame.prototype.create.GameState = function(gs){
-//		return new GameState({
-//								state: gs.state,
-//								step: gs.step,
-//								round: gs.round
-//		});
-//	};
-//	
-//	nodeGame.prototype.create.PlayerList = function(list){
-//		return new PlayerList(list);
-//	};
 	
 	// Exposing Costants
 	
@@ -1798,7 +1870,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 13:26:28 CEST 2011
+ * Built on Do 20. Okt 18:13:27 CEST 2011
  *
  */
  
@@ -3271,7 +3343,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 13:26:28 CEST 2011
+ * Built on Do 20. Okt 18:13:27 CEST 2011
  *
  */
  

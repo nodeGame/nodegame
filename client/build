@@ -72,6 +72,8 @@ done
 
 echo $NODEGAME built correctly.
 
+./build_nodemodule
+
 # Producing a minified version as well
 # exec yui $NODEGAME -o $NODEGAMEMIN   --charset=utf-8
 

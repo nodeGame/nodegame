@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "Copying files into the node_modules directory."
+
+FILES[0]='EventEmitter.js'
+FILES[1]='Utils.js'
+FILES[2]='GameState.js'
+FILES[3]='PlayerList.js'
+FILES[4]='GameMsg.js'
+FILES[5]='GameLoop.js'
+FILES[6]='GameMsgGenerator.js'
+FILES[7]='GameSocketClient.js'
+FILES[8]='Game.js'
+FILES[9]='nodeGame.js'
+FILES[10]='package.json'
+
+DIR="nodeGame/"
+MODULEDIR="nodeclient/node_modules/nodegame-client/"
+
+for f in ${FILES[*]}
+do
+  F=$DIR$f
+  echo "Processing $F file..."
+  `cp $F $MODULEDIR$f`
+done
+
+echo "Done."
+
