@@ -2,7 +2,7 @@
  * Start File for nodeGame server with conf.
  */
 
-var ServerNode = require('./ServerNode');
+var ServerNode = require('./nodegame-server');
 
 
 
