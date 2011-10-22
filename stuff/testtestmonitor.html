@@ -1,0 +1,24 @@
+<!doctype html>
+<title>Test Game</title>
+<body>
+<div id="root"></div>
+<script src="client/build/0.2/nodegame-all-0.2.js" charset="utf-8"></script>
+<script src="games/testgame/Monitor_TestGame.js" charset="utf-8"></script>
+
+<script>
+    window.onload = function(){
+  
+    // Create the Client
+      
+    var net = {
+      name: "P_Monitor_Test",
+      host: "localhost",
+      port: 8004 // 8000 Admin Port
+    };
+    
+    
+    node.play(net, new Monitor_Test());
+    
+  }
+</script>
+</body>

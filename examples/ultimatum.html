@@ -1,0 +1,23 @@
+<!doctype html>
+<title>Ultimatum Game</title>
+<body>
+<div id="root"></div>
+<script src="http://localhost:8004/socket.io/socket.io.js"></script> 
+<script src="http://localhost:8004/nodegame.js" charset="utf-8"></script>
+<script src="http://localhost:8004/games/ultimatum/Ultimatum.js" charset="utf-8"></script>
+
+<script>
+  	window.onload = function(){
+	
+		// Create the Client
+			
+		var conf = {
+			name: "P_" + Math.floor(Math.random()*100),
+			url: "http://localhost:8004/player"
+		};
+
+    node.play(conf, new Ultimatum());
+    
+	}
+</script>
+</body>
