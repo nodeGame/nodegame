@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -1767,7 +1767,7 @@
 	node.play = function (conf, game) {	
 		that.gsc = new GameSocketClient(conf);
 		
-		that.game = new Game(game, that.gsc);
+		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
 		that.gsc.setGame(that.game);
@@ -1870,7 +1870,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -2770,7 +2770,7 @@ GameBoard.prototype.listeners = function() {
  */
 
 function GameSummary(id) {
-	
+	//debugger;
 	this.game = node.game;
 	this.id = id || 'gamesummary';
 	this.name = 'Game Summary';
@@ -3343,7 +3343,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -3734,7 +3734,8 @@ GameWindow.prototype.setup = function (type){
 	
 	case 'MONITOR':
 		
-		node.removeListener('in.STATE');
+		// TODO: Check this
+		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
 		try {
@@ -3764,7 +3765,7 @@ GameWindow.prototype.setup = function (type){
 			this.addGadget(this.root,w);
 		}
 		catch(e) {
-			console.log('nodeWindow: Standard Gadget not found ' + e.message);
+			console.log('nodeWindow: Gadget not found ' + e.message);
 		}
 		
 		break;

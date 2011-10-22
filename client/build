@@ -7,7 +7,8 @@ BUILD="./releases/"$VERSION"/"
 EXT=".js"
 MIN="-min"
 
-NODEGAME=$BUILD$NAME"-"$VERSION$EXT
+BUILDNAME=$NAME"-"$VERSION$EXT
+NODEGAME=$BUILD$BUILDNAME
 NODEGAMEMIN=$BUILD$NAME$MIN"-"$VERSION$EXT
 
 DATE=`eval date` #+%Y%m%d`
@@ -73,6 +74,16 @@ done
 echo $NODEGAME built correctly.
 
 ./build_nodemodule
+
+echo "Copying the build into the server directory"
+
+SERVERDIR="../server/nodegame/"
+LATEST="nodegame-all-latest.js"
+
+`cp $NODEGAME ${SERVERDIR}/$LATEST`
+#PATHSERVERBUILD=`$(readlink -f $SERVERDIR$BUILDNAME)`
+
+echo "Copy done"
 
 # Producing a minified version as well
 # exec yui $NODEGAME -o $NODEGAMEMIN   --charset=utf-8

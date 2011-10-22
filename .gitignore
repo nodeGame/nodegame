@@ -1,6 +1,7 @@
-server/node_modules
+stuff
 yuicompressor-2.4.6
 server/log/messages
 server/log/syslog
 *.tmp*
-client/built/*
+client/releases/*
+jquery

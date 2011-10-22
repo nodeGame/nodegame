@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -904,7 +904,7 @@ GameBoard.prototype.listeners = function() {
  */
 
 function GameSummary(id) {
-	
+	//debugger;
 	this.game = node.game;
 	this.id = id || 'gamesummary';
 	this.name = 'Game Summary';

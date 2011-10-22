@@ -5,7 +5,7 @@
  */
 
 function GameSummary(id) {
-	
+	//debugger;
 	this.game = node.game;
 	this.id = id || 'gamesummary';
 	this.name = 'Game Summary';

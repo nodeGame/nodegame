@@ -168,7 +168,8 @@
 	node.play = function (conf, game) {	
 		that.gsc = new GameSocketClient(conf);
 		
-		that.game = new Game(game, that.gsc);
+		// TODO Check why is not working...
+		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
 		that.gsc.setGame(that.game);

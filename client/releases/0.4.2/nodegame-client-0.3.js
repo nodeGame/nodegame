@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -1756,7 +1756,7 @@
 	node.play = function (conf, game) {	
 		that.gsc = new GameSocketClient(conf);
 		
-		that.game = new Game(game, that.gsc);
+		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
 		that.gsc.setGame(that.game);

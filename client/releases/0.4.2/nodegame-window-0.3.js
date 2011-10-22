@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 20. Okt 18:13:27 CEST 2011
+ * Built on Fri Oct 21 18:44:13 CEST 2011
  *
  */
  
@@ -395,7 +395,8 @@ GameWindow.prototype.setup = function (type){
 	
 	case 'MONITOR':
 		
-		node.removeListener('in.STATE');
+		// TODO: Check this
+		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
 		try {
@@ -425,7 +426,7 @@ GameWindow.prototype.setup = function (type){
 			this.addGadget(this.root,w);
 		}
 		catch(e) {
-			console.log('nodeWindow: Standard Gadget not found ' + e.message);
+			console.log('nodeWindow: Gadget not found ' + e.message);
 		}
 		
 		break;

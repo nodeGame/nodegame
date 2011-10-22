@@ -2,7 +2,7 @@ function Ultimatum () {
 	
 	this.name = 'Ultimatum Game';
 	this.description = 'Ultimatum Descr';
-	this.version = '0.1';
+	this.version = '0.2';
 	
 	this.automatic_step = false;
 	

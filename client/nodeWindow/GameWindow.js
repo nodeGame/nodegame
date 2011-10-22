@@ -37,7 +37,8 @@ GameWindow.prototype.setup = function (type){
 	
 	case 'MONITOR':
 		
-		node.removeListener('in.STATE');
+		// TODO: Check this
+		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
 		try {
@@ -67,7 +68,7 @@ GameWindow.prototype.setup = function (type){
 			this.addGadget(this.root,w);
 		}
 		catch(e) {
-			console.log('nodeWindow: Standard Gadget not found ' + e.message);
+			console.log('nodeWindow: Gadget not found ' + e.message);
 		}
 		
 		break;

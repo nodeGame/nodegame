@@ -5,8 +5,6 @@
 var ServerNode = require('./nodegame-server');
 
 
-
-
 //io.configure('production', function(){
 //	  that.server.enable('browser client etag');
 //	  that.server.set('log level', 3);
