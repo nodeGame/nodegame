@@ -7,7 +7,6 @@
 	 * Exposing constructor
 	 */
 	exports.GameMsg = GameMsg;
-	
 	/*
 	 * JSON Data Format for nodeGame Apps.
 	 */
@@ -32,6 +31,14 @@
 	GameMsg.IN				= 'in.';	// Prefix for incoming msgs
 	GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
 			
+	
+	/**
+	 * Exporting constants
+	 * 
+	 */
+//	exports.actions = GameMsg.actions;
+//	exports.targets = GameMsg.targets;
+//	
 	
 	function GameMsg (gm) {
 		this.id = Math.floor(Math.random()*1000000);

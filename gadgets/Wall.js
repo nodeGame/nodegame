@@ -6,6 +6,8 @@
  */
 
 
+var Utils = node.Utils;
+
 function Wall(id) {
 	this.game = node.game;
 	this.id = id || 'wall';

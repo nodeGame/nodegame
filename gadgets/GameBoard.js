@@ -36,7 +36,7 @@ GameBoard.prototype.listeners = function() {
 		console.log('I Updating Board ' + msg.text);
 		that.board.innerHTML = 'Updating...';
 		
-		var pl = node.create.PlayerList(msg.data);
+		var pl = new node.PlayerList(msg.data);
 		
 		//console.log(pl);
 		

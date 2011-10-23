@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -633,7 +633,6 @@
 	 * Exposing constructor
 	 */
 	exports.GameMsg = GameMsg;
-	
 	/*
 	 * JSON Data Format for nodeGame Apps.
 	 */
@@ -658,6 +657,14 @@
 	GameMsg.IN				= 'in.';	// Prefix for incoming msgs
 	GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
 			
+	
+	/**
+	 * Exporting constants
+	 * 
+	 */
+//	exports.actions = GameMsg.actions;
+//	exports.targets = GameMsg.targets;
+//	
 	
 	function GameMsg (gm) {
 		this.id = Math.floor(Math.random()*1000000);
@@ -1704,21 +1711,19 @@
 	 */
 	exports.nodeGame = nodeGame;
 	
-	nodeGame.prototype.__proto__ = EventEmitter.prototype;
-	nodeGame.prototype.constructor = nodeGame;
+	/**
+	 *  Exposing constants
+	 */	
+	exports.actions = GameMsg.actions;
+	exports.IN = GameMsg.IN;
+	exports.OUT = GameMsg.OUT;
+	exports.targets = GameMsg.targets;		
+	exports.states = GameState.iss;
 	
-	// Exposing Costants
-	
-	nodeGame.prototype.actions = GameMsg.actions;
-	
-	nodeGame.prototype.IN = GameMsg.IN;
-	nodeGame.prototype.OUT = GameMsg.OUT;
-	
-	nodeGame.prototype.targets = GameMsg.targets;
-				
-	nodeGame.prototype.states = GameState.iss;
 	
 	// Constructor
+	nodeGame.prototype.__proto__ = EventEmitter.prototype;
+	nodeGame.prototype.constructor = nodeGame;
 	
 	function nodeGame() {
 		EventEmitter.call(this);
@@ -1754,8 +1759,9 @@
 	};
 	
 	node.play = function (conf, game) {	
-		that.gsc = new GameSocketClient(conf);
+		node.gsc = that.gsc = new GameSocketClient(conf);
 		
+		// TODO Check why is not working...
 		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		

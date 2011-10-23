@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -360,6 +360,9 @@ Document.prototype.insertAfter = function (node, referenceNode) {
  * GameWindow
  */
 
+var Player = node.Player;
+var PlayerList = node.PlayerList;
+
 GameWindow.prototype = new Document();
 GameWindow.prototype.constructor = GameWindow;
 
@@ -399,7 +402,7 @@ GameWindow.prototype.setup = function (type){
 		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
-		try {
+		//try {
 			
 			var nps = new NextPreviousState();
 			this.addGadget(this.root,nps);
@@ -424,10 +427,10 @@ GameWindow.prototype.setup = function (type){
 					
 			var w = new Wall();
 			this.addGadget(this.root,w);
-		}
-		catch(e) {
-			console.log('nodeWindow: Gadget not found ' + e.message);
-		}
+//		}
+//		catch(e) {
+//			console.log('nodeWindow: Error loading gadget ' + e);
+//		}
 		
 		break;
 		
@@ -540,7 +543,7 @@ GameWindow.prototype.addGadget = function (root, g) {
 		g.listeners();
 	}
 	catch(e){
-		throw 'Not compatible gadget: ' + e.message;
+		throw 'Not compatible gadget: ' + e;
 	}
 };
 
@@ -587,7 +590,7 @@ GameWindow.prototype.populateRecipientSelector = function (toSelector, playerLis
 	
 	
 	var opt;
-	var pl = node.create.PlayerList(playerList);
+	var pl = new PlayerList(playerList);
 	
 	
 	try {

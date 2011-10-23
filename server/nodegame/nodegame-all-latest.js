@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -644,7 +644,6 @@
 	 * Exposing constructor
 	 */
 	exports.GameMsg = GameMsg;
-	
 	/*
 	 * JSON Data Format for nodeGame Apps.
 	 */
@@ -669,6 +668,14 @@
 	GameMsg.IN				= 'in.';	// Prefix for incoming msgs
 	GameMsg.OUT				= 'out.';	// Prefix for outgoing msgs
 			
+	
+	/**
+	 * Exporting constants
+	 * 
+	 */
+//	exports.actions = GameMsg.actions;
+//	exports.targets = GameMsg.targets;
+//	
 	
 	function GameMsg (gm) {
 		this.id = Math.floor(Math.random()*1000000);
@@ -1715,21 +1722,19 @@
 	 */
 	exports.nodeGame = nodeGame;
 	
-	nodeGame.prototype.__proto__ = EventEmitter.prototype;
-	nodeGame.prototype.constructor = nodeGame;
+	/**
+	 *  Exposing constants
+	 */	
+	exports.actions = GameMsg.actions;
+	exports.IN = GameMsg.IN;
+	exports.OUT = GameMsg.OUT;
+	exports.targets = GameMsg.targets;		
+	exports.states = GameState.iss;
 	
-	// Exposing Costants
-	
-	nodeGame.prototype.actions = GameMsg.actions;
-	
-	nodeGame.prototype.IN = GameMsg.IN;
-	nodeGame.prototype.OUT = GameMsg.OUT;
-	
-	nodeGame.prototype.targets = GameMsg.targets;
-				
-	nodeGame.prototype.states = GameState.iss;
 	
 	// Constructor
+	nodeGame.prototype.__proto__ = EventEmitter.prototype;
+	nodeGame.prototype.constructor = nodeGame;
 	
 	function nodeGame() {
 		EventEmitter.call(this);
@@ -1765,8 +1770,9 @@
 	};
 	
 	node.play = function (conf, game) {	
-		that.gsc = new GameSocketClient(conf);
+		node.gsc = that.gsc = new GameSocketClient(conf);
 		
+		// TODO Check why is not working...
 		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
@@ -1870,7 +1876,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -2715,7 +2721,7 @@ GameBoard.prototype.listeners = function() {
 		console.log('I Updating Board ' + msg.text);
 		that.board.innerHTML = 'Updating...';
 		
-		var pl = node.create.PlayerList(msg.data);
+		var pl = new node.PlayerList(msg.data);
 		
 		//console.log(pl);
 		
@@ -3280,6 +3286,8 @@ WaitScreen.prototype.listeners = function () {
  */
 
 
+var Utils = node.Utils;
+
 function Wall(id) {
 	this.game = node.game;
 	this.id = id || 'wall';
@@ -3343,7 +3351,7 @@ Wall.prototype.listeners = function() {
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -3699,6 +3707,9 @@ Document.prototype.insertAfter = function (node, referenceNode) {
  * GameWindow
  */
 
+var Player = node.Player;
+var PlayerList = node.PlayerList;
+
 GameWindow.prototype = new Document();
 GameWindow.prototype.constructor = GameWindow;
 
@@ -3738,7 +3749,7 @@ GameWindow.prototype.setup = function (type){
 		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
-		try {
+		//try {
 			
 			var nps = new NextPreviousState();
 			this.addGadget(this.root,nps);
@@ -3763,10 +3774,10 @@ GameWindow.prototype.setup = function (type){
 					
 			var w = new Wall();
 			this.addGadget(this.root,w);
-		}
-		catch(e) {
-			console.log('nodeWindow: Gadget not found ' + e.message);
-		}
+//		}
+//		catch(e) {
+//			console.log('nodeWindow: Error loading gadget ' + e);
+//		}
 		
 		break;
 		
@@ -3879,7 +3890,7 @@ GameWindow.prototype.addGadget = function (root, g) {
 		g.listeners();
 	}
 	catch(e){
-		throw 'Not compatible gadget: ' + e.message;
+		throw 'Not compatible gadget: ' + e;
 	}
 };
 
@@ -3926,7 +3937,7 @@ GameWindow.prototype.populateRecipientSelector = function (toSelector, playerLis
 	
 	
 	var opt;
-	var pl = node.create.PlayerList(playerList);
+	var pl = new PlayerList(playerList);
 	
 	
 	try {

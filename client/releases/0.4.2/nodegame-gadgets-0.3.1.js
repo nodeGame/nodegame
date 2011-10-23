@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Oct 21 18:44:13 CEST 2011
+ * Built on Sun Oct 23 12:17:30 CEST 2011
  *
  */
  
@@ -849,7 +849,7 @@ GameBoard.prototype.listeners = function() {
 		console.log('I Updating Board ' + msg.text);
 		that.board.innerHTML = 'Updating...';
 		
-		var pl = node.create.PlayerList(msg.data);
+		var pl = new node.PlayerList(msg.data);
 		
 		//console.log(pl);
 		
@@ -1413,6 +1413,8 @@ WaitScreen.prototype.listeners = function () {
  * 
  */
 
+
+var Utils = node.Utils;
 
 function Wall(id) {
 	this.game = node.game;

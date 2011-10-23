@@ -2,6 +2,9 @@
  * GameWindow
  */
 
+var Player = node.Player;
+var PlayerList = node.PlayerList;
+
 GameWindow.prototype = new Document();
 GameWindow.prototype.constructor = GameWindow;
 
@@ -41,7 +44,7 @@ GameWindow.prototype.setup = function (type){
 		node.node.removeListener('in.STATE');
 	
 		// TODO: use multiple ifs instead
-		try {
+		//try {
 			
 			var nps = new NextPreviousState();
 			this.addGadget(this.root,nps);
@@ -66,10 +69,10 @@ GameWindow.prototype.setup = function (type){
 					
 			var w = new Wall();
 			this.addGadget(this.root,w);
-		}
-		catch(e) {
-			console.log('nodeWindow: Gadget not found ' + e.message);
-		}
+//		}
+//		catch(e) {
+//			console.log('nodeWindow: Error loading gadget ' + e);
+//		}
 		
 		break;
 		
@@ -182,7 +185,7 @@ GameWindow.prototype.addGadget = function (root, g) {
 		g.listeners();
 	}
 	catch(e){
-		throw 'Not compatible gadget: ' + e.message;
+		throw 'Not compatible gadget: ' + e;
 	}
 };
 
@@ -229,7 +232,7 @@ GameWindow.prototype.populateRecipientSelector = function (toSelector, playerLis
 	
 	
 	var opt;
-	var pl = node.create.PlayerList(playerList);
+	var pl = new PlayerList(playerList);
 	
 	
 	try {
