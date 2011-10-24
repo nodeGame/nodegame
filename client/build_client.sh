@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME="nodegame-client"
-VERSION="0.3"
+VERSION=$1 #TODO Check if $1 is empty
 
 BUILD="./releases/"
 

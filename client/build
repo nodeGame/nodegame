@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME="nodegame-all"
-VERSION="0.4.2"
+VERSION="0.4.4"
 
 BUILD="./releases/"$VERSION"/"
 EXT=".js"
@@ -50,6 +50,8 @@ addBlanks 2 $NODEGAME
 
 
 # Add all the classes
+
+# BUG: if there are multiple versions of the sublibraries they are all added
 
 FILES=$BUILD"*"
 
