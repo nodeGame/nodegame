@@ -24,9 +24,9 @@ function Wall(id) {
 }
 
 Wall.prototype.append = function (root, id) {
-	var fieldset = nodeWindow.addFieldset(root, this.id+'_fieldset', 'Game Log');
+	var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
 	var idLogDiv = id || this.id;
-	this.wall = nodeWindow.addElement('pre', fieldset, idLogDiv);
+	this.wall = node.window.addElement('pre', fieldset, idLogDiv);
 };
 
 Wall.prototype.write = function(text) {

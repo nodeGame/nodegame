@@ -12,7 +12,7 @@ function Test () {
 	var counter = 0;
 	
 	this.init = function() {		
-		nodeWindow.setup('PLAYER');
+		node.window.setup('PLAYER');
 		
 		node.onDATA(function(msg){
 			console.log(counter++ + ' ' + msg.data);

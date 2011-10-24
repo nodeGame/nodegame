@@ -33,11 +33,11 @@ StateBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset 	= nodeWindow.addFieldset(root, idFieldset, 'Change Game State');
-	var sendButton 	= nodeWindow.addButton(fieldset, idButton);
-	var stateSel 	= nodeWindow.addStateSelector(fieldset, idStateSel);
-	this.actionSel	= nodeWindow.addActionSelector(fieldset, idActionSel);
-	this.recipient 	= nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Change Game State');
+	var sendButton 	= node.window.addButton(fieldset, idButton);
+	var stateSel 	= node.window.addStateSelector(fieldset, idStateSel);
+	this.actionSel	= node.window.addActionSelector(fieldset, idActionSel);
+	this.recipient 	= node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	var that = this;
 
@@ -62,7 +62,7 @@ StateBar.prototype.append = function (root, ids) {
 			var round = result[3] || 1;
 			console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
 			
-			var state = node.create.GameState({
+			var state = new node.GameState({
 												state: state,
 												step: step,
 												round: round
@@ -89,7 +89,7 @@ StateBar.prototype.listeners = function () {
 	
 	node.onPLIST( function(msg) {
 		
-		nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+		node.window.populateRecipientSelector(that.recipient,msg.data);
 		// was
 		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 	}); 

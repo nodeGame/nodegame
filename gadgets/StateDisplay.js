@@ -30,10 +30,10 @@ StateDisplay.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('state')) idState = ids.state;
 	}
 	
-	this.fieldset = nodeWindow.addFieldset(root, idFieldset, 'Player Status');
+	this.fieldset = node.window.addFieldset(root, idFieldset, 'Player Status');
 	
 	
-	this.playerDiv = nodeWindow.addDiv(this.fieldset,idPlayer);
+	this.playerDiv = node.window.addDiv(this.fieldset,idPlayer);
 	
 	var checkPlayerName = setInterval(function(idState,idPlayer){
 			if(that.game.player !== null){
@@ -54,7 +54,7 @@ StateDisplay.prototype.updateAll = function(idState,idPlayer) {
 	this.playerDiv.appendChild(document.createElement('br'));
 	this.playerDiv.appendChild(pId);
 	
-	this.stateDiv = nodeWindow.addDiv(this.playerDiv,idState);
+	this.stateDiv = node.window.addDiv(this.playerDiv,idState);
 	this.updateState(this.game.gameState);
 };
 

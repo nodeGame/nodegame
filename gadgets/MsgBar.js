@@ -29,10 +29,10 @@ MsgBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Send Msg To Players');
-	var sendButton = nodeWindow.addButton(fieldset, idButton);
-	var msgText = nodeWindow.addTextInput(fieldset, idMsgText);
-	this.recipient = nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Msg To Players');
+	var sendButton = node.window.addButton(fieldset, idButton);
+	var msgText = node.window.addTextInput(fieldset, idMsgText);
+	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	var that = this;
 	
@@ -53,7 +53,7 @@ MsgBar.prototype.listeners = function(){
 	var that = this;
 	
 	node.onPLIST( function(msg) {
-		nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+		node.window.populateRecipientSelector(that.recipient,msg.data);
 		// was
 		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 	}); 

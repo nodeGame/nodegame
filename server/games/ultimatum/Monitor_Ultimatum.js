@@ -10,7 +10,7 @@ function Monitor_Ultimatum () {
 	this.automatic_step = false;
 	
 	this.init = function() {
-		nodeWindow.setup('MONITOR');
+		node.window.setup('MONITOR');
 	};
 	
 	var pregame1 = function(){

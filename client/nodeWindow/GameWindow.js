@@ -62,7 +62,7 @@ GameWindow.prototype.setup = function (type){
 			this.addGadget(this.root,db);
 			
 			var mb = new MsgBar();
-			nodeWindow.addGadget(this.root,mb);
+			this.addGadget(this.root,mb);
 			
 			var gm = new GameBoard();
 			this.addGadget(this.root,gm);
@@ -83,10 +83,17 @@ GameWindow.prototype.setup = function (type){
 	    var mainframe 	= this.addIFrame(this.root,'mainframe');
 	    
 	    var ws = new WaitScreen();
-		nodeWindow.addGadget(this.root,ws);
+		this.addGadget(this.root,ws);
 	    
 		break;
 	}
+	
+	this.frame = window.frames[this.mainframe];
+};
+
+
+GameWindow.prototype.getElementById = function (id) {
+	return this.frame.getElementById(id);
 };
 
 //1. Load a Frame into the mainframe or other specified frame
@@ -118,10 +125,13 @@ GameWindow.prototype.setup = function (type){
 //};
 
 
+// TODO: frames are loaded taking into account also the path of the game in the server
+
 // FAKE ONLOAD  TODO: try to make it work with onload
 GameWindow.prototype.loadFrame = function (url, func, frame) {
-	var frame = this.mainframe || frame;
+	var frame =  frame || this.mainframe;
 	var that = this;	
+	
 	window.frames[frame].location = url;
 	//window.frames[frame].location.href = url;
 	

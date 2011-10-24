@@ -45,20 +45,20 @@ ChernoffFaces.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('button')) idButton = ids.button;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
 	
-	var canvas = nodeWindow.addCanvas(root, idCanvas, this.dims);
+	var canvas = node.window.addCanvas(root, idCanvas, this.dims);
 	
 	var fp = new FacePainter(canvas);
 	var fv = new FaceVector();
 	
 	fp.draw(fv);
 	
-	var button = nodeWindow.addButton(fieldset,idButton);
+	var button = node.window.addButton(fieldset,idButton);
 									
 	// Add Gadget
 	var sc = new SliderControls('cf_controls',FaceVector.defaults);
-	nodeWindow.addGadget(fieldset,sc);
+	node.window.addGadget(fieldset,sc);
 	
 	var that = this;
 
@@ -93,7 +93,7 @@ ChernoffFaces.prototype.listeners = function () {
 
 function FacePainter (canvas, settings) {
 		
-	this.canvas = nodeWindow.create.Canvas(canvas);
+	this.canvas = node.window.create.Canvas(canvas);
 	
 	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
 	this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;

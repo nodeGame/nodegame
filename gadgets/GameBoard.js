@@ -19,8 +19,8 @@ function GameBoard (id) {
 
 GameBoard.prototype.append = function(root) {
 	this.root = root;
-	var fieldset = nodeWindow.addFieldset(root, this.id + '_fieldset', 'Game State');
-	this.board = nodeWindow.addDiv(fieldset,this.id);
+	var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
+	this.board = node.window.addDiv(fieldset,this.id);
 	this.board.innerHTML = this.noPlayers;
 	
 };

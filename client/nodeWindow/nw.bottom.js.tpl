@@ -1,6 +1,6 @@
 
 	//Expose nodeGame to the global object
-	window.nodeGameWindow = window.nodeWindow = new GameWindow();
+	nodeGame.window = new GameWindow();
 	
 
 })(window.node);

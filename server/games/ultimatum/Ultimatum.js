@@ -13,25 +13,25 @@ function Ultimatum () {
 	this.RESPONDENT = 0;
 	
 	this.init = function() {		
-		nodeWindow.setup('PLAYER');
+		node.window.setup('PLAYER');
 	};
 	
 	
 	var pregame1 = function() {
 		var that = this;
 		
-		nodeWindow.loadFrame('games/ultimatum/pregame.html', function() {
+		node.window.loadFrame('http://localhost/nodegame/dev/server/games/ultimatum/pregame.html', function() {
 				
-			var frame = nodeWindow.frame;		
+			var frame = node.window.frame;		
 			
 			 node.onDATA( function(msg){
 			
 				if (msg.data === 'READY') {
-					var root = nodeWindow.frame.getElementById('root');
+					var root = node.window.frame.getElementById('root');
 					var root = window.frames['mainframe'].document.getElementById('root');
 					//console.log('Root' + root);
-					nodeWindow.write(root,'Press the button to start the experiment');
-					var button = nodeWindow.addButton(root, 'sendb');
+					node.window.write(root,'Press the button to start the experiment');
+					var button = node.window.addButton(root, 'sendb');
 
 					button.onclick = function() {
 						node.fire('DONE', 'User ready to start the experiment.');
@@ -50,7 +50,7 @@ function Ultimatum () {
 	
 		var that = this;
 		
-		nodeWindow.loadFrame('games/ultimatum/instructions.html', function() {
+		node.window.loadFrame('http://localhost/nodegame/dev/server/games/ultimatum/instructions.html', function() {
 	
 			var b = window.frames['mainframe'].document.getElementById('read');
 		
@@ -66,21 +66,21 @@ function Ultimatum () {
 		
 	var ultimatum = function(){
 		var that = this;		
-		nodeWindow.loadFrame('games/ultimatum/solo.html');
+		node.window.loadFrame('http://localhost:8004/games/ultimatum/solo.html');
 				
 		node.onDATA (function(msg){
 					
 			if (msg.data === 'BIDDER') {
 				
-				nodeWindow.loadFrame('games/ultimatum/bidder.html', function(){
+				node.window.loadFrame('games/ultimatum/bidder.html', function(){
 
-					var root = nodeWindow.frame.getElementById('root');
-					var b = nodeWindow.frame.getElementById('submitOffer');
+					var root = node.window.frame.getElementById('root');
+					var b = node.window.frame.getElementById('submitOffer');
 					
 					b.onclick = function() {
-						var offer = nodeWindow.frame.getElementById('offer');
+						var offer = node.window.frame.getElementById('offer');
 						node.fire('out.say.DATA','OFFER', that.other,offer.value);
-						nodeWindow.write(root,' Your offer: ' +  offer.value);
+						node.window.write(root,' Your offer: ' +  offer.value);
 					};
 					
 					//node.printAllListeners();
@@ -88,12 +88,12 @@ function Ultimatum () {
 					node.onDATA (function(msg) {
 						
 						if (msg.data === 'ACCEPT') {
-							nodeWindow.write(root, 'Your offer was accepted');
+							node.window.write(root, 'Your offer was accepted');
 							node.DONE();
 						}
 						
 						if (msg.data === 'REJECT') {
-							nodeWindow.write(root, 'Your offer was rejected');
+							node.window.write(root, 'Your offer was rejected');
 							node.DONE();
 						}
 					});
@@ -103,7 +103,7 @@ function Ultimatum () {
 			}
 			else if (msg.data === 'RESPONDENT') {
 				
-				nodeWindow.loadFrame('games/ultimatum/resp.html', function(){
+				node.window.loadFrame('http://localhost:8004/games/ultimatum/resp.html', function(){
 				
 					
 					
@@ -111,16 +111,16 @@ function Ultimatum () {
 						
 						if (msg.data === 'OFFER') {
 							
-							var offered = nodeWindow.frame.getElementById('offered');
-							nodeWindow.write(offered, 'You received an offer of ' + msg.text);
+							var offered = node.window.frame.getElementById('offered');
+							node.window.write(offered, 'You received an offer of ' + msg.text);
 							offered.style.display = '';
 						}
 						
 					});
 					
 					
-					var accept = nodeWindow.frame.getElementById('accept');
-					var reject = nodeWindow.frame.getElementById('reject');
+					var accept = node.window.frame.getElementById('accept');
+					var reject = node.window.frame.getElementById('reject');
 					
 					
 					accept.onclick = function() {
@@ -149,7 +149,7 @@ function Ultimatum () {
 	
 	var postgame1 = function(){
 		var that = this;
-		nodeWindow.loadFrame('games/ultimatum/postgame.html');
+		node.window.loadFrame('http://localhost:8004/games/ultimatum/postgame.html');
 		
 		//node.RANDOMDONE();
 		
@@ -158,7 +158,7 @@ function Ultimatum () {
 	
 	var endgame1 = function(){
 	
-		nodeWindow.loadFrame('games/ultimatum/ended.html');
+		node.window.loadFrame('http://localhost:8004/games/ultimatum/ended.html');
 		console.log('Game ended');
 	};
 	

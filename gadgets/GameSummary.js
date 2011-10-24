@@ -28,10 +28,10 @@ GameSummary.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('player')) idSummary = ids.player;
 	}
 	
-	this.fieldset = nodeWindow.addFieldset(root, idFieldset, 'Game Summary');
+	this.fieldset = node.window.addFieldset(root, idFieldset, 'Game Summary');
 	
 	
-	this.summaryDiv = nodeWindow.addDiv(this.fieldset,idSummary);
+	this.summaryDiv = node.window.addDiv(this.fieldset,idSummary);
 	
 	
 	that.writeSummary();
@@ -54,7 +54,7 @@ GameSummary.prototype.writeSummary = function(idState,idSummary) {
 	this.summaryDiv.appendChild(document.createElement('br'));
 	this.summaryDiv.appendChild(gMaxP);
 	
-	nodeWindow.addDiv(this.fieldset,this.summaryDiv,idSummary);
+	node.window.addDiv(this.fieldset,this.summaryDiv,idSummary);
 };
 
 GameSummary.prototype.listeners = function() {}; 

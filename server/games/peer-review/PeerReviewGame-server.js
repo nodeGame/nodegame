@@ -10,7 +10,7 @@ function Monitor_Example () {
 	this.automatic_step = true;
 	
 	this.init = function() {
-		node.window.setup('MONITOR');
+		nodeWindow.setup('MONITOR');
 	};
 	
 	var pregame1 = function(){

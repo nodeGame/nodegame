@@ -10,7 +10,7 @@ function Monitor_Test () {
 	this.maxPlayers = 10;
 	
 	this.init = function() {		
-		nodeWindow.setup('MONITOR');
+		node.window.setup('MONITOR');
 	};
 	
 	var counter = 0;

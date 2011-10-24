@@ -26,9 +26,9 @@ NextPreviousState.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('rew')) idRew = ids.rew;
 	}
 	
-	var fieldset 	= nodeWindow.addFieldset(root, idFieldset, 'Rew-Fwd');
-	var rew 		= nodeWindow.addButton(fieldset, idRew, '<<');
-	var fwd 		= nodeWindow.addButton(fieldset, idFwd, '>>');
+	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Rew-Fwd');
+	var rew 		= node.window.addButton(fieldset, idRew, '<<');
+	var fwd 		= node.window.addButton(fieldset, idFwd, '>>');
 	
 	
 	var that = this;

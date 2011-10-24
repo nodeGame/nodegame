@@ -10,7 +10,7 @@ function SliderControls (id, features) {
 	this.id = id;
 	this.features = features;
 	
-	this.list = nodeWindow.create.List();
+	this.list = node.window.create.List();
 };
 
 SliderControls.prototype.append = function(root) {
@@ -28,7 +28,7 @@ SliderControls.prototype.append = function(root) {
 			listRoot.appendChild(item);
 			
 			var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-			var slider = nodeWindow.addJQuerySlider(item, id, attributes);
+			var slider = node.window.addJQuerySlider(item, id, attributes);
 			
 			// If a label element is present it checks whether it is an
 			// object literal or a string.
@@ -44,7 +44,7 @@ SliderControls.prototype.append = function(root) {
 					}
 				}
 				
-				nodeWindow.addLabel(slider, labelId, labelText, id);
+				node.window.addLabel(slider, labelId, labelText, id);
 			}
 			
 			

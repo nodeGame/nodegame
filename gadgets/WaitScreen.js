@@ -25,7 +25,7 @@ WaitScreen.prototype.append = function (root, id) {};
 WaitScreen.prototype.listeners = function () {
 	var that = this;
 	node.on('WAIT', function(text) {
-		that.waitingDiv = nodeWindow.addDiv(document.body, that.id);
+		that.waitingDiv = node.window.addDiv(document.body, that.id);
 		if (that.waitingDiv.style.display === "none"){
 			that.waitingDiv.style.display = "";
 		}

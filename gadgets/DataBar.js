@@ -34,11 +34,11 @@ DataBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Send Data to Players');
-	var sendButton = nodeWindow.addButton(fieldset, idButton);
-	var dataInput = nodeWindow.addTextInput(fieldset, idData);
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Data to Players');
+	var sendButton = node.window.addButton(fieldset, idButton);
+	var dataInput = node.window.addTextInput(fieldset, idData);
 	
-	this.recipient = nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	
 	
@@ -69,6 +69,6 @@ DataBar.prototype.listeners = function () {
 	var PREFIX = 'in.';
 	
 	node.onPLIST( function(msg) {
-			nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+			node.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 };

@@ -50,7 +50,6 @@ function ServerNode (options, io) {
 	var dumpmsg = options.dumpmsg || true;
 		
 	this.createServers();
-	
 }
 
 ServerNode.prototype.createHTTPServer = function (options) {
@@ -68,9 +67,12 @@ ServerNode.prototype.createHTTPServer = function (options) {
 			filePath = './nodegame/nodegame-all-latest.js';
 		}
 		
-		console.log(filePath);
 		
 		var extname = path.extname(filePath);
+		
+		console.log(filePath);
+		
+		
 		var contentType = 'text/html';
 		switch (extname) {
 			case '.js':
@@ -96,6 +98,7 @@ ServerNode.prototype.createHTTPServer = function (options) {
 				});
 			}
 			else {
+				console.log('Unexisting path requested.')
 				response.writeHead(404);
 				response.end();
 			}
