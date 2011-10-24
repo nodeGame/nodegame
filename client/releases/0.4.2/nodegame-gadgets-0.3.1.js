@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Oct 23 12:17:30 CEST 2011
+ * Built on Mon Oct 24 18:24:50 CEST 2011
  *
  */
  
@@ -56,20 +56,20 @@ ChernoffFaces.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('button')) idButton = ids.button;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
 	
-	var canvas = nodeWindow.addCanvas(root, idCanvas, this.dims);
+	var canvas = node.window.addCanvas(root, idCanvas, this.dims);
 	
 	var fp = new FacePainter(canvas);
 	var fv = new FaceVector();
 	
 	fp.draw(fv);
 	
-	var button = nodeWindow.addButton(fieldset,idButton);
+	var button = node.window.addButton(fieldset,idButton);
 									
 	// Add Gadget
 	var sc = new SliderControls('cf_controls',FaceVector.defaults);
-	nodeWindow.addGadget(fieldset,sc);
+	node.window.addGadget(fieldset,sc);
 	
 	var that = this;
 
@@ -104,7 +104,7 @@ ChernoffFaces.prototype.listeners = function () {
 
 function FacePainter (canvas, settings) {
 		
-	this.canvas = nodeWindow.create.Canvas(canvas);
+	this.canvas = node.window.create.Canvas(canvas);
 	
 	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
 	this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;
@@ -770,11 +770,11 @@ DataBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Send Data to Players');
-	var sendButton = nodeWindow.addButton(fieldset, idButton);
-	var dataInput = nodeWindow.addTextInput(fieldset, idData);
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Data to Players');
+	var sendButton = node.window.addButton(fieldset, idButton);
+	var dataInput = node.window.addTextInput(fieldset, idData);
 	
-	this.recipient = nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	
 	
@@ -805,7 +805,7 @@ DataBar.prototype.listeners = function () {
 	var PREFIX = 'in.';
 	
 	node.onPLIST( function(msg) {
-			nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+			node.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 }; 
  
@@ -832,8 +832,8 @@ function GameBoard (id) {
 
 GameBoard.prototype.append = function(root) {
 	this.root = root;
-	var fieldset = nodeWindow.addFieldset(root, this.id + '_fieldset', 'Game State');
-	this.board = nodeWindow.addDiv(fieldset,this.id);
+	var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
+	this.board = node.window.addDiv(fieldset,this.id);
 	this.board.innerHTML = this.noPlayers;
 	
 };
@@ -927,10 +927,10 @@ GameSummary.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('player')) idSummary = ids.player;
 	}
 	
-	this.fieldset = nodeWindow.addFieldset(root, idFieldset, 'Game Summary');
+	this.fieldset = node.window.addFieldset(root, idFieldset, 'Game Summary');
 	
 	
-	this.summaryDiv = nodeWindow.addDiv(this.fieldset,idSummary);
+	this.summaryDiv = node.window.addDiv(this.fieldset,idSummary);
 	
 	
 	that.writeSummary();
@@ -953,7 +953,7 @@ GameSummary.prototype.writeSummary = function(idState,idSummary) {
 	this.summaryDiv.appendChild(document.createElement('br'));
 	this.summaryDiv.appendChild(gMaxP);
 	
-	nodeWindow.addDiv(this.fieldset,this.summaryDiv,idSummary);
+	node.window.addDiv(this.fieldset,this.summaryDiv,idSummary);
 };
 
 GameSummary.prototype.listeners = function() {};  
@@ -991,10 +991,10 @@ MsgBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset = nodeWindow.addFieldset(root, idFieldset, 'Send Msg To Players');
-	var sendButton = nodeWindow.addButton(fieldset, idButton);
-	var msgText = nodeWindow.addTextInput(fieldset, idMsgText);
-	this.recipient = nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Msg To Players');
+	var sendButton = node.window.addButton(fieldset, idButton);
+	var msgText = node.window.addTextInput(fieldset, idMsgText);
+	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	var that = this;
 	
@@ -1015,7 +1015,7 @@ MsgBar.prototype.listeners = function(){
 	var that = this;
 	
 	node.onPLIST( function(msg) {
-		nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+		node.window.populateRecipientSelector(that.recipient,msg.data);
 		// was
 		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 	}); 
@@ -1051,9 +1051,9 @@ NextPreviousState.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('rew')) idRew = ids.rew;
 	}
 	
-	var fieldset 	= nodeWindow.addFieldset(root, idFieldset, 'Rew-Fwd');
-	var rew 		= nodeWindow.addButton(fieldset, idRew, '<<');
-	var fwd 		= nodeWindow.addButton(fieldset, idFwd, '>>');
+	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Rew-Fwd');
+	var rew 		= node.window.addButton(fieldset, idRew, '<<');
+	var fwd 		= node.window.addButton(fieldset, idFwd, '>>');
 	
 	
 	var that = this;
@@ -1108,7 +1108,7 @@ function SliderControls (id, features) {
 	this.id = id;
 	this.features = features;
 	
-	this.list = nodeWindow.create.List();
+	this.list = node.window.create.List();
 };
 
 SliderControls.prototype.append = function(root) {
@@ -1126,7 +1126,7 @@ SliderControls.prototype.append = function(root) {
 			listRoot.appendChild(item);
 			
 			var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-			var slider = nodeWindow.addJQuerySlider(item, id, attributes);
+			var slider = node.window.addJQuerySlider(item, id, attributes);
 			
 			// If a label element is present it checks whether it is an
 			// object literal or a string.
@@ -1142,7 +1142,7 @@ SliderControls.prototype.append = function(root) {
 					}
 				}
 				
-				nodeWindow.addLabel(slider, labelId, labelText, id);
+				node.window.addLabel(slider, labelId, labelText, id);
 			}
 			
 			
@@ -1204,11 +1204,11 @@ StateBar.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
 	}
 	
-	var fieldset 	= nodeWindow.addFieldset(root, idFieldset, 'Change Game State');
-	var sendButton 	= nodeWindow.addButton(fieldset, idButton);
-	var stateSel 	= nodeWindow.addStateSelector(fieldset, idStateSel);
-	this.actionSel	= nodeWindow.addActionSelector(fieldset, idActionSel);
-	this.recipient 	= nodeWindow.addRecipientSelector(fieldset, idRecipient);
+	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Change Game State');
+	var sendButton 	= node.window.addButton(fieldset, idButton);
+	var stateSel 	= node.window.addStateSelector(fieldset, idStateSel);
+	this.actionSel	= node.window.addActionSelector(fieldset, idActionSel);
+	this.recipient 	= node.window.addRecipientSelector(fieldset, idRecipient);
 	
 	var that = this;
 
@@ -1233,7 +1233,7 @@ StateBar.prototype.append = function (root, ids) {
 			var round = result[3] || 1;
 			console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
 			
-			var state = node.create.GameState({
+			var state = new node.GameState({
 												state: state,
 												step: step,
 												round: round
@@ -1260,7 +1260,7 @@ StateBar.prototype.listeners = function () {
 	
 	node.onPLIST( function(msg) {
 		
-		nodeWindow.populateRecipientSelector(that.recipient,msg.data);
+		node.window.populateRecipientSelector(that.recipient,msg.data);
 		// was
 		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 	}); 
@@ -1300,10 +1300,10 @@ StateDisplay.prototype.append = function (root, ids) {
 		if (ids.hasOwnProperty('state')) idState = ids.state;
 	}
 	
-	this.fieldset = nodeWindow.addFieldset(root, idFieldset, 'Player Status');
+	this.fieldset = node.window.addFieldset(root, idFieldset, 'Player Status');
 	
 	
-	this.playerDiv = nodeWindow.addDiv(this.fieldset,idPlayer);
+	this.playerDiv = node.window.addDiv(this.fieldset,idPlayer);
 	
 	var checkPlayerName = setInterval(function(idState,idPlayer){
 			if(that.game.player !== null){
@@ -1324,7 +1324,7 @@ StateDisplay.prototype.updateAll = function(idState,idPlayer) {
 	this.playerDiv.appendChild(document.createElement('br'));
 	this.playerDiv.appendChild(pId);
 	
-	this.stateDiv = nodeWindow.addDiv(this.playerDiv,idState);
+	this.stateDiv = node.window.addDiv(this.playerDiv,idState);
 	this.updateState(this.game.gameState);
 };
 
@@ -1382,7 +1382,7 @@ WaitScreen.prototype.append = function (root, id) {};
 WaitScreen.prototype.listeners = function () {
 	var that = this;
 	node.on('WAIT', function(text) {
-		that.waitingDiv = nodeWindow.addDiv(document.body, that.id);
+		that.waitingDiv = node.window.addDiv(document.body, that.id);
 		if (that.waitingDiv.style.display === "none"){
 			that.waitingDiv.style.display = "";
 		}
@@ -1432,9 +1432,9 @@ function Wall(id) {
 }
 
 Wall.prototype.append = function (root, id) {
-	var fieldset = nodeWindow.addFieldset(root, this.id+'_fieldset', 'Game Log');
+	var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
 	var idLogDiv = id || this.id;
-	this.wall = nodeWindow.addElement('pre', fieldset, idLogDiv);
+	this.wall = node.window.addElement('pre', fieldset, idLogDiv);
 };
 
 Wall.prototype.write = function(text) {

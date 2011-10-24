@@ -8,15 +8,16 @@ var PlayerList = node.PlayerList;
 GameWindow.prototype = new Document();
 GameWindow.prototype.constructor = GameWindow;
 
-GameWindow.prototype.create = {};
+// The gadgets container
+GameWindow.prototype.gadgets = {};
 
-GameWindow.prototype.create.Canvas = function(canvas){
-	return new Canvas(canvas);
-};
-
-GameWindow.prototype.create.List = function(id){
-	return new List(id);
-};
+//GameWindow.prototype.create.Canvas = function(canvas){
+//	return new Canvas(canvas);
+//};
+//
+//GameWindow.prototype.create.List = function(id){
+//	return new List(id);
+//};
 
 function GameWindow() {
 	
@@ -42,48 +43,25 @@ GameWindow.prototype.setup = function (type){
 		
 		// TODO: Check this
 		node.node.removeListener('in.STATE');
-	
-		// TODO: use multiple ifs instead
-		//try {
-			
-			var nps = new NextPreviousState();
-			this.addGadget(this.root,nps);
-			
-			var gs = new GameSummary();
-			this.addGadget(this.root,gs);
-			
-			var sd = new StateDisplay();
-			this.addGadget(this.root,sd);
-			
-			var sb = new StateBar();
-			this.addGadget(this.root,sb);
+		
+		this.addGadget('NextPreviousState');
+		this.addGadget('GameSummary');
+		this.addGadget('StateDisplay');
+		this.addGadget('StateBar');
+		this.addGadget('DataBar');
+		this.addGadget('MsgBar');
+		this.addGadget('GameBoard');
+		this.addGadget('Wall');
 
-			var db = new DataBar();
-			this.addGadget(this.root,db);
-			
-			var mb = new MsgBar();
-			this.addGadget(this.root,mb);
-			
-			var gm = new GameBoard();
-			this.addGadget(this.root,gm);
-					
-			var w = new Wall();
-			this.addGadget(this.root,w);
-//		}
-//		catch(e) {
-//			console.log('nodeWindow: Error loading gadget ' + e);
-//		}
-		
 		break;
-		
+	
 		
 	case 'PLAYER':
 		
 		var maincss		= this.addCSS(this.root, 'style.css');
 	    var mainframe 	= this.addIFrame(this.root,'mainframe');
 	    
-	    var ws = new WaitScreen();
-		this.addGadget(this.root,ws);
+		this.addGadget('WaitScreen');
 	    
 		break;
 	}
@@ -187,7 +165,14 @@ GameWindow.prototype.addHeader = function (root, id) {
 
 // Gadget
 
-GameWindow.prototype.addGadget = function (root, g) {
+GameWindow.prototype.addGadget = function (g, root) {
+	
+	var root = root || this.root;
+	// Check if it is a object (new gadget)
+	// If it is a string is the name of an existing gadget
+	if ('object' !== typeof g) {
+		g = new this.gadgets[g];
+	}
 	
 	console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 	try {
