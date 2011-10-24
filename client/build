@@ -47,28 +47,18 @@ echo " *" >> $NODEGAME
 echo " */" >> $NODEGAME
 addBlanks 2 $NODEGAME
 
-
-
 # Add all the classes
 
-# BUG: if there are multiple versions of the sublibraries they are all added
+FILES[0]='nodegame-client-'
+FILES[1]='nodegame-window-'
+FILES[2]='nodegame-gadgets-'
 
-FILES=$BUILD"*"
-
-for f in $FILES	; do
-
-	if [ -f "$f" ]
-	then
-		if [ ${f##*.} == "js" ]
-			then
-				if [ $f != $NODEGAME ]
-				then
-					echo "Processing $f file..."
-					`cat $f >> $NODEGAME`
-					addBlanks 4 $NODEGAME
-				fi
-			fi
-		fi
+for f in ${FILES[*]}
+do
+  F=$BUILD$f${VERSION}.js
+  echo "Processing $F file..."
+  `cat $F >> $NODEGAME`
+  addBlanks 4 $NODEGAME
 done
 
 `chmod +x $NODEGAME`
