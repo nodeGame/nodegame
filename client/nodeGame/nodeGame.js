@@ -194,18 +194,7 @@
 	
 	
 	// Sending
-	
-	
-// TODO: Check if this is ok to be commented
-	
-	// Send a GameMsg to the recipient
-	// gameMSg must be a valid GameMsg
-//	node.send = function(gameMsg,to) {
-//		that.gsc.send(gameMsg,to);
-//	};
-	
-	
-	
+		
 	
 //	this.setSTATE = function(action,state,to){	
 //		var stateEvent = GameMsg.OUT + action + '.STATE'; 

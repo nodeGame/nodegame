@@ -58,47 +58,6 @@
 		this.forward = 0; // is this msg just a forward?	
 	};
 	
-	//function GameMsg (session, currentState, action, target, from, to, text, data,
-	//					priority, reliable) {
-	//		
-	//	this.id = Math.floor(Math.random()*1000000);
-	//
-	//	this.action = action; 
-	//	this.target = target;
-	//	
-	//	this.session = session;
-	//	this.currentState = currentState;
-	//	
-	//	this.from = from;
-	//	this.to = to;
-	//	this.text = text;
-	//	this.data = data;
-	//	
-	//	this.priority = priority;
-	//	this.reliable = reliable;
-	//
-	//	this.created = Utils.getDate();
-	//	this.forward = 0; // is this msg just a forward?	
-	//	
-	//};
-	//
-	//// Does not change the msg ID
-	//GameMsg.prototype.import = function(jsonMsg) {
-	//	
-	//	this.session = jsonMsg.session;
-	//	this.currentState = jsonMsg.currentState;
-	//	this.target = jsonMsg.target; // was action
-	//	this.from = jsonMsg.from;
-	//	this.to = jsonMsg.to;
-	//	this.text = jsonMsg.text;
-	//	this.action = jsonMsg.action; 
-	//	this.data = jsonMsg.data;
-	//	this.priority = jsonMsg.priority;
-	//	this.reliable = jsonMsg.reliable;
-	//	this.forward = jsonMsg.forward;
-	//	
-	//};
-	
 	// Copy everything
 	GameMsg.clone = function (gameMsg) {
 		
@@ -111,13 +70,6 @@
 		
 		return gm;
 	};
-	
-	// Copy everything
-	//GameMsg.prototype.clone = function(jsonMsg) {
-	//	
-	//	this.import(jsonMsg);
-	//	this.id = jsonMsg.id;
-	//};
 	
 	GameMsg.prototype.stringify = function() {
 		return JSON.stringify(this);
@@ -161,17 +113,6 @@
 		
 		return line;
 	};
-	
-	//GameMsg.parse = function(msg) {
-	//	try {
-	//		var gm = new GameMsg();
-	//		gm.import(msg);
-	//		return gm;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parse GameMsg ' + e.message;
-	//	}
-	//};
 	
 	GameMsg.prototype.toInEvent = function() {
 		return 'in.' + this.toEvent();

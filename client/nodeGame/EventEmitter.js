@@ -15,15 +15,7 @@
 	EventEmitter.prototype = {
 	
 	    constructor: EventEmitter,
-	
-	//    on: function(type, listener){
-	//        if (typeof this._listeners[type] == "undefined"){
-	//            this._listeners[type] = [];
-	//        }
-	//        //console.log('Added Listener: ' + type + ' ' + listener);
-	//        this._listeners[type].push(listener);
-	//    },
-	    
+		    
 	    addListener: function(type,listener) {
 	    	 if (typeof this._listeners[type] == "undefined"){
 	             this._listeners[type] = [];

@@ -22,16 +22,7 @@
 		this.session = session;
 		this.sender = sender;
 		this.state = state;
-	};
-	
-	//GameMsgGenerator.prototype.setCurrentState = function (state) {
-	//	this.state = state;
-	//};
-	//
-	//GameMsgGenerator.prototype.getCurrentState = function () {
-	//	return this.state;
-	//};
-	
+	};	
 	
 	// HI
 	
