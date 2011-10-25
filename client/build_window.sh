@@ -62,33 +62,27 @@ addBlanks 2 $NODEGAME
 
 # Add header
 
-echo "Writing header:" $HEADER  
-`cat $HEADER >> $NODEGAME`
+#echo "Writing header:" $HEADER  
+#`cat $HEADER >> $NODEGAME`
 
 
 # Add all the classes
+FILES[0]='Document.js'
+FILES[1]='GameWindow.js'
+FILES[2]='Canvas.js'
+FILES[3]='List.js'
 
-
-FILES=$DIR"*"
-
-for f in $FILES	; do
-
-	if [ -f "$f" ]
-	then
-    EXT1=${f##*.}
-		if [ ${f##*.} == "js" ]
-			then
-			echo "Processing $f file..."
-				`cat $f >> $NODEGAME`
-				addBlanks 2 $NODEGAME
-		 	fi
-		fi
-
+for f in ${FILES[*]}
+do
+	F=$DIR$f
+	echo "Processing $F file..."
+	`cat $F >> $NODEGAME`
+	addBlanks 2 $NODEGAME
 done
 
 # Adding bottom
-echo "Writing closure:" $BOTTOM  
-`cat $BOTTOM >> $NODEGAME`
+# echo "Writing closure:" $BOTTOM  
+# `cat $BOTTOM >> $NODEGAME`
 
 `chmod +x $NODEGAME`
 

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.4.2
+ * nodeGame-all v0.4.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Oct 24 18:28:03 CEST 2011
+ * Built on Tue Oct 25 12:37:10 CEST 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.3
+ * nodeGame Client v0.4.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Oct 24 18:28:03 CEST 2011
+ * Built on Tue Oct 25 12:37:10 CEST 2011
  *
  */
  
@@ -1871,4352 +1871,2238 @@
  
  
 /*!
- * nodeGadgets v0.3.1
+ * nodeWindow v0.4.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Oct 24 18:24:50 CEST 2011
+ * Built on Tue Oct 25 12:37:10 CEST 2011
  *
  */
  
  
-// TODO: hide helping classes
-
-/*!
- * ChernoffFaces
- * 
- * Parametrically display Chernoff Faces
- * 
- */
-
-ChernoffFaces.defaults = {};
-ChernoffFaces.defaults.canvas = {};
-ChernoffFaces.defaults.canvas.width = 100;
-ChernoffFaces.defaults.canvas.heigth = 100;
-
-function ChernoffFaces(id, dims) {
+(function(node) {
 	
-	this.game = node.game;
-	this.id = id || 'ChernoffFaces';
-	this.name = 'Chernoff Faces';
-	this.version = '0.1';
+	/*!
+	 * Document
+	 * 
+	 */
 	
-	this.bar = null;
-	this.root = null;
+	// Create the window obj
+	node.window = {};
 	
-	this.recipient = null;
+	// Note: this will be erased, when the GameWindow obj will be created
+	node.window.Document = Document;
 	
-	this.dims = {
-				width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
-				height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
-	};
-};
-
-ChernoffFaces.prototype.append = function (root, ids) {
+	function Document() {};
 	
-	var PREF = this.id + '_';
+	Document.prototype.addButton = function (root, id, text, attributes) {
+		var sb = document.createElement('button');
+		sb.id = id;
+		sb.appendChild(document.createTextNode(text || 'Send'));	
+		this.addAttributes2Elem(sb, attributes);
 	
-	var idFieldset = PREF + 'fieldset'; 
-	var idCanvas = PREF + 'canvas';
-	var idButton = PREF + 'button';
-
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
-	
-	var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-	
-	var fp = new FacePainter(canvas);
-	var fv = new FaceVector();
-	
-	fp.draw(fv);
-	
-	var button = node.window.addButton(fieldset,idButton);
-									
-	// Add Gadget
-	var sc = new SliderControls('cf_controls',FaceVector.defaults);
-	node.window.addGadget(fieldset,sc);
-	
-	var that = this;
-
-	button.onclick = function() {		
-		var fv = sc.getAllValues();
-		console.log(fv);
-		var fv = new FaceVector(fv);
-		console.log(fv);
-		fp.redraw(fv);
+		root.appendChild(sb);
+		return sb;
 	};
 	
-	return fieldset;
+	Document.prototype.addFieldset = function (root, id, legend, attributes) {
+		var f = this.addElement('fieldset', root, id, attributes);
+		var l = document.createElement('Legend');
+		l.appendChild(document.createTextNode(legend));	
+		f.appendChild(l);
+		root.appendChild(f);
+		return f;
+	};
 	
-};
-
-ChernoffFaces.prototype.listeners = function () {
-	var that = this;
-//	
-//	node.on( 'input', function(msg) {
-//			var fv = new FaceVector(sc.getAllValues());
-//			fp.redraw(fv);
-//		}); 
-};
-
-
-/*!
-* ChernoffFaces
-* 
-* Parametrically display Chernoff Faces
-* 
-*/
-
-function FacePainter (canvas, settings) {
-		
-	this.canvas = node.window.create.Canvas(canvas);
+	Document.prototype.addTextInput = function (root, id, attributes) {
+		var mt =  document.createElement('input');
+		mt.id = id;
+		mt.setAttribute('type', 'text');
+		this.addAttributes2Elem(mt, attributes);
+		root.appendChild(mt);
+		return mt;
+	};
 	
-	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
-	this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;
-};
-
-//Draws a Chernoff face.
-FacePainter.prototype.draw = function (face, x, y) {
+	Document.prototype.addCanvas = function (root, id, attributes) {
+		var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
 			
-	this.fit2Canvas(face);
-	this.canvas.scale(face.scaleX, face.scaleY);
-	
-	console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
-	
-	var x = x || this.canvas.centerX;
-	var y = y || this.canvas.centerY;
-	
-	this.drawHead(face, x, y);
-		
-	this.drawEyes(face, x, y);
-
-	this.drawPupils(face, x, y);
-
-	this.drawEyebrow(face, x, y);
-
-	this.drawNose(face, x, y);
-	
-	this.drawMouth(face, x, y);
-	
-};		
-	
-FacePainter.prototype.redraw = function (face, x, y) {
-	this.canvas.clear();
-	this.draw(face,x,y);
-}
-
-FacePainter.prototype.scale = function (x, y) {
-	this.canvas.scale(this.scaleX, this.scaleY);
-}
-
-// TODO: Improve. It eats a bit of the margins
-FacePainter.prototype.fit2Canvas = function(face) {
-	if (!this.canvas) {
-		console.log('No canvas found');
-		return;
-	}
-	
-	if (this.canvas.width > this.canvas.height) {
-		var ratio = this.canvas.width / face.head_radius * face.head_scale_x;
-	}
-	else {
-		var ratio = this.canvas.height / face.head_radius * face.head_scale_y;
-	}
-	
-	face.scaleX = ratio / 2;
-	face.scaleY = ratio / 2;
-}
-
-FacePainter.prototype.drawHead = function (face, x, y) {
-	
-	var radius = face.head_radius;
-	
-	this.canvas.drawOval({
-				   x: x, 
-				   y: y,
-				   radius: radius,
-				   scale_x: face.head_scale_x,
-				   scale_y: face.head_scale_y,
-				   color: face.color,
-				   lineWidth: face.lineWidth
-	});
-};
-
-FacePainter.prototype.drawEyes = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
-	var spacing = face.eye_spacing;
-		
-	var radius = face.eye_radius;
-	//console.log(face);
-	this.canvas.drawOval({
-					x: x - spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-					
-	});
-	//console.log(face);
-	this.canvas.drawOval({
-					x: x + spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-}
-
-FacePainter.prototype.drawPupils = function (face, x, y) {
-		
-	var radius = face.pupil_radius;
-	var spacing = face.eye_spacing;
-	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
-	
-	this.canvas.drawOval({
-					x: x - spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.pupil_scale_x,
-					scale_y: face.pupil_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-	
-	this.canvas.drawOval({
-					x: x + spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.pupil_scale_x,
-					scale_y: face.pupil_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-
-};
-
-FacePainter.prototype.drawEyebrow = function (face, x, y) {
-	
-	var height = FacePainter.computeEyebrowOffset(face,y);
-	var spacing = face.eyebrow_spacing;
-	var length = face.eyebrow_length;
-	var angle = face.eyebrow_angle;
-	
-	this.canvas.drawLine({
-					x: x - spacing,
-					y: height,
-					length: length,
-					angle: angle,
-					color: face.color,
-					lineWidth: face.lineWidth
-				
-					
-	});
-	
-	this.canvas.drawLine({
-					x: x + spacing,
-					y: height,
-					length: 0-length,
-					angle: -angle,	
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-	
-};
-
-FacePainter.prototype.drawNose = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.nose_height, y);
-	var nastril_r_x = x + face.nose_width / 2;
-	var nastril_r_y = height + face.nose_length;
-	var nastril_l_x = nastril_r_x - face.nose_width;
-	var nastril_l_y = nastril_r_y; 
-	
-	this.canvas.ctx.lineWidth = face.lineWidth;
-	this.canvas.ctx.strokeStyle = face.color;
-	
-	this.canvas.ctx.save();
-	this.canvas.ctx.beginPath();
-	this.canvas.ctx.moveTo(x,height);
-	this.canvas.ctx.lineTo(nastril_r_x,nastril_r_y);
-	this.canvas.ctx.lineTo(nastril_l_x,nastril_l_y);
-	//this.canvas.ctx.closePath();
-	this.canvas.ctx.stroke();
-	this.canvas.ctx.restore();
-
-};
-		
-FacePainter.prototype.drawMouth = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.mouth_height, y);
-	var startX = x - face.mouth_width / 2;
-    var endX = x + face.mouth_width / 2;
-	
-	var top_y = height - face.mouth_top_y;
-	var bottom_y = height + face.mouth_bottom_y;
-	
-	// Upper Lip
-	this.canvas.ctx.moveTo(startX,height);
-    this.canvas.ctx.quadraticCurveTo(x, top_y, endX, height);
-    this.canvas.ctx.stroke();
-	
-    //Lower Lip
-    this.canvas.ctx.moveTo(startX,height);
-    this.canvas.ctx.quadraticCurveTo(x, bottom_y, endX, height);
-    this.canvas.ctx.stroke();
-   
-};	
-
-
-//TODO Scaling ?
-FacePainter.computeFaceOffset = function (face, offset, y) {
-	var y = y || 0;
-	//var pos = y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
-	var pos = y - face.head_radius + face.head_radius * 2 * offset;
-	//console.log('POS: ' + pos);
-	return pos;
-};
-
-FacePainter.computeEyebrowOffset = function (face, y) {
-	var y = y || 0;
-	var eyemindistance = 2;
-	return FacePainter.computeFaceOffset(face, face.eye_height, y) - eyemindistance - face.eyebrow_eyedistance;
-};
-
-
-/*!
-* 
-* A description of a Chernoff Face.
-*
-* This class packages the 11-dimensional vector of numbers from 0 through 1 that completely
-* describe a Chernoff face.  
-*
-*/
-
-//FaceVector.defaults = {
-//		// Head
-//		head_radius: {
-//			// id can be specified otherwise is taken head_radius
-//			min: 10,
-//			max: 100,
-//			step: 0.01,
-//			value: 30,
-//			label: 'Face radius'
-//		},
-//		head_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 0.5,
-//			label: 'Scale head horizontally'
-//		},
-//		head_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 1,
-//			label: 'Scale head vertically'
-//		},
-//		// Eye
-//		eye_height: {
-//			min: 0.1,
-//			max: 0.9,
-//			step: 0.1,
-//			value: 0.4,
-//			label: 'Eye height'
-//		},
-//		eye_radius: {
-//			min: 2,
-//			max: 30,
-//			step: 1,
-//			value: 5,
-//			label: 'Eye radius'
-//		},
-//		eye_spacing: {
-//			min: 0,
-//			max: 50,
-//			step: 2,
-//			value: 10,
-//			label: 'Eye spacing'
-//		},
-//		eye_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale eyes horizontally'
-//		},
-//		eye_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale eyes vertically'
-//		},
-//		// Pupil
-//		pupil_radius: {
-//			min: 1,
-//			max: 9,
-//			step: 1,
-//			value: 1,  //this.eye_radius;
-//			label: 'Pupil radius'
-//		},
-//		pupil_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale pupils horizontally'
-//		},
-//		pupil_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale pupils vertically'
-//		},
-//		// Eyebrow
-//		eyebrow_length: {
-//			min: 1,
-//			max: 30,
-//			step: 1,
-//			value: 10,
-//			label: 'Eyebrow length'
-//		},
-//		eyebrow_eyedistance: {
-//			min: 0.3,
-//			max: 10,
-//			step: 0.2,
-//			value: 3, // From the top of the eye
-//			label: 'Eyebrow from eye'
-//		},
-//		eyebrow_angle: {
-//			min: -2,
-//			max: 2,
-//			step: 0.2,
-//			value: -0.5,
-//			label: 'Eyebrow angle'
-//		},
-//		eyebrow_spacing: {
-//			min: 0,
-//			max: 20,
-//			step: 1,
-//			value: 5,
-//			label: 'Eyebrow spacing'
-//		},
-//		// Nose
-//		nose_height: {
-//			min: 0.4,
-//			max: 1,
-//			step: 0.1,
-//			value: 0.4,
-//			label: 'Nose height'
-//		},
-//		nose_length: {
-//			min: 0.2,
-//			max: 30,
-//			step: 0.2,
-//			value: 15,
-//			label: 'Nose length'
-//		},
-//		nose_width: {
-//			min: 0,
-//			max: 30,
-//			step: 2,
-//			value: 10,
-//			label: 'Nose width'
-//		},
-//		// Mouth
-//		mouth_height: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 0.75, 
-//			label: 'Mouth height'
-//		},
-//		mouth_width: {
-//			min: 2,
-//			max: 100,
-//			step: 2,
-//			value: 20,
-//			label: 'Mouth width'
-//		},
-//		mouth_top_y: {
-//			min: -10,
-//			max: 30,
-//			step: 0.5,
-//			value: -2,
-//			label: 'Upper lip'
-//		},
-//		mouth_bottom_y: {
-//			min: -10,
-//			max: 30,
-//			step: 0.5,
-//			value: 20,
-//			label: 'Lower lip'
-//		}					
-//};
-
-FaceVector.defaults = {
-		// Head
-		head_radius: {
-			// id can be specified otherwise is taken head_radius
-			min: 10,
-			max: 100,
-			step: 0.01,
-			value: 30,
-			label: 'Face radius'
-		},
-		head_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 0.5,
-			label: 'Scale head horizontally'
-		},
-		head_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale head vertically'
-		},
-		// Eye
-		eye_height: {
-			min: 0.1,
-			max: 0.9,
-			step: 0.01,
-			value: 0.4,
-			label: 'Eye height'
-		},
-		eye_radius: {
-			min: 2,
-			max: 30,
-			step: 0.01,
-			value: 5,
-			label: 'Eye radius'
-		},
-		eye_spacing: {
-			min: 0,
-			max: 50,
-			step: 0.01,
-			value: 10,
-			label: 'Eye spacing'
-		},
-		eye_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale eyes horizontally'
-		},
-		eye_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale eyes vertically'
-		},
-		// Pupil
-		pupil_radius: {
-			min: 1,
-			max: 9,
-			step: 0.01,
-			value: 1,  //this.eye_radius;
-			label: 'Pupil radius'
-		},
-		pupil_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale pupils horizontally'
-		},
-		pupil_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale pupils vertically'
-		},
-		// Eyebrow
-		eyebrow_length: {
-			min: 1,
-			max: 30,
-			step: 0.01,
-			value: 10,
-			label: 'Eyebrow length'
-		},
-		eyebrow_eyedistance: {
-			min: 0.3,
-			max: 10,
-			step: 0.01,
-			value: 3, // From the top of the eye
-			label: 'Eyebrow from eye'
-		},
-		eyebrow_angle: {
-			min: -2,
-			max: 2,
-			step: 0.01,
-			value: -0.5,
-			label: 'Eyebrow angle'
-		},
-		eyebrow_spacing: {
-			min: 0,
-			max: 20,
-			step: 0.01,
-			value: 5,
-			label: 'Eyebrow spacing'
-		},
-		// Nose
-		nose_height: {
-			min: 0.4,
-			max: 1,
-			step: 0.01,
-			value: 0.4,
-			label: 'Nose height'
-		},
-		nose_length: {
-			min: 0.2,
-			max: 30,
-			step: 0.01,
-			value: 15,
-			label: 'Nose length'
-		},
-		nose_width: {
-			min: 0,
-			max: 30,
-			step: 0.01,
-			value: 10,
-			label: 'Nose width'
-		},
-		// Mouth
-		mouth_height: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 0.75, 
-			label: 'Mouth height'
-		},
-		mouth_width: {
-			min: 2,
-			max: 100,
-			step: 0.01,
-			value: 20,
-			label: 'Mouth width'
-		},
-		mouth_top_y: {
-			min: -10,
-			max: 30,
-			step: 0.01,
-			value: -2,
-			label: 'Upper lip'
-		},
-		mouth_bottom_y: {
-			min: -10,
-			max: 30,
-			step: 0.01,
-			value: 20,
-			label: 'Lower lip'
-		}					
-};
-
-function FaceVector (faceVector) {
-	
-	//if (typeof(faceVector) !== 'undefined') {
-	
-	var faceVector = faceVector || {};
-	
-	this.scaleX = faceVector.scaleX || 1;
-	this.scaleY = faceVector.scaleY || 1;
-	
-	this.color = faceVector.color || 'green';
-	this.lineWidth = faceVector.lineWidth || 1;
-	
-	// Merge on key
-	for (var key in FaceVector.defaults) {
-		if (FaceVector.defaults.hasOwnProperty(key)){
-			if (faceVector.hasOwnProperty(key)){
-				this[key] = faceVector[key];
-			}
-			else {
-				this[key] = FaceVector.defaults[key].value;
-			}
+		if (!context) {
+			alert('Canvas is not supported');
+			return false;
 		}
-	}
 		
-	delete this.faceVector;
-	
-		
-};
-
-//Constructs a random face vector.
-FaceVector.prototype.shuffle = function () {
-	for (var key in this) {
-		if (this.hasOwnProperty(key)) {
-			
-			if (key !== 'color') {
-				this[key] = Math.random();
-			}
-		}
-	}
-};
-
-//Computes the Euclidean distance between two FaceVectors.
-FaceVector.prototype.distance = function (face) {
-	return FaceVector.distance(this,face);
-};
-	
-	
-FaceVector.distance = function (face1, face2) {
-	var sum = 0.0;
-	var diff;
-	
-	for (var key in face1) {
-		if (face1.hasOwnProperty(key)) {
-			diff = face1[key] - face2[key];
-			sum = sum + diff * diff;
-		}
-	}
-	
-	return Math.sqrt(sum);
-};
-
-FaceVector.prototype.toString = function() {
-	var out = 'Face: ';
-	for (var key in this) {
-		if (this.hasOwnProperty(key)) {
-			out += key + ' ' + this[key];
-		}
-	};
-	return out;
-};
- 
- 
- 
- 
-/*
- * DataBar
- * 
- * Sends DATA msgs
- * 
- */
-
-function DataBar(id) {
-	
-	this.game = node.game;
-	this.id = id || 'databar';
-	this.name = 'Data Bar';
-	this.version = '0.2.1';
-	
-	this.bar = null;
-	this.root = null;
-	
-	this.recipient = null;
-};
-
-DataBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idData = PREF + 'dataText';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('data')) idData = ids.data;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Data to Players');
-	var sendButton = node.window.addButton(fieldset, idButton);
-	var dataInput = node.window.addTextInput(fieldset, idData);
-	
-	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	
-	
-	var that = this;
-
-	sendButton.onclick = function() {
-		
-		var to = that.recipient.value;
-
-		//try {
-			//var data = JSON.parse(dataInput.value);
-			data = dataInput.value;
-			console.log('Parsed Data: ' + JSON.stringify(data));
-			
-			node.fire(node.OUT + node.actions.SAY + '.DATA',data,to);
-//			}
-//			catch(e) {
-//				console.log('Impossible to parse the data structure');
-//			}
+		canvas.id = id;
+		this.addAttributes2Elem(canvas, attributes);
+		root.appendChild(canvas);
+		return canvas;
 	};
 	
-	return fieldset;
-	
-};
-
-DataBar.prototype.listeners = function () {
-	var that = this;
-	var PREFIX = 'in.';
-	
-	node.onPLIST( function(msg) {
-			node.window.populateRecipientSelector(that.recipient,msg.data);
-		}); 
-}; 
- 
- 
- 
-/*!
- * GameBoard
- */ 
-
-function GameBoard (id) {
-	
-	this.game = node.game;
-	this.id = id || 'gboard';
-	this.name = 'GameBoard';
-	
-	this.version = '0.2.1';
-	
-	this.board = null;
-	this.root = null;
-	
-	this.noPlayers = 'No players connected...';
-	
-}
-
-GameBoard.prototype.append = function(root) {
-	this.root = root;
-	var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
-	this.board = node.window.addDiv(fieldset,this.id);
-	this.board.innerHTML = this.noPlayers;
-	
-};
-
-GameBoard.prototype.listeners = function() {
-	var that = this;
-	
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	
-	node.onPLIST( function (msg) {
-		console.log('I Updating Board ' + msg.text);
-		that.board.innerHTML = 'Updating...';
-		
-		var pl = new node.PlayerList(msg.data);
-		
-		//console.log(pl);
-		
-		if (pl.size() !== 0) {
-			that.board.innerHTML = '';
-			pl.forEach( function(p) {
-				//console.log(p);
-				var line = '[' + p.id + "|" + p.name + "]> \t"; 
-				
-				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
-				pState += ' ';
-				
-				switch (p.state.is) {
-				
-				case node.states.UNKNOWN:
-					pState += '(unknown)';
-					break;
-				case node.states.PLAYING:
-					pState += '(playing)';
-					break;
-				case node.states.DONE:
-					pState += '(done)';
-					break;	
-				case node.states.PAUSE:
-					pState += '(pause)';
-					break;		
-				default:
-					pState += '('+p.state.is+')';
-					break;		
-				}
-				
-				if (p.state.paused) {
-					pState += ' (P)';
-				}
-				
-				that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
-			});
-			//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
-			}
-			else {
-				that.board.innerHTML = that.noPlayers;
-			}
-		});
-}; 
- 
- 
- 
-/*!
- * GameSummary
- * 
- * Show Game Info
- */
-
-function GameSummary(id) {
-	//debugger;
-	this.game = node.game;
-	this.id = id || 'gamesummary';
-	this.name = 'Game Summary';
-	this.version = '0.2.1';
-	
-	this.fieldset = null;
-	this.summaryDiv = null;
-}
-
-
-GameSummary.prototype.append = function (root, ids) {
-	var that = this;
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset';
-	var idSummary = PREF + 'player';
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('player')) idSummary = ids.player;
-	}
-	
-	this.fieldset = node.window.addFieldset(root, idFieldset, 'Game Summary');
-	
-	
-	this.summaryDiv = node.window.addDiv(this.fieldset,idSummary);
-	
-	
-	that.writeSummary();
-		
-	return this.fieldset;
-	
-};
-
-GameSummary.prototype.writeSummary = function(idState,idSummary) {
-	var gName = document.createTextNode('Name: ' + this.game.name);
-	var gDescr = document.createTextNode('Descr: ' + this.game.description);
-	var gMinP = document.createTextNode('Min Pl.: ' + this.game.minPlayers);
-	var gMaxP = document.createTextNode('Max Pl.: ' + this.game.maxPlayers);
-	
-	this.summaryDiv.appendChild(gName);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gDescr);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gMinP);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gMaxP);
-	
-	node.window.addDiv(this.fieldset,this.summaryDiv,idSummary);
-};
-
-GameSummary.prototype.listeners = function() {};  
- 
- 
- 
-/*!
- * MsgBar
- * 
- */
-
-function MsgBar(id){
-	
-	this.game = node.game;
-	this.id = id || 'msgbar';
-	this.name = 'Msg Bar';
-	this.version = '0.2.1';
-	
-	this.recipient = null;
-}
-
-MsgBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idMsgText = PREF + 'msgText';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('msgText')) idMsgText = ids.msgText;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Msg To Players');
-	var sendButton = node.window.addButton(fieldset, idButton);
-	var msgText = node.window.addTextInput(fieldset, idMsgText);
-	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	var that = this;
-	
-	sendButton.onclick = function() {
-
-		// Should be within the range of valid values
-		// but we should add a check
-		var to = that.recipient.value;
-		var msg = node.TXT(msgText.value,to);
-		//console.log(msg.stringify());
+	Document.prototype.addSlider = function (root, id, attributes) {
+		var slider = document.createElement('input');
+		slider.id = id;
+		slider.setAttribute('type', 'range');
+		this.addAttributes2Elem(slider, attributes);
+		root.appendChild(slider);
+		return slider;
 	};
-
-	return fieldset;
 	
-};
-
-MsgBar.prototype.listeners = function(){
-	var that = this;
-	
-	node.onPLIST( function(msg) {
-		node.window.populateRecipientSelector(that.recipient,msg.data);
-		// was
-		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
-	}); 
-}; 
- 
- 
- 
-/*!
- * NextPreviousState
- * 
- * Step back and forth in the gameState
- * 
- */
-
-function NextPreviousState(id) {
-	this.game = node.game;
-	this.id = id || 'nextprevious';
-	this.name = 'Next,Previous State';
-	this.version = '0.2.1';
-	
-}
-
-NextPreviousState.prototype.append = function (root, ids) {
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idFwd = PREF + 'sendButton';
-	var idRew = PREF + 'stateSel';
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('fwd')) idFwd = ids.fwd;
-		if (ids.hasOwnProperty('rew')) idRew = ids.rew;
-	}
-	
-	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Rew-Fwd');
-	var rew 		= node.window.addButton(fieldset, idRew, '<<');
-	var fwd 		= node.window.addButton(fieldset, idFwd, '>>');
+	Document.prototype.addJQuerySlider = function (root, id, attributes) {
+		var slider = document.createElement('div');
+		slider.id = id;
+		slider.slider(attributes);
+		root.appendChild(slider);
+		return slider;
+	};
 	
 	
-	var that = this;
-
-	fwd.onclick = function() {
+	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
+		var label = document.createElement('label');
+		label.id = id;
+		label.appendChild(document.createTextNode(labelText));	
+		label.setAttribute('for', forElem);
+		this.addAttributes2Elem(label, attributes);
 		
-		var state = that.game.next();
+		var root = node.window.getElementById(forElem);
+		root.parentNode.insertBefore(label,root);
+		return label;
 		
-		if (state) {
-			var stateEvent = node.OUT + node.actions.SET + '.STATE';
-			//var stateEvent = 'out.' + action + '.STATE';
-			node.fire(stateEvent,state,'ALL');
+		// Add the label immediately before if no root elem has been provided
+		if (!root) {
+			var root = node.window.getElementById(forElem);
+			root.insertBefore(label);
 		}
 		else {
-			console.log('No next state. Not sent.');
-			node.gsc.sendTXT('E: no next state. Not sent');
+			root.appendChild(label);
 		}
-	};
-
-	rew.onclick = function() {
-		
-		var state = that.game.previous();
-		
-		if (state) {
-			var stateEvent = node.OUT + node.actions.SET + '.STATE';
-			//var stateEvent = 'out.' + action + '.STATE';
-			node.fire(stateEvent,state,'ALL');
-		}
-		else {
-			console.log('No previous state. Not sent.');
-			node.gsc.sendTXT('E: no previous state. Not sent');
-		}
+		return label;
 	};
 	
-	
-	return fieldset;
-};
-
-NextPreviousState.prototype.listeners = function () {};  
- 
- 
- 
-/*!
- * Slider Controls
- * 
- */
-
-function SliderControls (id, features) {
-	this.name = 'Slider Controls'
-	this.version = '0.1';
-	
-	this.id = id;
-	this.features = features;
-	
-	this.list = node.window.create.List();
-};
-
-SliderControls.prototype.append = function(root) {
-	
-	var listRoot = this.list.getRoot();
-	root.appendChild(listRoot);
-	
-	for (var key in this.features) {
-		if (this.features.hasOwnProperty(key)) {
-			
-			var f = this.features[key];
-			var id = f.id || key;
-			
-			var item = this.list.getItem();
-			listRoot.appendChild(item);
-			
-			var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-			var slider = node.window.addJQuerySlider(item, id, attributes);
-			
-			// If a label element is present it checks whether it is an
-			// object literal or a string.
-			// In the former case it scans the obj for additional properties
-			if (f.label) {
-				var labelId = 'label_' + id;
-				var labelText = f.label;
-				
-				if (typeof(f.label) === 'object') {
-					var labelText = f.label.text;
-					if (f.label.id) {
-						labelId = f.label.id; 
-					}
-				}
-				
-				node.window.addLabel(slider, labelId, labelText, id);
-			}
-			
-			
-		}
-	}
-};
-
-SliderControls.prototype.listeners = function() {
-	
-};
-
-SliderControls.prototype.getAllValues = function() {
-	var out = {};
-	for (var key in this.features) {
-		
-		if (this.features.hasOwnProperty(key)) {
-			console.log('STE ' + key + ' ' + document.getElementById(key).value);
-			out[key] = Number(document.getElementById(key).value);
-		}
-	}
-	
-	return out;
-}; 
- 
- 
- 
-/*
- * StateBar
- * 
- * Sends STATE msgs
- */
-
-function StateBar(id) {
-	
-	this.game = node.game;;
-	this.id = id || 'statebar';
-	this.name = 'State Bar';
-	this.version = '0.2.1';
-	
-	this.actionSel = null;
-	this.recipient = null;
-}
-
-StateBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idStateSel = PREF + 'stateSel';
-	var idActionSel = PREF + 'actionSel';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('state')) idStateSel = ids.idStateSel;
-		if (ids.hasOwnProperty('action')) idActionSel = ids.idActionSel;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Change Game State');
-	var sendButton 	= node.window.addButton(fieldset, idButton);
-	var stateSel 	= node.window.addStateSelector(fieldset, idStateSel);
-	this.actionSel	= node.window.addActionSelector(fieldset, idActionSel);
-	this.recipient 	= node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	var that = this;
-
-	sendButton.onclick = function() {
-
-		// Should be within the range of valid values
-		// but we should add a check
-		var to = that.recipient.value;
-		
-		//var parseState = /(\d+)(?:\.(\d+))?(?::(\d+))?/;
-		//var parseState = /^\b\d+\.\b[\d+]?\b:[\d+)]?$/;
-		//var parseState = /^(\d+)$/;
-		//var parseState = /(\S+)?/;
-		var parseState = /^(\d+)(?:\.(\d+))?(?::(\d+))?$/;
-		
-		var result = parseState.exec(stateSel.value);
-		
-		if (result !== null) {
-			// Note: not result[0]!
-			var state = result[1];
-			var step = result[2] || 1;
-			var round = result[3] || 1;
-			console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
-			
-			var state = new node.GameState({
-												state: state,
-												step: step,
-												round: round
-			});
-			
-			var stateEvent = node.OUT + that.actionSel.value + '.STATE';
-			node.fire(stateEvent,state,to);
-		}
-		else {
-			console.log('Not valid state. Not sent.');
-			node.gsc.sendTXT('E: not valid state. Not sent');
-		}
-	};
-
-	return fieldset;
-	
-};
-
-StateBar.prototype.listeners = function () {
-	var that = this;
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	
-	node.onPLIST( function(msg) {
-		
-		node.window.populateRecipientSelector(that.recipient,msg.data);
-		// was
-		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
-	}); 
-};  
- 
- 
- 
-/*
- * StateDisplay
- * 
- * Sends STATE msgs
- */
-
-function StateDisplay(id) {
-	
-	this.game = node.game;
-	this.id = id || 'statedisplay';
-	this.name = 'State Display';
-	this.version = '0.2.1';
-	
-	this.fieldset = null;
-	this.stateDiv = null;
-}
-
-
-StateDisplay.prototype.append = function (root, ids) {
-	var that = this;
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset';
-	var idPlayer = PREF + 'player';
-	var idState = PREF + 'state'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('player')) idPlayer = ids.player;
-		if (ids.hasOwnProperty('state')) idState = ids.state;
-	}
-	
-	this.fieldset = node.window.addFieldset(root, idFieldset, 'Player Status');
-	
-	
-	this.playerDiv = node.window.addDiv(this.fieldset,idPlayer);
-	
-	var checkPlayerName = setInterval(function(idState,idPlayer){
-			if(that.game.player !== null){
-				clearInterval(checkPlayerName);
-				that.updateAll();
-			}
-		},100);
-
-	return this.fieldset;
-	
-};
-
-StateDisplay.prototype.updateAll = function(idState,idPlayer) {
-	var pName = document.createTextNode('Name: ' + this.game.player.name);
-	var pId = document.createTextNode('Id: ' + this.game.player.id);
-	
-	this.playerDiv.appendChild(pName);
-	this.playerDiv.appendChild(document.createElement('br'));
-	this.playerDiv.appendChild(pId);
-	
-	this.stateDiv = node.window.addDiv(this.playerDiv,idState);
-	this.updateState(this.game.gameState);
-};
-
-StateDisplay.prototype.updateState =  function(state) {
-	var that = this;
-	var checkStateDiv = setInterval(function(){
-		if(that.stateDiv){
-			clearInterval(checkStateDiv);
-			that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
-			// was
-			//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
-		}
-	},100);
-};
-
-StateDisplay.prototype.listeners = function () {
-	var that = this;
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	var IN =  node.IN;
-	var OUT = node.OUT;
-	
-	node.on( 'STATECHANGE', function(state) {
-		that.updateState(state);
-	}); 
-};  
- 
- 
- 
-/*
- * Wait Screen
- * 
- * Show a standard waiting screen
- * 
- */
-
-//var waitScreen = function(){
-
-function WaitScreen(id) {
-	
-	this.game = node.game;
-	this.id = id || 'waiting';
-	this.name = 'WaitingScreen';
-	this.version = '0.2.1';
-	
-	
-	this.text = 'Waiting for other players...';
-	this.waitingDiv = null;
-	
-}
-
-WaitScreen.prototype.append = function (root, id) {};
-
-WaitScreen.prototype.listeners = function () {
-	var that = this;
-	node.on('WAIT', function(text) {
-		that.waitingDiv = node.window.addDiv(document.body, that.id);
-		if (that.waitingDiv.style.display === "none"){
-			that.waitingDiv.style.display = "";
-		}
-	
-		that.waitingDiv.appendChild(document.createTextNode(that.text || text));
-		that.game.pause();
-	});
-	
-	// It is supposed to fade away when a new state starts
-	node.on('STATECHANGE', function(text) {
-		if (that.waitingDiv) {
-			
-			if (that.waitingDiv.style.display == ""){
-				that.waitingDiv.style.display = "none";
-			}
-		// TODO: Document.js add method to remove element
-		}
-	});
-	
-};  
- 
- 
- 
-/*
- * Wall
- * 
- * Prints lines sequentially;
- * 
- */
-
-
-var Utils = node.Utils;
-
-function Wall(id) {
-	this.game = node.game;
-	this.id = id || 'wall';
-	this.name = 'Wall';
-	this.version = '0.2.1';
-	
-	this.wall = null;
-	
-	this.buffer = [];
-	
-	this.counter = 0;
-	// TODO: buffer is not read now
-	
-}
-
-Wall.prototype.append = function (root, id) {
-	var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
-	var idLogDiv = id || this.id;
-	this.wall = node.window.addElement('pre', fieldset, idLogDiv);
-};
-
-Wall.prototype.write = function(text) {
-	if (document.readyState !== 'complete') {
-        this.buffer.push(s);
-    } else {
-    	var mark = this.counter++ + ') ' + Utils.getTime() + ' ';
-    	this.wall.innerHTML = mark + text + "\n" + this.wall.innerHTML;
-        this.buffer = []; // Where to place it?
-    }  
-};
-
-Wall.prototype.listeners = function() {
-	var that = this;
-//		this.game.on('in.say.MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-//	
-//		this.game.on('out.say.MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-//	
-//	
-//		this.game.on('MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-	
-	node.on('LOG', function(msg){
-		that.write(msg);
-	});
-};  
- 
- 
- 
- 
- 
- 
- 
-/*!
- * nodeGadgets v0.3.2
- * http://nodegame.org
- *
- * Copyright 2011, Stefano Balietti
- *
- * Built on Mon Oct 24 18:28:04 CEST 2011
- *
- */
- 
- 
-// TODO: hide helping classes
-
-/*!
- * ChernoffFaces
- * 
- * Parametrically display Chernoff Faces
- * 
- */
-
-ChernoffFaces.defaults = {};
-ChernoffFaces.defaults.canvas = {};
-ChernoffFaces.defaults.canvas.width = 100;
-ChernoffFaces.defaults.canvas.heigth = 100;
-
-function ChernoffFaces(id, dims) {
-	
-	this.game = node.game;
-	this.id = id || 'ChernoffFaces';
-	this.name = 'Chernoff Faces';
-	this.version = '0.1';
-	
-	this.bar = null;
-	this.root = null;
-	
-	this.recipient = null;
-	
-	this.dims = {
-				width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
-				height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
-	};
-};
-
-ChernoffFaces.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idCanvas = PREF + 'canvas';
-	var idButton = PREF + 'button';
-
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
-	
-	var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-	
-	var fp = new FacePainter(canvas);
-	var fv = new FaceVector();
-	
-	fp.draw(fv);
-	
-	var button = node.window.addButton(fieldset,idButton);
-									
-	// Add Gadget
-	var sc = new SliderControls('cf_controls',FaceVector.defaults);
-	node.window.addGadget(fieldset,sc);
-	
-	var that = this;
-
-	button.onclick = function() {		
-		var fv = sc.getAllValues();
-		console.log(fv);
-		var fv = new FaceVector(fv);
-		console.log(fv);
-		fp.redraw(fv);
+	Document.prototype.addSelect = function (root, id, attributes) {
+		return this.addElement('select', root, id, attributes);
 	};
 	
-	return fieldset;
-	
-};
-
-ChernoffFaces.prototype.listeners = function () {
-	var that = this;
-//	
-//	node.on( 'input', function(msg) {
-//			var fv = new FaceVector(sc.getAllValues());
-//			fp.redraw(fv);
-//		}); 
-};
-
-
-/*!
-* ChernoffFaces
-* 
-* Parametrically display Chernoff Faces
-* 
-*/
-
-function FacePainter (canvas, settings) {
+	Document.prototype.populateSelect = function (select,list) {
 		
-	this.canvas = node.window.create.Canvas(canvas);
-	
-	this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
-	this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;
-};
-
-//Draws a Chernoff face.
-FacePainter.prototype.draw = function (face, x, y) {
-			
-	this.fit2Canvas(face);
-	this.canvas.scale(face.scaleX, face.scaleY);
-	
-	console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
-	
-	var x = x || this.canvas.centerX;
-	var y = y || this.canvas.centerY;
-	
-	this.drawHead(face, x, y);
-		
-	this.drawEyes(face, x, y);
-
-	this.drawPupils(face, x, y);
-
-	this.drawEyebrow(face, x, y);
-
-	this.drawNose(face, x, y);
-	
-	this.drawMouth(face, x, y);
-	
-};		
-	
-FacePainter.prototype.redraw = function (face, x, y) {
-	this.canvas.clear();
-	this.draw(face,x,y);
-}
-
-FacePainter.prototype.scale = function (x, y) {
-	this.canvas.scale(this.scaleX, this.scaleY);
-}
-
-// TODO: Improve. It eats a bit of the margins
-FacePainter.prototype.fit2Canvas = function(face) {
-	if (!this.canvas) {
-		console.log('No canvas found');
-		return;
-	}
-	
-	if (this.canvas.width > this.canvas.height) {
-		var ratio = this.canvas.width / face.head_radius * face.head_scale_x;
-	}
-	else {
-		var ratio = this.canvas.height / face.head_radius * face.head_scale_y;
-	}
-	
-	face.scaleX = ratio / 2;
-	face.scaleY = ratio / 2;
-}
-
-FacePainter.prototype.drawHead = function (face, x, y) {
-	
-	var radius = face.head_radius;
-	
-	this.canvas.drawOval({
-				   x: x, 
-				   y: y,
-				   radius: radius,
-				   scale_x: face.head_scale_x,
-				   scale_y: face.head_scale_y,
-				   color: face.color,
-				   lineWidth: face.lineWidth
-	});
-};
-
-FacePainter.prototype.drawEyes = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
-	var spacing = face.eye_spacing;
-		
-	var radius = face.eye_radius;
-	//console.log(face);
-	this.canvas.drawOval({
-					x: x - spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-					
-	});
-	//console.log(face);
-	this.canvas.drawOval({
-					x: x + spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.eye_scale_x,
-					scale_y: face.eye_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-}
-
-FacePainter.prototype.drawPupils = function (face, x, y) {
-		
-	var radius = face.pupil_radius;
-	var spacing = face.eye_spacing;
-	var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
-	
-	this.canvas.drawOval({
-					x: x - spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.pupil_scale_x,
-					scale_y: face.pupil_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-	
-	this.canvas.drawOval({
-					x: x + spacing,
-					y: height,
-					radius: radius,
-					scale_x: face.pupil_scale_x,
-					scale_y: face.pupil_scale_y,
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-
-};
-
-FacePainter.prototype.drawEyebrow = function (face, x, y) {
-	
-	var height = FacePainter.computeEyebrowOffset(face,y);
-	var spacing = face.eyebrow_spacing;
-	var length = face.eyebrow_length;
-	var angle = face.eyebrow_angle;
-	
-	this.canvas.drawLine({
-					x: x - spacing,
-					y: height,
-					length: length,
-					angle: angle,
-					color: face.color,
-					lineWidth: face.lineWidth
-				
-					
-	});
-	
-	this.canvas.drawLine({
-					x: x + spacing,
-					y: height,
-					length: 0-length,
-					angle: -angle,	
-					color: face.color,
-					lineWidth: face.lineWidth
-	});
-	
-};
-
-FacePainter.prototype.drawNose = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.nose_height, y);
-	var nastril_r_x = x + face.nose_width / 2;
-	var nastril_r_y = height + face.nose_length;
-	var nastril_l_x = nastril_r_x - face.nose_width;
-	var nastril_l_y = nastril_r_y; 
-	
-	this.canvas.ctx.lineWidth = face.lineWidth;
-	this.canvas.ctx.strokeStyle = face.color;
-	
-	this.canvas.ctx.save();
-	this.canvas.ctx.beginPath();
-	this.canvas.ctx.moveTo(x,height);
-	this.canvas.ctx.lineTo(nastril_r_x,nastril_r_y);
-	this.canvas.ctx.lineTo(nastril_l_x,nastril_l_y);
-	//this.canvas.ctx.closePath();
-	this.canvas.ctx.stroke();
-	this.canvas.ctx.restore();
-
-};
-		
-FacePainter.prototype.drawMouth = function (face, x, y) {
-	
-	var height = FacePainter.computeFaceOffset(face, face.mouth_height, y);
-	var startX = x - face.mouth_width / 2;
-    var endX = x + face.mouth_width / 2;
-	
-	var top_y = height - face.mouth_top_y;
-	var bottom_y = height + face.mouth_bottom_y;
-	
-	// Upper Lip
-	this.canvas.ctx.moveTo(startX,height);
-    this.canvas.ctx.quadraticCurveTo(x, top_y, endX, height);
-    this.canvas.ctx.stroke();
-	
-    //Lower Lip
-    this.canvas.ctx.moveTo(startX,height);
-    this.canvas.ctx.quadraticCurveTo(x, bottom_y, endX, height);
-    this.canvas.ctx.stroke();
-   
-};	
-
-
-//TODO Scaling ?
-FacePainter.computeFaceOffset = function (face, offset, y) {
-	var y = y || 0;
-	//var pos = y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
-	var pos = y - face.head_radius + face.head_radius * 2 * offset;
-	//console.log('POS: ' + pos);
-	return pos;
-};
-
-FacePainter.computeEyebrowOffset = function (face, y) {
-	var y = y || 0;
-	var eyemindistance = 2;
-	return FacePainter.computeFaceOffset(face, face.eye_height, y) - eyemindistance - face.eyebrow_eyedistance;
-};
-
-
-/*!
-* 
-* A description of a Chernoff Face.
-*
-* This class packages the 11-dimensional vector of numbers from 0 through 1 that completely
-* describe a Chernoff face.  
-*
-*/
-
-//FaceVector.defaults = {
-//		// Head
-//		head_radius: {
-//			// id can be specified otherwise is taken head_radius
-//			min: 10,
-//			max: 100,
-//			step: 0.01,
-//			value: 30,
-//			label: 'Face radius'
-//		},
-//		head_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 0.5,
-//			label: 'Scale head horizontally'
-//		},
-//		head_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 1,
-//			label: 'Scale head vertically'
-//		},
-//		// Eye
-//		eye_height: {
-//			min: 0.1,
-//			max: 0.9,
-//			step: 0.1,
-//			value: 0.4,
-//			label: 'Eye height'
-//		},
-//		eye_radius: {
-//			min: 2,
-//			max: 30,
-//			step: 1,
-//			value: 5,
-//			label: 'Eye radius'
-//		},
-//		eye_spacing: {
-//			min: 0,
-//			max: 50,
-//			step: 2,
-//			value: 10,
-//			label: 'Eye spacing'
-//		},
-//		eye_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale eyes horizontally'
-//		},
-//		eye_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale eyes vertically'
-//		},
-//		// Pupil
-//		pupil_radius: {
-//			min: 1,
-//			max: 9,
-//			step: 1,
-//			value: 1,  //this.eye_radius;
-//			label: 'Pupil radius'
-//		},
-//		pupil_scale_x: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale pupils horizontally'
-//		},
-//		pupil_scale_y: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.2,
-//			value: 1,
-//			label: 'Scale pupils vertically'
-//		},
-//		// Eyebrow
-//		eyebrow_length: {
-//			min: 1,
-//			max: 30,
-//			step: 1,
-//			value: 10,
-//			label: 'Eyebrow length'
-//		},
-//		eyebrow_eyedistance: {
-//			min: 0.3,
-//			max: 10,
-//			step: 0.2,
-//			value: 3, // From the top of the eye
-//			label: 'Eyebrow from eye'
-//		},
-//		eyebrow_angle: {
-//			min: -2,
-//			max: 2,
-//			step: 0.2,
-//			value: -0.5,
-//			label: 'Eyebrow angle'
-//		},
-//		eyebrow_spacing: {
-//			min: 0,
-//			max: 20,
-//			step: 1,
-//			value: 5,
-//			label: 'Eyebrow spacing'
-//		},
-//		// Nose
-//		nose_height: {
-//			min: 0.4,
-//			max: 1,
-//			step: 0.1,
-//			value: 0.4,
-//			label: 'Nose height'
-//		},
-//		nose_length: {
-//			min: 0.2,
-//			max: 30,
-//			step: 0.2,
-//			value: 15,
-//			label: 'Nose length'
-//		},
-//		nose_width: {
-//			min: 0,
-//			max: 30,
-//			step: 2,
-//			value: 10,
-//			label: 'Nose width'
-//		},
-//		// Mouth
-//		mouth_height: {
-//			min: 0.2,
-//			max: 2,
-//			step: 0.1,
-//			value: 0.75, 
-//			label: 'Mouth height'
-//		},
-//		mouth_width: {
-//			min: 2,
-//			max: 100,
-//			step: 2,
-//			value: 20,
-//			label: 'Mouth width'
-//		},
-//		mouth_top_y: {
-//			min: -10,
-//			max: 30,
-//			step: 0.5,
-//			value: -2,
-//			label: 'Upper lip'
-//		},
-//		mouth_bottom_y: {
-//			min: -10,
-//			max: 30,
-//			step: 0.5,
-//			value: 20,
-//			label: 'Lower lip'
-//		}					
-//};
-
-FaceVector.defaults = {
-		// Head
-		head_radius: {
-			// id can be specified otherwise is taken head_radius
-			min: 10,
-			max: 100,
-			step: 0.01,
-			value: 30,
-			label: 'Face radius'
-		},
-		head_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 0.5,
-			label: 'Scale head horizontally'
-		},
-		head_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale head vertically'
-		},
-		// Eye
-		eye_height: {
-			min: 0.1,
-			max: 0.9,
-			step: 0.01,
-			value: 0.4,
-			label: 'Eye height'
-		},
-		eye_radius: {
-			min: 2,
-			max: 30,
-			step: 0.01,
-			value: 5,
-			label: 'Eye radius'
-		},
-		eye_spacing: {
-			min: 0,
-			max: 50,
-			step: 0.01,
-			value: 10,
-			label: 'Eye spacing'
-		},
-		eye_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale eyes horizontally'
-		},
-		eye_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale eyes vertically'
-		},
-		// Pupil
-		pupil_radius: {
-			min: 1,
-			max: 9,
-			step: 0.01,
-			value: 1,  //this.eye_radius;
-			label: 'Pupil radius'
-		},
-		pupil_scale_x: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale pupils horizontally'
-		},
-		pupil_scale_y: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 1,
-			label: 'Scale pupils vertically'
-		},
-		// Eyebrow
-		eyebrow_length: {
-			min: 1,
-			max: 30,
-			step: 0.01,
-			value: 10,
-			label: 'Eyebrow length'
-		},
-		eyebrow_eyedistance: {
-			min: 0.3,
-			max: 10,
-			step: 0.01,
-			value: 3, // From the top of the eye
-			label: 'Eyebrow from eye'
-		},
-		eyebrow_angle: {
-			min: -2,
-			max: 2,
-			step: 0.01,
-			value: -0.5,
-			label: 'Eyebrow angle'
-		},
-		eyebrow_spacing: {
-			min: 0,
-			max: 20,
-			step: 0.01,
-			value: 5,
-			label: 'Eyebrow spacing'
-		},
-		// Nose
-		nose_height: {
-			min: 0.4,
-			max: 1,
-			step: 0.01,
-			value: 0.4,
-			label: 'Nose height'
-		},
-		nose_length: {
-			min: 0.2,
-			max: 30,
-			step: 0.01,
-			value: 15,
-			label: 'Nose length'
-		},
-		nose_width: {
-			min: 0,
-			max: 30,
-			step: 0.01,
-			value: 10,
-			label: 'Nose width'
-		},
-		// Mouth
-		mouth_height: {
-			min: 0.2,
-			max: 2,
-			step: 0.01,
-			value: 0.75, 
-			label: 'Mouth height'
-		},
-		mouth_width: {
-			min: 2,
-			max: 100,
-			step: 0.01,
-			value: 20,
-			label: 'Mouth width'
-		},
-		mouth_top_y: {
-			min: -10,
-			max: 30,
-			step: 0.01,
-			value: -2,
-			label: 'Upper lip'
-		},
-		mouth_bottom_y: {
-			min: -10,
-			max: 30,
-			step: 0.01,
-			value: 20,
-			label: 'Lower lip'
-		}					
-};
-
-function FaceVector (faceVector) {
-	
-	//if (typeof(faceVector) !== 'undefined') {
-	
-	var faceVector = faceVector || {};
-	
-	this.scaleX = faceVector.scaleX || 1;
-	this.scaleY = faceVector.scaleY || 1;
-	
-	this.color = faceVector.color || 'green';
-	this.lineWidth = faceVector.lineWidth || 1;
-	
-	// Merge on key
-	for (var key in FaceVector.defaults) {
-		if (FaceVector.defaults.hasOwnProperty(key)){
-			if (faceVector.hasOwnProperty(key)){
-				this[key] = faceVector[key];
-			}
-			else {
-				this[key] = FaceVector.defaults[key].value;
+		for (var key in list) {
+			if (list.hasOwnProperty(key)) {
+				var opt = document.createElement('option');
+				opt.value = list[key];
+				opt.appendChild(document.createTextNode(key));
+				select.appendChild(opt);
 			}
 		}
-	}
-		
-	delete this.faceVector;
+	};
 	
+	Document.prototype.write = function (root, text) {
+		var tn = document.createTextNode(text);
+		root.appendChild(tn);
+		return tn;
+	};
+	
+	Document.prototype.writeln = function (root, text, rc) {
+		var RC = rc || '<br />';
+		return this.write(root, text+RC);
+	};
+	
+	// IFRAME
+	
+	Document.prototype.addIFrame = function (root, id, attributes) {
+		var attributes = {'name' : id}; // For Firefox
+		return this.addElement('iframe', root, id, attributes);
+	};
+	
+	
+	// BR
+	
+	Document.prototype.addBr = function (root) {
+		var br = document.createElement('br');
+		return this.insertAfter(br,root);
+	};
+	
+	// CSS
+	
+	Document.prototype.addCSS = function (root, css, id, attributes) {
 		
-};
-
-//Constructs a random face vector.
-FaceVector.prototype.shuffle = function () {
-	for (var key in this) {
-		if (this.hasOwnProperty(key)) {
+		var attributes = attributes || {'rel' : 'stylesheet',
+										'type': 'text/css'};
+		
+		attributes.href = css;
+		
+		var id = id || 'maincss';
+		
+		return this.addElement('link', root, id, attributes);
+	};
+	
+	
+	Document.prototype.addDiv = function (root, id, attributes) {
+		return this.addElement('div', root, id, attributes);
+	};
+	
+	
+	// TODO: Potentially unsafe
+	// Works only with Chrome
+	Document.prototype.loadFile = function (container,file) {
+		
+		// Check for the various File API support.
+		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+		  console.log('The File APIs are not fully supported in this browser.');
+		  return false;
+		}
+		function onInitFs(fs) {
+		  console.log('Opened file system: ' + fs.name);
+		}
+		
+		function errorHandler(e) {
+			  var msg = '';
+	
+			  switch (e.code) {
+			    case FileError.QUOTA_EXCEEDED_ERR:
+			      msg = 'QUOTA_EXCEEDED_ERR';
+			      break;
+			    case FileError.NOT_FOUND_ERR:
+			      msg = 'NOT_FOUND_ERR';
+			      break;
+			    case FileError.SECURITY_ERR:
+			      msg = 'SECURITY_ERR';
+			      break;
+			    case FileError.INVALID_MODIFICATION_ERR:
+			      msg = 'INVALID_MODIFICATION_ERR';
+			      break;
+			    case FileError.INVALID_STATE_ERR:
+			      msg = 'INVALID_STATE_ERR';
+			      break;
+			    default:
+			      msg = 'Unknown Error';
+			      break;
+			  }
+	
+			  console.log('Error: ' + msg);
+		};
+		
+		// second param is 5MB, reserved space for storage
+		window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
+		
 			
-			if (key !== 'color') {
-				this[key] = Math.random();
+		container.innerHTML += 'DONE FS';
+		return container;
+	};
+	
+	// Util
+	
+	Document.prototype.addElement = function (elem, root, id, attributes) {
+		var e = document.createElement(elem);
+		if (id) {
+			e.id = id;
+		}
+		this.addAttributes2Elem(e, attributes);
+		
+		root.appendChild(e);
+		return e;
+	};
+	
+	Document.prototype.addAttributes2Elem = function (e, a) {
+		
+		for (var key in a) {
+			if (a.hasOwnProperty(key)){
+				e.setAttribute(key,a[key]);
 			}
 		}
-	}
-};
-
-//Computes the Euclidean distance between two FaceVectors.
-FaceVector.prototype.distance = function (face) {
-	return FaceVector.distance(this,face);
-};
-	
-	
-FaceVector.distance = function (face1, face2) {
-	var sum = 0.0;
-	var diff;
-	
-	for (var key in face1) {
-		if (face1.hasOwnProperty(key)) {
-			diff = face1[key] - face2[key];
-			sum = sum + diff * diff;
-		}
-	}
-	
-	return Math.sqrt(sum);
-};
-
-FaceVector.prototype.toString = function() {
-	var out = 'Face: ';
-	for (var key in this) {
-		if (this.hasOwnProperty(key)) {
-			out += key + ' ' + this[key];
-		}
-	};
-	return out;
-};
- 
- 
- 
- 
-/*
- * DataBar
- * 
- * Sends DATA msgs
- * 
- */
-
-function DataBar(id) {
-	
-	this.game = node.game;
-	this.id = id || 'databar';
-	this.name = 'Data Bar';
-	this.version = '0.2.1';
-	
-	this.bar = null;
-	this.root = null;
-	
-	this.recipient = null;
-};
-
-DataBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idData = PREF + 'dataText';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('data')) idData = ids.data;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Data to Players');
-	var sendButton = node.window.addButton(fieldset, idButton);
-	var dataInput = node.window.addTextInput(fieldset, idData);
-	
-	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	
-	
-	var that = this;
-
-	sendButton.onclick = function() {
-		
-		var to = that.recipient.value;
-
-		//try {
-			//var data = JSON.parse(dataInput.value);
-			data = dataInput.value;
-			console.log('Parsed Data: ' + JSON.stringify(data));
-			
-			node.fire(node.OUT + node.actions.SAY + '.DATA',data,to);
-//			}
-//			catch(e) {
-//				console.log('Impossible to parse the data structure');
-//			}
+		return e;
 	};
 	
-	return fieldset;
-	
-};
-
-DataBar.prototype.listeners = function () {
-	var that = this;
-	var PREFIX = 'in.';
-	
-	node.onPLIST( function(msg) {
-			node.window.populateRecipientSelector(that.recipient,msg.data);
-		}); 
-}; 
- 
- 
- 
-/*!
- * GameBoard
- */ 
-
-function GameBoard (id) {
-	
-	this.game = node.game;
-	this.id = id || 'gboard';
-	this.name = 'GameBoard';
-	
-	this.version = '0.2.1';
-	
-	this.board = null;
-	this.root = null;
-	
-	this.noPlayers = 'No players connected...';
-	
-}
-
-GameBoard.prototype.append = function(root) {
-	this.root = root;
-	var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
-	this.board = node.window.addDiv(fieldset,this.id);
-	this.board.innerHTML = this.noPlayers;
-	
-};
-
-GameBoard.prototype.listeners = function() {
-	var that = this;
-	
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	
-	node.onPLIST( function (msg) {
-		console.log('I Updating Board ' + msg.text);
-		that.board.innerHTML = 'Updating...';
+	Document.prototype.removeChildrenFromNode = function (e) {
 		
-		var pl = new node.PlayerList(msg.data);
-		
-		//console.log(pl);
-		
-		if (pl.size() !== 0) {
-			that.board.innerHTML = '';
-			pl.forEach( function(p) {
-				//console.log(p);
-				var line = '[' + p.id + "|" + p.name + "]> \t"; 
-				
-				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
-				pState += ' ';
-				
-				switch (p.state.is) {
-				
-				case node.states.UNKNOWN:
-					pState += '(unknown)';
-					break;
-				case node.states.PLAYING:
-					pState += '(playing)';
-					break;
-				case node.states.DONE:
-					pState += '(done)';
-					break;	
-				case node.states.PAUSE:
-					pState += '(pause)';
-					break;		
-				default:
-					pState += '('+p.state.is+')';
-					break;		
-				}
-				
-				if (p.state.paused) {
-					pState += ' (P)';
-				}
-				
-				that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
-			});
-			//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
-			}
-			else {
-				that.board.innerHTML = that.noPlayers;
-			}
-		});
-}; 
- 
- 
- 
-/*!
- * GameSummary
- * 
- * Show Game Info
- */
-
-function GameSummary(id) {
-	//debugger;
-	this.game = node.game;
-	this.id = id || 'gamesummary';
-	this.name = 'Game Summary';
-	this.version = '0.2.1';
-	
-	this.fieldset = null;
-	this.summaryDiv = null;
-}
-
-
-GameSummary.prototype.append = function (root, ids) {
-	var that = this;
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset';
-	var idSummary = PREF + 'player';
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('player')) idSummary = ids.player;
-	}
-	
-	this.fieldset = node.window.addFieldset(root, idFieldset, 'Game Summary');
-	
-	
-	this.summaryDiv = node.window.addDiv(this.fieldset,idSummary);
-	
-	
-	that.writeSummary();
-		
-	return this.fieldset;
-	
-};
-
-GameSummary.prototype.writeSummary = function(idState,idSummary) {
-	var gName = document.createTextNode('Name: ' + this.game.name);
-	var gDescr = document.createTextNode('Descr: ' + this.game.description);
-	var gMinP = document.createTextNode('Min Pl.: ' + this.game.minPlayers);
-	var gMaxP = document.createTextNode('Max Pl.: ' + this.game.maxPlayers);
-	
-	this.summaryDiv.appendChild(gName);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gDescr);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gMinP);
-	this.summaryDiv.appendChild(document.createElement('br'));
-	this.summaryDiv.appendChild(gMaxP);
-	
-	node.window.addDiv(this.fieldset,this.summaryDiv,idSummary);
-};
-
-GameSummary.prototype.listeners = function() {};  
- 
- 
- 
-/*!
- * MsgBar
- * 
- */
-
-function MsgBar(id){
-	
-	this.game = node.game;
-	this.id = id || 'msgbar';
-	this.name = 'Msg Bar';
-	this.version = '0.2.1';
-	
-	this.recipient = null;
-}
-
-MsgBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idMsgText = PREF + 'msgText';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('msgText')) idMsgText = ids.msgText;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset = node.window.addFieldset(root, idFieldset, 'Send Msg To Players');
-	var sendButton = node.window.addButton(fieldset, idButton);
-	var msgText = node.window.addTextInput(fieldset, idMsgText);
-	this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	var that = this;
-	
-	sendButton.onclick = function() {
-
-		// Should be within the range of valid values
-		// but we should add a check
-		var to = that.recipient.value;
-		var msg = node.TXT(msgText.value,to);
-		//console.log(msg.stringify());
-	};
-
-	return fieldset;
-	
-};
-
-MsgBar.prototype.listeners = function(){
-	var that = this;
-	
-	node.onPLIST( function(msg) {
-		node.window.populateRecipientSelector(that.recipient,msg.data);
-		// was
-		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
-	}); 
-}; 
- 
- 
- 
-/*!
- * NextPreviousState
- * 
- * Step back and forth in the gameState
- * 
- */
-
-function NextPreviousState(id) {
-	this.game = node.game;
-	this.id = id || 'nextprevious';
-	this.name = 'Next,Previous State';
-	this.version = '0.2.1';
-	
-}
-
-NextPreviousState.prototype.append = function (root, ids) {
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idFwd = PREF + 'sendButton';
-	var idRew = PREF + 'stateSel';
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('fwd')) idFwd = ids.fwd;
-		if (ids.hasOwnProperty('rew')) idRew = ids.rew;
-	}
-	
-	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Rew-Fwd');
-	var rew 		= node.window.addButton(fieldset, idRew, '<<');
-	var fwd 		= node.window.addButton(fieldset, idFwd, '>>');
-	
-	
-	var that = this;
-
-	fwd.onclick = function() {
-		
-		var state = that.game.next();
-		
-		if (state) {
-			var stateEvent = node.OUT + node.actions.SET + '.STATE';
-			//var stateEvent = 'out.' + action + '.STATE';
-			node.fire(stateEvent,state,'ALL');
-		}
-		else {
-			console.log('No next state. Not sent.');
-			node.gsc.sendTXT('E: no next state. Not sent');
-		}
-	};
-
-	rew.onclick = function() {
-		
-		var state = that.game.previous();
-		
-		if (state) {
-			var stateEvent = node.OUT + node.actions.SET + '.STATE';
-			//var stateEvent = 'out.' + action + '.STATE';
-			node.fire(stateEvent,state,'ALL');
-		}
-		else {
-			console.log('No previous state. Not sent.');
-			node.gsc.sendTXT('E: no previous state. Not sent');
-		}
-	};
-	
-	
-	return fieldset;
-};
-
-NextPreviousState.prototype.listeners = function () {};  
- 
- 
- 
-/*!
- * Slider Controls
- * 
- */
-
-function SliderControls (id, features) {
-	this.name = 'Slider Controls'
-	this.version = '0.1';
-	
-	this.id = id;
-	this.features = features;
-	
-	this.list = node.window.create.List();
-};
-
-SliderControls.prototype.append = function(root) {
-	
-	var listRoot = this.list.getRoot();
-	root.appendChild(listRoot);
-	
-	for (var key in this.features) {
-		if (this.features.hasOwnProperty(key)) {
-			
-			var f = this.features[key];
-			var id = f.id || key;
-			
-			var item = this.list.getItem();
-			listRoot.appendChild(item);
-			
-			var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-			var slider = node.window.addJQuerySlider(item, id, attributes);
-			
-			// If a label element is present it checks whether it is an
-			// object literal or a string.
-			// In the former case it scans the obj for additional properties
-			if (f.label) {
-				var labelId = 'label_' + id;
-				var labelText = f.label;
-				
-				if (typeof(f.label) === 'object') {
-					var labelText = f.label.text;
-					if (f.label.id) {
-						labelId = f.label.id; 
-					}
-				}
-				
-				node.window.addLabel(slider, labelId, labelText, id);
-			}
-			
-			
-		}
-	}
-};
-
-SliderControls.prototype.listeners = function() {
-	
-};
-
-SliderControls.prototype.getAllValues = function() {
-	var out = {};
-	for (var key in this.features) {
-		
-		if (this.features.hasOwnProperty(key)) {
-			console.log('STE ' + key + ' ' + document.getElementById(key).value);
-			out[key] = Number(document.getElementById(key).value);
-		}
-	}
-	
-	return out;
-}; 
- 
- 
- 
-/*
- * StateBar
- * 
- * Sends STATE msgs
- */
-
-function StateBar(id) {
-	
-	this.game = node.game;;
-	this.id = id || 'statebar';
-	this.name = 'State Bar';
-	this.version = '0.2.1';
-	
-	this.actionSel = null;
-	this.recipient = null;
-}
-
-StateBar.prototype.append = function (root, ids) {
-	
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset'; 
-	var idButton = PREF + 'sendButton';
-	var idStateSel = PREF + 'stateSel';
-	var idActionSel = PREF + 'actionSel';
-	var idRecipient = PREF + 'recipient'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('button')) idButton = ids.button;
-		if (ids.hasOwnProperty('state')) idStateSel = ids.idStateSel;
-		if (ids.hasOwnProperty('action')) idActionSel = ids.idActionSel;
-		if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
-	}
-	
-	var fieldset 	= node.window.addFieldset(root, idFieldset, 'Change Game State');
-	var sendButton 	= node.window.addButton(fieldset, idButton);
-	var stateSel 	= node.window.addStateSelector(fieldset, idStateSel);
-	this.actionSel	= node.window.addActionSelector(fieldset, idActionSel);
-	this.recipient 	= node.window.addRecipientSelector(fieldset, idRecipient);
-	
-	var that = this;
-
-	sendButton.onclick = function() {
-
-		// Should be within the range of valid values
-		// but we should add a check
-		var to = that.recipient.value;
-		
-		//var parseState = /(\d+)(?:\.(\d+))?(?::(\d+))?/;
-		//var parseState = /^\b\d+\.\b[\d+]?\b:[\d+)]?$/;
-		//var parseState = /^(\d+)$/;
-		//var parseState = /(\S+)?/;
-		var parseState = /^(\d+)(?:\.(\d+))?(?::(\d+))?$/;
-		
-		var result = parseState.exec(stateSel.value);
-		
-		if (result !== null) {
-			// Note: not result[0]!
-			var state = result[1];
-			var step = result[2] || 1;
-			var round = result[3] || 1;
-			console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
-			
-			var state = new node.GameState({
-												state: state,
-												step: step,
-												round: round
-			});
-			
-			var stateEvent = node.OUT + that.actionSel.value + '.STATE';
-			node.fire(stateEvent,state,to);
-		}
-		else {
-			console.log('Not valid state. Not sent.');
-			node.gsc.sendTXT('E: not valid state. Not sent');
-		}
-	};
-
-	return fieldset;
-	
-};
-
-StateBar.prototype.listeners = function () {
-	var that = this;
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	
-	node.onPLIST( function(msg) {
-		
-		node.window.populateRecipientSelector(that.recipient,msg.data);
-		// was
-		//that.game.window.populateRecipientSelector(that.recipient,msg.data);
-	}); 
-};  
- 
- 
- 
-/*
- * StateDisplay
- * 
- * Sends STATE msgs
- */
-
-function StateDisplay(id) {
-	
-	this.game = node.game;
-	this.id = id || 'statedisplay';
-	this.name = 'State Display';
-	this.version = '0.2.1';
-	
-	this.fieldset = null;
-	this.stateDiv = null;
-}
-
-
-StateDisplay.prototype.append = function (root, ids) {
-	var that = this;
-	var PREF = this.id + '_';
-	
-	var idFieldset = PREF + 'fieldset';
-	var idPlayer = PREF + 'player';
-	var idState = PREF + 'state'; 
-	
-	if (ids !== null && ids !== undefined) {
-		if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		if (ids.hasOwnProperty('player')) idPlayer = ids.player;
-		if (ids.hasOwnProperty('state')) idState = ids.state;
-	}
-	
-	this.fieldset = node.window.addFieldset(root, idFieldset, 'Player Status');
-	
-	
-	this.playerDiv = node.window.addDiv(this.fieldset,idPlayer);
-	
-	var checkPlayerName = setInterval(function(idState,idPlayer){
-			if(that.game.player !== null){
-				clearInterval(checkPlayerName);
-				that.updateAll();
-			}
-		},100);
-
-	return this.fieldset;
-	
-};
-
-StateDisplay.prototype.updateAll = function(idState,idPlayer) {
-	var pName = document.createTextNode('Name: ' + this.game.player.name);
-	var pId = document.createTextNode('Id: ' + this.game.player.id);
-	
-	this.playerDiv.appendChild(pName);
-	this.playerDiv.appendChild(document.createElement('br'));
-	this.playerDiv.appendChild(pId);
-	
-	this.stateDiv = node.window.addDiv(this.playerDiv,idState);
-	this.updateState(this.game.gameState);
-};
-
-StateDisplay.prototype.updateState =  function(state) {
-	var that = this;
-	var checkStateDiv = setInterval(function(){
-		if(that.stateDiv){
-			clearInterval(checkStateDiv);
-			that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
-			// was
-			//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
-		}
-	},100);
-};
-
-StateDisplay.prototype.listeners = function () {
-	var that = this;
-	var say = node.actions.SAY + '.';
-	var set = node.actions.SET + '.';
-	var get = node.actions.GET + '.'; 
-	var IN =  node.IN;
-	var OUT = node.OUT;
-	
-	node.on( 'STATECHANGE', function(state) {
-		that.updateState(state);
-	}); 
-};  
- 
- 
- 
-/*
- * Wait Screen
- * 
- * Show a standard waiting screen
- * 
- */
-
-//var waitScreen = function(){
-
-function WaitScreen(id) {
-	
-	this.game = node.game;
-	this.id = id || 'waiting';
-	this.name = 'WaitingScreen';
-	this.version = '0.2.1';
-	
-	
-	this.text = 'Waiting for other players...';
-	this.waitingDiv = null;
-	
-}
-
-WaitScreen.prototype.append = function (root, id) {};
-
-WaitScreen.prototype.listeners = function () {
-	var that = this;
-	node.on('WAIT', function(text) {
-		that.waitingDiv = node.window.addDiv(document.body, that.id);
-		if (that.waitingDiv.style.display === "none"){
-			that.waitingDiv.style.display = "";
-		}
-	
-		that.waitingDiv.appendChild(document.createTextNode(that.text || text));
-		that.game.pause();
-	});
-	
-	// It is supposed to fade away when a new state starts
-	node.on('STATECHANGE', function(text) {
-		if (that.waitingDiv) {
-			
-			if (that.waitingDiv.style.display == ""){
-				that.waitingDiv.style.display = "none";
-			}
-		// TODO: Document.js add method to remove element
-		}
-	});
-	
-};  
- 
- 
- 
-/*
- * Wall
- * 
- * Prints lines sequentially;
- * 
- */
-
-
-var Utils = node.Utils;
-
-function Wall(id) {
-	this.game = node.game;
-	this.id = id || 'wall';
-	this.name = 'Wall';
-	this.version = '0.2.1';
-	
-	this.wall = null;
-	
-	this.buffer = [];
-	
-	this.counter = 0;
-	// TODO: buffer is not read now
-	
-}
-
-Wall.prototype.append = function (root, id) {
-	var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
-	var idLogDiv = id || this.id;
-	this.wall = node.window.addElement('pre', fieldset, idLogDiv);
-};
-
-Wall.prototype.write = function(text) {
-	if (document.readyState !== 'complete') {
-        this.buffer.push(s);
-    } else {
-    	var mark = this.counter++ + ') ' + Utils.getTime() + ' ';
-    	this.wall.innerHTML = mark + text + "\n" + this.wall.innerHTML;
-        this.buffer = []; // Where to place it?
-    }  
-};
-
-Wall.prototype.listeners = function() {
-	var that = this;
-//		this.game.on('in.say.MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-//	
-//		this.game.on('out.say.MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-//	
-//	
-//		this.game.on('MSG', function(p,msg){
-//			that.write(msg.toSMS());
-//		});
-	
-	node.on('LOG', function(msg){
-		that.write(msg);
-	});
-};  
- 
- 
- 
- 
- 
- 
- 
-/*!
- * nodeWindow v0.3.1
- * http://nodegame.org
- *
- * Copyright 2011, Stefano Balietti
- *
- * Built on Mon Oct 24 18:28:03 CEST 2011
- *
- */
- 
- 
-(function( nodeGame ) {
-
-	console.log('nodeWindow: loading...');
-	
-	if (nodeGame) {
-		var gsc = nodeGame.gsc || null;
-		var game = nodeGame.game || null;
-	}
-	else {
-		console.log('nodeWindow: nodeGame not found');
-	}
-	
-// Starting Classes
-
-/*!
- * Canvas
- * 
- */ 
-
-function Canvas(canvas) {
-	this.canvas = canvas;
-	// 2D Canvas Context 
-	this.ctx = canvas.getContext('2d');
-	
-	this.centerX = canvas.width / 2;
-	this.centerY = canvas.height / 2;
-	
-	this.width = canvas.width;
-	this.height = canvas.height;
-	
-	console.log(canvas.width);
-	console.log(canvas.height);		
-};
-
-Canvas.prototype = {
-			
-	constructor: Canvas,
-	
-	drawOval: function (settings) {
-	
-		// We keep the center fixed
-		var x = settings.x / settings.scale_x;
-		var y = settings.y / settings.scale_y;
-	
-		var radius = settings.radius || 100;
-		//console.log(settings);
-		//console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
-		
-		this.ctx.lineWidth = settings.lineWidth || 1;
-		this.ctx.strokeStyle = settings.color || '#000000';
-		
-		this.ctx.save();
-		this.ctx.scale(settings.scale_x, settings.scale_y);
-		this.ctx.beginPath();
-		this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
-		this.ctx.stroke();
-		this.ctx.closePath();
-		this.ctx.restore();
-	},
-	
-	drawLine: function (settings) {
-	
-		var from_x = settings.x;
-		var from_y = settings.y;
-	
-		var length = settings.length;
-		var angle = settings.angle;
-			
-		// Rotation
-		var to_x = - Math.cos(angle) * length + settings.x;
-		var to_y =  Math.sin(angle) * length + settings.y;
-		//console.log('aa ' + to_x + ' ' + to_y);
-		
-		//console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
-		//console.log('Length: ' + length + ', Angle: ' + angle );
-		
-		this.ctx.lineWidth = settings.lineWidth || 1;
-		this.ctx.strokeStyle = settings.color || '#000000';
-		
-		this.ctx.save();
-		this.ctx.beginPath();
-		this.ctx.moveTo(from_x,from_y);
-		this.ctx.lineTo(to_x,to_y);
-		this.ctx.stroke();
-		this.ctx.closePath();
-		this.ctx.restore();
-	},
-	
-	scale: function (x,y) {
-		this.ctx.scale(x,y);
-		this.centerX = this.canvas.width / 2 / x;
-		this.centerY = this.canvas.height / 2 / y;
-	},
-	
-	clear: function() {
-		this.ctx.clearRect(0, 0, this.width, this.height);
-		// For IE
-		var w = this.canvas.width;
-		this.canvas.width = 1;
-		this.canvas.width = w;
-	}
-	
-}; 
- 
-/*!
- * Document
- * 
- */
-
-function Document() {};
-
-Document.prototype.addButton = function (root, id, text, attributes) {
-	var sb = document.createElement('button');
-	sb.id = id;
-	sb.appendChild(document.createTextNode(text || 'Send'));	
-	this.addAttributes2Elem(sb, attributes);
-
-	root.appendChild(sb);
-	return sb;
-};
-
-Document.prototype.addFieldset = function (root, id, legend, attributes) {
-	var f = this.addElement('fieldset', root, id, attributes);
-	var l = document.createElement('Legend');
-	l.appendChild(document.createTextNode(legend));	
-	f.appendChild(l);
-	root.appendChild(f);
-	return f;
-};
-
-Document.prototype.addTextInput = function (root, id, attributes) {
-	var mt =  document.createElement('input');
-	mt.id = id;
-	mt.setAttribute('type', 'text');
-	this.addAttributes2Elem(mt, attributes);
-	root.appendChild(mt);
-	return mt;
-};
-
-Document.prototype.addCanvas = function (root, id, attributes) {
-	var canvas = document.createElement('canvas');
-	var context = canvas.getContext('2d');
-		
-	if (!context) {
-		alert('Canvas is not supported');
-		return false;
-	}
-	
-	canvas.id = id;
-	this.addAttributes2Elem(canvas, attributes);
-	root.appendChild(canvas);
-	return canvas;
-};
-
-Document.prototype.addSlider = function (root, id, attributes) {
-	var slider = document.createElement('input');
-	slider.id = id;
-	slider.setAttribute('type', 'range');
-	this.addAttributes2Elem(slider, attributes);
-	root.appendChild(slider);
-	return slider;
-};
-
-Document.prototype.addJQuerySlider = function (root, id, attributes) {
-	var slider = document.createElement('div');
-	slider.id = id;
-	slider.slider(attributes);
-	root.appendChild(slider);
-	return slider;
-};
-
-
-Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
-	var label = document.createElement('label');
-	label.id = id;
-	label.appendChild(document.createTextNode(labelText));	
-	label.setAttribute('for', forElem);
-	this.addAttributes2Elem(label, attributes);
-	
-	var root = document.getElementById(forElem);
-	root.parentNode.insertBefore(label,root);
-	return label;
-	
-	// Add the label immediately before if no root elem has been provided
-	if (!root) {
-		var root = document.getElementById(forElem);
-		root.insertBefore(label);
-	}
-	else {
-		root.appendChild(label);
-	}
-	return label;
-};
-
-Document.prototype.addSelect = function (root, id, attributes) {
-	return this.addElement('select', root, id, attributes);
-};
-
-Document.prototype.populateSelect = function (select,list) {
-	
-	for (var key in list) {
-		if (list.hasOwnProperty(key)) {
-			var opt = document.createElement('option');
-			opt.value = list[key];
-			opt.appendChild(document.createTextNode(key));
-			select.appendChild(opt);
-		}
-	}
-};
-
-Document.prototype.write = function (root, text) {
-	var tn = document.createTextNode(text);
-	root.appendChild(tn);
-	return tn;
-};
-
-Document.prototype.writeln = function (root, text, rc) {
-	var RC = rc || '<br />';
-	return this.write(root, text+RC);
-};
-
-// IFRAME
-
-Document.prototype.addIFrame = function (root, id, attributes) {
-	var attributes = {'name' : id}; // For Firefox
-	return this.addElement('iframe', root, id, attributes);
-};
-
-
-// BR
-
-Document.prototype.addBr = function (root) {
-	var br = document.createElement('br');
-	return this.insertAfter(br,root);
-};
-
-// CSS
-
-Document.prototype.addCSS = function (root, css, id, attributes) {
-	
-	var attributes = attributes || {'rel' : 'stylesheet',
-									'type': 'text/css'};
-	
-	attributes.href = css;
-	
-	var id = id || 'maincss';
-	
-	return this.addElement('link', root, id, attributes);
-};
-
-
-Document.prototype.addDiv = function (root, id, attributes) {
-	return this.addElement('div', root, id, attributes);
-};
-
-
-// TODO: Potentially unsafe
-// Works only with Chrome
-Document.prototype.loadFile = function (container,file) {
-	
-	// Check for the various File API support.
-	if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-	  console.log('The File APIs are not fully supported in this browser.');
-	  return false;
-	}
-	function onInitFs(fs) {
-	  console.log('Opened file system: ' + fs.name);
-	}
-	
-	function errorHandler(e) {
-		  var msg = '';
-
-		  switch (e.code) {
-		    case FileError.QUOTA_EXCEEDED_ERR:
-		      msg = 'QUOTA_EXCEEDED_ERR';
-		      break;
-		    case FileError.NOT_FOUND_ERR:
-		      msg = 'NOT_FOUND_ERR';
-		      break;
-		    case FileError.SECURITY_ERR:
-		      msg = 'SECURITY_ERR';
-		      break;
-		    case FileError.INVALID_MODIFICATION_ERR:
-		      msg = 'INVALID_MODIFICATION_ERR';
-		      break;
-		    case FileError.INVALID_STATE_ERR:
-		      msg = 'INVALID_STATE_ERR';
-		      break;
-		    default:
-		      msg = 'Unknown Error';
-		      break;
-		  }
-
-		  console.log('Error: ' + msg);
-	};
-	
-	// second param is 5MB, reserved space for storage
-	window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
-	
-		
-	container.innerHTML += 'DONE FS';
-	return container;
-};
-
-// Util
-
-Document.prototype.addElement = function (elem, root, id, attributes) {
-	var e = document.createElement(elem);
-	if (id) {
-		e.id = id;
-	}
-	this.addAttributes2Elem(e, attributes);
-	
-	root.appendChild(e);
-	return e;
-};
-
-Document.prototype.addAttributes2Elem = function (e, a) {
-	
-	for (var key in a) {
-		if (a.hasOwnProperty(key)){
-			e.setAttribute(key,a[key]);
-		}
-	}
-	return e;
-};
-
-Document.prototype.removeChildrenFromNode = function (e) {
-	
-    if(!e) {
-        return false;
-    }
-    if(typeof(e)=='string') {
-        e = xGetElementById(e);
-    }
-    while (e.hasChildNodes()) {
-        e.removeChild(e.firstChild);
-    }
-    return true;
-};
-
-Document.prototype.insertAfter = function (node, referenceNode) {
-	  referenceNode.insertBefore(node, referenceNode.nextSibling);
-};
-
- 
- 
-/*!
- * GameWindow
- */
-
-var Player = node.Player;
-var PlayerList = node.PlayerList;
-
-GameWindow.prototype = new Document();
-GameWindow.prototype.constructor = GameWindow;
-
-GameWindow.prototype.create = {};
-
-GameWindow.prototype.create.Canvas = function(canvas){
-	return new Canvas(canvas);
-};
-
-GameWindow.prototype.create.List = function(id){
-	return new List(id);
-};
-
-function GameWindow() {
-	
-	Document.call(this);
-	this.mainframe = 'mainframe';
-	this.root = this.generateRandomRoot();
-};
-
-GameWindow.prototype.generateRandomRoot = function () {
-	// We assume that the BODY element always exists
-	// TODO: Check if body element does not exist and add it
-	var root = Math.floor(Math.random()*10000);
-	var rootEl = this.addElement('div', document.body, root);
-	return rootEl;
-};
-
-GameWindow.prototype.setup = function (type){
-
-	
-	switch (type) {
-	
-	case 'MONITOR':
-		
-		// TODO: Check this
-		node.node.removeListener('in.STATE');
-	
-		// TODO: use multiple ifs instead
-		//try {
-			
-			var nps = new NextPreviousState();
-			this.addGadget(this.root,nps);
-			
-			var gs = new GameSummary();
-			this.addGadget(this.root,gs);
-			
-			var sd = new StateDisplay();
-			this.addGadget(this.root,sd);
-			
-			var sb = new StateBar();
-			this.addGadget(this.root,sb);
-
-			var db = new DataBar();
-			this.addGadget(this.root,db);
-			
-			var mb = new MsgBar();
-			this.addGadget(this.root,mb);
-			
-			var gm = new GameBoard();
-			this.addGadget(this.root,gm);
-					
-			var w = new Wall();
-			this.addGadget(this.root,w);
-//		}
-//		catch(e) {
-//			console.log('nodeWindow: Error loading gadget ' + e);
-//		}
-		
-		break;
-		
-		
-	case 'PLAYER':
-		
-		var maincss		= this.addCSS(this.root, 'style.css');
-	    var mainframe 	= this.addIFrame(this.root,'mainframe');
-	    
-	    var ws = new WaitScreen();
-		this.addGadget(this.root,ws);
-	    
-		break;
-	}
-	
-	this.frame = window.frames[this.mainframe];
-};
-
-
-GameWindow.prototype.getElementById = function (id) {
-	return this.frame.getElementById(id);
-};
-
-//1. Load a Frame into the mainframe or other specified frame
-//2. Wait until the frame is loaded
-//3. Put a reference of the loaded frame.document into this.frame
-//4. Exec the callback function
-//GameWindow.prototype.loadFrame = function (url, func, frame) {
-//		var frame = this.mainframe || frame;
-//		var that = this;
-//	
-//		// TODO: check which one are really necessary
-//		//window.frames[frame].src = url;
-//		window.frames[frame].location = url;
-//		//window.frames[frame].location.href = url;
-//		console.log('Loaded Frame');
-//		window.frames[frame].document.onload = function() {
-//			console.log('THIS' + this);
-//		    if (this.readyState==='complete'){
-//		    	that.frame = window.frames[frame].document;
-//		    	if (func) {
-//		    		func.call(); // TODO: Pass the right this reference
-//		    		console.log('Frame Loaded correctly!');
-//		    	}
-//		    }
-//		    else {
-//		    	console.log('DEBUG: frame not ready ' + window.frames[frame].document.readyState);
-//		    }
-//		};
-//};
-
-
-// TODO: frames are loaded taking into account also the path of the game in the server
-
-// FAKE ONLOAD  TODO: try to make it work with onload
-GameWindow.prototype.loadFrame = function (url, func, frame) {
-	var frame =  frame || this.mainframe;
-	var that = this;	
-	
-	window.frames[frame].location = url;
-	//window.frames[frame].location.href = url;
-	
-	this.frame = window.frames[frame].document;
-	var ii=0;
-	var isFrameLoaded = setInterval( function() {
-		if (window.frames[frame].document.readyState === 'complete') {
-		//if (window.frames[frame].document) {	
-			clearInterval(isFrameLoaded);
-			//console.log('Interval cleared');
-			that.frame = window.frames[frame].document;
-			if (func) {
-	    		func.call(); // TODO: Pass the right this reference
-	    		//console.log('Frame Loaded correctly!');
-	    	}
-		}
-		else {
-			console.log('not yet ' + window.frames[frame].document.readyState);
-		}
-	}, 100);
-};
-
-GameWindow.prototype.loadPage = function (url, frame) {
-	var frame = this.mainframe || frame;
-	var that = this;
-	
-	// TODO: check which one are really necessary
-	window.frames[frame].src = url;
-	window.frames[frame].location = url;
-	window.frames[frame].location = url;
-	window.frames[frame].location.href = url;
-	
-	window.frames[frame].document.onreadystatechange = function() {
-	    if (this.readyState==='complete'){
-	    	that.frame = window.frames[frame].document;
+	    if(!e) {
+	        return false;
 	    }
-	    else {
-	    	console.log('not yet ' + window.frames[frame].document.readyState);
+	    if(typeof(e)=='string') {
+	        e = xGetElementById(e);
 	    }
+	    while (e.hasChildNodes()) {
+	        e.removeChild(e.firstChild);
+	    }
+	    return true;
 	};
-};
-
-GameWindow.prototype.getFrame = function() {
-	return this.frame = window.frames['mainframe'].document;
-};
-
-
-// Header
-
-GameWindow.prototype.addHeader = function (root, id) {
-	return this.addDiv(root,id);
-};
-
-// Gadget
-
-GameWindow.prototype.addGadget = function (root, g) {
 	
-	console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
-	try {
-		g.append(root);
-		g.listeners();
-	}
-	catch(e){
-		throw 'Not compatible gadget: ' + e;
-	}
-};
-
-// Recipients
-
-GameWindow.prototype.addRecipientSelector = function (root, id) {
-
-	var toSelector = document.createElement('select');
-	toSelector.id = id;
-
-	root.appendChild(toSelector);
-	
-	this.addStandardRecipients(toSelector);
-	
-	//this.toSels.push(toSelector);
-	
-	return toSelector;
-};
-
-GameWindow.prototype.addStandardRecipients = function (toSelector) {
-		
-	var opt = document.createElement('option');
-	opt.value = 'ALL';
-	opt.appendChild(document.createTextNode('ALL'));
-	toSelector.appendChild(opt);
-	
-	var opt = document.createElement('option');
-	opt.value = 'SERVER';
-	opt.appendChild(document.createTextNode('SERVER'));
-	toSelector.appendChild(opt);
-	
-
-	
-};
-
-GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
-	
-	if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
-		return;
-	}
-	
-	this.removeChildrenFromNode(toSelector);
-	this.addStandardRecipients(toSelector);
-	
-	
-	var opt;
-	var pl = new PlayerList(playerList);
-	
-	
-	try {
-		pl.forEach( function(p) {
-			opt = document.createElement('option');
-			opt.value = p.id;
-			opt.appendChild(document.createTextNode(p.name));
-			toSelector.appendChild(opt);
-			}, 
-			toSelector);
-	}
-	catch (e) {
-		console.log('(E) Bad Formatted Player List. Discarded. ' + p);
-	}
-};
-
-// Actions
-
-
-GameWindow.prototype.addActionSelector = function (root, id) {
-
-	var actionSelector = document.createElement('select');
-	actionSelector.id = id;
-
-	root.appendChild(actionSelector);
-	this.populateSelect(actionSelector, node.actions);
-	
-	return actionSelector;
-};
-
-// States
-
-GameWindow.prototype.addStateSelector = function (root, id) {
-	var stateSelector = this.addTextInput(root,id);
-	return stateSelector;
-};
-
-
-// 
- 
-/*!
- * 
- * List: handle list operation
- * 
- */
-
-function List(id) {
-	this.id = id || 'list';
-	
-	this.FIRST_LEVEL = 'dl';
-	this.SECOND_LEVEL = 'dt';
-	this.THIRD_LEVEL = 'dd';
-
-	this.list = [];
-}
-
-List.prototype.append = function(root) {
-	return root.appendChild(this.write());
-};
-
-List.prototype.add = function(elem) {
-	this.list.push(elem);
-};
-
-List.prototype.write = function() {
-	
-	var root = document.createElement(this.FIRST_LEVEL);
-	
-	var i = 0;
-	var len = list.length;
-	for (;i<len;i++) {
-		var elem = document.createElement(this.SECOND_LEVEL);
-		elem.appendChild(list[i]);
-		root.appendChild(elem);
-	}
-	
-	return root;
-};
-
-List.prototype.getRoot = function() {
-	return document.createElement(this.FIRST_LEVEL);
-};
-
-List.prototype.getItem = function() {
-	return document.createElement(this.SECOND_LEVEL);
-};
- 
- 
-
-	//Expose nodeGame to the global object
-	nodeGame.window = new GameWindow();
-	
+	Document.prototype.insertAfter = function (node, referenceNode) {
+		  referenceNode.insertBefore(node, referenceNode.nextSibling);
+	};
 
 })(window.node); 
  
+(function(node) {
+	/*!
+	 * GameWindow
+	 */
+	
+	var Player = node.Player;
+	var PlayerList = node.PlayerList;
+	
+	var Document = node.window.Document;
+	
+	GameWindow.prototype = new Document();
+	GameWindow.prototype.constructor = GameWindow;
+	
+	// The gadgets container
+	GameWindow.prototype.gadgets = {};
+	
+	function GameWindow() {
+		
+		console.log('nodeWindow: loading...');
+		
+		if ('undefined' !== typeof node) {
+			var gsc = node.gsc || null;
+			var game = node.game || null;
+		}
+		else {
+			console.log('nodeWindow: nodeGame not found');
+		}
+		
+		Document.call(this);
+		this.mainframe = 'mainframe';
+		this.root = this.generateRandomRoot();
+	};
+	
+	GameWindow.prototype.generateRandomRoot = function () {
+		// We assume that the BODY element always exists
+		// TODO: Check if body element does not exist and add it
+		var root = Math.floor(Math.random()*10000);
+		var rootEl = this.addElement('div', document.body, root);
+		return rootEl;
+	};
+	
+	GameWindow.prototype.setup = function (type){
+	
+		
+		switch (type) {
+		
+		case 'MONITOR':
+			
+			// TODO: Check this
+			node.node.removeListener('in.STATE');
+			
+			this.addGadget('NextPreviousState');
+			this.addGadget('GameSummary');
+			this.addGadget('StateDisplay');
+			this.addGadget('StateBar');
+			this.addGadget('DataBar');
+			this.addGadget('MsgBar');
+			this.addGadget('GameBoard');
+			this.addGadget('Wall');
+	
+			break;
+		
+			
+		case 'PLAYER':
+			
+			var maincss		= this.addCSS(this.root, 'style.css');
+		    var mainframe 	= this.addIFrame(this.root,'mainframe');
+		    
+			this.addGadget('WaitScreen');
+		    
+			break;
+		}
+		
+		this.frame = window.frames[this.mainframe];
+	};
+	
+	
+	GameWindow.prototype.getElementById = function (id) {
+		return this.frame.getElementById(id);
+	};
+	
+	//1. Load a Frame into the mainframe or other specified frame
+	//2. Wait until the frame is loaded
+	//3. Put a reference of the loaded frame.document into this.frame
+	//4. Exec the callback function
+	//GameWindow.prototype.loadFrame = function (url, func, frame) {
+	//		var frame = this.mainframe || frame;
+	//		var that = this;
+	//	
+	//		// TODO: check which one are really necessary
+	//		//window.frames[frame].src = url;
+	//		window.frames[frame].location = url;
+	//		//window.frames[frame].location.href = url;
+	//		console.log('Loaded Frame');
+	//		window.frames[frame].document.onload = function() {
+	//			console.log('THIS' + this);
+	//		    if (this.readyState==='complete'){
+	//		    	that.frame = window.frames[frame].document;
+	//		    	if (func) {
+	//		    		func.call(); // TODO: Pass the right this reference
+	//		    		console.log('Frame Loaded correctly!');
+	//		    	}
+	//		    }
+	//		    else {
+	//		    	console.log('DEBUG: frame not ready ' + window.frames[frame].document.readyState);
+	//		    }
+	//		};
+	//};
+	
+	
+	// TODO: frames are loaded taking into account also the path of the game in the server
+	
+	// FAKE ONLOAD  TODO: try to make it work with onload
+	GameWindow.prototype.loadFrame = function (url, func, frame) {
+		var frame =  frame || this.mainframe;
+		var that = this;	
+		
+		window.frames[frame].location = url;
+		//window.frames[frame].location.href = url;
+		
+		this.frame = window.frames[frame].document;
+		var ii=0;
+		var isFrameLoaded = setInterval( function() {
+			if (window.frames[frame].document.readyState === 'complete') {
+			//if (window.frames[frame].document) {	
+				clearInterval(isFrameLoaded);
+				//console.log('Interval cleared');
+				that.frame = window.frames[frame].document;
+				if (func) {
+		    		func.call(); // TODO: Pass the right this reference
+		    		//console.log('Frame Loaded correctly!');
+		    	}
+			}
+			else {
+				console.log('not yet ' + window.frames[frame].document.readyState);
+			}
+		}, 100);
+	};
+	
+	GameWindow.prototype.loadPage = function (url, frame) {
+		var frame = this.mainframe || frame;
+		var that = this;
+		
+		// TODO: check which one are really necessary
+		window.frames[frame].src = url;
+		window.frames[frame].location = url;
+		window.frames[frame].location = url;
+		window.frames[frame].location.href = url;
+		
+		window.frames[frame].document.onreadystatechange = function() {
+		    if (this.readyState==='complete'){
+		    	that.frame = window.frames[frame].document;
+		    }
+		    else {
+		    	console.log('not yet ' + window.frames[frame].document.readyState);
+		    }
+		};
+	};
+	
+	GameWindow.prototype.getFrame = function() {
+		return this.frame = window.frames['mainframe'].document;
+	};
+	
+	
+	// Header
+	
+	GameWindow.prototype.addHeader = function (root, id) {
+		return this.addDiv(root,id);
+	};
+	
+	// Gadget
+	
+	GameWindow.prototype.addGadget = function (g, root, options) {
+		var root = root || this.root;
+		// Check if it is a object (new gadget)
+		// If it is a string is the name of an existing gadget
+		if ('object' !== typeof g) {
+			g = new this.gadgets[g](options);
+		}
+		
+		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
+		try {
+			g.append(root);
+			g.listeners();
+		}
+		catch(e){
+			throw 'Not compatible gadget: ' + e;
+		}
+		
+		return g;
+	};
+	
+	// Recipients
+	
+	GameWindow.prototype.addRecipientSelector = function (root, id) {
+	
+		var toSelector = document.createElement('select');
+		toSelector.id = id;
+	
+		root.appendChild(toSelector);
+		
+		this.addStandardRecipients(toSelector);
+		
+		//this.toSels.push(toSelector);
+		
+		return toSelector;
+	};
+	
+	GameWindow.prototype.addStandardRecipients = function (toSelector) {
+			
+		var opt = document.createElement('option');
+		opt.value = 'ALL';
+		opt.appendChild(document.createTextNode('ALL'));
+		toSelector.appendChild(opt);
+		
+		var opt = document.createElement('option');
+		opt.value = 'SERVER';
+		opt.appendChild(document.createTextNode('SERVER'));
+		toSelector.appendChild(opt);
+		
+	
+		
+	};
+	
+	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
+		
+		if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
+			return;
+		}
+		
+		this.removeChildrenFromNode(toSelector);
+		this.addStandardRecipients(toSelector);
+		
+		
+		var opt;
+		var pl = new PlayerList(playerList);
+		
+		
+		try {
+			pl.forEach( function(p) {
+				opt = document.createElement('option');
+				opt.value = p.id;
+				opt.appendChild(document.createTextNode(p.name));
+				toSelector.appendChild(opt);
+				}, 
+				toSelector);
+		}
+		catch (e) {
+			console.log('(E) Bad Formatted Player List. Discarded. ' + p);
+		}
+	};
+	
+	// Actions
+	
+	
+	GameWindow.prototype.addActionSelector = function (root, id) {
+	
+		var actionSelector = document.createElement('select');
+		actionSelector.id = id;
+	
+		root.appendChild(actionSelector);
+		this.populateSelect(actionSelector, node.actions);
+		
+		return actionSelector;
+	};
+	
+	// States
+	
+	GameWindow.prototype.addStateSelector = function (root, id) {
+		var stateSelector = this.addTextInput(root,id);
+		return stateSelector;
+	};
+	
+	
+	/**
+	 * Expose nodeGame to the global object
+	 */	
+	node.window = new GameWindow();
+	node.window.Document = Document; // Restoring Document constructor
+	
+})(window.node); 
+ 
+(function(exports) {
+	
+	/*!
+	 * Canvas
+	 * 
+	 */ 
+	
+	exports.Canvas = Canvas;
+	
+	function Canvas(canvas) {
+		this.canvas = canvas;
+		// 2D Canvas Context 
+		this.ctx = canvas.getContext('2d');
+		
+		this.centerX = canvas.width / 2;
+		this.centerY = canvas.height / 2;
+		
+		this.width = canvas.width;
+		this.height = canvas.height;
+		
+		console.log(canvas.width);
+		console.log(canvas.height);		
+	};
+	
+	Canvas.prototype = {
+				
+		constructor: Canvas,
+		
+		drawOval: function (settings) {
+		
+			// We keep the center fixed
+			var x = settings.x / settings.scale_x;
+			var y = settings.y / settings.scale_y;
+		
+			var radius = settings.radius || 100;
+			//console.log(settings);
+			//console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
+			
+			this.ctx.lineWidth = settings.lineWidth || 1;
+			this.ctx.strokeStyle = settings.color || '#000000';
+			
+			this.ctx.save();
+			this.ctx.scale(settings.scale_x, settings.scale_y);
+			this.ctx.beginPath();
+			this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
+			this.ctx.stroke();
+			this.ctx.closePath();
+			this.ctx.restore();
+		},
+		
+		drawLine: function (settings) {
+		
+			var from_x = settings.x;
+			var from_y = settings.y;
+		
+			var length = settings.length;
+			var angle = settings.angle;
+				
+			// Rotation
+			var to_x = - Math.cos(angle) * length + settings.x;
+			var to_y =  Math.sin(angle) * length + settings.y;
+			//console.log('aa ' + to_x + ' ' + to_y);
+			
+			//console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
+			//console.log('Length: ' + length + ', Angle: ' + angle );
+			
+			this.ctx.lineWidth = settings.lineWidth || 1;
+			this.ctx.strokeStyle = settings.color || '#000000';
+			
+			this.ctx.save();
+			this.ctx.beginPath();
+			this.ctx.moveTo(from_x,from_y);
+			this.ctx.lineTo(to_x,to_y);
+			this.ctx.stroke();
+			this.ctx.closePath();
+			this.ctx.restore();
+		},
+		
+		scale: function (x,y) {
+			this.ctx.scale(x,y);
+			this.centerX = this.canvas.width / 2 / x;
+			this.centerY = this.canvas.height / 2 / y;
+		},
+		
+		clear: function() {
+			this.ctx.clearRect(0, 0, this.width, this.height);
+			// For IE
+			var w = this.canvas.width;
+			this.canvas.width = 1;
+			this.canvas.width = w;
+		}
+		
+	};
+})(node.window); 
+ 
+(function(exports){
+	
+	/*!
+	 * 
+	 * List: handle list operation
+	 * 
+	 */
+	
+	exports.List = List;
+	
+	function List(id) {
+		this.id = id || 'list';
+		
+		this.FIRST_LEVEL = 'dl';
+		this.SECOND_LEVEL = 'dt';
+		this.THIRD_LEVEL = 'dd';
+	
+		this.list = [];
+	}
+	
+	List.prototype.append = function(root) {
+		return root.appendChild(this.write());
+	};
+	
+	List.prototype.add = function(elem) {
+		this.list.push(elem);
+	};
+	
+	List.prototype.write = function() {
+		
+		var root = document.createElement(this.FIRST_LEVEL);
+		
+		var i = 0;
+		var len = list.length;
+		for (;i<len;i++) {
+			var elem = document.createElement(this.SECOND_LEVEL);
+			elem.appendChild(list[i]);
+			root.appendChild(elem);
+		}
+		
+		return root;
+	};
+	
+	List.prototype.getRoot = function() {
+		return document.createElement(this.FIRST_LEVEL);
+	};
+	
+	List.prototype.getItem = function() {
+		return document.createElement(this.SECOND_LEVEL);
+	};
+	
+})(node.window);
+ 
+ 
+ 
+ 
  
  
 /*!
- * nodeWindow v0.3
+ * nodeGadgets v0.4.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Oct 24 18:24:50 CEST 2011
+ * Built on Tue Oct 25 12:37:10 CEST 2011
  *
  */
  
  
-(function( nodeGame ) {
-
-	console.log('nodeWindow: loading...');
-	
-	if (nodeGame) {
-		var gsc = nodeGame.gsc || null;
-		var game = nodeGame.game || null;
-	}
-	else {
-		console.log('nodeWindow: nodeGame not found');
-	}
-	
-// Starting Classes
-
-/*!
- * Canvas
- * 
- */ 
-
-function Canvas(canvas) {
-	this.canvas = canvas;
-	// 2D Canvas Context 
-	this.ctx = canvas.getContext('2d');
-	
-	this.centerX = canvas.width / 2;
-	this.centerY = canvas.height / 2;
-	
-	this.width = canvas.width;
-	this.height = canvas.height;
-	
-	console.log(canvas.width);
-	console.log(canvas.height);		
-};
-
-Canvas.prototype = {
-			
-	constructor: Canvas,
-	
-	drawOval: function (settings) {
-	
-		// We keep the center fixed
-		var x = settings.x / settings.scale_x;
-		var y = settings.y / settings.scale_y;
-	
-		var radius = settings.radius || 100;
-		//console.log(settings);
-		//console.log('X,Y(' + x + ', ' + y + '); Radius: ' + radius + ', Scale: ' + settings.scale_x + ',' + settings.scale_y);
+(function (exports) {
+	/*!
+	 * ChernoffFaces
+	 * 
+	 * Parametrically display Chernoff Faces
+	 * 
+	 */
 		
-		this.ctx.lineWidth = settings.lineWidth || 1;
-		this.ctx.strokeStyle = settings.color || '#000000';
+	/**
+	 * Expose constructor
+	 */
+	exports.ChernoffFaces = ChernoffFaces;
+	
+	ChernoffFaces.defaults = {};
+	ChernoffFaces.defaults.canvas = {};
+	ChernoffFaces.defaults.canvas.width = 100;
+	ChernoffFaces.defaults.canvas.heigth = 100;
+	
+	function ChernoffFaces(id, dims) {
 		
-		this.ctx.save();
-		this.ctx.scale(settings.scale_x, settings.scale_y);
-		this.ctx.beginPath();
-		this.ctx.arc(x, y, radius, 0, Math.PI*2, false);
-		this.ctx.stroke();
-		this.ctx.closePath();
-		this.ctx.restore();
-	},
-	
-	drawLine: function (settings) {
-	
-		var from_x = settings.x;
-		var from_y = settings.y;
-	
-		var length = settings.length;
-		var angle = settings.angle;
-			
-		// Rotation
-		var to_x = - Math.cos(angle) * length + settings.x;
-		var to_y =  Math.sin(angle) * length + settings.y;
-		//console.log('aa ' + to_x + ' ' + to_y);
+		this.game = node.game;
+		this.id = id || 'ChernoffFaces';
+		this.name = 'Chernoff Faces';
+		this.version = '0.1';
 		
-		//console.log('From (' + from_x + ', ' + from_y + ') To (' + to_x + ', ' + to_y + ')');
-		//console.log('Length: ' + length + ', Angle: ' + angle );
+		this.bar = null;
+		this.root = null;
 		
-		this.ctx.lineWidth = settings.lineWidth || 1;
-		this.ctx.strokeStyle = settings.color || '#000000';
+		this.recipient = null;
 		
-		this.ctx.save();
-		this.ctx.beginPath();
-		this.ctx.moveTo(from_x,from_y);
-		this.ctx.lineTo(to_x,to_y);
-		this.ctx.stroke();
-		this.ctx.closePath();
-		this.ctx.restore();
-	},
-	
-	scale: function (x,y) {
-		this.ctx.scale(x,y);
-		this.centerX = this.canvas.width / 2 / x;
-		this.centerY = this.canvas.height / 2 / y;
-	},
-	
-	clear: function() {
-		this.ctx.clearRect(0, 0, this.width, this.height);
-		// For IE
-		var w = this.canvas.width;
-		this.canvas.width = 1;
-		this.canvas.width = w;
-	}
-	
-}; 
- 
-/*!
- * Document
- * 
- */
-
-function Document() {};
-
-Document.prototype.addButton = function (root, id, text, attributes) {
-	var sb = document.createElement('button');
-	sb.id = id;
-	sb.appendChild(document.createTextNode(text || 'Send'));	
-	this.addAttributes2Elem(sb, attributes);
-
-	root.appendChild(sb);
-	return sb;
-};
-
-Document.prototype.addFieldset = function (root, id, legend, attributes) {
-	var f = this.addElement('fieldset', root, id, attributes);
-	var l = document.createElement('Legend');
-	l.appendChild(document.createTextNode(legend));	
-	f.appendChild(l);
-	root.appendChild(f);
-	return f;
-};
-
-Document.prototype.addTextInput = function (root, id, attributes) {
-	var mt =  document.createElement('input');
-	mt.id = id;
-	mt.setAttribute('type', 'text');
-	this.addAttributes2Elem(mt, attributes);
-	root.appendChild(mt);
-	return mt;
-};
-
-Document.prototype.addCanvas = function (root, id, attributes) {
-	var canvas = document.createElement('canvas');
-	var context = canvas.getContext('2d');
-		
-	if (!context) {
-		alert('Canvas is not supported');
-		return false;
-	}
-	
-	canvas.id = id;
-	this.addAttributes2Elem(canvas, attributes);
-	root.appendChild(canvas);
-	return canvas;
-};
-
-Document.prototype.addSlider = function (root, id, attributes) {
-	var slider = document.createElement('input');
-	slider.id = id;
-	slider.setAttribute('type', 'range');
-	this.addAttributes2Elem(slider, attributes);
-	root.appendChild(slider);
-	return slider;
-};
-
-Document.prototype.addJQuerySlider = function (root, id, attributes) {
-	var slider = document.createElement('div');
-	slider.id = id;
-	slider.slider(attributes);
-	root.appendChild(slider);
-	return slider;
-};
-
-
-Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
-	var label = document.createElement('label');
-	label.id = id;
-	label.appendChild(document.createTextNode(labelText));	
-	label.setAttribute('for', forElem);
-	this.addAttributes2Elem(label, attributes);
-	
-	var root = document.getElementById(forElem);
-	root.parentNode.insertBefore(label,root);
-	return label;
-	
-	// Add the label immediately before if no root elem has been provided
-	if (!root) {
-		var root = document.getElementById(forElem);
-		root.insertBefore(label);
-	}
-	else {
-		root.appendChild(label);
-	}
-	return label;
-};
-
-Document.prototype.addSelect = function (root, id, attributes) {
-	return this.addElement('select', root, id, attributes);
-};
-
-Document.prototype.populateSelect = function (select,list) {
-	
-	for (var key in list) {
-		if (list.hasOwnProperty(key)) {
-			var opt = document.createElement('option');
-			opt.value = list[key];
-			opt.appendChild(document.createTextNode(key));
-			select.appendChild(opt);
-		}
-	}
-};
-
-Document.prototype.write = function (root, text) {
-	var tn = document.createTextNode(text);
-	root.appendChild(tn);
-	return tn;
-};
-
-Document.prototype.writeln = function (root, text, rc) {
-	var RC = rc || '<br />';
-	return this.write(root, text+RC);
-};
-
-// IFRAME
-
-Document.prototype.addIFrame = function (root, id, attributes) {
-	var attributes = {'name' : id}; // For Firefox
-	return this.addElement('iframe', root, id, attributes);
-};
-
-
-// BR
-
-Document.prototype.addBr = function (root) {
-	var br = document.createElement('br');
-	return this.insertAfter(br,root);
-};
-
-// CSS
-
-Document.prototype.addCSS = function (root, css, id, attributes) {
-	
-	var attributes = attributes || {'rel' : 'stylesheet',
-									'type': 'text/css'};
-	
-	attributes.href = css;
-	
-	var id = id || 'maincss';
-	
-	return this.addElement('link', root, id, attributes);
-};
-
-
-Document.prototype.addDiv = function (root, id, attributes) {
-	return this.addElement('div', root, id, attributes);
-};
-
-
-// TODO: Potentially unsafe
-// Works only with Chrome
-Document.prototype.loadFile = function (container,file) {
-	
-	// Check for the various File API support.
-	if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-	  console.log('The File APIs are not fully supported in this browser.');
-	  return false;
-	}
-	function onInitFs(fs) {
-	  console.log('Opened file system: ' + fs.name);
-	}
-	
-	function errorHandler(e) {
-		  var msg = '';
-
-		  switch (e.code) {
-		    case FileError.QUOTA_EXCEEDED_ERR:
-		      msg = 'QUOTA_EXCEEDED_ERR';
-		      break;
-		    case FileError.NOT_FOUND_ERR:
-		      msg = 'NOT_FOUND_ERR';
-		      break;
-		    case FileError.SECURITY_ERR:
-		      msg = 'SECURITY_ERR';
-		      break;
-		    case FileError.INVALID_MODIFICATION_ERR:
-		      msg = 'INVALID_MODIFICATION_ERR';
-		      break;
-		    case FileError.INVALID_STATE_ERR:
-		      msg = 'INVALID_STATE_ERR';
-		      break;
-		    default:
-		      msg = 'Unknown Error';
-		      break;
-		  }
-
-		  console.log('Error: ' + msg);
+		this.dims = {
+					width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
+					height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
+		};
 	};
 	
-	// second param is 5MB, reserved space for storage
-	window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
+	ChernoffFaces.prototype.append = function (root, ids) {
+		
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idCanvas = PREF + 'canvas';
+		var idButton = PREF + 'button';
 	
 		
-	container.innerHTML += 'DONE FS';
-	return container;
-};
-
-// Util
-
-Document.prototype.addElement = function (elem, root, id, attributes) {
-	var e = document.createElement(elem);
-	if (id) {
-		e.id = id;
-	}
-	this.addAttributes2Elem(e, attributes);
-	
-	root.appendChild(e);
-	return e;
-};
-
-Document.prototype.addAttributes2Elem = function (e, a) {
-	
-	for (var key in a) {
-		if (a.hasOwnProperty(key)){
-			e.setAttribute(key,a[key]);
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
 		}
-	}
-	return e;
-};
-
-Document.prototype.removeChildrenFromNode = function (e) {
-	
-    if(!e) {
-        return false;
-    }
-    if(typeof(e)=='string') {
-        e = xGetElementById(e);
-    }
-    while (e.hasChildNodes()) {
-        e.removeChild(e.firstChild);
-    }
-    return true;
-};
-
-Document.prototype.insertAfter = function (node, referenceNode) {
-	  referenceNode.insertBefore(node, referenceNode.nextSibling);
-};
-
- 
- 
-/*!
- * GameWindow
- */
-
-var Player = node.Player;
-var PlayerList = node.PlayerList;
-
-GameWindow.prototype = new Document();
-GameWindow.prototype.constructor = GameWindow;
-
-GameWindow.prototype.create = {};
-
-GameWindow.prototype.create.Canvas = function(canvas){
-	return new Canvas(canvas);
-};
-
-GameWindow.prototype.create.List = function(id){
-	return new List(id);
-};
-
-function GameWindow() {
-	
-	Document.call(this);
-	this.mainframe = 'mainframe';
-	this.root = this.generateRandomRoot();
-};
-
-GameWindow.prototype.generateRandomRoot = function () {
-	// We assume that the BODY element always exists
-	// TODO: Check if body element does not exist and add it
-	var root = Math.floor(Math.random()*10000);
-	var rootEl = this.addElement('div', document.body, root);
-	return rootEl;
-};
-
-GameWindow.prototype.setup = function (type){
-
-	
-	switch (type) {
-	
-	case 'MONITOR':
 		
-		// TODO: Check this
-		node.node.removeListener('in.STATE');
+		var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
+		
+		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
+		
+		var fp = new FacePainter(canvas);
+		var fv = new FaceVector();
+		
+		fp.draw(fv);
+		
+		var button = node.window.addButton(fieldset,idButton);
+										
+		// Add Gadget
+		var sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
+		sc = node.window.addGadget(sc,fieldset);
+		
+		var that = this;
 	
-		// TODO: use multiple ifs instead
-		//try {
-			
-			var nps = new NextPreviousState();
-			this.addGadget(this.root,nps);
-			
-			var gs = new GameSummary();
-			this.addGadget(this.root,gs);
-			
-			var sd = new StateDisplay();
-			this.addGadget(this.root,sd);
-			
-			var sb = new StateBar();
-			this.addGadget(this.root,sb);
-
-			var db = new DataBar();
-			this.addGadget(this.root,db);
-			
-			var mb = new MsgBar();
-			this.addGadget(this.root,mb);
-			
-			var gm = new GameBoard();
-			this.addGadget(this.root,gm);
-					
-			var w = new Wall();
-			this.addGadget(this.root,w);
-//		}
-//		catch(e) {
-//			console.log('nodeWindow: Error loading gadget ' + e);
-//		}
+		button.onclick = function() {		
+			var fv = sc.getAllValues();
+			console.log(fv);
+			var fv = new FaceVector(fv);
+			console.log(fv);
+			fp.redraw(fv);
+		};
 		
-		break;
+		return fieldset;
 		
+	};
+	
+	ChernoffFaces.prototype.listeners = function () {
+		var that = this;
+	//	
+	//	node.on( 'input', function(msg) {
+	//			var fv = new FaceVector(sc.getAllValues());
+	//			fp.redraw(fv);
+	//		}); 
+	};
+	
+	
+	/*!
+	* ChernoffFaces
+	* 
+	* Parametrically display Chernoff Faces
+	* 
+	*/
+	
+	function FacePainter (canvas, settings) {
+			
+		this.canvas = new node.window.Canvas(canvas);
 		
-	case 'PLAYER':
+		this.scaleX = canvas.width / ChernoffFaces.defaults.canvas.width;
+		this.scaleY = canvas.height / ChernoffFaces.defaults.canvas.heigth;
+	};
+	
+	//Draws a Chernoff face.
+	FacePainter.prototype.draw = function (face, x, y) {
+				
+		this.fit2Canvas(face);
+		this.canvas.scale(face.scaleX, face.scaleY);
 		
-		var maincss		= this.addCSS(this.root, 'style.css');
-	    var mainframe 	= this.addIFrame(this.root,'mainframe');
-	    
-	    var ws = new WaitScreen();
-		this.addGadget(this.root,ws);
-	    
-		break;
+		console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
+		
+		var x = x || this.canvas.centerX;
+		var y = y || this.canvas.centerY;
+		
+		this.drawHead(face, x, y);
+			
+		this.drawEyes(face, x, y);
+	
+		this.drawPupils(face, x, y);
+	
+		this.drawEyebrow(face, x, y);
+	
+		this.drawNose(face, x, y);
+		
+		this.drawMouth(face, x, y);
+		
+	};		
+		
+	FacePainter.prototype.redraw = function (face, x, y) {
+		this.canvas.clear();
+		this.draw(face,x,y);
 	}
 	
-	this.frame = window.frames[this.mainframe];
-};
-
-
-GameWindow.prototype.getElementById = function (id) {
-	return this.frame.getElementById(id);
-};
-
-//1. Load a Frame into the mainframe or other specified frame
-//2. Wait until the frame is loaded
-//3. Put a reference of the loaded frame.document into this.frame
-//4. Exec the callback function
-//GameWindow.prototype.loadFrame = function (url, func, frame) {
-//		var frame = this.mainframe || frame;
-//		var that = this;
-//	
-//		// TODO: check which one are really necessary
-//		//window.frames[frame].src = url;
-//		window.frames[frame].location = url;
-//		//window.frames[frame].location.href = url;
-//		console.log('Loaded Frame');
-//		window.frames[frame].document.onload = function() {
-//			console.log('THIS' + this);
-//		    if (this.readyState==='complete'){
-//		    	that.frame = window.frames[frame].document;
-//		    	if (func) {
-//		    		func.call(); // TODO: Pass the right this reference
-//		    		console.log('Frame Loaded correctly!');
-//		    	}
-//		    }
-//		    else {
-//		    	console.log('DEBUG: frame not ready ' + window.frames[frame].document.readyState);
-//		    }
-//		};
-//};
-
-
-// TODO: frames are loaded taking into account also the path of the game in the server
-
-// FAKE ONLOAD  TODO: try to make it work with onload
-GameWindow.prototype.loadFrame = function (url, func, frame) {
-	var frame =  frame || this.mainframe;
-	var that = this;	
+	FacePainter.prototype.scale = function (x, y) {
+		this.canvas.scale(this.scaleX, this.scaleY);
+	}
 	
-	window.frames[frame].location = url;
-	//window.frames[frame].location.href = url;
-	
-	this.frame = window.frames[frame].document;
-	var ii=0;
-	var isFrameLoaded = setInterval( function() {
-		if (window.frames[frame].document.readyState === 'complete') {
-		//if (window.frames[frame].document) {	
-			clearInterval(isFrameLoaded);
-			//console.log('Interval cleared');
-			that.frame = window.frames[frame].document;
-			if (func) {
-	    		func.call(); // TODO: Pass the right this reference
-	    		//console.log('Frame Loaded correctly!');
-	    	}
+	// TODO: Improve. It eats a bit of the margins
+	FacePainter.prototype.fit2Canvas = function(face) {
+		if (!this.canvas) {
+			console.log('No canvas found');
+			return;
+		}
+		
+		if (this.canvas.width > this.canvas.height) {
+			var ratio = this.canvas.width / face.head_radius * face.head_scale_x;
 		}
 		else {
-			console.log('not yet ' + window.frames[frame].document.readyState);
+			var ratio = this.canvas.height / face.head_radius * face.head_scale_y;
 		}
-	}, 100);
-};
-
-GameWindow.prototype.loadPage = function (url, frame) {
-	var frame = this.mainframe || frame;
-	var that = this;
-	
-	// TODO: check which one are really necessary
-	window.frames[frame].src = url;
-	window.frames[frame].location = url;
-	window.frames[frame].location = url;
-	window.frames[frame].location.href = url;
-	
-	window.frames[frame].document.onreadystatechange = function() {
-	    if (this.readyState==='complete'){
-	    	that.frame = window.frames[frame].document;
-	    }
-	    else {
-	    	console.log('not yet ' + window.frames[frame].document.readyState);
-	    }
-	};
-};
-
-GameWindow.prototype.getFrame = function() {
-	return this.frame = window.frames['mainframe'].document;
-};
-
-
-// Header
-
-GameWindow.prototype.addHeader = function (root, id) {
-	return this.addDiv(root,id);
-};
-
-// Gadget
-
-GameWindow.prototype.addGadget = function (root, g) {
-	
-	console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
-	try {
-		g.append(root);
-		g.listeners();
-	}
-	catch(e){
-		throw 'Not compatible gadget: ' + e;
-	}
-};
-
-// Recipients
-
-GameWindow.prototype.addRecipientSelector = function (root, id) {
-
-	var toSelector = document.createElement('select');
-	toSelector.id = id;
-
-	root.appendChild(toSelector);
-	
-	this.addStandardRecipients(toSelector);
-	
-	//this.toSels.push(toSelector);
-	
-	return toSelector;
-};
-
-GameWindow.prototype.addStandardRecipients = function (toSelector) {
 		
-	var opt = document.createElement('option');
-	opt.value = 'ALL';
-	opt.appendChild(document.createTextNode('ALL'));
-	toSelector.appendChild(opt);
-	
-	var opt = document.createElement('option');
-	opt.value = 'SERVER';
-	opt.appendChild(document.createTextNode('SERVER'));
-	toSelector.appendChild(opt);
-	
-
-	
-};
-
-GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
-	
-	if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
-		return;
+		face.scaleX = ratio / 2;
+		face.scaleY = ratio / 2;
 	}
 	
-	this.removeChildrenFromNode(toSelector);
-	this.addStandardRecipients(toSelector);
+	FacePainter.prototype.drawHead = function (face, x, y) {
+		
+		var radius = face.head_radius;
+		
+		this.canvas.drawOval({
+					   x: x, 
+					   y: y,
+					   radius: radius,
+					   scale_x: face.head_scale_x,
+					   scale_y: face.head_scale_y,
+					   color: face.color,
+					   lineWidth: face.lineWidth
+		});
+	};
 	
-	
-	var opt;
-	var pl = new PlayerList(playerList);
-	
-	
-	try {
-		pl.forEach( function(p) {
-			opt = document.createElement('option');
-			opt.value = p.id;
-			opt.appendChild(document.createTextNode(p.name));
-			toSelector.appendChild(opt);
-			}, 
-			toSelector);
+	FacePainter.prototype.drawEyes = function (face, x, y) {
+		
+		var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
+		var spacing = face.eye_spacing;
+			
+		var radius = face.eye_radius;
+		//console.log(face);
+		this.canvas.drawOval({
+						x: x - spacing,
+						y: height,
+						radius: radius,
+						scale_x: face.eye_scale_x,
+						scale_y: face.eye_scale_y,
+						color: face.color,
+						lineWidth: face.lineWidth
+						
+		});
+		//console.log(face);
+		this.canvas.drawOval({
+						x: x + spacing,
+						y: height,
+						radius: radius,
+						scale_x: face.eye_scale_x,
+						scale_y: face.eye_scale_y,
+						color: face.color,
+						lineWidth: face.lineWidth
+		});
 	}
-	catch (e) {
-		console.log('(E) Bad Formatted Player List. Discarded. ' + p);
-	}
-};
-
-// Actions
-
-
-GameWindow.prototype.addActionSelector = function (root, id) {
-
-	var actionSelector = document.createElement('select');
-	actionSelector.id = id;
-
-	root.appendChild(actionSelector);
-	this.populateSelect(actionSelector, node.actions);
 	
-	return actionSelector;
-};
+	FacePainter.prototype.drawPupils = function (face, x, y) {
+			
+		var radius = face.pupil_radius;
+		var spacing = face.eye_spacing;
+		var height = FacePainter.computeFaceOffset(face, face.eye_height, y);
+		
+		this.canvas.drawOval({
+						x: x - spacing,
+						y: height,
+						radius: radius,
+						scale_x: face.pupil_scale_x,
+						scale_y: face.pupil_scale_y,
+						color: face.color,
+						lineWidth: face.lineWidth
+		});
+		
+		this.canvas.drawOval({
+						x: x + spacing,
+						y: height,
+						radius: radius,
+						scale_x: face.pupil_scale_x,
+						scale_y: face.pupil_scale_y,
+						color: face.color,
+						lineWidth: face.lineWidth
+		});
+	
+	};
+	
+	FacePainter.prototype.drawEyebrow = function (face, x, y) {
+		
+		var height = FacePainter.computeEyebrowOffset(face,y);
+		var spacing = face.eyebrow_spacing;
+		var length = face.eyebrow_length;
+		var angle = face.eyebrow_angle;
+		
+		this.canvas.drawLine({
+						x: x - spacing,
+						y: height,
+						length: length,
+						angle: angle,
+						color: face.color,
+						lineWidth: face.lineWidth
+					
+						
+		});
+		
+		this.canvas.drawLine({
+						x: x + spacing,
+						y: height,
+						length: 0-length,
+						angle: -angle,	
+						color: face.color,
+						lineWidth: face.lineWidth
+		});
+		
+	};
+	
+	FacePainter.prototype.drawNose = function (face, x, y) {
+		
+		var height = FacePainter.computeFaceOffset(face, face.nose_height, y);
+		var nastril_r_x = x + face.nose_width / 2;
+		var nastril_r_y = height + face.nose_length;
+		var nastril_l_x = nastril_r_x - face.nose_width;
+		var nastril_l_y = nastril_r_y; 
+		
+		this.canvas.ctx.lineWidth = face.lineWidth;
+		this.canvas.ctx.strokeStyle = face.color;
+		
+		this.canvas.ctx.save();
+		this.canvas.ctx.beginPath();
+		this.canvas.ctx.moveTo(x,height);
+		this.canvas.ctx.lineTo(nastril_r_x,nastril_r_y);
+		this.canvas.ctx.lineTo(nastril_l_x,nastril_l_y);
+		//this.canvas.ctx.closePath();
+		this.canvas.ctx.stroke();
+		this.canvas.ctx.restore();
+	
+	};
+			
+	FacePainter.prototype.drawMouth = function (face, x, y) {
+		
+		var height = FacePainter.computeFaceOffset(face, face.mouth_height, y);
+		var startX = x - face.mouth_width / 2;
+	    var endX = x + face.mouth_width / 2;
+		
+		var top_y = height - face.mouth_top_y;
+		var bottom_y = height + face.mouth_bottom_y;
+		
+		// Upper Lip
+		this.canvas.ctx.moveTo(startX,height);
+	    this.canvas.ctx.quadraticCurveTo(x, top_y, endX, height);
+	    this.canvas.ctx.stroke();
+		
+	    //Lower Lip
+	    this.canvas.ctx.moveTo(startX,height);
+	    this.canvas.ctx.quadraticCurveTo(x, bottom_y, endX, height);
+	    this.canvas.ctx.stroke();
+	   
+	};	
+	
+	
+	//TODO Scaling ?
+	FacePainter.computeFaceOffset = function (face, offset, y) {
+		var y = y || 0;
+		//var pos = y - face.head_radius * face.scaleY + face.head_radius * face.scaleY * 2 * offset;
+		var pos = y - face.head_radius + face.head_radius * 2 * offset;
+		//console.log('POS: ' + pos);
+		return pos;
+	};
+	
+	FacePainter.computeEyebrowOffset = function (face, y) {
+		var y = y || 0;
+		var eyemindistance = 2;
+		return FacePainter.computeFaceOffset(face, face.eye_height, y) - eyemindistance - face.eyebrow_eyedistance;
+	};
+	
+	
+	/*!
+	* 
+	* A description of a Chernoff Face.
+	*
+	* This class packages the 11-dimensional vector of numbers from 0 through 1 that completely
+	* describe a Chernoff face.  
+	*
+	*/
+	
+	//FaceVector.defaults = {
+	//		// Head
+	//		head_radius: {
+	//			// id can be specified otherwise is taken head_radius
+	//			min: 10,
+	//			max: 100,
+	//			step: 0.01,
+	//			value: 30,
+	//			label: 'Face radius'
+	//		},
+	//		head_scale_x: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.1,
+	//			value: 0.5,
+	//			label: 'Scale head horizontally'
+	//		},
+	//		head_scale_y: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.1,
+	//			value: 1,
+	//			label: 'Scale head vertically'
+	//		},
+	//		// Eye
+	//		eye_height: {
+	//			min: 0.1,
+	//			max: 0.9,
+	//			step: 0.1,
+	//			value: 0.4,
+	//			label: 'Eye height'
+	//		},
+	//		eye_radius: {
+	//			min: 2,
+	//			max: 30,
+	//			step: 1,
+	//			value: 5,
+	//			label: 'Eye radius'
+	//		},
+	//		eye_spacing: {
+	//			min: 0,
+	//			max: 50,
+	//			step: 2,
+	//			value: 10,
+	//			label: 'Eye spacing'
+	//		},
+	//		eye_scale_x: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.2,
+	//			value: 1,
+	//			label: 'Scale eyes horizontally'
+	//		},
+	//		eye_scale_y: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.2,
+	//			value: 1,
+	//			label: 'Scale eyes vertically'
+	//		},
+	//		// Pupil
+	//		pupil_radius: {
+	//			min: 1,
+	//			max: 9,
+	//			step: 1,
+	//			value: 1,  //this.eye_radius;
+	//			label: 'Pupil radius'
+	//		},
+	//		pupil_scale_x: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.2,
+	//			value: 1,
+	//			label: 'Scale pupils horizontally'
+	//		},
+	//		pupil_scale_y: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.2,
+	//			value: 1,
+	//			label: 'Scale pupils vertically'
+	//		},
+	//		// Eyebrow
+	//		eyebrow_length: {
+	//			min: 1,
+	//			max: 30,
+	//			step: 1,
+	//			value: 10,
+	//			label: 'Eyebrow length'
+	//		},
+	//		eyebrow_eyedistance: {
+	//			min: 0.3,
+	//			max: 10,
+	//			step: 0.2,
+	//			value: 3, // From the top of the eye
+	//			label: 'Eyebrow from eye'
+	//		},
+	//		eyebrow_angle: {
+	//			min: -2,
+	//			max: 2,
+	//			step: 0.2,
+	//			value: -0.5,
+	//			label: 'Eyebrow angle'
+	//		},
+	//		eyebrow_spacing: {
+	//			min: 0,
+	//			max: 20,
+	//			step: 1,
+	//			value: 5,
+	//			label: 'Eyebrow spacing'
+	//		},
+	//		// Nose
+	//		nose_height: {
+	//			min: 0.4,
+	//			max: 1,
+	//			step: 0.1,
+	//			value: 0.4,
+	//			label: 'Nose height'
+	//		},
+	//		nose_length: {
+	//			min: 0.2,
+	//			max: 30,
+	//			step: 0.2,
+	//			value: 15,
+	//			label: 'Nose length'
+	//		},
+	//		nose_width: {
+	//			min: 0,
+	//			max: 30,
+	//			step: 2,
+	//			value: 10,
+	//			label: 'Nose width'
+	//		},
+	//		// Mouth
+	//		mouth_height: {
+	//			min: 0.2,
+	//			max: 2,
+	//			step: 0.1,
+	//			value: 0.75, 
+	//			label: 'Mouth height'
+	//		},
+	//		mouth_width: {
+	//			min: 2,
+	//			max: 100,
+	//			step: 2,
+	//			value: 20,
+	//			label: 'Mouth width'
+	//		},
+	//		mouth_top_y: {
+	//			min: -10,
+	//			max: 30,
+	//			step: 0.5,
+	//			value: -2,
+	//			label: 'Upper lip'
+	//		},
+	//		mouth_bottom_y: {
+	//			min: -10,
+	//			max: 30,
+	//			step: 0.5,
+	//			value: 20,
+	//			label: 'Lower lip'
+	//		}					
+	//};
+	
+	FaceVector.defaults = {
+			// Head
+			head_radius: {
+				// id can be specified otherwise is taken head_radius
+				min: 10,
+				max: 100,
+				step: 0.01,
+				value: 30,
+				label: 'Face radius'
+			},
+			head_scale_x: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 0.5,
+				label: 'Scale head horizontally'
+			},
+			head_scale_y: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 1,
+				label: 'Scale head vertically'
+			},
+			// Eye
+			eye_height: {
+				min: 0.1,
+				max: 0.9,
+				step: 0.01,
+				value: 0.4,
+				label: 'Eye height'
+			},
+			eye_radius: {
+				min: 2,
+				max: 30,
+				step: 0.01,
+				value: 5,
+				label: 'Eye radius'
+			},
+			eye_spacing: {
+				min: 0,
+				max: 50,
+				step: 0.01,
+				value: 10,
+				label: 'Eye spacing'
+			},
+			eye_scale_x: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 1,
+				label: 'Scale eyes horizontally'
+			},
+			eye_scale_y: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 1,
+				label: 'Scale eyes vertically'
+			},
+			// Pupil
+			pupil_radius: {
+				min: 1,
+				max: 9,
+				step: 0.01,
+				value: 1,  //this.eye_radius;
+				label: 'Pupil radius'
+			},
+			pupil_scale_x: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 1,
+				label: 'Scale pupils horizontally'
+			},
+			pupil_scale_y: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 1,
+				label: 'Scale pupils vertically'
+			},
+			// Eyebrow
+			eyebrow_length: {
+				min: 1,
+				max: 30,
+				step: 0.01,
+				value: 10,
+				label: 'Eyebrow length'
+			},
+			eyebrow_eyedistance: {
+				min: 0.3,
+				max: 10,
+				step: 0.01,
+				value: 3, // From the top of the eye
+				label: 'Eyebrow from eye'
+			},
+			eyebrow_angle: {
+				min: -2,
+				max: 2,
+				step: 0.01,
+				value: -0.5,
+				label: 'Eyebrow angle'
+			},
+			eyebrow_spacing: {
+				min: 0,
+				max: 20,
+				step: 0.01,
+				value: 5,
+				label: 'Eyebrow spacing'
+			},
+			// Nose
+			nose_height: {
+				min: 0.4,
+				max: 1,
+				step: 0.01,
+				value: 0.4,
+				label: 'Nose height'
+			},
+			nose_length: {
+				min: 0.2,
+				max: 30,
+				step: 0.01,
+				value: 15,
+				label: 'Nose length'
+			},
+			nose_width: {
+				min: 0,
+				max: 30,
+				step: 0.01,
+				value: 10,
+				label: 'Nose width'
+			},
+			// Mouth
+			mouth_height: {
+				min: 0.2,
+				max: 2,
+				step: 0.01,
+				value: 0.75, 
+				label: 'Mouth height'
+			},
+			mouth_width: {
+				min: 2,
+				max: 100,
+				step: 0.01,
+				value: 20,
+				label: 'Mouth width'
+			},
+			mouth_top_y: {
+				min: -10,
+				max: 30,
+				step: 0.01,
+				value: -2,
+				label: 'Upper lip'
+			},
+			mouth_bottom_y: {
+				min: -10,
+				max: 30,
+				step: 0.01,
+				value: 20,
+				label: 'Lower lip'
+			}					
+	};
+	
+	function FaceVector (faceVector) {
+		
+		//if (typeof(faceVector) !== 'undefined') {
+		
+		var faceVector = faceVector || {};
+		
+		this.scaleX = faceVector.scaleX || 1;
+		this.scaleY = faceVector.scaleY || 1;
+		
+		this.color = faceVector.color || 'green';
+		this.lineWidth = faceVector.lineWidth || 1;
+		
+		// Merge on key
+		for (var key in FaceVector.defaults) {
+			if (FaceVector.defaults.hasOwnProperty(key)){
+				if (faceVector.hasOwnProperty(key)){
+					this[key] = faceVector[key];
+				}
+				else {
+					this[key] = FaceVector.defaults[key].value;
+				}
+			}
+		}
+			
+		delete this.faceVector;
+		
+			
+	};
+	
+	//Constructs a random face vector.
+	FaceVector.prototype.shuffle = function () {
+		for (var key in this) {
+			if (this.hasOwnProperty(key)) {
+				
+				if (key !== 'color') {
+					this[key] = Math.random();
+				}
+			}
+		}
+	};
+	
+	//Computes the Euclidean distance between two FaceVectors.
+	FaceVector.prototype.distance = function (face) {
+		return FaceVector.distance(this,face);
+	};
+		
+		
+	FaceVector.distance = function (face1, face2) {
+		var sum = 0.0;
+		var diff;
+		
+		for (var key in face1) {
+			if (face1.hasOwnProperty(key)) {
+				diff = face1[key] - face2[key];
+				sum = sum + diff * diff;
+			}
+		}
+		
+		return Math.sqrt(sum);
+	};
+	
+	FaceVector.prototype.toString = function() {
+		var out = 'Face: ';
+		for (var key in this) {
+			if (this.hasOwnProperty(key)) {
+				out += key + ' ' + this[key];
+			}
+		};
+		return out;
+	};
 
-// States
-
-GameWindow.prototype.addStateSelector = function (root, id) {
-	var stateSelector = this.addTextInput(root,id);
-	return stateSelector;
-};
-
-
-// 
+})(node.window.gadgets); 
  
-/*!
- * 
- * List: handle list operation
- * 
- */
-
-function List(id) {
-	this.id = id || 'list';
+ 
+ 
+(function (exports) {
 	
-	this.FIRST_LEVEL = 'dl';
-	this.SECOND_LEVEL = 'dt';
-	this.THIRD_LEVEL = 'dd';
-
-	this.list = [];
-}
-
-List.prototype.append = function(root) {
-	return root.appendChild(this.write());
-};
-
-List.prototype.add = function(elem) {
-	this.list.push(elem);
-};
-
-List.prototype.write = function() {
 	
-	var root = document.createElement(this.FIRST_LEVEL);
+	/*
+	 * DataBar
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
 	
-	var i = 0;
-	var len = list.length;
-	for (;i<len;i++) {
-		var elem = document.createElement(this.SECOND_LEVEL);
-		elem.appendChild(list[i]);
-		root.appendChild(elem);
+	exports.DataBar	= DataBar;
+		
+	function DataBar(id) {
+		
+		this.game = node.game;
+		this.id = id || 'databar';
+		this.name = 'Data Bar';
+		this.version = '0.2.1';
+		
+		this.bar = null;
+		this.root = null;
+		
+		this.recipient = null;
+	};
+	
+	DataBar.prototype.append = function (root, ids) {
+		
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idButton = PREF + 'sendButton';
+		var idData = PREF + 'dataText';
+		var idRecipient = PREF + 'recipient'; 
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
+			if (ids.hasOwnProperty('data')) idData = ids.data;
+			if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
+		}
+		
+		var fieldset = node.window.addFieldset(root, idFieldset, 'Send Data to Players');
+		var sendButton = node.window.addButton(fieldset, idButton);
+		var dataInput = node.window.addTextInput(fieldset, idData);
+		
+		this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
+		
+		
+		
+		var that = this;
+	
+		sendButton.onclick = function() {
+			
+			var to = that.recipient.value;
+	
+			//try {
+				//var data = JSON.parse(dataInput.value);
+				data = dataInput.value;
+				console.log('Parsed Data: ' + JSON.stringify(data));
+				
+				node.fire(node.OUT + node.actions.SAY + '.DATA',data,to);
+	//			}
+	//			catch(e) {
+	//				console.log('Impossible to parse the data structure');
+	//			}
+		};
+		
+		return fieldset;
+		
+	};
+	
+	DataBar.prototype.listeners = function () {
+		var that = this;
+		var PREFIX = 'in.';
+		
+		node.onPLIST( function(msg) {
+				node.window.populateRecipientSelector(that.recipient,msg.data);
+			}); 
+	};
+	
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	/*!
+	 * GameBoard
+	 */ 
+	
+	exports.GameBoard = GameBoard;
+		
+	function GameBoard (id) {
+		
+		this.game = node.game;
+		this.id = id || 'gboard';
+		this.name = 'GameBoard';
+		
+		this.version = '0.2.1';
+		
+		this.board = null;
+		this.root = null;
+		
+		this.noPlayers = 'No players connected...';
+		
 	}
 	
-	return root;
-};
-
-List.prototype.getRoot = function() {
-	return document.createElement(this.FIRST_LEVEL);
-};
-
-List.prototype.getItem = function() {
-	return document.createElement(this.SECOND_LEVEL);
-};
+	GameBoard.prototype.append = function(root) {
+		this.root = root;
+		var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
+		this.board = node.window.addDiv(fieldset,this.id);
+		this.board.innerHTML = this.noPlayers;
+		
+	};
+	
+	GameBoard.prototype.listeners = function() {
+		var that = this;
+		
+		var say = node.actions.SAY + '.';
+		var set = node.actions.SET + '.';
+		var get = node.actions.GET + '.'; 
+		
+		node.onPLIST( function (msg) {
+			console.log('I Updating Board ' + msg.text);
+			that.board.innerHTML = 'Updating...';
+			
+			var pl = new node.PlayerList(msg.data);
+			
+			//console.log(pl);
+			
+			if (pl.size() !== 0) {
+				that.board.innerHTML = '';
+				pl.forEach( function(p) {
+					//console.log(p);
+					var line = '[' + p.id + "|" + p.name + "]> \t"; 
+					
+					var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
+					pState += ' ';
+					
+					switch (p.state.is) {
+					
+					case node.states.UNKNOWN:
+						pState += '(unknown)';
+						break;
+					case node.states.PLAYING:
+						pState += '(playing)';
+						break;
+					case node.states.DONE:
+						pState += '(done)';
+						break;	
+					case node.states.PAUSE:
+						pState += '(pause)';
+						break;		
+					default:
+						pState += '('+p.state.is+')';
+						break;		
+					}
+					
+					if (p.state.paused) {
+						pState += ' (P)';
+					}
+					
+					that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
+				});
+				//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
+				}
+				else {
+					that.board.innerHTML = that.noPlayers;
+				}
+			});
+	};
+})(node.window.gadgets); 
  
  
+ 
+(function (exports) {
 
-	//Expose nodeGame to the global object
-	nodeGame.window = new GameWindow();
+	
+	/*!
+	 * GameSummary
+	 * 
+	 * Show Game Info
+	 */
+	
+	exports.GameSummary	= GameSummary;
+	
+	function GameSummary(id) {
+		//debugger;
+		this.game = node.game;
+		this.id = id || 'gamesummary';
+		this.name = 'Game Summary';
+		this.version = '0.2.1';
+		
+		this.fieldset = null;
+		this.summaryDiv = null;
+	}
+	
+	
+	GameSummary.prototype.append = function (root, ids) {
+		var that = this;
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset';
+		var idSummary = PREF + 'player';
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('player')) idSummary = ids.player;
+		}
+		
+		this.fieldset = node.window.addFieldset(root, idFieldset, 'Game Summary');
+		
+		
+		this.summaryDiv = node.window.addDiv(this.fieldset,idSummary);
+		
+		
+		that.writeSummary();
+			
+		return this.fieldset;
+		
+	};
+	
+	GameSummary.prototype.writeSummary = function(idState,idSummary) {
+		var gName = document.createTextNode('Name: ' + this.game.name);
+		var gDescr = document.createTextNode('Descr: ' + this.game.description);
+		var gMinP = document.createTextNode('Min Pl.: ' + this.game.minPlayers);
+		var gMaxP = document.createTextNode('Max Pl.: ' + this.game.maxPlayers);
+		
+		this.summaryDiv.appendChild(gName);
+		this.summaryDiv.appendChild(document.createElement('br'));
+		this.summaryDiv.appendChild(gDescr);
+		this.summaryDiv.appendChild(document.createElement('br'));
+		this.summaryDiv.appendChild(gMinP);
+		this.summaryDiv.appendChild(document.createElement('br'));
+		this.summaryDiv.appendChild(gMaxP);
+		
+		node.window.addDiv(this.fieldset,this.summaryDiv,idSummary);
+	};
+	
+	GameSummary.prototype.listeners = function() {}; 
+
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+
+	
+	/*!
+	 * MsgBar
+	 * 
+	 */
+	
+	exports.MsgBar	= MsgBar;
+		
+	function MsgBar(id){
+		
+		this.game = node.game;
+		this.id = id || 'msgbar';
+		this.name = 'Msg Bar';
+		this.version = '0.2.1';
+		
+		this.recipient = null;
+	}
+	
+	MsgBar.prototype.append = function (root, ids) {
+		
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idButton = PREF + 'sendButton';
+		var idMsgText = PREF + 'msgText';
+		var idRecipient = PREF + 'recipient'; 
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
+			if (ids.hasOwnProperty('msgText')) idMsgText = ids.msgText;
+			if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
+		}
+		
+		var fieldset = node.window.addFieldset(root, idFieldset, 'Send Msg To Players');
+		var sendButton = node.window.addButton(fieldset, idButton);
+		var msgText = node.window.addTextInput(fieldset, idMsgText);
+		this.recipient = node.window.addRecipientSelector(fieldset, idRecipient);
+		
+		var that = this;
+		
+		sendButton.onclick = function() {
+	
+			// Should be within the range of valid values
+			// but we should add a check
+			var to = that.recipient.value;
+			var msg = node.TXT(msgText.value,to);
+			//console.log(msg.stringify());
+		};
+	
+		return fieldset;
+		
+	};
+	
+	MsgBar.prototype.listeners = function(){
+		var that = this;
+		
+		node.onPLIST( function(msg) {
+			node.window.populateRecipientSelector(that.recipient,msg.data);
+			// was
+			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		}); 
+	};
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	/*!
+	 * NextPreviousState
+	 * 
+	 * Step back and forth in the gameState
+	 * 
+	 */
+	
+	exports.NextPreviousState =	NextPreviousState;
+		
+	function NextPreviousState(id) {
+		this.game = node.game;
+		this.id = id || 'nextprevious';
+		this.name = 'Next,Previous State';
+		this.version = '0.2.1';
+		
+	}
+	
+	NextPreviousState.prototype.append = function (root, ids) {
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idFwd = PREF + 'sendButton';
+		var idRew = PREF + 'stateSel';
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('fwd')) idFwd = ids.fwd;
+			if (ids.hasOwnProperty('rew')) idRew = ids.rew;
+		}
+		
+		var fieldset 	= node.window.addFieldset(root, idFieldset, 'Rew-Fwd');
+		var rew 		= node.window.addButton(fieldset, idRew, '<<');
+		var fwd 		= node.window.addButton(fieldset, idFwd, '>>');
+		
+		
+		var that = this;
+	
+		fwd.onclick = function() {
+			
+			var state = that.game.next();
+			
+			if (state) {
+				var stateEvent = node.OUT + node.actions.SET + '.STATE';
+				//var stateEvent = 'out.' + action + '.STATE';
+				node.fire(stateEvent,state,'ALL');
+			}
+			else {
+				console.log('No next state. Not sent.');
+				node.gsc.sendTXT('E: no next state. Not sent');
+			}
+		};
+	
+		rew.onclick = function() {
+			
+			var state = that.game.previous();
+			
+			if (state) {
+				var stateEvent = node.OUT + node.actions.SET + '.STATE';
+				//var stateEvent = 'out.' + action + '.STATE';
+				node.fire(stateEvent,state,'ALL');
+			}
+			else {
+				console.log('No previous state. Not sent.');
+				node.gsc.sendTXT('E: no previous state. Not sent');
+			}
+		};
+		
+		
+		return fieldset;
+	};
+	
+	NextPreviousState.prototype.listeners = function () {}; 
+
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
 	
 
-})(window.node); 
+	/*!
+	 * Slider Controls
+	 * 
+	 */
+	
+	exports.SliderControls = SliderControls;	
+		
+	function SliderControls (id, features) {
+		this.name = 'Slider Controls'
+		this.version = '0.1';
+		
+		this.id = id;
+		this.features = features;
+		
+		this.list = new node.window.List();
+	};
+	
+	SliderControls.prototype.append = function(root) {
+		
+		var listRoot = this.list.getRoot();
+		root.appendChild(listRoot);
+		//debugger
+		for (var key in this.features) {
+			if (this.features.hasOwnProperty(key)) {
+				
+				var f = this.features[key];
+				var id = f.id || key;
+				
+				var item = this.list.getItem();
+				listRoot.appendChild(item);
+				
+				var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
+				//var slider = node.window.addJQuerySlider(item, id, attributes);
+				var slider = node.window.addSlider(item, id, attributes);
+				
+				
+				// If a label element is present it checks whether it is an
+				// object literal or a string.
+				// In the former case it scans the obj for additional properties
+				if (f.label) {
+					var labelId = 'label_' + id;
+					var labelText = f.label;
+					
+					if (typeof(f.label) === 'object') {
+						var labelText = f.label.text;
+						if (f.label.id) {
+							labelId = f.label.id; 
+						}
+					}
+					
+					node.window.addLabel(slider, labelId, labelText, id);
+				}
+				
+				
+			}
+		}
+	};
+	
+	SliderControls.prototype.listeners = function() {
+		
+	};
+	
+	SliderControls.prototype.getAllValues = function() {
+		var out = {};
+		for (var key in this.features) {
+			
+			if (this.features.hasOwnProperty(key)) {
+				console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
+				out[key] = Number(node.window.getElementById(key).value);
+			}
+		}
+		
+		return out;
+	};
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	/*
+	 * StateBar
+	 * 
+	 * Sends STATE msgs
+	 */
+	
+	exports.StateBar = StateBar;	
+		
+	function StateBar(id) {
+		
+		this.game = node.game;;
+		this.id = id || 'statebar';
+		this.name = 'State Bar';
+		this.version = '0.2.1';
+		
+		this.actionSel = null;
+		this.recipient = null;
+	}
+	
+	StateBar.prototype.append = function (root, ids) {
+		
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idButton = PREF + 'sendButton';
+		var idStateSel = PREF + 'stateSel';
+		var idActionSel = PREF + 'actionSel';
+		var idRecipient = PREF + 'recipient'; 
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
+			if (ids.hasOwnProperty('state')) idStateSel = ids.idStateSel;
+			if (ids.hasOwnProperty('action')) idActionSel = ids.idActionSel;
+			if (ids.hasOwnProperty('recipient')) idRecipient = ids.recipient;
+		}
+		
+		var fieldset 	= node.window.addFieldset(root, idFieldset, 'Change Game State');
+		var sendButton 	= node.window.addButton(fieldset, idButton);
+		var stateSel 	= node.window.addStateSelector(fieldset, idStateSel);
+		this.actionSel	= node.window.addActionSelector(fieldset, idActionSel);
+		this.recipient 	= node.window.addRecipientSelector(fieldset, idRecipient);
+		
+		var that = this;
+	
+		sendButton.onclick = function() {
+	
+			// Should be within the range of valid values
+			// but we should add a check
+			var to = that.recipient.value;
+			
+			//var parseState = /(\d+)(?:\.(\d+))?(?::(\d+))?/;
+			//var parseState = /^\b\d+\.\b[\d+]?\b:[\d+)]?$/;
+			//var parseState = /^(\d+)$/;
+			//var parseState = /(\S+)?/;
+			var parseState = /^(\d+)(?:\.(\d+))?(?::(\d+))?$/;
+			
+			var result = parseState.exec(stateSel.value);
+			
+			if (result !== null) {
+				// Note: not result[0]!
+				var state = result[1];
+				var step = result[2] || 1;
+				var round = result[3] || 1;
+				console.log('Action: ' + that.actionSel.value + ' Parsed State: ' + result.join("|"));
+				
+				var state = new node.GameState({
+													state: state,
+													step: step,
+													round: round
+				});
+				
+				var stateEvent = node.OUT + that.actionSel.value + '.STATE';
+				node.fire(stateEvent,state,to);
+			}
+			else {
+				console.log('Not valid state. Not sent.');
+				node.gsc.sendTXT('E: not valid state. Not sent');
+			}
+		};
+	
+		return fieldset;
+		
+	};
+	
+	StateBar.prototype.listeners = function () {
+		var that = this;
+		var say = node.actions.SAY + '.';
+		var set = node.actions.SET + '.';
+		var get = node.actions.GET + '.'; 
+		
+		node.onPLIST( function(msg) {
+			
+			node.window.populateRecipientSelector(that.recipient,msg.data);
+			// was
+			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		}); 
+	}; 
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+
+	/*
+	 * StateDisplay
+	 * 
+	 * Sends STATE msgs
+	 */
+	
+	exports.StateDisplay = StateDisplay;	
+		
+	function StateDisplay(id) {
+		
+		this.game = node.game;
+		this.id = id || 'statedisplay';
+		this.name = 'State Display';
+		this.version = '0.2.1';
+		
+		this.fieldset = null;
+		this.stateDiv = null;
+	}
+	
+	
+	StateDisplay.prototype.append = function (root, ids) {
+		var that = this;
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset';
+		var idPlayer = PREF + 'player';
+		var idState = PREF + 'state'; 
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('player')) idPlayer = ids.player;
+			if (ids.hasOwnProperty('state')) idState = ids.state;
+		}
+		
+		this.fieldset = node.window.addFieldset(root, idFieldset, 'Player Status');
+		
+		
+		this.playerDiv = node.window.addDiv(this.fieldset,idPlayer);
+		
+		var checkPlayerName = setInterval(function(idState,idPlayer){
+				if(that.game.player !== null){
+					clearInterval(checkPlayerName);
+					that.updateAll();
+				}
+			},100);
+	
+		return this.fieldset;
+		
+	};
+	
+	StateDisplay.prototype.updateAll = function(idState,idPlayer) {
+		var pName = document.createTextNode('Name: ' + this.game.player.name);
+		var pId = document.createTextNode('Id: ' + this.game.player.id);
+		
+		this.playerDiv.appendChild(pName);
+		this.playerDiv.appendChild(document.createElement('br'));
+		this.playerDiv.appendChild(pId);
+		
+		this.stateDiv = node.window.addDiv(this.playerDiv,idState);
+		this.updateState(this.game.gameState);
+	};
+	
+	StateDisplay.prototype.updateState =  function(state) {
+		var that = this;
+		var checkStateDiv = setInterval(function(){
+			if(that.stateDiv){
+				clearInterval(checkStateDiv);
+				that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
+				// was
+				//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
+			}
+		},100);
+	};
+	
+	StateDisplay.prototype.listeners = function () {
+		var that = this;
+		var say = node.actions.SAY + '.';
+		var set = node.actions.SET + '.';
+		var get = node.actions.GET + '.'; 
+		var IN =  node.IN;
+		var OUT = node.OUT;
+		
+		node.on( 'STATECHANGE', function(state) {
+			that.updateState(state);
+		}); 
+	}; 
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+
+	/*
+	 * Wait Screen
+	 * 
+	 * Show a standard waiting screen
+	 * 
+	 */
+	
+	exports.WaitScreen = WaitScreen;
+	
+	function WaitScreen(id) {
+		
+		this.game = node.game;
+		this.id = id || 'waiting';
+		this.name = 'WaitingScreen';
+		this.version = '0.2.1';
+		
+		
+		this.text = 'Waiting for other players...';
+		this.waitingDiv = null;
+		
+	}
+	
+	WaitScreen.prototype.append = function (root, id) {};
+	
+	WaitScreen.prototype.listeners = function () {
+		var that = this;
+		node.on('WAIT', function(text) {
+			that.waitingDiv = node.window.addDiv(document.body, that.id);
+			if (that.waitingDiv.style.display === "none"){
+				that.waitingDiv.style.display = "";
+			}
+		
+			that.waitingDiv.appendChild(document.createTextNode(that.text || text));
+			that.game.pause();
+		});
+		
+		// It is supposed to fade away when a new state starts
+		node.on('STATECHANGE', function(text) {
+			if (that.waitingDiv) {
+				
+				if (that.waitingDiv.style.display == ""){
+					that.waitingDiv.style.display = "none";
+				}
+			// TODO: Document.js add method to remove element
+			}
+		});
+		
+	}; 
+})(node.window.gadgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+
+	/*
+	 * Wall
+	 * 
+	 * Prints lines sequentially;
+	 * 
+	 */
+	
+	exports.Wall = Wall;
+	
+	var Utils = node.Utils;
+	
+	function Wall(id) {
+		this.game = node.game;
+		this.id = id || 'wall';
+		this.name = 'Wall';
+		this.version = '0.2.1';
+		
+		this.wall = null;
+		
+		this.buffer = [];
+		
+		this.counter = 0;
+		// TODO: buffer is not read now
+		
+	}
+	
+	Wall.prototype.append = function (root, id) {
+		var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
+		var idLogDiv = id || this.id;
+		this.wall = node.window.addElement('pre', fieldset, idLogDiv);
+	};
+	
+	Wall.prototype.write = function(text) {
+		if (document.readyState !== 'complete') {
+	        this.buffer.push(s);
+	    } else {
+	    	var mark = this.counter++ + ') ' + Utils.getTime() + ' ';
+	    	this.wall.innerHTML = mark + text + "\n" + this.wall.innerHTML;
+	        this.buffer = []; // Where to place it?
+	    }  
+	};
+	
+	Wall.prototype.listeners = function() {
+		var that = this;
+	//		this.game.on('in.say.MSG', function(p,msg){
+	//			that.write(msg.toSMS());
+	//		});
+	//	
+	//		this.game.on('out.say.MSG', function(p,msg){
+	//			that.write(msg.toSMS());
+	//		});
+	//	
+	//	
+	//		this.game.on('MSG', function(p,msg){
+	//			that.write(msg.toSMS());
+	//		});
+		
+		node.on('LOG', function(msg){
+			that.write(msg);
+		});
+	}; 
+})(node.window.gadgets); 
+ 
+ 
+ 
+ 
  
  
  

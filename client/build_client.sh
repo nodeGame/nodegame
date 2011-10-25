@@ -67,9 +67,6 @@ addBlanks 2 $NODEGAME
 
 # Add all the classes
 
-FILES=$DIR"*"
-
-
 FILES[0]='EventEmitter.js'
 FILES[1]='Utils.js'
 FILES[2]='GameState.js'
