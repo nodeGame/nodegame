@@ -9,6 +9,7 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 
+var ServerChannel = require('./ServerChannel');
 var AdminServer = require('./AdminServer');
 var PlayerServer = require('./PlayerServer');
 var GameServer = require('./GameServer');
@@ -21,35 +22,14 @@ var GameMsgGenerator = require('./GameMsgGenerator');
 var PlayerList = require('./PlayerList').PlayerList;
 var Player = require('./PlayerList').Player;
 
-function ServerNode (options, io) {
+function ServerNode (options, server, io) {
 	
-	this.io = io || require('socket.io');
-		
-	this.name = options.name;
+	this.options = options;
+	this.port = options.port || '80';
+	this.maxChannels = options.maxChannels;
+	this.channels = [];
 	
-	if (options.mail) {
-		nodemailer.sendmail = true;
-		nodemailer.send_mail({sender: this.name, 
-	        				  to: options.mail.to,
-					          subject: options.mail.subject,
-					          body: "MAIL. For now you cannot change this..."}, // TODO allow for custom body
-			    function(error, success){
-	            console.log("Message "+(success?"sent":"failed"));
-	        });
-	}
-	
-	this.nPlayers = options.nPlayers;
-	
-	this.dump = options.dump; // Should it dump all the msgs?
-	
-	this.adminChannel = options.admin;
-	this.playerChannel = options.player;
-	
-	this.port = options.port;
-
-	var dumpmsg = options.dumpmsg || true;
-		
-	this.createServers();
+	this.listen(server, io);
 }
 
 ServerNode.prototype.createHTTPServer = function (options) {
@@ -107,9 +87,11 @@ ServerNode.prototype.createHTTPServer = function (options) {
 	});
 };
 
-ServerNode.prototype.createServers = function() {
+ServerNode.prototype.listen = function (http,io) {
 	
-	this.http = this.createHTTPServer();
+	this.io = io || require('socket.io');
+	this.http = http || this.createHTTPServer();
+	
 	this.http.listen(this.port);
 	this.server = this.io.listen(this.http);
 	
@@ -117,28 +99,18 @@ ServerNode.prototype.createServers = function() {
 	  this.server.enable('browser client etag');
 	  this.server.set('log level', 1);
 	//});
-		
-	this.adminServer = new AdminServer ({
-										 io: 		this.io,
-										 server: 	this.server,
-										 channel: 	this.adminChannel,
-										 name: 		'[Admin]'
-										});
-	
-	this.playerServer = new PlayerServer ({
-										   io: 		this.io,
-										   server: 	this.server,
-										   channel: this.playerChannel, 
-										   name: 	'[Player]'
-										 });
-	
-	// TODO: probably we do not need this?
-	// No we need it for accessing Player Lists... maybe
-	this.adminServer.setPartner(this.playerServer);
-	this.playerServer.setPartner(this.adminServer);
-};
+}
 
-ServerNode.prototype.listen = function() {
-	this.adminServer.listen();
-	this.playerServer.listen();
+ServerNode.prototype.addChannel = function (options) {
+	// TODO merge global options with local options
+	var channel = new ServerChannel(options, this.server, this.io);
+	// TODO return false in case of error in creating the channel
+	var ok = channel.listen();
+	if (ok) {
+		this.channels.push(channel);
+		console.log('Channel added correctly.');
+	}
+	else {
+		console.log('Channel could not be added.');
+	}
 };

@@ -73,23 +73,6 @@ GameServer.prototype.secureParse = function (msg) {
 	
 };
 
-//GameServer.prototype.secureParse = function (msg) {
-//	
-//	var gameMsg = new GameMsg(null);
-//	
-//	try {	
-//		// TODO: use a static method or GameMsg.parse ?
-//		gameMsg.clone(JSON.parse(msg));
-//		this.log.msg('R, ' + gameMsg);
-//	}
-//	catch(e) {
-//		this.log.log("Malformed msg received: " + e, 'ERR');
-//	}
-//	
-//	return gameMsg;
-//};
-
-
 
 GameServer.prototype.attachListeners = function() {
 	var that = this;
