@@ -60,14 +60,16 @@ ServerChannel.prototype.createServers = function() {
 										 io: 		this.io,
 										 server: 	this.server,
 										 channel: 	this.adminChannel,
-										 name: 		'[Admin]'
+										 parent:	this.name,
+										 name: 		'A'
 										});
 	
 	this.playerServer = new PlayerServer ({
 										   io: 		this.io,
 										   server: 	this.server,
-										   channel: this.playerChannel, 
-										   name: 	'[Player]'
+										   channel: this.playerChannel,
+										   parent: 	this.name,
+										   name: 	'P'
 										 });
 	
 	this.adminServer.setPartner(this.playerServer);
