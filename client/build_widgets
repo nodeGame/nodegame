@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME="nodegame-gadgets"
+NAME="nodegame-widgets"
 VERSION=$1 #TODO Check if $1 is empty
 
 
@@ -58,7 +58,7 @@ addBlanks 2 $NODEGAME
 
 # Add all the classes
 
-FILES="../gadgets/*"
+FILES="../widgets/*"
 
 for f in $FILES	; do
 

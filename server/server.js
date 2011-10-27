@@ -11,6 +11,10 @@ var options = {
 				mail: false
 };
 
+// ServerNode accepts two additional parameters:
+// - an instance of an http Express server
+// - an instance of socket.io
+// If not passed, they will be created with default settings
 var sn = new ServerNode(options);
 
 sn.addChannel({

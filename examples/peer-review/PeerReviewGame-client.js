@@ -50,7 +50,7 @@ function PeerReviewGame () {
 			
 			var root = node.window.getElementById('root');
 			//'cf', {width: 500, height:500};
-			node.window.addGadget('ChernoffFaces',root);
+			node.window.addWidget('ChernoffFaces',root);
 			//cf.append(root);
 	
 		});

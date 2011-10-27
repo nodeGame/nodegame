@@ -11,8 +11,8 @@
 	GameWindow.prototype = new Document();
 	GameWindow.prototype.constructor = GameWindow;
 	
-	// The gadgets container
-	GameWindow.prototype.gadgets = {};
+	// The widgets container
+	GameWindow.prototype.widgets = {};
 	
 	function GameWindow() {
 		
@@ -49,14 +49,14 @@
 			// TODO: Check this
 			node.node.removeListener('in.STATE');
 			
-			this.addGadget('NextPreviousState');
-			this.addGadget('GameSummary');
-			this.addGadget('StateDisplay');
-			this.addGadget('StateBar');
-			this.addGadget('DataBar');
-			this.addGadget('MsgBar');
-			this.addGadget('GameBoard');
-			this.addGadget('Wall');
+			this.addWidget('NextPreviousState');
+			this.addWidget('GameSummary');
+			this.addWidget('StateDisplay');
+			this.addWidget('StateBar');
+			this.addWidget('DataBar');
+			this.addWidget('MsgBar');
+			this.addWidget('GameBoard');
+			this.addWidget('Wall');
 	
 			break;
 		
@@ -66,7 +66,7 @@
 			var maincss		= this.addCSS(this.root, 'style.css');
 		    var mainframe 	= this.addIFrame(this.root,'mainframe');
 		    
-			this.addGadget('WaitScreen');
+			this.addWidget('WaitScreen');
 		    
 			break;
 		}
@@ -170,12 +170,12 @@
 	
 	// Gadget
 	
-	GameWindow.prototype.addGadget = function (g, root, options) {
+	GameWindow.prototype.addWidget = function (g, root, options) {
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			g = new this.gadgets[g](options);
+			g = new this.widgets[g](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);

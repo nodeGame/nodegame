@@ -1,4 +1,3 @@
-
 module.exports = ServerNode;
 
 var util = require('util');
@@ -10,21 +9,14 @@ var fs = require('fs');
 var path = require('path');
 
 var ServerChannel = require('./ServerChannel');
-var AdminServer = require('./AdminServer');
-var PlayerServer = require('./PlayerServer');
-var GameServer = require('./GameServer');
-
-var Utils = require('./Utils');
-var ServerLog = require('./ServerLog');
-var GameState = require('./GameState');
-var GameMsg = require('./GameMsg');
-var GameMsgGenerator = require('./GameMsgGenerator');
-var PlayerList = require('./PlayerList').PlayerList;
-var Player = require('./PlayerList').Player;
 
 function ServerNode (options, server, io) {
 	
 	this.options = options;
+	
+	this.options.mail = this.options.mail || false;
+	this.options.dump = this.options.mail || true;
+	
 	this.port = options.port || '80';
 	this.maxChannels = options.maxChannels;
 	this.channels = [];
@@ -87,7 +79,7 @@ ServerNode.prototype.createHTTPServer = function (options) {
 	});
 };
 
-ServerNode.prototype.listen = function (http,io) {
+ServerNode.prototype.listen = function (http, io) {
 	
 	this.io = io || require('socket.io');
 	this.http = http || this.createHTTPServer();
@@ -108,9 +100,9 @@ ServerNode.prototype.addChannel = function (options) {
 	var ok = channel.listen();
 	if (ok) {
 		this.channels.push(channel);
-		console.log('Channel added correctly.');
+		console.log('Channel added correctly: ' + options.name);
 	}
 	else {
-		console.log('Channel could not be added.');
+		console.log('Channel could not be added: ' + options.name);
 	}
 };

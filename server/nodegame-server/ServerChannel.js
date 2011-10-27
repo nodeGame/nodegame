@@ -5,10 +5,6 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var nodemailer = require("nodemailer");
 
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
-
 var AdminServer = require('./AdminServer');
 var PlayerServer = require('./PlayerServer');
 var GameServer = require('./GameServer');
@@ -24,7 +20,7 @@ var Player = require('./PlayerList').Player;
 function ServerChannel (options, server, io) {
 	
 	this.server = server;
-	this.io = io || require('socket.io');
+	this.io = io;
 		
 	this.name = options.name;
 	

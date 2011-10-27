@@ -17,19 +17,15 @@ function Ultimatum () {
 	};
 	
 	
-	var pregame1 = function() {
+	var pregame = function() {
 		var that = this;
 		
-		node.window.loadFrame('http://localhost/nodegame/dev/server/games/ultimatum/pregame.html', function() {
+		node.window.loadFrame('pregame.html', function() {
 				
-			var frame = node.window.frame;		
-			
 			 node.onDATA( function(msg){
 			
 				if (msg.data === 'READY') {
-					var root = node.window.frame.getElementById('root');
-					var root = window.frames['mainframe'].document.getElementById('root');
-					//console.log('Root' + root);
+					var root = node.window.getElementById('root');
 					node.window.write(root,'Press the button to start the experiment');
 					var button = node.window.addButton(root, 'sendb');
 
@@ -46,13 +42,12 @@ function Ultimatum () {
 		console.log('Pregame');
 	};
 	
-	var instructions = function(){
-	
+	var instructions = function(){	
 		var that = this;
 		
-		node.window.loadFrame('http://localhost/nodegame/dev/server/games/ultimatum/instructions.html', function() {
+		node.window.loadFrame('instructions.html', function() {
 	
-			var b = window.frames['mainframe'].document.getElementById('read');
+			var b = node.window.getElementById('read');
 		
 			b.onclick = function() {
 				node.DONE('Done for now...');
@@ -66,25 +61,23 @@ function Ultimatum () {
 		
 	var ultimatum = function(){
 		var that = this;		
-		node.window.loadFrame('http://localhost:8004/games/ultimatum/solo.html');
+		node.window.loadFrame('solo.html');
 				
 		node.onDATA (function(msg){
 					
 			if (msg.data === 'BIDDER') {
 				
-				node.window.loadFrame('games/ultimatum/bidder.html', function(){
+				node.window.loadFrame('bidder.html', function(){
 
-					var root = node.window.frame.getElementById('root');
-					var b = node.window.frame.getElementById('submitOffer');
+					var root = node.window.getElementById('root');
+					var b = node.window.getElementById('submitOffer');
 					
 					b.onclick = function() {
-						var offer = node.window.frame.getElementById('offer');
+						var offer = node.window.getElementById('offer');
 						node.fire('out.say.DATA','OFFER', that.other,offer.value);
 						node.window.write(root,' Your offer: ' +  offer.value);
 					};
-					
-					//node.printAllListeners();
-					
+						
 					node.onDATA (function(msg) {
 						
 						if (msg.data === 'ACCEPT') {
@@ -103,7 +96,7 @@ function Ultimatum () {
 			}
 			else if (msg.data === 'RESPONDENT') {
 				
-				node.window.loadFrame('http://localhost:8004/games/ultimatum/resp.html', function(){
+				node.window.loadFrame('resp.html', function(){
 				
 					
 					
@@ -111,7 +104,7 @@ function Ultimatum () {
 						
 						if (msg.data === 'OFFER') {
 							
-							var offered = node.window.frame.getElementById('offered');
+							var offered = node.window.getElementById('offered');
 							node.window.write(offered, 'You received an offer of ' + msg.text);
 							offered.style.display = '';
 						}
@@ -119,8 +112,8 @@ function Ultimatum () {
 					});
 					
 					
-					var accept = node.window.frame.getElementById('accept');
-					var reject = node.window.frame.getElementById('reject');
+					var accept = node.window.getElementById('accept');
+					var reject = node.window.getElementById('reject');
 					
 					
 					accept.onclick = function() {
@@ -147,25 +140,20 @@ function Ultimatum () {
 		console.log('Game1');
 	};
 	
-	var postgame1 = function(){
-		var that = this;
-		node.window.loadFrame('http://localhost:8004/games/ultimatum/postgame.html');
-		
-		//node.RANDOMDONE();
-		
+	var postgame = function(){
+		node.window.loadFrame('postgame.html');
 		console.log('Postgame');
 	};
 	
-	var endgame1 = function(){
-	
-		node.window.loadFrame('http://localhost:8004/games/ultimatum/ended.html');
+	var endgame = function(){
+		node.window.loadFrame('ended.html');
 		console.log('Game ended');
 	};
 	
 	// Assigning Functions to Loops
 	
 	var pregameloop = {
-		1: pregame1
+		1: pregame
 	};
 	
 	var instructionsloop = {
@@ -177,11 +165,11 @@ function Ultimatum () {
 	};
 	
 	var postgameloop = {
-		1: postgame1
+		1: postgame
 	};
 	
 	var endgameloop = {
-		1: endgame1
+		1: endgame
 	};
 	
 	

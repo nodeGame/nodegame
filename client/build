@@ -30,9 +30,9 @@ function addBlanks {
 
 # Produce partial builds
 
-./build_client.sh $VERSION
-./build_window.sh $VERSION
-./build_gadgets.sh $VERSION
+./build_client $VERSION
+./build_window $VERSION
+./build_widgets $VERSION
 
 # Init the file
 
@@ -51,7 +51,7 @@ addBlanks 2 $NODEGAME
 
 FILES[0]='nodegame-client-'
 FILES[1]='nodegame-window-'
-FILES[2]='nodegame-gadgets-'
+FILES[2]='nodegame-widgets-'
 
 for f in ${FILES[*]}
 do
