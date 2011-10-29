@@ -87,4 +87,4 @@
 			that.updateState(state);
 		}); 
 	}; 
-})(node.window.gadgets);
+})(node.window.widgets);

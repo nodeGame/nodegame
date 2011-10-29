@@ -176,9 +176,13 @@
 		console.log('nodeGame: ready.');
 	};	
 	
-	node.fire = function (event, p1, p2, p3) {	
+	node.fire = node.emit = function (event, p1, p2, p3) {	
 		that.fire(event, p1, p2, p3);
 	};	
+	
+	node.set = function (key, value) {
+		that.emit('SET')
+	}
 	
 	
 	// *Aliases*

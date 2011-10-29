@@ -67,7 +67,7 @@
 				that.pl = new PlayerList(msg.data);
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
+					console.log('WE PLAY AUTO');
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
