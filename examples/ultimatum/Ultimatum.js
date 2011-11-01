@@ -4,7 +4,7 @@ function Ultimatum () {
 	this.description = 'Ultimatum Descr';
 	this.version = '0.2';
 	
-	this.automatic_step = false;
+	this.automatic_step = true;
 	
 	this.minPlayers = 2;
 	this.maxPlayers = 10;

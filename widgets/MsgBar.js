@@ -63,4 +63,4 @@
 			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 	};
-})(node.window.gadgets);
+})(node.window.widgets);

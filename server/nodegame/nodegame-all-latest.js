@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 13:48:30 CET 2011
+ * Built on Di 1. Nov 16:59:19 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 13:48:30 CET 2011
+ * Built on Di 1. Nov 16:59:19 CET 2011
  *
  */
  
@@ -1010,16 +1010,29 @@
 	
 	
 	// DATA
+
+
+	GameMsgGenerator.prototype.sayDATA = function (data, to, text, reliable) {
+		return this.createDATA(GameMsg.actions.SAY, data, to, text, reliable);
+	};
+
+	GameMsgGenerator.prototype.setDATA = function (data, to, text, reliable) {
+		return this.createDATA(GameMsg.actions.SET, data, to, text, reliable);
+	};
+
+	GameMsgGenerator.prototype.getPLIST = function (data, to, text, reliable) {
+		return this.createDATA(GameMsg.actions.GET, data, to, text, reliable);
+	};
 	
-	GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
+	GameMsgGenerator.prototype.createDATA = function (action, data, to, text, reliable) {
 		
 		var rel = reliable || 1;
-		var text = text || 'data';
+		var text = text || 'data msg';
 		
 		return new GameMsg({
 							session: this.session, 
 							state: this.state,
-							action: GameMsg.actions.SAY,
+							action: action,
 							target: GameMsg.targets.DATA,
 							from: this.sender,
 							to: to,
@@ -1200,9 +1213,9 @@
 		this.send(msg);
 	};
 	
-	GameSocketClient.prototype.sendDATA = function (data, to, msg) {
+	GameSocketClient.prototype.sendDATA = function (action, data, to, msg) {
 		var to = to || 'SERVER';
-		var msg = this.gmg.createDATA(data,to,msg);
+		var msg = this.gmg.createDATA(action, data, to, msg);
 		this.send(msg);
 	};
 	
@@ -1231,10 +1244,66 @@
   , 'undefined' != typeof io ? io : module.parent.exports.io
 ); 
  
+(function (exports) {
+	
+	
+	/**
+	 * Expose constructor
+	 */
+	exports.GameStorage = GameStorage;
+	
+	/**
+	 * GameStorage interface
+	 *
+	 * @api public
+	 */
+	
+	function GameStorage (options) {
+	  this.options = options;
+	  this.clients = {};
+	};
+	
+	
+	/**
+	 * Write data into the memory of a client
+	 * It overwrites the same key
+	 * 
+	 * @param {String} client
+	 * @data {Object}
+	 * @api public
+	 */
+	
+	GameStorage.prototype.add = function (client, data) {
+	  if (!this.clients[client]) {
+	    this.clients[client] = {};
+	  }
+	  
+	  for (var i in data) {
+		  if (data.hasOwnProperty(i)){
+			  this.clients[client][i] = data[i];
+			  console.log('Added ' +  i + ' ' + data[i]);
+		  }
+	  }
+	  
+	  return true;
+	};
+	
+	GameStorage.prototype.dump = function () {
+	
+		return this.clients;
+	};
+	
+
+	
+})(
+	'undefined' != typeof node ? node : module.exports
+); 
+ 
 (function (exports, node) {
 	
 	var GameState = node.GameState;
 	var GameMsg = node.GameMsg;
+	var GameStorage = node.GameStorage;
 	var PlayerList = node.PlayerList;
 	var GameLoop = node.GameLoop;
 	var Utils = node.Utils;
@@ -1276,6 +1345,8 @@
 		
 		this.pl = new PlayerList();
 		
+		this.memory = new GameStorage();
+		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
@@ -1287,20 +1358,26 @@
 		var incomingListeners = function() {
 			
 			// Set
-			
 			node.on( IN + set + 'STATE', function(msg){
-				that.updateState(msg.data);
+				that.memory.add(msg.from, msg.data);
 			});
 			
-			// TODO: Also for set.PLIST
+			node.on( IN + set + 'DATA', function(msg){
+				console.log('in.set.data');
+				that.memory.add(msg.from, msg.data);
+			});
 			
 			// Say
+
+			node.on( IN + say + 'STATE', function(msg){
+				that.updateState(msg.data);
+			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
 				that.pl = new PlayerList(msg.data);
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
+					console.log('WE PLAY AUTO');
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
@@ -1321,18 +1398,12 @@
 		}();
 		
 		var outgoingListeners = function() {
-	
-			// SET
 			
-			node.on( OUT + set + 'STATE', function (state, to) {
-				that.gsc.sendSTATE('set',state,to);
-			});		
-		
 			// SAY
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
-				that.gsc.sendSTATE('say', state, to);
+				that.gsc.sendSTATE(GameMsg.actions.SAY, state, to);
 			});	
 			
 			node.on( OUT + say + 'TXT', function (text, to) {
@@ -1350,6 +1421,16 @@
 			node.on('WAIT', function(msg) {
 				that.gameState.paused = true;
 				that.publishState();
+			});
+			
+			// SET
+			
+			node.on( OUT + set + 'STATE', function (state, to) {
+				that.gsc.sendSTATE(GameMsg.actions.SET, state, to);
+			});
+			
+			node.on( OUT + set + 'DATA', function (data, to) {
+				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
 			});
 			
 		}();
@@ -1443,6 +1524,10 @@
 	
 		return false; 
 	};
+	
+	Game.prototype.dump = function() {
+		return this.memory.dump();
+	}
 	
 	Game.prototype.init = function() {
 		
@@ -1558,6 +1643,14 @@
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
 	    
 	    /**
+	     * Expose GameStorage
+	     *
+	     * @api public
+	     */
+	
+	    node.GameStorage = require('./GameStorage').GameStorage;
+	    
+	    /**
 	     * Expose Game
 	     *
 	     * @api public
@@ -1598,7 +1691,7 @@
 	function nodeGame() {
 		EventEmitter.call(this);
 		this.gsc = null;
-		this.game = null;	
+		this.game = null;
 	};
 	
 	
@@ -1645,6 +1738,19 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
+	node.set = function (key, value) {
+		var data = {}; // necessary, otherwise the key is called key
+		data[key] = value;
+		that.emit('out.set.DATA', data);
+	}
+
+	node.get = function (key, value) {
+		that.emit('out.get.DATA')
+	}
+	
+	node.dump = function () {
+		return node.game.dump();
+	}
 	
 //	/**
 //	 * Stores data for the client.
@@ -1661,7 +1767,7 @@
 //	 * @api public
 //	 */
 //	node.get = function (key, fn) {
-//		node.store .get(key, fn);
+//		node.store.get(key, fn);
 //	};
 //
 //	/**
@@ -1683,7 +1789,7 @@
 //	node.del = function (key, fn) {
 //	  node.store.del(key, fn);
 //	};
-	
+//	
 	// *Aliases*
 	//
 	// Conventions:
@@ -1762,7 +1868,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 13:48:30 CET 2011
+ * Built on Di 1. Nov 16:59:19 CET 2011
  *
  */
  
@@ -2459,7 +2565,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 13:48:30 CET 2011
+ * Built on Di 1. Nov 16:59:19 CET 2011
  *
  */
  
@@ -3190,7 +3296,7 @@
 		return out;
 	};
 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3274,7 +3380,7 @@
 			}); 
 	};
 	
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3365,7 +3471,7 @@
 				}
 			});
 	};
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3435,7 +3541,7 @@
 	
 	GameSummary.prototype.listeners = function() {}; 
 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3504,7 +3610,7 @@
 			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 	};
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3583,7 +3689,7 @@
 	
 	NextPreviousState.prototype.listeners = function () {}; 
 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3664,7 +3770,7 @@
 		
 		return out;
 	};
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3768,7 +3874,7 @@
 			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 	}; 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3861,7 +3967,7 @@
 			that.updateState(state);
 		}); 
 	}; 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3916,7 +4022,7 @@
 		});
 		
 	}; 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  
@@ -3984,7 +4090,7 @@
 			that.write(msg);
 		});
 	}; 
-})(node.window.gadgets); 
+})(node.window.widgets); 
  
  
  

@@ -1,17 +1,10 @@
-(function (exports, node) {
+(function (exports) {
 	
 	
 	/**
-	 * Expose the constructor.
+	 * Expose constructor
 	 */
-	
-	exports = module.exports = GameStorage;
-	
-	/**
-	 * Module dependencies.
-	 */
-	
-	var EventEmitter = process.EventEmitter;
+	exports.GameStorage = GameStorage;
 	
 	/**
 	 * GameStorage interface
@@ -24,76 +17,38 @@
 	  this.clients = {};
 	};
 	
-	/**
-	 * Inherit from EventEmitter.
-	 */
-	
-	GameStorage.prototype.__proto__ = EventEmitter.prototype;
 	
 	/**
-	 * Initializes a client GameStorage
-	 *
-	 * @param {String} id
+	 * Write data into the memory of a client
+	 * It overwrites the same key
+	 * 
+	 * @param {String} client
+	 * @data {Object}
 	 * @api public
 	 */
 	
-	GameStorage.prototype.client = function (id) {
-	  if (!this.clients[id]) {
-	    this.clients[id] = new (this.constructor.Client)(this, id);
+	GameStorage.prototype.add = function (client, data) {
+	  if (!this.clients[client]) {
+	    this.clients[client] = {};
 	  }
-	
-	  return this.clients[id];
-	};
-	
-	/**
-	 * Destroys a client
-	 *
-	 * @api {String} sid
-	 * @param {Number} number of seconds to expire client data
-	 * @api private
-	 */
-	
-	GameStorage.prototype.destroyClient = function (id, expiration) {
-	  if (this.clients[id]) {
-	    this.clients[id].destroy(expiration);
-	    delete this.clients[id];
+	  
+	  for (var i in data) {
+		  if (data.hasOwnProperty(i)){
+			  this.clients[client][i] = data[i];
+			  console.log('Added ' +  i + ' ' + data[i]);
+		  }
 	  }
-	
-	  return this;
+	  
+	  return true;
 	};
 	
-	/**
-	 * Destroys the GameStorage
-	 *
-	 * @param {Number} number of seconds to expire client data
-	 * @api private
-	 */
+	GameStorage.prototype.dump = function () {
 	
-	GameStorage.prototype.destroy = function (clientExpiration) {
-	  var keys = Object.keys(this.clients)
-	    , count = keys.length;
-	
-	  for (var i = 0, l = count; i < l; i++) {
-	    this.destroyClient(keys[i], clientExpiration);
-	  }
-	
-	  this.clients = {};
-	
-	  return this;
+		return this.clients;
 	};
 	
-	/**
-	 * Client.
-	 *
-	 * @api public
-	 */
-	
-	GameStorage.Client = function (GameStorage, id) {
-	  this.GameStorage = GameStorage;
-	  this.id = id;
-	};
+
 	
 })(
 	'undefined' != typeof node ? node : module.exports
-  , 'undefined' != typeof node ? node : module.parent.exports
 );

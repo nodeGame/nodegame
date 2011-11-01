@@ -2,6 +2,7 @@
 	
 	var GameState = node.GameState;
 	var GameMsg = node.GameMsg;
+	var GameStorage = node.GameStorage;
 	var PlayerList = node.PlayerList;
 	var GameLoop = node.GameLoop;
 	var Utils = node.Utils;
@@ -43,6 +44,8 @@
 		
 		this.pl = new PlayerList();
 		
+		this.memory = new GameStorage();
+		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';
 		var set = GameMsg.actions.SET + '.';
@@ -54,20 +57,26 @@
 		var incomingListeners = function() {
 			
 			// Set
-			
 			node.on( IN + set + 'STATE', function(msg){
-				that.updateState(msg.data);
+				that.memory.add(msg.from, msg.data);
 			});
 			
-			// TODO: Also for set.PLIST
+			node.on( IN + set + 'DATA', function(msg){
+				console.log('in.set.data');
+				that.memory.add(msg.from, msg.data);
+			});
 			
 			// Say
+
+			node.on( IN + say + 'STATE', function(msg){
+				that.updateState(msg.data);
+			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
 				that.pl = new PlayerList(msg.data);
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
+					console.log('WE PLAY AUTO');
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
@@ -88,18 +97,12 @@
 		}();
 		
 		var outgoingListeners = function() {
-	
-			// SET
 			
-			node.on( OUT + set + 'STATE', function (state, to) {
-				that.gsc.sendSTATE('set',state,to);
-			});		
-		
 			// SAY
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
-				that.gsc.sendSTATE('say', state, to);
+				that.gsc.sendSTATE(GameMsg.actions.SAY, state, to);
 			});	
 			
 			node.on( OUT + say + 'TXT', function (text, to) {
@@ -117,6 +120,16 @@
 			node.on('WAIT', function(msg) {
 				that.gameState.paused = true;
 				that.publishState();
+			});
+			
+			// SET
+			
+			node.on( OUT + set + 'STATE', function (state, to) {
+				that.gsc.sendSTATE(GameMsg.actions.SET, state, to);
+			});
+			
+			node.on( OUT + set + 'DATA', function (data, to) {
+				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
 			});
 			
 		}();
@@ -210,6 +223,10 @@
 	
 		return false; 
 	};
+	
+	Game.prototype.dump = function() {
+		return this.memory.dump();
+	}
 	
 	Game.prototype.init = function() {
 		

@@ -62,4 +62,4 @@
 			that.write(msg);
 		});
 	}; 
-})(node.window.gadgets);
+})(node.window.widgets);

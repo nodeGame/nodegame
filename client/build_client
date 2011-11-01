@@ -75,8 +75,9 @@ FILES[4]='GameMsg.js'
 FILES[5]='GameLoop.js'
 FILES[6]='GameMsgGenerator.js'
 FILES[7]='GameSocketClient.js'
-FILES[8]='Game.js'
-FILES[9]='nodeGame.js'
+FILES[8]='GameStorage.js'
+FILES[9]='Game.js'
+FILES[10]='nodeGame.js'
 
 for f in ${FILES[*]}
 do

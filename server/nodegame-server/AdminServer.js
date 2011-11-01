@@ -44,7 +44,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 	});
 
 	this.on(say+'DATA', function(msg) { 
-		that.gmm.forwardDATA (msg.data, msg.to, msg.text);
+		that.gmm.forwardDATA (GameMsg.actions.SAY, msg.data, msg.to, msg.text);
 		that.gmm.sendTXT(msg.from + ' sent DATA to ' + msg.to, 'ALL');
 	});
 
@@ -56,15 +56,11 @@ AdminServer.prototype.attachCustomListeners = function() {
 			that.gmm.sendTXT('**Not possible to change state: some players are not ready**', msg.from);
 		}
 		else {
+			
 			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
-			that.gmm.forwardSTATE (GameMsg.actions.SET,msg.data, msg.to);
-			that.gmm.sendSTATE (GameMsg.actions.SET,msg.data, msg.to);
+			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
+			that.gmm.sendSTATE (GameMsg.actions.SAY,msg.data, msg.to);
 		}
-	});
-		
-	
-	this.on(get+'MEMORY', function(msg){
-		that.gmm.sendDATA(this.dumpMemory());
 	});
 };

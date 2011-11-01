@@ -93,6 +93,14 @@
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
 	    
 	    /**
+	     * Expose GameStorage
+	     *
+	     * @api public
+	     */
+	
+	    node.GameStorage = require('./GameStorage').GameStorage;
+	    
+	    /**
 	     * Expose Game
 	     *
 	     * @api public
@@ -133,8 +141,7 @@
 	function nodeGame() {
 		EventEmitter.call(this);
 		this.gsc = null;
-		this.game = null;	
-		this.store = new 
+		this.game = null;
 	};
 	
 	
@@ -181,6 +188,19 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
+	node.set = function (key, value) {
+		var data = {}; // necessary, otherwise the key is called key
+		data[key] = value;
+		that.emit('out.set.DATA', data);
+	}
+
+	node.get = function (key, value) {
+		that.emit('out.get.DATA')
+	}
+	
+	node.dump = function () {
+		return node.game.dump();
+	}
 	
 //	/**
 //	 * Stores data for the client.

@@ -73,4 +73,4 @@
 	
 	NextPreviousState.prototype.listeners = function () {}; 
 
-})(node.window.gadgets);
+})(node.window.widgets);

@@ -156,38 +156,6 @@ GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) 
 	});
 };
 
-//GameMsgGenerator.prototype.sayPLIST = function(plist,to,reliable) {
-//	return this.createPLIST(GameMsg.actions.SAY, plist, to,reliable);
-//};
-//
-//GameMsgGenerator.prototype.setPLIST = function(plist,to,reliable) {
-//	return this.createPLIST(GameMsg.actions.SET, plist, to,reliable);
-//};
-//
-//GameMsgGenerator.prototype.getPLIST = function(plist,to,reliable) {
-//	return this.createPLIST(GameMsg.actions.GET, plist, to,reliable);
-//};
-//
-//GameMsgGenerator.prototype.createPLIST = function(target,plist,to,reliable) {
-//	
-//	//console.log('Creating plist msg ' + plist + ' ' + plist.size());
-//	
-//	var rel = reliable || 1;
-//	
-//	return new GameMsg(
-//						this.session, 
-//						this.currentState,
-//						target,
-//						GameMsg.targets.PLIST,
-//						this.sender,
-//						to,
-//						'List of Players: ' + plist.size(),
-//						plist.pl,
-//						null,
-//						rel
-//						);
-//};
-
 
 // TXT
 
@@ -238,7 +206,19 @@ GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 
 // DATA
 
-GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
+GameMsgGenerator.prototype.sayDATA = function (data, to, text, reliable) {
+	return this.createDATA(GameMsg.actions.SAY, data, to, text, reliable);
+};
+
+GameMsgGenerator.prototype.setDATA = function (data, to, text, reliable) {
+	return this.createDATA(GameMsg.actions.SET, data, to, text, reliable);
+};
+
+GameMsgGenerator.prototype.getPLIST = function (data, to, text, reliable) {
+	return this.createDATA(GameMsg.actions.GET, data, to, text, reliable);
+};
+
+GameMsgGenerator.prototype.createDATA = function (action, data, to, text, reliable) {
 	
 	var rel = reliable || 1;
 	var text = text || 'data';
@@ -246,7 +226,7 @@ GameMsgGenerator.prototype.createDATA = function (data, to, text, reliable) {
 	return new GameMsg({
 						session: this.session, 
 						state: this.state,
-						action: GameMsg.actions.SAY,
+						action: action,
 						target: GameMsg.targets.DATA,
 						from: this.sender,
 						to: to,

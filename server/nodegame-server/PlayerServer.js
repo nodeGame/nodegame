@@ -51,7 +51,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 			that.gmm.sendDATA (msg.data, msg.to, msg.text);
 		}
 	});
-	
+    
     this.on(say+'STATE', function(msg) {
 		
 		//that.log.log('onSTATE P ' + util.inspect(msg));
@@ -64,11 +64,35 @@ PlayerServer.prototype.attachCustomListeners = function() {
 			that.gmm.forwardPLIST(that);
 		}
 	});	
-	
     
-    this.on(get+'MEMORY', function(msg) {
+    // Set
+    
+//    this.on(set+'DATA', function(msg) {
+//    	
+//		// Personal msg
+//		// TODO: maybe checked before?
+//		if (msg.to !== null || msg.to || 'SERVER'){
+//			that.gmm.sendDATA (GameMsg.actions.SET, msg.data, msg.to, msg.text);
+//		}
+//		
+//		that.gmm.forwardDATA (GameMsg.actions.SET, msg.data, msg.to, msg.text);
+//	    console.log('set.DATA!!!');
+//		
+//	});
+    
+    this.on(set+'DATA', function(msg) {
     	
-    });
+		// Personal msg
+		// TODO: maybe checked before?
+		if (msg.to !== null || msg.to || 'SERVER'){
+			that.gmm.send(msg);
+		}
+		
+		that.gmm.forward (msg);
+	    console.log('set.DATA!!!');
+		
+	});
+    
     
     
     this.on('closed', function(id) {

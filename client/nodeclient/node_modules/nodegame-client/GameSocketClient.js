@@ -136,9 +136,9 @@
 		this.send(msg);
 	};
 	
-	GameSocketClient.prototype.sendDATA = function (data, to, msg) {
+	GameSocketClient.prototype.sendDATA = function (action, data, to, msg) {
 		var to = to || 'SERVER';
-		var msg = this.gmg.createDATA(data,to,msg);
+		var msg = this.gmg.createDATA(action, data, to, msg);
 		this.send(msg);
 	};
 	

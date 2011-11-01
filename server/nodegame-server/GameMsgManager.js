@@ -18,9 +18,6 @@ function GameMsgManager(node) {
 	this.name = node.name || 'GenericSender';
 	this.session = Math.floor(Math.random()*10000);
 	this.currentState =  node.currentState || new GameState(); // TODO: Check what is best to init
-	this.timeout = 10000; // 10 Seconds	
-	
-	this.msgQueue = {};
 	
 	this.node = node;
 	this.log = node.log;
@@ -28,7 +25,6 @@ function GameMsgManager(node) {
 	this.socket = node.socket;
 	
 	this.gmg = new GameMsgGenerator(this.session,this.name,this.currentState);	// TODO: Check what is best to init
-	this.types = this.gmg.types;
 }
 
 GameMsgManager.prototype.sendHI = function(text,to) {
@@ -55,9 +51,9 @@ GameMsgManager.prototype.sendSTATE = function(action,state,to) {
 	this.send(stateMsg);
 };
 
-GameMsgManager.prototype.sendDATA = function (data,to,text) {
+GameMsgManager.prototype.sendDATA = function (action,data,to,text) {
 	var recipient = to || 'ALL';
-	var dataMsg = this.gmg.createDATA(data, recipient,text);
+	var dataMsg = this.gmg.createDATA(action, data, recipient,text);
 	this.send(dataMsg);
 };
 
@@ -68,7 +64,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	var msg = gameMsg.stringify();
 	
 	if (to === 'SERVER' || to === null) {
-		this.log.log('E, Trying to send msg to nobody.')
+		this.log.log('E, Trying to send msg to nobody: ' + to);
 		return false;
 	}
 	
@@ -128,17 +124,18 @@ GameMsgManager.prototype.forwardSTATE = function(action,state,to) {
 	this.forward(stateMsg);
 };
 
-GameMsgManager.prototype.forwardDATA = function (data,to,text) {
+GameMsgManager.prototype.forwardDATA = function (action, data, to, text) {
 	var recipient = to || 'ALL';
-	var dataMsg = this.gmg.createDATA(data, recipient,text);
+	var dataMsg = this.gmg.createDATA(action, data, recipient, text);
 	this.forward(dataMsg);
 };
 
 GameMsgManager.prototype.forward = function (gameMsg, to) {
 
 	// Create a copy of the msg and prepare the attributes
-	var gameMsg = new GameMsg(gameMsg);
-	gameMsg.from = this.node.name;
+	//var gameMsg = new GameMsg(gameMsg);
+	//gameMsg.from = this.node.name;
+	
 	gameMsg.forward = 1;
 	
 	if (gameMsg.to === 'SERVER' || gameMsg === null || gameMsg.to === undefined) {
