@@ -63,4 +63,8 @@ AdminServer.prototype.attachCustomListeners = function() {
 		}
 	});
 		
+	
+	this.on(get+'MEMORY', function(msg){
+		that.gmm.sendDATA(this.dumpMemory());
+	});
 };

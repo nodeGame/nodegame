@@ -21,7 +21,7 @@
 		this.servername = null;
 		this.game = null;
 		
-		this.socket = this.connect();
+		this.io = this.connect();
 	}
 	
 	GameSocketClient.prototype.setGame = function(game) {
@@ -152,10 +152,10 @@
 		// TODO: Check Do volatile msgs exist for clients?
 		
 		//if (msg.reliable) {
-			this.socket.send(msg.stringify());
+			this.io.send(msg.stringify());
 		//}
 		//else {
-		//	this.socket.volatile.send(msg.stringify());
+		//	this.io.volatile.send(msg.stringify());
 		//}
 		console.log('S: ' + msg);
 		node.fire('LOG', 'S: ' + msg.toSMS());

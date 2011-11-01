@@ -29,25 +29,6 @@
 		this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
 		this.paused = 	(gs) ? gs.paused : false;
 	}
-	 
-	//GameState.clone = function (gamestate) {
-	//	var gs = new GameState();
-	//	gs.state = gamestate.state;
-	//	gs.step = gamestate.step;
-	//	gs.round = gamestate.round;
-	//	gs.is = gamestate.is;
-	//	gs.paused = gamestate.paused;	
-	//	
-	//	return gs;
-	//}
-	
-	//GameState.prototype.import = function (gamestate) {
-	//	this.state = gamestate.state;
-	//	this.step = gamestate.step;
-	//	this.round = gamestate.round;
-	//	this.is = gamestate.is;
-	//	this.paused = gamestate.paused;
-	//};
 	
 	GameState.prototype.toString = function () {
 		var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
@@ -82,17 +63,6 @@
 		
 		return result;
 	};
-	
-	//GameState.parse = function(gamestate) {
-	//	try {
-	//		var gs = new GameState();
-	//		gs.import(gamestate);
-	//		return gs;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parsing GameState ' + e.message;
-	//	}
-	//};
 	
 	GameState.stringify = function (gs) {
 		return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;

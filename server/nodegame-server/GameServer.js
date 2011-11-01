@@ -153,3 +153,13 @@ GameServer.prototype.getConnections = function() {
 	}
 	return clientids;
 };
+
+GameServer.prototype.dumpMemory = function() {
+	var dump = [];
+	for ( var i in this.channel.sockets.store) {
+		if (this.channel.sockets.store.hasOwnProperty(i)) {
+			dump.push(i.data);
+			console.log(i.data);
+		}
+	}
+};

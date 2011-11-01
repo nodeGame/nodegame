@@ -65,6 +65,12 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		}
 	});	
 	
+    
+    this.on(get+'MEMORY', function(msg) {
+    	
+    });
+    
+    
     this.on('closed', function(id) {
       	console.log(that.name + ' ----------------- Got Closed ' + id);
     	that.pl.remove(id);

@@ -133,7 +133,8 @@
 	function nodeGame() {
 		EventEmitter.call(this);
 		this.gsc = null;
-		this.game = null;		
+		this.game = null;	
+		this.store = new 
 	};
 	
 	
@@ -181,6 +182,44 @@
 	};	
 	
 	
+//	/**
+//	 * Stores data for the client.
+//	 *
+//	 * @api public
+//	 */
+//	node.set = function (key, value, fn) {
+//	  node.store.set(key, value, fn);
+//	};
+//
+//	/**
+//	 * Retrieves data for the client
+//	 *
+//	 * @api public
+//	 */
+//	node.get = function (key, fn) {
+//		node.store.get(key, fn);
+//	};
+//
+//	/**
+//	 * Checks data for the client
+//	 *
+//	 * @api public
+//	 */
+//	
+//	node.has = function (key, fn) {
+//	  node.store.has(key, fn);
+//	};
+//	
+//	/**
+//	 * Deletes data for the client
+//	 *
+//	 * @api public
+//	 */
+//	
+//	node.del = function (key, fn) {
+//	  node.store.del(key, fn);
+//	};
+//	
 	// *Aliases*
 	//
 	// Conventions:

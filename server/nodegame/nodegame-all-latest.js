@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.4.4
+ * nodeGame-all v0.4.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Oct 25 12:37:10 CEST 2011
+ * Built on Di 1. Nov 13:48:30 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.4.4
+ * nodeGame Client v0.4.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Oct 25 12:37:10 CEST 2011
+ * Built on Di 1. Nov 13:48:30 CET 2011
  *
  */
  
@@ -37,15 +37,7 @@
 	EventEmitter.prototype = {
 	
 	    constructor: EventEmitter,
-	
-	//    on: function(type, listener){
-	//        if (typeof this._listeners[type] == "undefined"){
-	//            this._listeners[type] = [];
-	//        }
-	//        //console.log('Added Listener: ' + type + ' ' + listener);
-	//        this._listeners[type].push(listener);
-	//    },
-	    
+		    
 	    addListener: function(type,listener) {
 	    	 if (typeof this._listeners[type] == "undefined"){
 	             this._listeners[type] = [];
@@ -262,25 +254,6 @@
 		this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
 		this.paused = 	(gs) ? gs.paused : false;
 	}
-	 
-	//GameState.clone = function (gamestate) {
-	//	var gs = new GameState();
-	//	gs.state = gamestate.state;
-	//	gs.step = gamestate.step;
-	//	gs.round = gamestate.round;
-	//	gs.is = gamestate.is;
-	//	gs.paused = gamestate.paused;	
-	//	
-	//	return gs;
-	//}
-	
-	//GameState.prototype.import = function (gamestate) {
-	//	this.state = gamestate.state;
-	//	this.step = gamestate.step;
-	//	this.round = gamestate.round;
-	//	this.is = gamestate.is;
-	//	this.paused = gamestate.paused;
-	//};
 	
 	GameState.prototype.toString = function () {
 		var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
@@ -315,17 +288,6 @@
 		
 		return result;
 	};
-	
-	//GameState.parse = function(gamestate) {
-	//	try {
-	//		var gs = new GameState();
-	//		gs.import(gamestate);
-	//		return gs;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parsing GameState ' + e.message;
-	//	}
-	//};
 	
 	GameState.stringify = function (gs) {
 		return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
@@ -369,10 +331,7 @@
 			this.add(arrayIDS[j],'P_' + ++i);
 		}
 	};
-	
-	
-	// Check Here!!! 
-	
+		
 	PlayerList.prototype.addPlayer = function (player) {
 		return this.add(player.id, player.name);
 	};
@@ -425,16 +384,6 @@
 	     return this.map(function(o){
 	    	 return o.getId();
 	     	});
-	//     
-	//	 var result = new Array();
-	//	 
-	//	 for (var key in this.pl) {
-	//		 if (this.pl.hasOwnProperty(key)) {
-	//			 result.push(key);
-	//		 }
-	//	  }
-	//
-	//	  return result;
 	};
 	
 	
@@ -604,26 +553,9 @@
 		return this.name;
 	};
 	
-	//Player.prototype.import = function (player) {
-	//	this.id = player.id;
-	//	this.name = player.name;
-	//	this.state = player.state;
-	//};
-	
 	Player.prototype.updateState = function (state) {
 		this.state = state;
 	};
-	
-	//Player.parse = function(player) {
-	//	try {
-	//		var p = new Player();
-	//		p.import(player);
-	//		return p;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parse Player ' + e.message;
-	//	}
-	//};
 	
 	Player.prototype.toString = function() {
 		var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
@@ -695,47 +627,6 @@
 		this.forward = 0; // is this msg just a forward?	
 	};
 	
-	//function GameMsg (session, currentState, action, target, from, to, text, data,
-	//					priority, reliable) {
-	//		
-	//	this.id = Math.floor(Math.random()*1000000);
-	//
-	//	this.action = action; 
-	//	this.target = target;
-	//	
-	//	this.session = session;
-	//	this.currentState = currentState;
-	//	
-	//	this.from = from;
-	//	this.to = to;
-	//	this.text = text;
-	//	this.data = data;
-	//	
-	//	this.priority = priority;
-	//	this.reliable = reliable;
-	//
-	//	this.created = Utils.getDate();
-	//	this.forward = 0; // is this msg just a forward?	
-	//	
-	//};
-	//
-	//// Does not change the msg ID
-	//GameMsg.prototype.import = function(jsonMsg) {
-	//	
-	//	this.session = jsonMsg.session;
-	//	this.currentState = jsonMsg.currentState;
-	//	this.target = jsonMsg.target; // was action
-	//	this.from = jsonMsg.from;
-	//	this.to = jsonMsg.to;
-	//	this.text = jsonMsg.text;
-	//	this.action = jsonMsg.action; 
-	//	this.data = jsonMsg.data;
-	//	this.priority = jsonMsg.priority;
-	//	this.reliable = jsonMsg.reliable;
-	//	this.forward = jsonMsg.forward;
-	//	
-	//};
-	
 	// Copy everything
 	GameMsg.clone = function (gameMsg) {
 		
@@ -748,13 +639,6 @@
 		
 		return gm;
 	};
-	
-	// Copy everything
-	//GameMsg.prototype.clone = function(jsonMsg) {
-	//	
-	//	this.import(jsonMsg);
-	//	this.id = jsonMsg.id;
-	//};
 	
 	GameMsg.prototype.stringify = function() {
 		return JSON.stringify(this);
@@ -798,17 +682,6 @@
 		
 		return line;
 	};
-	
-	//GameMsg.parse = function(msg) {
-	//	try {
-	//		var gm = new GameMsg();
-	//		gm.import(msg);
-	//		return gm;
-	//	}
-	//	catch(e){
-	//		throw 'Error while trying to parse GameMsg ' + e.message;
-	//	}
-	//};
 	
 	GameMsg.prototype.toInEvent = function() {
 		return 'in.' + this.toEvent();
@@ -913,8 +786,6 @@
 														round: gameState.round
 			}));
 			
-	//		return new GameState(gameState.state,gameState.step+1,gameState.round);
-			
 			return new GameState({
 				state: gameState.state,
 				step: newStep,
@@ -925,7 +796,6 @@
 		if (this.limits[idxLimit]['rounds'] > gameState.round){
 			var newRound = Number(gameState.round)+1;
 			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
-			//return new GameState(gameState.state,1,newRound);
 			return new GameState({
 				state: gameState.state,
 				step: 1,
@@ -967,7 +837,6 @@
 		else if (gameState.round > 1){
 			var oldRound = Number(gameState.round)-1;
 			var oldStep = this.limits[idxLimit]['steps'];
-			//return new GameState(gameState.state,oldStep,oldRound);
 			return new GameState({
 				state: gameState.state,
 				step: oldStep,
@@ -978,7 +847,6 @@
 			var oldRound = this.limits[idxLimit-1]['rounds'];
 			var oldStep = this.limits[idxLimit-1]['steps'];
 			var oldState = idxLimit;
-			//return new GameState(oldState,oldStep,oldRound);
 			return new GameState({
 				state: oldState,
 				step: oldStep,
@@ -1022,16 +890,7 @@
 		this.session = session;
 		this.sender = sender;
 		this.state = state;
-	};
-	
-	//GameMsgGenerator.prototype.setCurrentState = function (state) {
-	//	this.state = state;
-	//};
-	//
-	//GameMsgGenerator.prototype.getCurrentState = function () {
-	//	return this.state;
-	//};
-	
+	};	
 	
 	// HI
 	
@@ -1226,7 +1085,7 @@
 		this.servername = null;
 		this.game = null;
 		
-		this.socket = this.connect();
+		this.io = this.connect();
 	}
 	
 	GameSocketClient.prototype.setGame = function(game) {
@@ -1357,10 +1216,10 @@
 		// TODO: Check Do volatile msgs exist for clients?
 		
 		//if (msg.reliable) {
-			this.socket.send(msg.stringify());
+			this.io.send(msg.stringify());
 		//}
 		//else {
-		//	this.socket.volatile.send(msg.stringify());
+		//	this.io.volatile.send(msg.stringify());
 		//}
 		console.log('S: ' + msg);
 		node.fire('LOG', 'S: ' + msg.toSMS());
@@ -1465,30 +1324,30 @@
 	
 			// SET
 			
-			node.on( OUT + set + 'STATE', function(state,to){
+			node.on( OUT + set + 'STATE', function (state, to) {
 				that.gsc.sendSTATE('set',state,to);
 			});		
 		
 			// SAY
 			
-			node.on( OUT + say + 'STATE', function(state,to){
+			node.on( OUT + say + 'STATE', function (state, to) {
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
-				that.gsc.sendSTATE('say',state,to);
+				that.gsc.sendSTATE('say', state, to);
 			});	
 			
-			node.on( OUT + say + 'TXT', function(text,to){
+			node.on( OUT + say + 'TXT', function (text, to) {
 				that.gsc.sendTXT(text,to);
 			});
 			
-			node.on( OUT + say + 'DATA', function(data,to,msg){
+			node.on( OUT + say + 'DATA', function (data, to, msg) {
 				that.gsc.sendDATA(data,to,msg);
 			});
 			
-			node.on('DONE', function(msg){
+			node.on('DONE', function(msg) {
 				that.is(GameState.iss.DONE);
 			});
 			
-			node.on('WAIT', function(msg){
+			node.on('WAIT', function(msg) {
 				that.gameState.paused = true;
 				that.publishState();
 			});
@@ -1739,7 +1598,7 @@
 	function nodeGame() {
 		EventEmitter.call(this);
 		this.gsc = null;
-		this.game = null;		
+		this.game = null;	
 	};
 	
 	
@@ -1782,10 +1641,48 @@
 		console.log('nodeGame: ready.');
 	};	
 	
-	node.fire = function (event, p1, p2, p3) {	
-		that.fire(event, p1, p2, p3);
+	node.fire = node.emit = function (event, p1, p2, p3) {	
+		that.emit(event, p1, p2, p3);
 	};	
 	
+	
+//	/**
+//	 * Stores data for the client.
+//	 *
+//	 * @api public
+//	 */
+//	node.set = function (key, value, fn) {
+//	  node.store.set(key, value, fn);
+//	};
+//
+//	/**
+//	 * Retrieves data for the client
+//	 *
+//	 * @api public
+//	 */
+//	node.get = function (key, fn) {
+//		node.store .get(key, fn);
+//	};
+//
+//	/**
+//	 * Checks data for the client
+//	 *
+//	 * @api public
+//	 */
+//	
+//	node.has = function (key, fn) {
+//	  node.store.has(key, fn);
+//	};
+//	
+//	/**
+//	 * Deletes data for the client
+//	 *
+//	 * @api public
+//	 */
+//	
+//	node.del = function (key, fn) {
+//	  node.store.del(key, fn);
+//	};
 	
 	// *Aliases*
 	//
@@ -1800,18 +1697,7 @@
 	
 	
 	// Sending
-	
-	
-// TODO: Check if this is ok to be commented
-	
-	// Send a GameMsg to the recipient
-	// gameMSg must be a valid GameMsg
-//	node.send = function(gameMsg,to) {
-//		that.gsc.send(gameMsg,to);
-//	};
-	
-	
-	
+		
 	
 //	this.setSTATE = function(action,state,to){	
 //		var stateEvent = GameMsg.OUT + action + '.STATE'; 
@@ -1871,12 +1757,12 @@
  
  
 /*!
- * nodeWindow v0.4.4
+ * nodeWindow v0.4.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Oct 25 12:37:10 CEST 2011
+ * Built on Di 1. Nov 13:48:30 CET 2011
  *
  */
  
@@ -2145,8 +2031,8 @@
 	GameWindow.prototype = new Document();
 	GameWindow.prototype.constructor = GameWindow;
 	
-	// The gadgets container
-	GameWindow.prototype.gadgets = {};
+	// The widgets container
+	GameWindow.prototype.widgets = {};
 	
 	function GameWindow() {
 		
@@ -2183,14 +2069,14 @@
 			// TODO: Check this
 			node.node.removeListener('in.STATE');
 			
-			this.addGadget('NextPreviousState');
-			this.addGadget('GameSummary');
-			this.addGadget('StateDisplay');
-			this.addGadget('StateBar');
-			this.addGadget('DataBar');
-			this.addGadget('MsgBar');
-			this.addGadget('GameBoard');
-			this.addGadget('Wall');
+			this.addWidget('NextPreviousState');
+			this.addWidget('GameSummary');
+			this.addWidget('StateDisplay');
+			this.addWidget('StateBar');
+			this.addWidget('DataBar');
+			this.addWidget('MsgBar');
+			this.addWidget('GameBoard');
+			this.addWidget('Wall');
 	
 			break;
 		
@@ -2200,7 +2086,7 @@
 			var maincss		= this.addCSS(this.root, 'style.css');
 		    var mainframe 	= this.addIFrame(this.root,'mainframe');
 		    
-			this.addGadget('WaitScreen');
+			this.addWidget('WaitScreen');
 		    
 			break;
 		}
@@ -2304,12 +2190,12 @@
 	
 	// Gadget
 	
-	GameWindow.prototype.addGadget = function (g, root, options) {
+	GameWindow.prototype.addWidget = function (g, root, options) {
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			g = new this.gadgets[g](options);
+			g = new this.widgets[g](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
@@ -2568,12 +2454,12 @@
  
  
 /*!
- * nodeGadgets v0.4.4
+ * nodeGadgets v0.4.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Oct 25 12:37:10 CEST 2011
+ * Built on Di 1. Nov 13:48:30 CET 2011
  *
  */
  
