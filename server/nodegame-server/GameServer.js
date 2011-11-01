@@ -11,13 +11,15 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 util.inherits(GameServer, EventEmitter);
 
-var Utils = require('./Utils');
 var ServerLog = require('./ServerLog');
-
-var GameMsg = require('./GameMsg');
 var GameMsgManager = require('./GameMsgManager');
-var PlayerList = require('./PlayerList').PlayerList;
-var Player = require('./PlayerList').Player;
+
+var Utils = require('nodegame-client').Utils;
+var GameState = require('nodegame-client').GameState;
+var GameMsg = require('nodegame-client').GameMsg;
+
+var PlayerList = require('nodegame-client').PlayerList;
+var Player = require('nodegame-client').Player;
 
 function GameServer(options) {
 
@@ -153,12 +155,9 @@ GameServer.prototype.getConnections = function() {
 	return clientids;
 };
 
-GameServer.prototype.dumpMemory = function() {
-	var dump = [];
-	for ( var i in this.channel.sockets.store) {
-		if (this.channel.sockets.store.hasOwnProperty(i)) {
-			dump.push(i.data);
-			console.log(i.data);
-		}
+GameServer.prototype.isValidRecipient = function (to) {
+	if (to !== null && to !== 'SERVER') {
+		return true;
 	}
+	return false;
 };

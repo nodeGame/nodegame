@@ -3,19 +3,20 @@ module.exports = ServerChannel;
 
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
-var nodemailer = require("nodemailer");
+var nodemailer = require('nodemailer');
 
 var AdminServer = require('./AdminServer');
 var PlayerServer = require('./PlayerServer');
 var GameServer = require('./GameServer');
-
-var Utils = require('./Utils');
 var ServerLog = require('./ServerLog');
-var GameState = require('./GameState');
-var GameMsg = require('./GameMsg');
 var GameMsgGenerator = require('./GameMsgGenerator');
-var PlayerList = require('./PlayerList').PlayerList;
-var Player = require('./PlayerList').Player;
+
+var Utils = require('nodegame-client').Utils;
+var GameState = require('nodegame-client').GameState;
+var GameMsg = require('nodegame-client').GameMsg;
+
+var PlayerList = require('nodegame-client').PlayerList;
+var Player = require('nodegame-client').Player;
 
 function ServerChannel (options, server, io) {
 	

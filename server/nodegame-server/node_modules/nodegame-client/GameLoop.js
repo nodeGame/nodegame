@@ -84,8 +84,6 @@
 														round: gameState.round
 			}));
 			
-	//		return new GameState(gameState.state,gameState.step+1,gameState.round);
-			
 			return new GameState({
 				state: gameState.state,
 				step: newStep,
@@ -96,7 +94,6 @@
 		if (this.limits[idxLimit]['rounds'] > gameState.round){
 			var newRound = Number(gameState.round)+1;
 			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
-			//return new GameState(gameState.state,1,newRound);
 			return new GameState({
 				state: gameState.state,
 				step: 1,
@@ -138,7 +135,6 @@
 		else if (gameState.round > 1){
 			var oldRound = Number(gameState.round)-1;
 			var oldStep = this.limits[idxLimit]['steps'];
-			//return new GameState(gameState.state,oldStep,oldRound);
 			return new GameState({
 				state: gameState.state,
 				step: oldStep,
@@ -149,7 +145,6 @@
 			var oldRound = this.limits[idxLimit-1]['rounds'];
 			var oldStep = this.limits[idxLimit-1]['steps'];
 			var oldState = idxLimit;
-			//return new GameState(oldState,oldStep,oldRound);
 			return new GameState({
 				state: oldState,
 				step: oldStep,

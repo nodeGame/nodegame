@@ -2,16 +2,11 @@ module.exports = GameMsgManager;
 
 var util = require('util');
 
-//SOCKET.IO
-var io = require('socket.io');
-
-// TODO: Does Socket.io provides reliable sending? 
-// Reliable is disable for now.
-
-
-var GameState = require('./GameState');
-var GameMsg = require('./GameMsg');
 var GameMsgGenerator = require('./GameMsgGenerator');
+
+var GameState = require('nodegame-client').GameState;
+var GameMsg = require('nodegame-client').GameMsg;
+
 
 function GameMsgManager(node) {
 	
@@ -40,7 +35,7 @@ GameMsgManager.prototype.sendTXT = function(text,to) {
 GameMsgManager.prototype.sendPLIST = function(node,to) {
 	var recipient = to || 'ALL';
 	// TODO: set/get/say choose carefully
-	var plMsg = this.gmg.createPLIST(GameMsg.actions.SET, node.pl, recipient);
+	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, recipient);
 	this.send(plMsg);
 };
 
@@ -64,7 +59,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	var msg = gameMsg.stringify();
 	
 	if (to === 'SERVER' || to === null) {
-		this.log.log('E, Trying to send msg to nobody: ' + to);
+		this.log.log('E, Trying to send msg to nobody: ' + to, 'ERR');
 		return false;
 	}
 	

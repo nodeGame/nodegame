@@ -1,5 +1,5 @@
-var GameMsg = require('./GameMsg');
-var GameState = require('./GameState');
+var GameState = require('nodegame-client').GameState;
+var GameMsg = require('nodegame-client').GameMsg;
 
 module.exports = GameMsgGenerator; 
 
@@ -8,14 +8,6 @@ function GameMsgGenerator (session,sender,state) {
 	this.sender = sender;
 	this.state = state;
 };
-
-//GameMsgGenerator.prototype.setCurrentState = function (state) {
-//	this.currentState = state;
-//};
-//
-//GameMsgGenerator.prototype.getCurrentState = function () {
-//	return this.currentState;
-//};
 
 
 // HI

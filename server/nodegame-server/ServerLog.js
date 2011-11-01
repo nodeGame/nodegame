@@ -4,7 +4,7 @@ var sys = require("sys");
 var fs = require('fs');
 var path = require('path');
 
-var Utils = require('./Utils');
+var Utils = require('nodegame-client').Utils;
 
 module.exports = ServerLog;
 

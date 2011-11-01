@@ -2,7 +2,7 @@ module.exports = ServerNode;
 
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
-var nodemailer = require("nodemailer");
+var nodemailer = require('nodemailer');
 
 var http = require('http');
 var fs = require('fs');
@@ -11,13 +11,12 @@ var path = require('path');
 var ServerChannel = require('./ServerChannel');
 
 function ServerNode (options, server, io) {
-	
+
 	this.options = options;
 	
 	this.options.mail = this.options.mail || false;
 	this.options.dump = this.options.mail || true;
 	
-	this.port = options.port || '80';
 	this.maxChannels = options.maxChannels;
 	this.channels = [];
 	

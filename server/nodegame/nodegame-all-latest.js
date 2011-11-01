@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 16:59:19 CET 2011
+ * Built on Di 1. Nov 21:53:21 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 16:59:19 CET 2011
+ * Built on Di 1. Nov 21:53:21 CET 2011
  *
  */
  
@@ -248,11 +248,20 @@
 	function GameState (gs) {
 		
 		// TODO: The check for gs is done many times. Change it.
-		this.state = 	(gs) ? gs.state : 0;
-		this.step = 	(gs) ? gs.step : 0;
-		this.round = 	(gs) ? gs.round : 0;
-		this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
-		this.paused = 	(gs) ? gs.paused : false;
+		if (gs) {
+			this.state = 	gs.state;
+			this.step = 	gs.step;
+			this.round = 	gs.round;
+			this.is = 		(gs.is) ? gs.is : GameState.iss.UNKNOWN;
+			this.paused = 	(gs.paused) ? gs.paused : false;
+		}
+		else {
+			this.state = 	0;
+			this.step = 	0;
+			this.round = 	0;
+			this.is = 		GameState.iss.UNKNOWN;
+			this.paused = 	false;
+		}
 	}
 	
 	GameState.prototype.toString = function () {
@@ -449,7 +458,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -1363,7 +1372,6 @@
 			});
 			
 			node.on( IN + set + 'DATA', function(msg){
-				console.log('in.set.data');
 				that.memory.add(msg.from, msg.data);
 			});
 			
@@ -1389,7 +1397,10 @@
 						node.fire('OUT.say.TXT', this.minPlayers + ' players connected. Game can start');
 						console.log( this.minPlayers + ' players connected. Game can start');
 						that.updateState(that.next());
-					}	
+					}
+					else {
+						console.log(that.pl.isStateDone(that.gameState));
+					}
 				}
 	//			else {
 	//				console.log('WAITING FOR MONITOR TO STEP');
@@ -1400,6 +1411,13 @@
 		var outgoingListeners = function() {
 			
 			// SAY
+			
+			node.on( OUT + say + 'HI', function(){
+				console.log('OIH');
+				// Upon establishing a successful connection with the server
+				// Enter the first state
+				that.step();
+			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
@@ -1435,22 +1453,11 @@
 			
 		}();
 		
+		// Enter the first state
+		this.step();
 	}
 	
-	//Game.prototype.addLocalListener = function (type,func,state) {
-	//	var state = state || this.gameState;
-	//	// TODO: check why I was calling this function
-	//	//node.on(type,func);
-	//	
-	//	if (typeof this._localListeners[type] == "undefined"){
-	//        this._localListeners[type] = [];
-	//    }
-	//
-	//    this._localListeners[type].push(func);
-	//};
-	
 	// Dealing with the STATE
-	
 	
 	Game.prototype.pause = function() {
 		this.gameState.paused = true;
@@ -1503,15 +1510,9 @@
 	
 	Game.prototype.step = function(state) {
 		
-		// If not parameter is passed, it goes one step ahead
-		var nextState = state.state || this.gameState.state;
-		var nextRound = state.round || this.gameState.round;
-		var nextStep = state.step || this.gameState.step++;
+		var gameState = state || this.next();
 		
-		var gameState = new GameState({state: nextState,
-									   step: nextStep,
-									   round: nextRound
-									  });
+		//var gameState = new GameState(state);
 		
 		if (this.gameLoop.exist(gameState)) {			
 			this.gameState = gameState;
@@ -1552,7 +1553,7 @@
  * nodeGame
  */
 
-(function (exports, io) {
+(function (exports) {
 	
 	var node = exports;
 
@@ -1738,58 +1739,23 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
+	node.say = function (event, p1, p2, p3) {
+		that.emit('out.say.' + event, p1, p2, p3);
+	}
+	
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
 
-	node.get = function (key, value) {
-		that.emit('out.get.DATA')
-	}
+	// TODO node.get
+	//node.get = function (key, value) {};
 	
 	node.dump = function () {
 		return node.game.dump();
 	}
-	
-//	/**
-//	 * Stores data for the client.
-//	 *
-//	 * @api public
-//	 */
-//	node.set = function (key, value, fn) {
-//	  node.store.set(key, value, fn);
-//	};
-//
-//	/**
-//	 * Retrieves data for the client
-//	 *
-//	 * @api public
-//	 */
-//	node.get = function (key, fn) {
-//		node.store.get(key, fn);
-//	};
-//
-//	/**
-//	 * Checks data for the client
-//	 *
-//	 * @api public
-//	 */
-//	
-//	node.has = function (key, fn) {
-//	  node.store.has(key, fn);
-//	};
-//	
-//	/**
-//	 * Deletes data for the client
-//	 *
-//	 * @api public
-//	 */
-//	
-//	node.del = function (key, fn) {
-//	  node.store.del(key, fn);
-//	};
-//	
+
 	// *Aliases*
 	//
 	// Conventions:
@@ -1814,13 +1780,13 @@
 	
 	// Say
 	
-	node.onTXT = node.onTXTin = function(func) {
+	node.onTXT = function(func) {
 		node.on("in.say.TXT", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onDATA = node.onDATAin = function(func) {
+	node.onDATA = function(func) {
 		node.on("in.say.DATA", function(msg) {
 			func.call(that.game,msg);
 		});
@@ -1828,13 +1794,13 @@
 	
 	// Set
 	
-	node.onSTATE = node.onSTATEin = function(func) {
+	node.onSTATE = function(func) {
 		node.on("in.set.STATE", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onPLIST = node.onPLISTin = function(func) {
+	node.onPLIST = function(func) {
 		node.on("in.set.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
@@ -1853,10 +1819,7 @@
 	};
 	
 	
-})('undefined' != typeof node ? node : module.exports);
-//})('object' === typeof module ? module.exports : (window.node = {}));
-
-	 
+})('undefined' != typeof node ? node : module.exports); 
  
  
  
@@ -1868,7 +1831,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 16:59:19 CET 2011
+ * Built on Di 1. Nov 21:53:21 CET 2011
  *
  */
  
@@ -2565,7 +2528,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 16:59:19 CET 2011
+ * Built on Di 1. Nov 21:53:21 CET 2011
  *
  */
  

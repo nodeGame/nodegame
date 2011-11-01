@@ -3,14 +3,17 @@ module.exports = PlayerServer;
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
-var Utils = require('./Utils');
 var ServerLog = require('./ServerLog');
-
-var GameMsg = require('./GameMsg');
-var GameMsgManager = require('./GameMsgManager');
-var PlayerList = require('./PlayerList').PlayerList;
-var Player = require('./PlayerList').Player;
 var GameServer = require('./GameServer');
+var GameMsgManager = require('./GameMsgManager');
+
+
+var Utils = require('nodegame-client').Utils;
+var GameState = require('nodegame-client').GameState;
+var GameMsg = require('nodegame-client').GameMsg;
+
+var PlayerList = require('nodegame-client').PlayerList;
+var Player = require('nodegame-client').Player;
 
 PlayerServer.prototype.__proto__ = GameServer.prototype;
 PlayerServer.prototype.constructor = PlayerServer;
@@ -18,6 +21,8 @@ PlayerServer.prototype.constructor = PlayerServer;
 function PlayerServer(options) {
 	GameServer.call(this,options);
 }
+
+//PlayerServer passes the id of the sender when forwarding msgs
 
 PlayerServer.prototype.attachCustomListeners = function() {
 	var that = this;
@@ -27,7 +32,6 @@ PlayerServer.prototype.attachCustomListeners = function() {
 	var get = GameMsg.actions.GET + '.'; 
 	
     this.on(say+'HI', function(msg) {
-    	console.log(that.name + ' ----------------- Got ' + msg.toEvent());
     	that.pl.addPlayer(msg.data);
         // TODO: check if we need to do it
     	that.gmm.sendPLIST(that); // Send the list of players to all the clients
@@ -39,16 +43,16 @@ PlayerServer.prototype.attachCustomListeners = function() {
     this.on(say+'TXT', function(msg) {
 		// Personal msg
 		// TODO: maybe checked before?
-		if (msg.to !== null || msg.to || 'SERVER'){
-			that.gmm.sendTXT (msg.text, msg.to);
+    	if (that.isValidRecipient(msg.to)){
+			that.gmm.send (msg);
 		}
 	});
 			
     this.on(say+'DATA', function(msg) {
 		// Personal msg
 		// TODO: maybe checked before?
-		if (msg.to !== null || msg.to || 'SERVER'){
-			that.gmm.sendDATA (msg.data, msg.to, msg.text);
+    	if (that.isValidRecipient(msg.to)){
+			that.gmm.send(msg);
 		}
 	});
     
@@ -67,33 +71,17 @@ PlayerServer.prototype.attachCustomListeners = function() {
     
     // Set
     
-//    this.on(set+'DATA', function(msg) {
-//    	
-//		// Personal msg
-//		// TODO: maybe checked before?
-//		if (msg.to !== null || msg.to || 'SERVER'){
-//			that.gmm.sendDATA (GameMsg.actions.SET, msg.data, msg.to, msg.text);
-//		}
-//		
-//		that.gmm.forwardDATA (GameMsg.actions.SET, msg.data, msg.to, msg.text);
-//	    console.log('set.DATA!!!');
-//		
-//	});
-    
     this.on(set+'DATA', function(msg) {
     	
 		// Personal msg
 		// TODO: maybe checked before?
-		if (msg.to !== null || msg.to || 'SERVER'){
+    	if (that.isValidRecipient(msg.to)){
 			that.gmm.send(msg);
 		}
-		
-		that.gmm.forward (msg);
-	    console.log('set.DATA!!!');
-		
+		else {
+			that.gmm.forward (msg);
+		}
 	});
-    
-    
     
     this.on('closed', function(id) {
       	console.log(that.name + ' ----------------- Got Closed ' + id);
