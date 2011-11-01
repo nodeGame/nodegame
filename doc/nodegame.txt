@@ -174,9 +174,12 @@ After importing the **+nodeGame-client+** library, the **+node+** object is avai
 [width="90%"]
 |=======
 |node.on('EVENT_A', function)	| Execute function whenever 'EVENT' happens
-|node.emit('EVENT_B') 	| Send  
+|node.emit('EVENT_B', param1, param2, param3) 	| Emit an event of
+type 'EVENT_B' locally  
+|node.fire('EVENT_B', param1, param2, param3)	| Same as emit, but deprecated
 |=======
 
+It is important to understand that the +*emit*+ method 
 
 
 Each message belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
