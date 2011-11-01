@@ -62,7 +62,6 @@
 			});
 			
 			node.on( IN + set + 'DATA', function(msg){
-				console.log('in.set.data');
 				that.memory.add(msg.from, msg.data);
 			});
 			
@@ -88,7 +87,10 @@
 						node.fire('OUT.say.TXT', this.minPlayers + ' players connected. Game can start');
 						console.log( this.minPlayers + ' players connected. Game can start');
 						that.updateState(that.next());
-					}	
+					}
+					else {
+						console.log(that.pl.isStateDone(that.gameState));
+					}
 				}
 	//			else {
 	//				console.log('WAITING FOR MONITOR TO STEP');

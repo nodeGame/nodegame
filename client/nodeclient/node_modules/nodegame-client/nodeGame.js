@@ -188,15 +188,18 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
+	node.say = function (event, p1, p2, p3) {
+		that.emit('out.say.' + event, p1, p2, p3);
+	}
+	
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
 
-	node.get = function (key, value) {
-		that.emit('out.get.DATA')
-	}
+	// TODO node.get
+	//node.get = function (key, value) {};
 	
 	node.dump = function () {
 		return node.game.dump();
