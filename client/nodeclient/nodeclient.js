@@ -8,4 +8,4 @@ var conf = {
 
 
 
-nodegame.play(conf, new Ultimatum(nodegame));
+nodegame.play(conf, new Ultimatum());

@@ -23,11 +23,20 @@
 	function GameState (gs) {
 		
 		// TODO: The check for gs is done many times. Change it.
-		this.state = 	(gs) ? gs.state : 0;
-		this.step = 	(gs) ? gs.step : 0;
-		this.round = 	(gs) ? gs.round : 0;
-		this.is = 		(gs) ? gs.is : GameState.iss.UNKNOWN;
-		this.paused = 	(gs) ? gs.paused : false;
+		if (gs) {
+			this.state = 	gs.state;
+			this.step = 	gs.step;
+			this.round = 	gs.round;
+			this.is = 		(gs.is) ? gs.is : GameState.iss.UNKNOWN;
+			this.paused = 	(gs.paused) ? gs.paused : false;
+		}
+		else {
+			this.state = 	0;
+			this.step = 	0;
+			this.round = 	0;
+			this.is = 		GameState.iss.UNKNOWN;
+			this.paused = 	false;
+		}
 	}
 	
 	GameState.prototype.toString = function () {

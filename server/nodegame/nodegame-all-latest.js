@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 21:53:21 CET 2011
+ * Built on Mi 2. Nov 18:51:23 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 21:53:21 CET 2011
+ * Built on Mi 2. Nov 18:51:23 CET 2011
  *
  */
  
@@ -756,11 +756,12 @@
 			return false;
 		}
 		// States are 1 based, arrays are 0-based => -1
-		if(gameState.round > this.limits[gameState.state-1]['rounds']) {
+		if (gameState.round > this.limits[gameState.state-1]['rounds']) {
 			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
 			return false;
 		}
 		
+		console.log('This exist: ' + gameState);
 			
 		return true;
 	};
@@ -782,6 +783,7 @@
 		
 		if (!this.exist(gameState)) {
 			console.log('No next state of non-existing state: ' + gameState);
+			return false;
 		}
 		
 		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
@@ -1175,6 +1177,8 @@
 						
 						// Send own name to SERVER
 						that.sendHI(that.player);
+						// Ready to play
+						node.emit('out.say.HI');
 				   	 } 
 		    	}
 		    });
@@ -1244,7 +1248,7 @@
 		//	this.io.volatile.send(msg.stringify());
 		//}
 		console.log('S: ' + msg);
-		node.fire('LOG', 'S: ' + msg.toSMS());
+		node.emit('LOG', 'S: ' + msg.toSMS());
 	};
 
 })(
@@ -1385,7 +1389,7 @@
 				that.pl = new PlayerList(msg.data);
 				// If we go auto
 				if (that.automatic_step) {
-					console.log('WE PLAY AUTO');
+					//console.log('WE PLAY AUTO');
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
@@ -1416,7 +1420,7 @@
 				console.log('OIH');
 				// Upon establishing a successful connection with the server
 				// Enter the first state
-				that.step();
+				that.updateState(that.next());
 			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
@@ -1452,9 +1456,7 @@
 			});
 			
 		}();
-		
-		// Enter the first state
-		this.step();
+			
 	}
 	
 	// Dealing with the STATE
@@ -1496,6 +1498,7 @@
 		console.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
+			console.log('New state is going to be ' + new GameState(state));
 			this.paused = false;
 			this.is(GameState.iss.PLAYING);
 			node.fire('STATECHANGE', this.gameState);
@@ -1503,7 +1506,8 @@
 		else {
 			// TODO: implement sendERR
 			node.fire('TXT','State was not updated');
-			this.publishState(); // Notify anyway what happened
+			// Removed
+			//this.publishState(); // Notify anyway what happened
 		}
 	};
 	
@@ -1512,9 +1516,7 @@
 		
 		var gameState = state || this.next();
 		
-		//var gameState = new GameState(state);
-		
-		if (this.gameLoop.exist(gameState)) {			
+		if (gameState) {			
 			this.gameState = gameState;
 			
 			// Local Listeners from previous state are erased before proceeding
@@ -1819,6 +1821,18 @@
 	};
 	
 	
+	
+	node.random = {};
+	
+	// Generates event at RANDOM timing in milliseconds
+	// if timing is missing, default is 6000
+	node.random.emit = function (event, timing){
+		var timing = timing || 6000;
+		setTimeout(function(event) {
+			node.emit(event);
+		}, 1000+Math.random()*timing, event);
+	};
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -1831,7 +1845,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 21:53:21 CET 2011
+ * Built on Mi 2. Nov 18:51:23 CET 2011
  *
  */
  
@@ -2528,7 +2542,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 1. Nov 21:53:21 CET 2011
+ * Built on Mi 2. Nov 18:51:23 CET 2011
  *
  */
  

@@ -2,7 +2,7 @@
  * nodeGame
  */
 
-(function (exports, io) {
+(function (exports) {
 	
 	var node = exports;
 
@@ -204,45 +204,7 @@
 	node.dump = function () {
 		return node.game.dump();
 	}
-	
-//	/**
-//	 * Stores data for the client.
-//	 *
-//	 * @api public
-//	 */
-//	node.set = function (key, value, fn) {
-//	  node.store.set(key, value, fn);
-//	};
-//
-//	/**
-//	 * Retrieves data for the client
-//	 *
-//	 * @api public
-//	 */
-//	node.get = function (key, fn) {
-//		node.store.get(key, fn);
-//	};
-//
-//	/**
-//	 * Checks data for the client
-//	 *
-//	 * @api public
-//	 */
-//	
-//	node.has = function (key, fn) {
-//	  node.store.has(key, fn);
-//	};
-//	
-//	/**
-//	 * Deletes data for the client
-//	 *
-//	 * @api public
-//	 */
-//	
-//	node.del = function (key, fn) {
-//	  node.store.del(key, fn);
-//	};
-//	
+
 	// *Aliases*
 	//
 	// Conventions:
@@ -267,13 +229,13 @@
 	
 	// Say
 	
-	node.onTXT = node.onTXTin = function(func) {
+	node.onTXT = function(func) {
 		node.on("in.say.TXT", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onDATA = node.onDATAin = function(func) {
+	node.onDATA = function(func) {
 		node.on("in.say.DATA", function(msg) {
 			func.call(that.game,msg);
 		});
@@ -281,13 +243,13 @@
 	
 	// Set
 	
-	node.onSTATE = node.onSTATEin = function(func) {
+	node.onSTATE = function(func) {
 		node.on("in.set.STATE", function(msg) {
 			func.call(that.game,msg);
 		});
 	};
 	
-	node.onPLIST = node.onPLISTin = function(func) {
+	node.onPLIST = function(func) {
 		node.on("in.set.PLIST", function(msg) {
 			func.call(that.game,msg);
 		});
@@ -306,7 +268,16 @@
 	};
 	
 	
-})('undefined' != typeof node ? node : module.exports);
-//})('object' === typeof module ? module.exports : (window.node = {}));
-
 	
+	node.random = {};
+	
+	// Generates event at RANDOM timing in milliseconds
+	// if timing is missing, default is 6000
+	node.random.emit = function (event, timing){
+		var timing = timing || 6000;
+		setTimeout(function(event) {
+			node.emit(event);
+		}, 1000+Math.random()*timing, event);
+	};
+	
+})('undefined' != typeof node ? node : module.exports);

@@ -75,7 +75,7 @@
 				that.pl = new PlayerList(msg.data);
 				// If we go auto
 				if (that.automatic_step) {
-					console.log('WE PLAY AUTO');
+					//console.log('WE PLAY AUTO');
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
@@ -101,6 +101,13 @@
 		var outgoingListeners = function() {
 			
 			// SAY
+			
+			node.on( OUT + say + 'HI', function(){
+				console.log('OIH');
+				// Upon establishing a successful connection with the server
+				// Enter the first state
+				that.updateState(that.next());
+			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
 				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
@@ -135,23 +142,10 @@
 			});
 			
 		}();
-		
+			
 	}
 	
-	//Game.prototype.addLocalListener = function (type,func,state) {
-	//	var state = state || this.gameState;
-	//	// TODO: check why I was calling this function
-	//	//node.on(type,func);
-	//	
-	//	if (typeof this._localListeners[type] == "undefined"){
-	//        this._localListeners[type] = [];
-	//    }
-	//
-	//    this._localListeners[type].push(func);
-	//};
-	
 	// Dealing with the STATE
-	
 	
 	Game.prototype.pause = function() {
 		this.gameState.paused = true;
@@ -197,24 +191,17 @@
 		else {
 			// TODO: implement sendERR
 			node.fire('TXT','State was not updated');
-			this.publishState(); // Notify anyway what happened
+			// Removed
+			//this.publishState(); // Notify anyway what happened
 		}
 	};
 	
 	
 	Game.prototype.step = function(state) {
 		
-		// If not parameter is passed, it goes one step ahead
-		var nextState = state.state || this.gameState.state;
-		var nextRound = state.round || this.gameState.round;
-		var nextStep = state.step || this.gameState.step++;
+		var gameState = state || this.next();
 		
-		var gameState = new GameState({state: nextState,
-									   step: nextStep,
-									   round: nextRound
-									  });
-		
-		if (this.gameLoop.exist(gameState)) {			
+		if (gameState) {			
 			this.gameState = gameState;
 			
 			// Local Listeners from previous state are erased before proceeding

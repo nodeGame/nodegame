@@ -10,18 +10,20 @@ FILES[4]='GameMsg.js'
 FILES[5]='GameLoop.js'
 FILES[6]='GameMsgGenerator.js'
 FILES[7]='GameSocketClient.js'
-FILES[8]='Game.js'
-FILES[9]='nodeGame.js'
-FILES[10]='package.json'
+FILES[8]='GameStorage.js'
+FILES[9]='Game.js'
+FILES[10]='nodeGame.js'
+FILES[11]='package.json'
 
 DIR="nodeGame/"
 MODULEDIR="nodeclient/node_modules/nodegame-client/"
-
+MODULEDIRSERVER="../server/nodegame-server/node_modules/nodegame-client/"
 for f in ${FILES[*]}
 do
   F=$DIR$f
   echo "Processing $F file..."
   `cp $F $MODULEDIR$f`
+	 `cp $F $MODULEDIRSERVER$f`
 done
 
 echo "Done."

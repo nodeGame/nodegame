@@ -57,10 +57,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 		}
 	});
 
-	
-	// SET
-	
-	this.on(set+'STATE', function(msg){
+	this.on(say+'STATE', function(msg){
 		if (!that.checkSync) {
 			that.gmm.sendTXT('**Not possible to change state: some players are not ready**', msg.from);
 		}
@@ -69,7 +66,16 @@ AdminServer.prototype.attachCustomListeners = function() {
 			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
 			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
-			that.gmm.sendSTATE (GameMsg.actions.SAY,msg.data, msg.to);
+			//that.gmm.sendSTATE (GameMsg.actions.SAY,msg.data, msg.to);
 		}
 	});
+	
+	// SET
+	
+	// Transform in say
+	this.on(set+'STATE', function(msg){
+		//this.emit(say+'STATE', msg);
+	});
+	
+	
 };

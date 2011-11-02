@@ -89,6 +89,8 @@
 						
 						// Send own name to SERVER
 						that.sendHI(that.player);
+						// Ready to play
+						node.emit('out.say.HI');
 				   	 } 
 		    	}
 		    });
@@ -158,7 +160,7 @@
 		//	this.io.volatile.send(msg.stringify());
 		//}
 		console.log('S: ' + msg);
-		node.fire('LOG', 'S: ' + msg.toSMS());
+		node.emit('LOG', 'S: ' + msg.toSMS());
 	};
 
 })(

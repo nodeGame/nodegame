@@ -45,11 +45,12 @@
 			return false;
 		}
 		// States are 1 based, arrays are 0-based => -1
-		if(gameState.round > this.limits[gameState.state-1]['rounds']) {
+		if (gameState.round > this.limits[gameState.state-1]['rounds']) {
 			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
 			return false;
 		}
 		
+		console.log('This exist: ' + gameState);
 			
 		return true;
 	};
@@ -71,6 +72,7 @@
 		
 		if (!this.exist(gameState)) {
 			console.log('No next state of non-existing state: ' + gameState);
+			return false;
 		}
 		
 		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
