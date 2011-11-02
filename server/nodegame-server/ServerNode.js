@@ -16,6 +16,7 @@ function ServerNode (options, server, io) {
 	
 	this.options.mail = this.options.mail || false;
 	this.options.dump = this.options.mail || true;
+	this.port = options.port || '80';
 	
 	this.maxChannels = options.maxChannels;
 	this.channels = [];
