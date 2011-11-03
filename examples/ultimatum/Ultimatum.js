@@ -12,7 +12,8 @@ function Ultimatum () {
 	this.BIDDER = 1;
 	this.RESPONDENT = 0;
 	
-	this.init = function() {		
+	this.init = function() {	
+		node.random.emit('DONE');
 		node.window.setup('PLAYER');
 	};
 	
@@ -62,9 +63,13 @@ function Ultimatum () {
 	var ultimatum = function(){
 		var that = this;		
 		node.window.loadFrame('solo.html');
-				
+			
+		console.log('STEANO');
+		
 		node.onDATA (function(msg){
 					
+			console.log('AAAAAAAAAAAAAAAAAAAAA');
+			
 			if (msg.data === 'BIDDER') {
 				
 				node.window.loadFrame('bidder.html', function(){

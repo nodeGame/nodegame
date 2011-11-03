@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 2. Nov 18:51:23 CET 2011
+ * Built on Do 3. Nov 09:47:28 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 2. Nov 18:51:23 CET 2011
+ * Built on Do 3. Nov 09:47:28 CET 2011
  *
  */
  
@@ -458,7 +458,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			console.log('Going to compare ' + gs + ' and ' + gameState);
+			//console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -1393,17 +1393,14 @@
 					var morePlayers = that.minPlayers - that.pl.size();
 					
 					if (morePlayers > 0 ) {
-						node.fire('OUT.say.TXT', morePlayers + ' player/s still needed to begin the game');
+						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to begin the game');
 						console.log( morePlayers + ' player/s still needed to begin the game');
 					}
 					// TODO: differentiate between before the game starts and during the game
 					else if (that.pl.isStateDone(that.gameState)) {		
-						node.fire('OUT.say.TXT', this.minPlayers + ' players connected. Game can start');
+						node.emit('OUT.say.TXT', this.minPlayers + ' players connected. Game can start');
 						console.log( this.minPlayers + ' players connected. Game can start');
 						that.updateState(that.next());
-					}
-					else {
-						console.log(that.pl.isStateDone(that.gameState));
 					}
 				}
 	//			else {
@@ -1417,7 +1414,6 @@
 			// SAY
 			
 			node.on( OUT + say + 'HI', function(){
-				console.log('OIH');
 				// Upon establishing a successful connection with the server
 				// Enter the first state
 				that.updateState(that.next());
@@ -1433,7 +1429,7 @@
 			});
 			
 			node.on( OUT + say + 'DATA', function (data, to, msg) {
-				that.gsc.sendDATA(data,to,msg);
+				that.gsc.sendDATA(GameMsg.actions.SAY, data,to,msg);
 			});
 			
 			node.on('DONE', function(msg) {
@@ -1498,7 +1494,6 @@
 		console.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
-			console.log('New state is going to be ' + new GameState(state));
 			this.paused = false;
 			this.is(GameState.iss.PLAYING);
 			node.fire('STATECHANGE', this.gameState);
@@ -1845,7 +1840,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 2. Nov 18:51:23 CET 2011
+ * Built on Do 3. Nov 09:47:28 CET 2011
  *
  */
  
@@ -2542,7 +2537,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 2. Nov 18:51:23 CET 2011
+ * Built on Do 3. Nov 09:47:28 CET 2011
  *
  */
  
