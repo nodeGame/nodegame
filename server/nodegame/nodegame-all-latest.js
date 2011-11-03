@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 09:47:28 CET 2011
+ * Built on Do 3. Nov 11:24:22 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 09:47:28 CET 2011
+ * Built on Do 3. Nov 11:24:22 CET 2011
  *
  */
  
@@ -241,7 +241,7 @@
 	GameState.iss = {};
 
 	GameState.iss.UNKNOWN = 0;
-	GameState.iss.STARTING = 10;
+	GameState.iss.LOADING = 10;
 	GameState.iss.PLAYING = 50;
 	GameState.iss.DONE = 100;
 	
@@ -1110,6 +1110,8 @@
 		this.game = null;
 		
 		this.io = this.connect();
+		
+		this.buffer = [];
 	}
 	
 	GameSocketClient.prototype.setGame = function(game) {
@@ -1139,16 +1141,23 @@
 			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
 			console.log('R: ' + gameMsg);			
-			node.fire('LOG', 'R: ' + gameMsg.toSMS());
+			node.emit('LOG', 'R: ' + gameMsg.toSMS());
 			return gameMsg;
 		}
 		catch(e) {
 			var error = "Malformed msg received: " + e;
 			console.log(error);
-			node.fire('LOG', 'E: ' + error);
+			node.emit('LOG', 'E: ' + error);
 			return false;
 		}
 		
+	};
+	
+	GameSocketClient.prototype.clearBuffer = function () {
+		for (var i=0; i<this.buffer.length; i++ ) {
+			node.emit(buffer.shift().toInEvent());
+		}
+	
 	};
 	
 	/**
@@ -1203,7 +1212,15 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				node.fire(msg.toInEvent(), msg);
+				
+				// Wait to fire the msgs if the game state is loading
+				//if (that.game.gameState.is !== GameState.LOADING) {
+					node.fire(msg.toInEvent(), msg);
+//				}
+//				else {
+//					console.log('Buffering: ' + msg);
+//					that.buffer.push(msg);
+//				}
 			}
 		});
 	};
@@ -1432,15 +1449,6 @@
 				that.gsc.sendDATA(GameMsg.actions.SAY, data,to,msg);
 			});
 			
-			node.on('DONE', function(msg) {
-				that.is(GameState.iss.DONE);
-			});
-			
-			node.on('WAIT', function(msg) {
-				that.gameState.paused = true;
-				that.publishState();
-			});
-			
 			// SET
 			
 			node.on( OUT + set + 'STATE', function (state, to) {
@@ -1449,6 +1457,24 @@
 			
 			node.on( OUT + set + 'DATA', function (data, to) {
 				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
+			});
+			
+		}();
+		
+		var internalListeners = function() {
+			
+			node.on('DONE', function(msg) {
+				that.gameState.is = GameState.iss.DONE;
+				that.publishState();
+			});
+			
+			node.on('WAIT', function(msg) {
+				that.gameState.paused = true;
+				that.publishState();
+			});
+			
+			node.on('STATECHANGE', function(){
+				that.gsc.clearBuffer();
 			});
 			
 		}();
@@ -1473,19 +1499,20 @@
 		return this.gameLoop.previous(this.gameState);
 	};
 	
-	Game.prototype.is = function(is) {
-		//console.log('IS ' + is);
-		this.gameState.is = is;
-		// TODO Check whether we should do it here or no
-		this.publishState();
-	};
+//	Game.prototype.is = function(is) {
+//		//console.log('IS ' + is);
+//		this.gameState.is = is;
+//		// TODO Check whether we should do it here or no
+//		// this.publishState();
+//	};
 	
 	Game.prototype.publishState = function() {
+		console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
-		node.fire(stateEvent,this.gameState,'ALL');
+		node.emit(stateEvent,this.gameState,'ALL');
 		console.log('I: New State = ' + this.gameState);
 	};
 	
@@ -1495,12 +1522,14 @@
 		
 		if (this.step(state) !== false){
 			this.paused = false;
-			this.is(GameState.iss.PLAYING);
-			node.fire('STATECHANGE', this.gameState);
+			this.gameState.is =  GameState.iss.PLAYING;
+			console.log('STTTEEEP ' + this.gameStep);
+			node.emit('STATECHANGE', this.gameState);
 		}
 		else {
+			console.log('error in stepping');
 			// TODO: implement sendERR
-			node.fire('TXT','State was not updated');
+			node.emit('TXT','State was not updated');
 			// Removed
 			//this.publishState(); // Notify anyway what happened
 		}
@@ -1511,16 +1540,30 @@
 		
 		var gameState = state || this.next();
 		
-		if (gameState) {			
-			this.gameState = gameState;
+		if (gameState) {
+			var func = this.gameLoop.getFunction(gameState);
 			
-			// Local Listeners from previous state are erased before proceeding
-			// to next one
-			node.node.clearLocalListeners();
-			return this.gameLoop.getFunction(this.gameState).call(this);
+			if (func) {
+			
+				gameState.is = GameState.iss.LOADING;
+				this.gameState = gameState;
+			
+				// This could speed up the loading in other client,
+				// but now causes problems of multiple update
+				this.publishState();
+				
+				// Local Listeners from previous state are erased before proceeding
+				// to next one
+				node.node.clearLocalListeners();
+				return func.call(this);
+			}
+			else {
+				console.log('No Func found');
+			}
 		}
-	
-		return false; 
+		
+		return false;
+		
 	};
 	
 	Game.prototype.dump = function() {
@@ -1840,7 +1883,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 09:47:28 CET 2011
+ * Built on Do 3. Nov 11:24:22 CET 2011
  *
  */
  
@@ -2177,63 +2220,108 @@
 		return this.frame.getElementById(id);
 	};
 	
-	//1. Load a Frame into the mainframe or other specified frame
-	//2. Wait until the frame is loaded
-	//3. Put a reference of the loaded frame.document into this.frame
-	//4. Exec the callback function
-	//GameWindow.prototype.loadFrame = function (url, func, frame) {
-	//		var frame = this.mainframe || frame;
-	//		var that = this;
-	//	
-	//		// TODO: check which one are really necessary
-	//		//window.frames[frame].src = url;
-	//		window.frames[frame].location = url;
-	//		//window.frames[frame].location.href = url;
-	//		console.log('Loaded Frame');
-	//		window.frames[frame].document.onload = function() {
-	//			console.log('THIS' + this);
-	//		    if (this.readyState==='complete'){
-	//		    	that.frame = window.frames[frame].document;
-	//		    	if (func) {
-	//		    		func.call(); // TODO: Pass the right this reference
-	//		    		console.log('Frame Loaded correctly!');
-	//		    	}
-	//		    }
-	//		    else {
-	//		    	console.log('DEBUG: frame not ready ' + window.frames[frame].document.readyState);
-	//		    }
-	//		};
-	//};
-	
+//	1. Load a Frame into the mainframe or other specified frame
+//	2. Wait until the frame is loaded
+//	3. Put a reference of the loaded frame.document into this.frame
+//	4. Exec the callback function
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var frame = this.frame || frame;
+//		var that = this;
+//		frame.location = url;
+//	
+//		frame.onload = function() {
+//			console.log('LOADING');
+//	    	if (func) {
+//	    		func.call(); // TODO: Pass the right this reference
+//	    		console.log('Frame Loaded correctly!');
+//	    	}
+//
+//		};
+//	};
+//	
 	
 	// TODO: frames are loaded taking into account also the path of the game in the server
 	
 	// FAKE ONLOAD  TODO: try to make it work with onload
-	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var that = this;	
+//		var frame = frame || this.frame;
+//		frame.location = url;
+//		
+//		var ii=0;
+//		var isFrameLoaded = setInterval( function() {
+//			if (frame.document.readyState === 'complete') {
+//			//if (window.frames[frame].document.readyState === 'complete') {
+//			//if (window.frames[frame].document) {	
+//				clearInterval(isFrameLoaded);
+//				//console.log('Interval cleared');
+//				
+//				// ???
+//				//frame = window.frames[frame].document;
+//				if (func) {
+//		    		func.call(); // TODO: Pass the right this reference
+//		    		//console.log('Frame Loaded correctly!');
+//		    	}
+//			}
+//			else {
+//				console.log('not yet ' + frame.document.readyState);
+//			}
+//		}, 100);
+//	};
+ 	
+	
+ 	// FAKE ONLOAD  TODO: try to make it work with onload
+ 	GameWindow.prototype.loadFrame = function (url, func, frame) {
 		var frame =  frame || this.mainframe;
-		var that = this;	
-		
+ 		var that = this;	
+ 		
 		window.frames[frame].location = url;
 		//window.frames[frame].location.href = url;
 		
 		this.frame = window.frames[frame].document;
-		var ii=0;
-		var isFrameLoaded = setInterval( function() {
+ 		var ii=0;
+ 		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
 			//if (window.frames[frame].document) {	
-				clearInterval(isFrameLoaded);
-				//console.log('Interval cleared');
+ 				clearInterval(isFrameLoaded);
+				console.log('Interval cleared');
 				that.frame = window.frames[frame].document;
-				if (func) {
-		    		func.call(); // TODO: Pass the right this reference
-		    		//console.log('Frame Loaded correctly!');
-		    	}
-			}
-			else {
+ 				if (func) {
+ 		    		func.call(); // TODO: Pass the right this reference
+		    		console.log('Frame Loaded correctly!');
+ 		    	}
+ 			}
+ 			else {
 				console.log('not yet ' + window.frames[frame].document.readyState);
-			}
-		}, 100);
-	};
+ 			}
+ 		}, 100);
+ 	};
+	
+ 	
+ 	
+// NEW VERSION 	
+ 	
+//	// FAKE ONLOAD  TODO: try to make it work with onload
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var that = this;	
+//		var frame = frame || this.frame;
+//		frame.location = url;
+//		
+//		var ii=0;
+//		var isFrameLoaded = setInterval( function() {
+//			if (frame.document.readyState === 'complete') {
+//				clearInterval(isFrameLoaded);
+//				console.log('Completing...' + url);
+//				if (func) {
+//		    		func.call(); // TODO: Pass the right this reference
+//		    		console.log('Frame Loaded correctly!');
+//		    	}
+//			}
+//			else {
+//				console.log('not yet ' + frame.document.readyState);
+//			}
+//		}, 100);
+//	};
 	
 	GameWindow.prototype.loadPage = function (url, frame) {
 		var frame = this.mainframe || frame;
@@ -2537,7 +2625,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 09:47:28 CET 2011
+ * Built on Do 3. Nov 11:24:22 CET 2011
  *
  */
  

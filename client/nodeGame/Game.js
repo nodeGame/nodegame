@@ -118,15 +118,6 @@
 				that.gsc.sendDATA(GameMsg.actions.SAY, data,to,msg);
 			});
 			
-			node.on('DONE', function(msg) {
-				that.is(GameState.iss.DONE);
-			});
-			
-			node.on('WAIT', function(msg) {
-				that.gameState.paused = true;
-				that.publishState();
-			});
-			
 			// SET
 			
 			node.on( OUT + set + 'STATE', function (state, to) {
@@ -135,6 +126,24 @@
 			
 			node.on( OUT + set + 'DATA', function (data, to) {
 				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
+			});
+			
+		}();
+		
+		var internalListeners = function() {
+			
+			node.on('DONE', function(msg) {
+				that.gameState.is = GameState.iss.DONE;
+				that.publishState();
+			});
+			
+			node.on('WAIT', function(msg) {
+				that.gameState.paused = true;
+				that.publishState();
+			});
+			
+			node.on('STATECHANGE', function(){
+				that.gsc.clearBuffer();
 			});
 			
 		}();
@@ -159,19 +168,20 @@
 		return this.gameLoop.previous(this.gameState);
 	};
 	
-	Game.prototype.is = function(is) {
-		//console.log('IS ' + is);
-		this.gameState.is = is;
-		// TODO Check whether we should do it here or no
-		this.publishState();
-	};
+//	Game.prototype.is = function(is) {
+//		//console.log('IS ' + is);
+//		this.gameState.is = is;
+//		// TODO Check whether we should do it here or no
+//		// this.publishState();
+//	};
 	
 	Game.prototype.publishState = function() {
+		console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
-		node.fire(stateEvent,this.gameState,'ALL');
+		node.emit(stateEvent,this.gameState,'ALL');
 		console.log('I: New State = ' + this.gameState);
 	};
 	
@@ -181,12 +191,14 @@
 		
 		if (this.step(state) !== false){
 			this.paused = false;
-			this.is(GameState.iss.PLAYING);
-			node.fire('STATECHANGE', this.gameState);
+			this.gameState.is =  GameState.iss.PLAYING;
+			console.log('STTTEEEP ' + this.gameStep);
+			node.emit('STATECHANGE', this.gameState);
 		}
 		else {
+			console.log('error in stepping');
 			// TODO: implement sendERR
-			node.fire('TXT','State was not updated');
+			node.emit('TXT','State was not updated');
 			// Removed
 			//this.publishState(); // Notify anyway what happened
 		}
@@ -197,16 +209,30 @@
 		
 		var gameState = state || this.next();
 		
-		if (gameState) {			
-			this.gameState = gameState;
+		if (gameState) {
+			var func = this.gameLoop.getFunction(gameState);
 			
-			// Local Listeners from previous state are erased before proceeding
-			// to next one
-			node.node.clearLocalListeners();
-			return this.gameLoop.getFunction(this.gameState).call(this);
+			if (func) {
+			
+				gameState.is = GameState.iss.LOADING;
+				this.gameState = gameState;
+			
+				// This could speed up the loading in other client,
+				// but now causes problems of multiple update
+				this.publishState();
+				
+				// Local Listeners from previous state are erased before proceeding
+				// to next one
+				node.node.clearLocalListeners();
+				return func.call(this);
+			}
+			else {
+				console.log('No Func found');
+			}
 		}
-	
-		return false; 
+		
+		return false;
+		
 	};
 	
 	Game.prototype.dump = function() {

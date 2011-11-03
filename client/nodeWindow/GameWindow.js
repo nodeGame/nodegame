@@ -79,63 +79,108 @@
 		return this.frame.getElementById(id);
 	};
 	
-	//1. Load a Frame into the mainframe or other specified frame
-	//2. Wait until the frame is loaded
-	//3. Put a reference of the loaded frame.document into this.frame
-	//4. Exec the callback function
-	//GameWindow.prototype.loadFrame = function (url, func, frame) {
-	//		var frame = this.mainframe || frame;
-	//		var that = this;
-	//	
-	//		// TODO: check which one are really necessary
-	//		//window.frames[frame].src = url;
-	//		window.frames[frame].location = url;
-	//		//window.frames[frame].location.href = url;
-	//		console.log('Loaded Frame');
-	//		window.frames[frame].document.onload = function() {
-	//			console.log('THIS' + this);
-	//		    if (this.readyState==='complete'){
-	//		    	that.frame = window.frames[frame].document;
-	//		    	if (func) {
-	//		    		func.call(); // TODO: Pass the right this reference
-	//		    		console.log('Frame Loaded correctly!');
-	//		    	}
-	//		    }
-	//		    else {
-	//		    	console.log('DEBUG: frame not ready ' + window.frames[frame].document.readyState);
-	//		    }
-	//		};
-	//};
-	
+//	1. Load a Frame into the mainframe or other specified frame
+//	2. Wait until the frame is loaded
+//	3. Put a reference of the loaded frame.document into this.frame
+//	4. Exec the callback function
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var frame = this.frame || frame;
+//		var that = this;
+//		frame.location = url;
+//	
+//		frame.onload = function() {
+//			console.log('LOADING');
+//	    	if (func) {
+//	    		func.call(); // TODO: Pass the right this reference
+//	    		console.log('Frame Loaded correctly!');
+//	    	}
+//
+//		};
+//	};
+//	
 	
 	// TODO: frames are loaded taking into account also the path of the game in the server
 	
 	// FAKE ONLOAD  TODO: try to make it work with onload
-	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var that = this;	
+//		var frame = frame || this.frame;
+//		frame.location = url;
+//		
+//		var ii=0;
+//		var isFrameLoaded = setInterval( function() {
+//			if (frame.document.readyState === 'complete') {
+//			//if (window.frames[frame].document.readyState === 'complete') {
+//			//if (window.frames[frame].document) {	
+//				clearInterval(isFrameLoaded);
+//				//console.log('Interval cleared');
+//				
+//				// ???
+//				//frame = window.frames[frame].document;
+//				if (func) {
+//		    		func.call(); // TODO: Pass the right this reference
+//		    		//console.log('Frame Loaded correctly!');
+//		    	}
+//			}
+//			else {
+//				console.log('not yet ' + frame.document.readyState);
+//			}
+//		}, 100);
+//	};
+ 	
+	
+ 	// FAKE ONLOAD  TODO: try to make it work with onload
+ 	GameWindow.prototype.loadFrame = function (url, func, frame) {
 		var frame =  frame || this.mainframe;
-		var that = this;	
-		
+ 		var that = this;	
+ 		
 		window.frames[frame].location = url;
 		//window.frames[frame].location.href = url;
 		
 		this.frame = window.frames[frame].document;
-		var ii=0;
-		var isFrameLoaded = setInterval( function() {
+ 		var ii=0;
+ 		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
 			//if (window.frames[frame].document) {	
-				clearInterval(isFrameLoaded);
-				//console.log('Interval cleared');
+ 				clearInterval(isFrameLoaded);
+				console.log('Interval cleared');
 				that.frame = window.frames[frame].document;
-				if (func) {
-		    		func.call(); // TODO: Pass the right this reference
-		    		//console.log('Frame Loaded correctly!');
-		    	}
-			}
-			else {
+ 				if (func) {
+ 		    		func.call(); // TODO: Pass the right this reference
+		    		console.log('Frame Loaded correctly!');
+ 		    	}
+ 			}
+ 			else {
 				console.log('not yet ' + window.frames[frame].document.readyState);
-			}
-		}, 100);
-	};
+ 			}
+ 		}, 100);
+ 	};
+	
+ 	
+ 	
+// NEW VERSION 	
+ 	
+//	// FAKE ONLOAD  TODO: try to make it work with onload
+//	GameWindow.prototype.loadFrame = function (url, func, frame) {
+//		var that = this;	
+//		var frame = frame || this.frame;
+//		frame.location = url;
+//		
+//		var ii=0;
+//		var isFrameLoaded = setInterval( function() {
+//			if (frame.document.readyState === 'complete') {
+//				clearInterval(isFrameLoaded);
+//				console.log('Completing...' + url);
+//				if (func) {
+//		    		func.call(); // TODO: Pass the right this reference
+//		    		console.log('Frame Loaded correctly!');
+//		    	}
+//			}
+//			else {
+//				console.log('not yet ' + frame.document.readyState);
+//			}
+//		}, 100);
+//	};
 	
 	GameWindow.prototype.loadPage = function (url, frame) {
 		var frame = this.mainframe || frame;

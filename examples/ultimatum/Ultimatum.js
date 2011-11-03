@@ -4,7 +4,7 @@ function Ultimatum () {
 	this.description = 'Ultimatum Descr';
 	this.version = '0.2';
 	
-	this.automatic_step = true;
+	this.automatic_step = false;
 	
 	this.minPlayers = 2;
 	this.maxPlayers = 10;
@@ -64,12 +64,8 @@ function Ultimatum () {
 		var that = this;		
 		node.window.loadFrame('solo.html');
 			
-		console.log('STEANO');
-		
 		node.onDATA (function(msg){
 					
-			console.log('AAAAAAAAAAAAAAAAAAAAA');
-			
 			if (msg.data === 'BIDDER') {
 				
 				node.window.loadFrame('bidder.html', function(){

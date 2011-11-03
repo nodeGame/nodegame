@@ -22,6 +22,8 @@
 		this.game = null;
 		
 		this.io = this.connect();
+		
+		this.buffer = [];
 	}
 	
 	GameSocketClient.prototype.setGame = function(game) {
@@ -51,16 +53,23 @@
 			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
 			console.log('R: ' + gameMsg);			
-			node.fire('LOG', 'R: ' + gameMsg.toSMS());
+			node.emit('LOG', 'R: ' + gameMsg.toSMS());
 			return gameMsg;
 		}
 		catch(e) {
 			var error = "Malformed msg received: " + e;
 			console.log(error);
-			node.fire('LOG', 'E: ' + error);
+			node.emit('LOG', 'E: ' + error);
 			return false;
 		}
 		
+	};
+	
+	GameSocketClient.prototype.clearBuffer = function () {
+		for (var i=0; i<this.buffer.length; i++ ) {
+			node.emit(buffer.shift().toInEvent());
+		}
+	
 	};
 	
 	/**
@@ -115,7 +124,15 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				node.fire(msg.toInEvent(), msg);
+				
+				// Wait to fire the msgs if the game state is loading
+				//if (that.game.gameState.is !== GameState.LOADING) {
+					node.fire(msg.toInEvent(), msg);
+//				}
+//				else {
+//					console.log('Buffering: ' + msg);
+//					that.buffer.push(msg);
+//				}
 			}
 		});
 	};

@@ -16,7 +16,7 @@
 	GameState.iss = {};
 
 	GameState.iss.UNKNOWN = 0;
-	GameState.iss.STARTING = 10;
+	GameState.iss.LOADING = 10;
 	GameState.iss.PLAYING = 50;
 	GameState.iss.DONE = 100;
 	
