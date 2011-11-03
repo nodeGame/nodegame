@@ -3,7 +3,7 @@ var Ultimatum = require('ultimatum');
 
 var conf = {
 	name: "P_" + Math.floor(Math.random()*100),
-	url: "http://localhost:8004/ultimatum/admin"
+	url: "http://localhost:8080/ultimatum/admin"
 };
 
 

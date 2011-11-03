@@ -1,14 +1,4 @@
-
-if ('object' === typeof module && 'function' === typeof require) {
-	module.exports = Ultimatum;
-	var node = require('../nodegame-client');
-	//console.log(node);
-	//console.log(module);
-}
-
-
-
-function Ultimatum () {
+function Monitor_Ultimatum () {
 	
 	this.name = 'Monitor for Ultimatum';
 	this.description = 'No Description';
@@ -17,14 +7,13 @@ function Ultimatum () {
 	this.minPlayers = 2;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = true;
+	this.automatic_step = false;
 	
 	this.init = function() {
-		var that = this;
+		node.window.setup('MONITOR');
 	};
 	
 	var pregame1 = function(){
-		//console.log(node);
 		console.log('Pregame');
 	};
 	
@@ -40,29 +29,29 @@ function Ultimatum () {
 		var g = null;
 		for(i=0;i<groups.length;i++){
 			g = groups[i];
-			//console.log(g);
-			console.log('GSIZE: ' + g.size());
+//			console.log(g);
+//			console.log(g.size());
 			if (g.size() > 1) {
 				// Bidder
 				var bidder = g.getRandom();
 				//console.log(bidder);
 				g.remove(bidder.id);				
-				node.say('DATA', 'BIDDER', bidder.id);
+				node.fire('out.say.DATA', 'BIDDER', bidder.id);
 				
 				// Respondent
 				var respondent = g.getRandom();
 				//console.log(respondent);
-				node.say('DATA', 'RESPONDENT', respondent.id);
+				node.fire('out.say.DATA', 'RESPONDENT', respondent.id);
 
 				// Make each other aware
-				node.say('DATA', 'OTHER', bidder.id, respondent.id);
-				node.say('DATA', 'OTHER', respondent.id, bidder.id);
+				node.fire('out.say.DATA', 'OTHER', bidder.id, respondent.id);
+				node.fire('out.say.DATA', 'OTHER', respondent.id, bidder.id);
 
 			}
 			else {
 				var solo =  g.getRandom();
 				console.log(solo);
-				node.say('DATA', 'SOLO',respondent.id);
+				node.fire('out.say.DATA', 'SOLO',respondent.id);
 			}	
 		}
 		console.log('Game1');
@@ -73,7 +62,6 @@ function Ultimatum () {
 	};
 	
 	var endgame1 = function(){
-		node.memory.dump('./exit.csv', true);		
 		console.log('Game ended');
 	};
 	
@@ -106,7 +94,7 @@ function Ultimatum () {
 	this.loops = {
 			1: {loop:pregameloop},
 			2: {loop:instructionsloop},
-			3: {rounds:2, loop:gameloop},
+			3: {rounds:10, loop:gameloop},
 			4: {loop:postgameloop},
 			5: {loop:endgameloop}
 		};	

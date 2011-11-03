@@ -6,7 +6,7 @@ var ServerNode = require('./nodegame-server');
 
 var options = { 
 				name: "nodeGame Server",
-				port: 8004,
+				port: 8080,
 				dump: true,
 				mail: false
 };
@@ -18,19 +18,19 @@ var options = {
 var sn = new ServerNode(options);
 
 sn.addChannel({
-				name: 'pr',
-			  	admin: 'peerreview/admin',
-			  	player: 'peerreview'
+				name: '2',
+			  	admin: 'ultimatum2/admin',
+			  	player: 'ultimatum2'
 });
 
 sn.addChannel({
-				name: 'example',
-				admin: 'examplegame/admin',
-				player: 'examplegame'
+				name: '3',
+				admin: 'ultimatum3/admin',
+				player: 'ultimatum3'
 });
 
 sn.addChannel({
-				name: 'ultimatum',
-				admin: 'ultimatum/admin',
-				player: 'ultimatum'
+				name: '4',
+				admin: 'ultimatum4/admin',
+				player: 'ultimatum4'
 });

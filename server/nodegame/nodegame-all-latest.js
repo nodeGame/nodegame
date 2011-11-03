@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.4.5
+ * nodeGame-all v0.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 15:49:50 CET 2011
+ * Built on Do 3. Nov 18:12:01 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.4.5
+ * nodeGame Client v0.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 15:49:50 CET 2011
+ * Built on Do 3. Nov 18:12:01 CET 2011
  *
  */
  
@@ -1616,7 +1616,7 @@
 	Game.prototype.step = function(state) {
 		
 		var gameState = state || this.next();
-		
+		console.log(gameState);
 		if (gameState) {
 			var func = this.gameLoop.getFunction(gameState);
 			
@@ -1671,6 +1671,9 @@
 	
 	var node = exports;
 
+	// Memory related operations
+	node.memory = {};
+	
 	// if node
 	
 	if ('object' === typeof module && 'function' === typeof require) {
@@ -1796,6 +1799,10 @@
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
+	    
+	    node.memory.dump = function (path, reverse) {
+			node.fs.writeCsv(path, node.memory.getValues(reverse));
+	    }
 	  }
 	  // end node
 		
@@ -1832,10 +1839,8 @@
 		this.game = null;
 	};
 	
-	// Memory related operations
-	node.memory = {};
 	
-	node.memory.dump = function (reverse) {
+	node.memory.get = function (reverse) {
 		return node.game.dump(reverse);
 	}
 
@@ -1954,11 +1959,11 @@
 	};
 	
 	node.DONE = function (text) {
-		node.fire("DONE",text);
+		node.emit("DONE",text);
 	};
 	
 	node.TXT = function (text, to) {
-		node.fire('out.say.TXT', text, to);
+		node.emit('out.say.TXT', text, to);
 	};
 	
 	
@@ -1974,6 +1979,21 @@
 		}, 1000+Math.random()*timing, event);
 	};
 	
+	node.random.exec = function (func, timing) {
+		var timing = timing || 6000;
+		setTimeout(function(func) {
+			func.call();
+		}, 1000+Math.random()*timing, func);
+	}
+	
+	node.replay = function() {
+		node.goto(new GameState({state: 1, step: 1, round: 1}));
+	}
+	
+	node.goto = function(state) {
+		node.game.updateState(state);
+	};
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -1981,12 +2001,12 @@
  
  
 /*!
- * nodeWindow v0.4.5
+ * nodeWindow v0.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 15:49:50 CET 2011
+ * Built on Do 3. Nov 18:12:01 CET 2011
  *
  */
  
@@ -2723,12 +2743,12 @@
  
  
 /*!
- * nodeGadgets v0.4.5
+ * nodeGadgets v0.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 15:49:50 CET 2011
+ * Built on Do 3. Nov 18:12:01 CET 2011
  *
  */
  

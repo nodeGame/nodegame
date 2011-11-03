@@ -6,6 +6,9 @@
 	
 	var node = exports;
 
+	// Memory related operations
+	node.memory = {};
+	
 	// if node
 	
 	if ('object' === typeof module && 'function' === typeof require) {
@@ -131,6 +134,10 @@
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
+	    
+	    node.memory.dump = function (path, reverse) {
+			node.fs.writeCsv(path, node.memory.getValues(reverse));
+	    }
 	  }
 	  // end node
 		
@@ -167,10 +174,8 @@
 		this.game = null;
 	};
 	
-	// Memory related operations
-	node.memory = {};
 	
-	node.memory.dump = function (reverse) {
+	node.memory.get = function (reverse) {
 		return node.game.dump(reverse);
 	}
 
@@ -289,11 +294,11 @@
 	};
 	
 	node.DONE = function (text) {
-		node.fire("DONE",text);
+		node.emit("DONE",text);
 	};
 	
 	node.TXT = function (text, to) {
-		node.fire('out.say.TXT', text, to);
+		node.emit('out.say.TXT', text, to);
 	};
 	
 	
@@ -307,6 +312,21 @@
 		setTimeout(function(event) {
 			node.emit(event);
 		}, 1000+Math.random()*timing, event);
+	};
+	
+	node.random.exec = function (func, timing) {
+		var timing = timing || 6000;
+		setTimeout(function(func) {
+			func.call();
+		}, 1000+Math.random()*timing, func);
+	}
+	
+	node.replay = function() {
+		node.goto(new GameState({state: 1, step: 1, round: 1}));
+	}
+	
+	node.goto = function(state) {
+		node.game.updateState(state);
 	};
 	
 })('undefined' != typeof node ? node : module.exports);

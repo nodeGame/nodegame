@@ -208,7 +208,7 @@
 	Game.prototype.step = function(state) {
 		
 		var gameState = state || this.next();
-		
+		console.log(gameState);
 		if (gameState) {
 			var func = this.gameLoop.getFunction(gameState);
 			
