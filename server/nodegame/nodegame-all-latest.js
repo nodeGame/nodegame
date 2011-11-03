@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 18:12:01 CET 2011
+ * Built on Do 3. Nov 20:55:53 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 18:12:01 CET 2011
+ * Built on Do 3. Nov 20:55:53 CET 2011
  *
  */
  
@@ -1212,10 +1212,11 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				
+				console.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
 				if (that.game.gameState.is !== GameState.LOADING) {
-					node.fire(msg.toInEvent(), msg);
+					console.log('GM is now: ' + that.game.gameState.is);
+					node.emit(msg.toInEvent(), msg);
 				}
 				else {
 					console.log('Buffering: ' + msg);
@@ -2006,7 +2007,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 18:12:01 CET 2011
+ * Built on Do 3. Nov 20:55:53 CET 2011
  *
  */
  
@@ -2401,7 +2402,7 @@
 		window.frames[frame].location = url;
 		//window.frames[frame].location.href = url;
 		
-		this.frame = window.frames[frame].document;
+		//this.frame = window.frames[frame].document;
  		var ii=0;
  		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
@@ -2748,7 +2749,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 18:12:01 CET 2011
+ * Built on Do 3. Nov 20:55:53 CET 2011
  *
  */
  

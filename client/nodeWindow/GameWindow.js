@@ -137,7 +137,7 @@
 		window.frames[frame].location = url;
 		//window.frames[frame].location.href = url;
 		
-		this.frame = window.frames[frame].document;
+		//this.frame = window.frames[frame].document;
  		var ii=0;
  		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
