@@ -47,9 +47,43 @@
 	  return true;
 	};
 	
-	GameStorage.prototype.dump = function () {
+	// Reverse the memory: instead of the history of a player for all rounds,
+	// we get the history of a round of all players
+	GameStorage.prototype.reverse = function () {
+		var reverse = {};
+		
+		for( var c in this.clients) {
+			if (this.clients.hasOwnProperty(c)) {
+				for (var s in this.clients[c]) {
+					if (this.clients[c].hasOwnProperty(s)) {
+						
+						if (!reverse[s]) {
+							reverse[s] = {};
+						}
+						
+						if (!reverse[s][c]) {
+							reverse[s][c] = {};
+						}
+						
+						var data = this.clients[c][s];
+						
+						for (var i in data) {
+						  if (data.hasOwnProperty(i)) {
+							  reverse[s][c][i] = data[i]; 
+							  console.log('Reversed ' +  i + ' ' + data[i]);
+						  }
+						}
+					}
+			    }
+			}
+		}
+		
+		return reverse;
+	};
 	
-		return this.clients;
+	GameStorage.prototype.dump = function (reverse) {
+		
+		return (reverse) ? this.reverse() : this.clients;
 	};
 	
 

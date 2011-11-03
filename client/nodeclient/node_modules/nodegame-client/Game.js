@@ -232,8 +232,8 @@
 		
 	};
 	
-	Game.prototype.dump = function() {
-		return this.memory.dump();
+	Game.prototype.dump = function(reverse) {
+		return this.memory.dump(reverse);
 	}
 	
 	Game.prototype.init = function() {

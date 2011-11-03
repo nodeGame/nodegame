@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 12:05:56 CET 2011
+ * Built on Do 3. Nov 13:04:56 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 12:05:56 CET 2011
+ * Built on Do 3. Nov 13:04:56 CET 2011
  *
  */
  
@@ -1323,9 +1323,43 @@
 	  return true;
 	};
 	
-	GameStorage.prototype.dump = function () {
+	// Reverse the memory: instead of the history of a player for all rounds,
+	// we get the history of a round of all players
+	GameStorage.prototype.reverse = function () {
+		var reverse = {};
+		
+		for( var c in this.clients) {
+			if (this.clients.hasOwnProperty(c)) {
+				for (var s in this.clients[c]) {
+					if (this.clients[c].hasOwnProperty(s)) {
+						
+						if (!reverse[s]) {
+							reverse[s] = {};
+						}
+						
+						if (!reverse[s][c]) {
+							reverse[s][c] = {};
+						}
+						
+						var data = this.clients[c][s];
+						
+						for (var i in data) {
+						  if (data.hasOwnProperty(i)) {
+							  reverse[s][c][i] = data[i]; 
+							  console.log('Reversed ' +  i + ' ' + data[i]);
+						  }
+						}
+					}
+			    }
+			}
+		}
+		
+		return reverse;
+	};
 	
-		return this.clients;
+	GameStorage.prototype.dump = function (reverse) {
+		
+		return (reverse) ? this.reverse() : this.clients;
 	};
 	
 
@@ -1568,8 +1602,8 @@
 		
 	};
 	
-	Game.prototype.dump = function() {
-		return this.memory.dump();
+	Game.prototype.dump = function(reverse) {
+		return this.memory.dump(reverse);
 	}
 	
 	Game.prototype.init = function() {
@@ -1700,7 +1734,28 @@
 	     */
 	
 	    node.Game = require('./Game').Game;
+	    
+	    
+	    node.csv = require('ya-csv');
+	    
+	    /**
+	     * Enable file system operations
+	     */
 	
+	    node.fs = {};
+	    
+	    /**
+	     * Takes an obj and write it down to a csv file;
+	     */
+	    node.fs.writeCsv = function (path, obj) {
+
+	    	var reader = csv.createCsvStreamReader(process.openStdin());
+	    	var writer = csv.createCsvStreamWriter(process.stdout);
+
+	    	reader.addListener('data', function(data) {
+	    	    writer.writeRecord(data);
+	    	});
+	    }
 	  }
 	  // end node
 		
@@ -1737,6 +1792,13 @@
 		this.game = null;
 	};
 	
+	// Memory related operations
+	node.memory = {};
+	
+	node.memory.dump = function (reverse) {
+		return node.game.dump(reverse);
+	}
+
 	
 	/**
 	 * Creating an object
@@ -1794,10 +1856,6 @@
 	// TODO node.get
 	//node.get = function (key, value) {};
 	
-	node.dump = function () {
-		return node.game.dump();
-	}
-
 	// *Aliases*
 	//
 	// Conventions:
@@ -1885,7 +1943,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 12:05:56 CET 2011
+ * Built on Do 3. Nov 13:04:56 CET 2011
  *
  */
  
@@ -2627,7 +2685,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 12:05:56 CET 2011
+ * Built on Do 3. Nov 13:04:56 CET 2011
  *
  */
  
