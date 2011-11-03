@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:24:22 CET 2011
+ * Built on Do 3. Nov 11:26:29 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:24:22 CET 2011
+ * Built on Do 3. Nov 11:26:29 CET 2011
  *
  */
  
@@ -1214,13 +1214,13 @@
 			if (msg) { // Parsing successful
 				
 				// Wait to fire the msgs if the game state is loading
-				//if (that.game.gameState.is !== GameState.LOADING) {
+				if (that.game.gameState.is !== GameState.LOADING) {
 					node.fire(msg.toInEvent(), msg);
-//				}
-//				else {
-//					console.log('Buffering: ' + msg);
-//					that.buffer.push(msg);
-//				}
+				}
+				else {
+					console.log('Buffering: ' + msg);
+					that.buffer.push(msg);
+				}
 			}
 		});
 	};
@@ -1557,9 +1557,6 @@
 				node.node.clearLocalListeners();
 				return func.call(this);
 			}
-			else {
-				console.log('No Func found');
-			}
 		}
 		
 		return false;
@@ -1883,7 +1880,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:24:22 CET 2011
+ * Built on Do 3. Nov 11:26:29 CET 2011
  *
  */
  
@@ -2625,7 +2622,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:24:22 CET 2011
+ * Built on Do 3. Nov 11:26:29 CET 2011
  *
  */
  

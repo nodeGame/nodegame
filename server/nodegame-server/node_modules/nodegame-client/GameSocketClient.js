@@ -126,13 +126,13 @@
 			if (msg) { // Parsing successful
 				
 				// Wait to fire the msgs if the game state is loading
-				//if (that.game.gameState.is !== GameState.LOADING) {
+				if (that.game.gameState.is !== GameState.LOADING) {
 					node.fire(msg.toInEvent(), msg);
-//				}
-//				else {
-//					console.log('Buffering: ' + msg);
-//					that.buffer.push(msg);
-//				}
+				}
+				else {
+					console.log('Buffering: ' + msg);
+					that.buffer.push(msg);
+				}
 			}
 		});
 	};

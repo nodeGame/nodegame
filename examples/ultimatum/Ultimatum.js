@@ -13,8 +13,8 @@ function Ultimatum () {
 	this.RESPONDENT = 0;
 	
 	this.init = function() {	
-		node.random.emit('DONE');
 		node.window.setup('PLAYER');
+		node.random.emit('DONE');
 	};
 	
 	
@@ -142,7 +142,9 @@ function Ultimatum () {
 	};
 	
 	var postgame = function(){
-		node.window.loadFrame('postgame.html');
+		node.window.loadFrame('postgame.html', function(){
+			node.random.emit('DONE');
+		});
 		console.log('Postgame');
 	};
 	

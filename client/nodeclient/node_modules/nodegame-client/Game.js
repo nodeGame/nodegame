@@ -226,9 +226,6 @@
 				node.node.clearLocalListeners();
 				return func.call(this);
 			}
-			else {
-				console.log('No Func found');
-			}
 		}
 		
 		return false;
