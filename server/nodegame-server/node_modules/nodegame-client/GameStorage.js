@@ -12,7 +12,8 @@
 	 * @api public
 	 */
 	
-	function GameStorage (options) {
+	function GameStorage (game, options) {
+	  this.game = game;
 	  this.options = options;
 	  this.clients = {};
 	};
@@ -31,10 +32,14 @@
 	  if (!this.clients[client]) {
 	    this.clients[client] = {};
 	  }
+	  var state = this.game.gameState.toString();
+	  if (!this.clients[client][state]) {
+		  this.clients[client][state] = {};
+	  }
 	  
 	  for (var i in data) {
-		  if (data.hasOwnProperty(i)){
-			  this.clients[client][i] = data[i];
+		  if (data.hasOwnProperty(i)) {
+			  this.clients[client][state][i] = data[i];
 			  console.log('Added ' +  i + ' ' + data[i]);
 		  }
 	  }

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:51:08 CET 2011
+ * Built on Do 3. Nov 12:05:56 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:51:08 CET 2011
+ * Built on Do 3. Nov 12:05:56 CET 2011
  *
  */
  
@@ -1288,7 +1288,8 @@
 	 * @api public
 	 */
 	
-	function GameStorage (options) {
+	function GameStorage (game, options) {
+	  this.game = game;
 	  this.options = options;
 	  this.clients = {};
 	};
@@ -1307,10 +1308,14 @@
 	  if (!this.clients[client]) {
 	    this.clients[client] = {};
 	  }
+	  var state = this.game.gameState.toString();
+	  if (!this.clients[client][state]) {
+		  this.clients[client][state] = {};
+	  }
 	  
 	  for (var i in data) {
-		  if (data.hasOwnProperty(i)){
-			  this.clients[client][i] = data[i];
+		  if (data.hasOwnProperty(i)) {
+			  this.clients[client][state][i] = data[i];
 			  console.log('Added ' +  i + ' ' + data[i]);
 		  }
 	  }
@@ -1375,7 +1380,7 @@
 		
 		this.pl = new PlayerList();
 		
-		this.memory = new GameStorage();
+		this.memory = new GameStorage(this);
 		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';
@@ -1880,7 +1885,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:51:08 CET 2011
+ * Built on Do 3. Nov 12:05:56 CET 2011
  *
  */
  
@@ -2622,7 +2627,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 11:51:09 CET 2011
+ * Built on Do 3. Nov 12:05:56 CET 2011
  *
  */
  
