@@ -115,20 +115,22 @@
 	     * Enable file system operations
 	     */
 	
+	    var fs = require('fs');
+	    var path = require('path');
+	    var csv = require('ya-csv');
+	    	
 	    node.fs = {};
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;
 	     */
 	    node.fs.writeCsv = function (path, obj) {
-
-	    	var reader = csv.createCsvStreamReader(process.openStdin());
-	    	var writer = csv.createCsvStreamWriter(process.stdout);
-
-	    	reader.addListener('data', function(data) {
-	    	    writer.writeRecord(data);
-	    	});
-	    }
+	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
+	    	var i;
+	    	for (i=0;i<obj.length;i++) {
+	    		writer.writeRecord(obj[i]);
+	    	}
+	    };
 	  }
 	  // end node
 		
@@ -172,6 +174,9 @@
 		return node.game.dump(reverse);
 	}
 
+	node.memory.getValues = function(reverse) {
+		return node.game.memory.getValues(reverse);
+	}
 	
 	/**
 	 * Creating an object

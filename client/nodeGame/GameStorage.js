@@ -86,8 +86,46 @@
 		return (reverse) ? this.reverse() : this.clients;
 	};
 	
-
+	GameStorage.prototype.getValues = function (reverse) {
+		
+		var values = [];
+		
+		var dump = this.dump(reverse);
+		for (var i in dump) {
+			if (dump.hasOwnProperty(i)) {
+				var line = this.getLine(i, dump);
+				for (var j in line) {
+					values.push(line[j]);
+				}
+			}
+		}
+		return values;
+	};
 	
+	GameStorage.prototype.getLine = function (id, storage) {
+		var storage = storage || this.clients;
+		if (!storage[id]) return;
+		
+		var lines = [];
+		
+		for (var i in storage[id]) {
+			if (storage[id].hasOwnProperty(i)) {
+				var line = [];
+				line.push(id);
+				line.push(i);
+				
+				for (var j in storage[id][i]) {
+					if (storage[id][i].hasOwnProperty(j)) {
+						line.push(storage[id][i][j]);
+					}
+				}
+				
+				lines.push(line);
+			}
+		}
+		
+		return lines;	
+	};
 })(
 	'undefined' != typeof node ? node : module.exports
 );

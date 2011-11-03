@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 13:04:56 CET 2011
+ * Built on Do 3. Nov 15:49:50 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 13:04:56 CET 2011
+ * Built on Do 3. Nov 15:49:50 CET 2011
  *
  */
  
@@ -1362,8 +1362,46 @@
 		return (reverse) ? this.reverse() : this.clients;
 	};
 	
-
+	GameStorage.prototype.getValues = function (reverse) {
+		
+		var values = [];
+		
+		var dump = this.dump(reverse);
+		for (var i in dump) {
+			if (dump.hasOwnProperty(i)) {
+				var line = this.getLine(i, dump);
+				for (var j in line) {
+					values.push(line[j]);
+				}
+			}
+		}
+		return values;
+	};
 	
+	GameStorage.prototype.getLine = function (id, storage) {
+		var storage = storage || this.clients;
+		if (!storage[id]) return;
+		
+		var lines = [];
+		
+		for (var i in storage[id]) {
+			if (storage[id].hasOwnProperty(i)) {
+				var line = [];
+				line.push(id);
+				line.push(i);
+				
+				for (var j in storage[id][i]) {
+					if (storage[id][i].hasOwnProperty(j)) {
+						line.push(storage[id][i][j]);
+					}
+				}
+				
+				lines.push(line);
+			}
+		}
+		
+		return lines;	
+	};
 })(
 	'undefined' != typeof node ? node : module.exports
 ); 
@@ -1742,20 +1780,22 @@
 	     * Enable file system operations
 	     */
 	
+	    var fs = require('fs');
+	    var path = require('path');
+	    var csv = require('ya-csv');
+	    	
 	    node.fs = {};
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;
 	     */
 	    node.fs.writeCsv = function (path, obj) {
-
-	    	var reader = csv.createCsvStreamReader(process.openStdin());
-	    	var writer = csv.createCsvStreamWriter(process.stdout);
-
-	    	reader.addListener('data', function(data) {
-	    	    writer.writeRecord(data);
-	    	});
-	    }
+	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
+	    	var i;
+	    	for (i=0;i<obj.length;i++) {
+	    		writer.writeRecord(obj[i]);
+	    	}
+	    };
 	  }
 	  // end node
 		
@@ -1799,6 +1839,9 @@
 		return node.game.dump(reverse);
 	}
 
+	node.memory.getValues = function(reverse) {
+		return node.game.memory.getValues(reverse);
+	}
 	
 	/**
 	 * Creating an object
@@ -1943,7 +1986,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 13:04:56 CET 2011
+ * Built on Do 3. Nov 15:49:50 CET 2011
  *
  */
  
@@ -2685,7 +2728,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 3. Nov 13:04:56 CET 2011
+ * Built on Do 3. Nov 15:49:50 CET 2011
  *
  */
  
