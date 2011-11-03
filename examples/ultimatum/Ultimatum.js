@@ -19,27 +19,7 @@ function Ultimatum () {
 	
 	
 	var pregame = function() {
-		var that = this;
-		
-		node.window.loadFrame('pregame.html', function() {
-				
-			 node.onDATA( function(msg){
-			
-				if (msg.data === 'READY') {
-					var root = node.window.getElementById('root');
-					node.window.write(root,'Press the button to start the experiment');
-					var button = node.window.addButton(root, 'sendb');
-
-					button.onclick = function() {
-						node.fire('DONE', 'User ready to start the experiment.');
-						node.fire('WAIT');
-					};
-				}
-			});
-			
-		
-		});
-	
+		node.window.loadFrame('pregame.html');
 		console.log('Pregame');
 	};
 	
@@ -52,7 +32,7 @@ function Ultimatum () {
 		
 			b.onclick = function() {
 				node.DONE('Done for now...');
-				node.fire('WAIT');
+				node.emit('WAIT');
 			};
 		});
 		
@@ -68,14 +48,18 @@ function Ultimatum () {
 					
 			if (msg.data === 'BIDDER') {
 				
-				node.window.loadFrame('bidder.html', function(){
+				node.set('ROLE','BIDDER');
+				
+				node.window.loadFrame('bidder.html', function() {
 
 					var root = node.window.getElementById('root');
 					var b = node.window.getElementById('submitOffer');
 					
 					b.onclick = function() {
 						var offer = node.window.getElementById('offer');
-						node.fire('out.say.DATA','OFFER', that.other,offer.value);
+						// Store the value in memory
+						node.set('offer', offer.value);
+						node.say('DATA','OFFER', that.other,offer.value);
 						node.window.write(root,' Your offer: ' +  offer.value);
 					};
 						
@@ -97,14 +81,13 @@ function Ultimatum () {
 			}
 			else if (msg.data === 'RESPONDENT') {
 				
+				node.set('ROLE','RESPONDENT');
+				
 				node.window.loadFrame('resp.html', function(){
 				
-					
-					
 					node.onDATA( function(msg) {
 						
-						if (msg.data === 'OFFER') {
-							
+						if (msg.data === 'OFFER') {			
 							var offered = node.window.getElementById('offered');
 							node.window.write(offered, 'You received an offer of ' + msg.text);
 							offered.style.display = '';
@@ -118,12 +101,14 @@ function Ultimatum () {
 					
 					
 					accept.onclick = function() {
-						node.fire('out.say.DATA', 'ACCEPT', that.other);
+						node.set('response','ACCEPT');
+						node.say('DATA', 'ACCEPT', that.other);
 						node.DONE();
 					};
 					
 					reject.onclick = function() {
-						node.fire('out.say.DATA', 'REJECT', that.other);
+						node.set('response','REJECT');
+						node.say('DATA', 'REJECT', that.other);
 						node.DONE();
 					};
 					
@@ -180,7 +165,7 @@ function Ultimatum () {
 	this.loops = {
 			1: {loop:pregameloop},
 			2: {loop:instructionsloop},
-			3: {rounds:10, loop:gameloop},
+			3: {rounds:10, loop:gameloop}, // rounds is governed by the server, if not automatic_step is set
 			4: {loop:postgameloop},
 			5: {loop:endgameloop}
 		};	
