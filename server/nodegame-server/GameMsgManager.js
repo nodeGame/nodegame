@@ -83,14 +83,21 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	}
 	// Send to a specific client
 	else {
-		if (rel) {
-			this.node.channel.sockets[to].json.send(msg);
+		var client = this.node.channel.sockets[to]; 
+		
+		if (client) {
+			if (rel) {
+				client.json.send(msg);
+			}
+			else {
+				client.volatile.json.send(msg);
+			}
+			this.log.log('Msg ' + gameMsg.toSMS() + ' sent to ' + to);
+			this.log.msg('S, ' + gameMsg);
 		}
 		else {
-			this.node.channel.sockets[to].volatile.json.send(msg);
+			this.log.log('Msg not sent. Unexisting recipient: ' + to, 'ERR');
 		}
-		this.log.log('Msg ' + gameMsg.toSMS() + ' sent to ' + to);
-		this.log.msg('S, ' + gameMsg);
 	}
 };
 
