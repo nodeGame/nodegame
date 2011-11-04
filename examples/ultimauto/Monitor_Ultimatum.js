@@ -1,6 +1,6 @@
 function Monitor_Ultimatum () {
 	
-	this.name = 'Monitor for Ultimatum';
+	this.name = 'Monitor for Ultimauto game';
 	this.description = 'No Description';
 	this.version = '0.1';
 	
@@ -22,38 +22,6 @@ function Monitor_Ultimatum () {
 	};
 		
 	var game = function(){
-		var that = this;
-		var groups = this.pl.getNGroups((this.pl.size()/2));
-		
-		var i;
-		var g = null;
-		for(i=0;i<groups.length;i++){
-			g = groups[i];
-//			console.log(g);
-//			console.log(g.size());
-			if (g.size() > 1) {
-				// Bidder
-				var bidder = g.getRandom();
-				//console.log(bidder);
-				g.remove(bidder.id);				
-				node.fire('out.say.DATA', 'BIDDER', bidder.id);
-				
-				// Respondent
-				var respondent = g.getRandom();
-				//console.log(respondent);
-				node.fire('out.say.DATA', 'RESPONDENT', respondent.id);
-
-				// Make each other aware
-				node.fire('out.say.DATA', 'OTHER', bidder.id, respondent.id);
-				node.fire('out.say.DATA', 'OTHER', respondent.id, bidder.id);
-
-			}
-			else {
-				var solo =  g.getRandom();
-				console.log(solo);
-				node.fire('out.say.DATA', 'SOLO',respondent.id);
-			}	
-		}
 		console.log('Game1');
 	};
 	

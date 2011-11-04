@@ -67,7 +67,9 @@
 	
 	GameSocketClient.prototype.clearBuffer = function () {
 		for (var i=0; i<this.buffer.length; i++ ) {
-			node.emit(buffer.shift().toInEvent());
+			var msg = this.buffer.shift();
+			node.emit(msg.toInEvent(), msg);
+			console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -126,11 +128,12 @@
 			if (msg) { // Parsing successful
 				console.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
-				if (that.game.gameState.is !== GameState.LOADING) {
+				if (that.game.gameState.is >= GameState.iss.PLAYING) {
 					console.log('GM is now: ' + that.game.gameState.is);
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
+					console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
 					console.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}

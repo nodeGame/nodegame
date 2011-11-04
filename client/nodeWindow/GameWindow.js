@@ -29,6 +29,8 @@
 		Document.call(this);
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
+		
+		this.areLoading = 0; 
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -131,12 +133,17 @@
 	
  	// FAKE ONLOAD  TODO: try to make it work with onload
  	GameWindow.prototype.loadFrame = function (url, func, frame) {
+ 		
+ 		node.game.gameState.is = node.GameState.iss.LOADING_WINDOW;
+ 		this.areLoading++;
+ 		
 		var frame =  frame || this.mainframe;
  		var that = this;	
  		
 		window.frames[frame].location = url;
 		//window.frames[frame].location.href = url;
 		
+		// HERE!
 		//this.frame = window.frames[frame].document;
  		var ii=0;
  		var isFrameLoaded = setInterval( function() {
@@ -149,6 +156,21 @@
  		    		func.call(); // TODO: Pass the right this reference
 		    		console.log('Frame Loaded correctly!');
  		    	}
+ 				
+ 				that.areLoading--;
+ 				console.log('ARE LOADING: ' + that.areLoading);
+ 				if (that.areLoading === 0) {
+ 				
+ 					if (node.game.gameState.is === node.GameState.iss.LOADING_WINDOW) {
+ 						console.log(node.game.gameState.is + ' = ' + node.GameState.iss.LOADING_WINDOW);
+ 						node.game.gameState.is === node.GameState.iss.LOADING;
+ 						console.log('back to loading');
+ 					}
+		    		else {
+		    			console.log('gamewindow last');
+		    			node.emit('LOADED');
+		    		}
+ 				}
  			}
  			else {
 				console.log('not yet ' + window.frames[frame].document.readyState);
