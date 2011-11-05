@@ -66,7 +66,9 @@
 	};
 	
 	GameSocketClient.prototype.clearBuffer = function () {
-		for (var i=0; i<this.buffer.length; i++ ) {
+		
+		var nelem = this.buffer.length;
+		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
 			console.log('Debuffered ' + msg);
@@ -126,10 +128,10 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				console.log('GM is: ' + that.game.gameState.is);
+				//console.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
-				if (that.game.gameState.is >= GameState.iss.PLAYING) {
-					console.log('GM is now: ' + that.game.gameState.is);
+				if (that.game.isGameReady()) {
+					//console.log('GM is now: ' + that.game.gameState.is);
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {

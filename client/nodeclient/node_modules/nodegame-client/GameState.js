@@ -15,12 +15,11 @@
 	
 	GameState.iss = {};
 
-	GameState.iss.UNKNOWN = 0; 			// A not yet initializa game;
-	GameState.iss.LOADING = 10;			// The game is loading
-	GameState.iss.LOADING_WINDOW = 15;	// Loading the iframe for the game
-	GameState.iss.LOADED = 25;			// The logic has been loaded, but the window may still require some time to process the DOM
-	GameState.iss.PLAYING = 50;			// Everything is ready
-	GameState.iss.DONE = 100;			// The player completed the game state
+	GameState.iss.UNKNOWN = 0; 		// Game has not been initialized
+	GameState.iss.LOADING = 10;		// The game is loading
+	GameState.iss.LOADED  = 25;		// Game is loaded, but the GameWindow could still require some time
+	GameState.iss.PLAYING = 50;		// Everything is ready
+	GameState.iss.DONE = 100;		// The player completed the game state
 	
 	function GameState (gs) {
 		

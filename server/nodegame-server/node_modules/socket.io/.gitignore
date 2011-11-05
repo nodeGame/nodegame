@@ -6,4 +6,3 @@ lib-cov
 *.dat
 *.out
 *.pid
-node_modules

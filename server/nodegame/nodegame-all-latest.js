@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 4. Nov 19:31:57 CET 2011
+ * Built on Sat Nov 5 12:56:43 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 4. Nov 19:31:57 CET 2011
+ * Built on Sat Nov 5 12:56:43 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -240,12 +240,11 @@
 	
 	GameState.iss = {};
 
-	GameState.iss.UNKNOWN = 0; 			// A not yet initializa game;
-	GameState.iss.LOADING = 10;			// The game is loading
-	GameState.iss.LOADING_WINDOW = 15;	// Loading the iframe for the game
-	GameState.iss.LOADED = 25;			// The logic has been loaded, but the window may still require some time to process the DOM
-	GameState.iss.PLAYING = 50;			// Everything is ready
-	GameState.iss.DONE = 100;			// The player completed the game state
+	GameState.iss.UNKNOWN = 0; 		// Game has not been initialized
+	GameState.iss.LOADING = 10;		// The game is loading
+	GameState.iss.LOADED  = 25;		// Game is loaded, but the GameWindow could still require some time
+	GameState.iss.PLAYING = 50;		// Everything is ready
+	GameState.iss.DONE = 100;		// The player completed the game state
 	
 	function GameState (gs) {
 		
@@ -1156,7 +1155,9 @@
 	};
 	
 	GameSocketClient.prototype.clearBuffer = function () {
-		for (var i=0; i<this.buffer.length; i++ ) {
+		
+		var nelem = this.buffer.length;
+		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
 			console.log('Debuffered ' + msg);
@@ -1216,10 +1217,10 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				console.log('GM is: ' + that.game.gameState.is);
+				//console.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
-				if (that.game.gameState.is >= GameState.iss.PLAYING) {
-					console.log('GM is now: ' + that.game.gameState.is);
+				if (that.game.isGameReady()) {
+					//console.log('GM is now: ' + that.game.gameState.is);
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
@@ -1556,9 +1557,21 @@
 				that.publishState();
 			});
 			
+			node.on('WINDOW_LOADED', function(){
+				if (that.isGameReady()) {
+					node.emit('LOADED');
+				}
+			});
+			
+			node.on('GAME_LOADED', function() {
+				if (that.isGameReady()) {
+					node.emit('LOADED');
+				}
+			});
+			
 			node.on('LOADED', function(){
 				that.gameState.is =  GameState.iss.PLAYING;
-				console.log('STTTEEEP ' + that.gameState);
+				//console.log('STTTEEEP ' + that.gameState.state);		
 				that.gsc.clearBuffer();
 			});
 			
@@ -1607,15 +1620,21 @@
 		
 		if (this.step(state) !== false){
 			this.paused = false;
-			if (this.gameState.is === GameState.iss.LOADING_WINDOW) {
-				this.gameState.is =  GameState.iss.LOADED
-			}
-			else {
-				console.log('game last');
+			this.gameState.is =  GameState.iss.LOADED;
+			if (this.isGameReady()) {
 				node.emit('LOADED');
 			}
-			
 		}
+			
+//			if (this.gameState.is === GameState.iss.LOADING_WINDOW) {
+//				this.gameState.is =  GameState.iss.LOADED
+//			}
+//			else {
+//				console.log('game last');
+//				node.emit('LOADED');
+//			}
+			
+		
 		else {
 			console.log('error in stepping');
 			// TODO: implement sendERR
@@ -1669,6 +1688,24 @@
 	//	  that.DONEWAIT('FUNZIA');
 	//	};
 	}; 
+	
+	
+	Game.prototype.isGameReady = function() {
+		
+		console.log('STAAAAAAAAAAAAAAAAATES: ' + this.gameState.is);
+		
+		if (this.gameState.is < GameState.iss.LOADED) return false;
+		
+		// Check if there is a gameWindow obj and whether it is loading
+		if (node.window) {
+			
+			console.log('W ' + node.window.state);
+			return (node.window.state >= GameState.iss.LOADED) ? true : false;
+		}
+		
+		return true;
+	};
+	
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -2019,7 +2056,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 4. Nov 19:31:57 CET 2011
+ * Built on Sat Nov 5 12:56:43 CET 2011
  *
  */
  
@@ -2282,6 +2319,7 @@
 	
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
+	var GameState = node.GameState;
 	
 	var Document = node.window.Document;
 	
@@ -2307,6 +2345,7 @@
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
 		
+		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
 	};
 	
@@ -2350,7 +2389,7 @@
 			break;
 		}
 		
-		this.frame = window.frames[this.mainframe];
+		this.frame = window.frames[this.mainframe].document;
 	};
 	
 	
@@ -2411,8 +2450,8 @@
  	// FAKE ONLOAD  TODO: try to make it work with onload
  	GameWindow.prototype.loadFrame = function (url, func, frame) {
  		
- 		node.game.gameState.is = node.GameState.iss.LOADING_WINDOW;
- 		this.areLoading++;
+ 		this.state = GameState.iss.LOADING;
+ 		this.areLoading++; // keep track of nested call to loadFrame
  		
 		var frame =  frame || this.mainframe;
  		var that = this;	
@@ -2421,32 +2460,32 @@
 		//window.frames[frame].location.href = url;
 		
 		// HERE!
-		//this.frame = window.frames[frame].document;
+		this.frame = window.frames[frame].document;
  		var ii=0;
  		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
-			//if (window.frames[frame].document) {	
  				clearInterval(isFrameLoaded);
-				console.log('Interval cleared');
+				//console.log('Interval cleared');
 				that.frame = window.frames[frame].document;
  				if (func) {
  		    		func.call(); // TODO: Pass the right this reference
-		    		console.log('Frame Loaded correctly!');
+		    		//console.log('Frame Loaded correctly!');
  		    	}
  				
  				that.areLoading--;
- 				console.log('ARE LOADING: ' + that.areLoading);
+ 				//console.log('ARE LOADING: ' + that.areLoading);
  				if (that.areLoading === 0) {
- 				
- 					if (node.game.gameState.is === node.GameState.iss.LOADING_WINDOW) {
- 						console.log(node.game.gameState.is + ' = ' + node.GameState.iss.LOADING_WINDOW);
- 						node.game.gameState.is === node.GameState.iss.LOADING;
- 						console.log('back to loading');
- 					}
-		    		else {
-		    			console.log('gamewindow last');
-		    			node.emit('LOADED');
-		    		}
+ 					that.state = GameState.iss.LOADED;
+ 					node.emit('WINDOW_LOADED');
+// 					if (node.game.gameState.is === node.GameState.iss.LOADING_WINDOW) {
+// 						console.log(node.game.gameState.is + ' = ' + node.GameState.iss.LOADING_WINDOW);
+// 						node.game.gameState.is === node.GameState.iss.LOADING;
+// 						console.log('back to loading');
+// 					}
+//		    		else {
+//		    			console.log('gamewindow last');
+//		    			node.emit('LOADED');
+//		    		}
  				}
  			}
  			else {
@@ -2783,7 +2822,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 4. Nov 19:31:57 CET 2011
+ * Built on Sat Nov 5 12:56:43 CET 2011
  *
  */
  

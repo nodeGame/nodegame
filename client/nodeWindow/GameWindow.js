@@ -5,6 +5,7 @@
 	
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
+	var GameState = node.GameState;
 	
 	var Document = node.window.Document;
 	
@@ -30,6 +31,7 @@
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
 		
+		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
 	};
 	
@@ -73,7 +75,7 @@
 			break;
 		}
 		
-		this.frame = window.frames[this.mainframe];
+		this.frame = window.frames[this.mainframe].document;
 	};
 	
 	
@@ -134,8 +136,8 @@
  	// FAKE ONLOAD  TODO: try to make it work with onload
  	GameWindow.prototype.loadFrame = function (url, func, frame) {
  		
- 		node.game.gameState.is = node.GameState.iss.LOADING_WINDOW;
- 		this.areLoading++;
+ 		this.state = GameState.iss.LOADING;
+ 		this.areLoading++; // keep track of nested call to loadFrame
  		
 		var frame =  frame || this.mainframe;
  		var that = this;	
@@ -144,32 +146,32 @@
 		//window.frames[frame].location.href = url;
 		
 		// HERE!
-		//this.frame = window.frames[frame].document;
+		this.frame = window.frames[frame].document;
  		var ii=0;
  		var isFrameLoaded = setInterval( function() {
 			if (window.frames[frame].document.readyState === 'complete') {
-			//if (window.frames[frame].document) {	
  				clearInterval(isFrameLoaded);
-				console.log('Interval cleared');
+				//console.log('Interval cleared');
 				that.frame = window.frames[frame].document;
  				if (func) {
  		    		func.call(); // TODO: Pass the right this reference
-		    		console.log('Frame Loaded correctly!');
+		    		//console.log('Frame Loaded correctly!');
  		    	}
  				
  				that.areLoading--;
- 				console.log('ARE LOADING: ' + that.areLoading);
+ 				//console.log('ARE LOADING: ' + that.areLoading);
  				if (that.areLoading === 0) {
- 				
- 					if (node.game.gameState.is === node.GameState.iss.LOADING_WINDOW) {
- 						console.log(node.game.gameState.is + ' = ' + node.GameState.iss.LOADING_WINDOW);
- 						node.game.gameState.is === node.GameState.iss.LOADING;
- 						console.log('back to loading');
- 					}
-		    		else {
-		    			console.log('gamewindow last');
-		    			node.emit('LOADED');
-		    		}
+ 					that.state = GameState.iss.LOADED;
+ 					node.emit('WINDOW_LOADED');
+// 					if (node.game.gameState.is === node.GameState.iss.LOADING_WINDOW) {
+// 						console.log(node.game.gameState.is + ' = ' + node.GameState.iss.LOADING_WINDOW);
+// 						node.game.gameState.is === node.GameState.iss.LOADING;
+// 						console.log('back to loading');
+// 					}
+//		    		else {
+//		    			console.log('gamewindow last');
+//		    			node.emit('LOADED');
+//		    		}
  				}
  			}
  			else {
