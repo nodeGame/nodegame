@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.5
+ * nodeGame-all v0.5.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:44:19 CET 2011
+ * Built on Sun Nov 6 14:04:32 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.5
+ * nodeGame Client v0.5.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:44:20 CET 2011
+ * Built on Sun Nov 6 14:04:32 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        // console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -452,9 +452,11 @@
 	};
 	
 	// TODO: improve
-	//Returns true if all the players are on the same gameState = gameState
-	//and they are all GameState = DONE.
-	PlayerList.prototype.isStateDone = function(gameState) {
+	// Returns true if all the players are on the same gameState = gameState
+	// and they are all GameState = DONE.
+	// If strict is TRUE, also not initialized players are taken into account
+	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		var strict = strict || false;
 		
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
@@ -478,8 +480,30 @@
 		for (i=0; i<result.length;i++) {
 			sum = sum + Number(result[i]);
 		}
-		return (sum === this.size()) ? true : false;
 		
+		var total = (strict) ? this.size() : this.actives(); 
+		
+		return (sum === total) ? true : false;
+		
+	};
+	
+	// Returns the number of player whose state is different from 0:0:0
+	PlayerList.prototype.actives = function(gameState) {
+		var result = 0;
+		
+		this.forEach(function(p){
+			var gs = new GameState(p.state);
+			
+			// Player is done for his state
+			if (GameState.compare(gs, new GameState()) !== 0) {
+				result++;
+			}
+			
+		});
+		
+		console.log('ACTIVES: ' + result);
+		
+		return result;
 	};
 	
 	
@@ -1160,7 +1184,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//console.log('Debuffered ' + msg);
+			console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -1225,7 +1249,7 @@
 				}
 				else {
 					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					//console.log('Buffering: ' + msg);
+					console.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
@@ -1517,7 +1541,14 @@
 			node.on( OUT + say + 'HI', function(){
 				// Upon establishing a successful connection with the server
 				// Enter the first state
-				that.updateState(that.next());
+				if (that.automatic_step) {
+					that.updateState(that.next());
+				}
+				else {
+					// The game is ready to step when necessary;
+					that.gameState.is = GameState.iss.LOADED;
+					that.gsc.sendSTATE(GameMsg.actions.SAY, that.gameState);
+				}
 			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
@@ -1681,14 +1712,14 @@
 	
 	Game.prototype.isGameReady = function() {
 		
-		//console.log('STAAAAAAAAAAAAAAAAATES: ' + this.gameState.is);
+		//console.log('GameState is : ' + this.gameState.is);
 		
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
 		if (node.window) {
 			
-			//console.log('W ' + node.window.state);
+			//console.log('WindowState is ' + node.window.state);
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
 		
@@ -2040,12 +2071,12 @@
  
  
 /*!
- * nodeWindow v0.5.5
+ * nodeWindow v0.5.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:44:20 CET 2011
+ * Built on Sun Nov 6 14:04:32 CET 2011
  *
  */
  
@@ -2703,12 +2734,12 @@
  
  
 /*!
- * nodeGadgets v0.5.5
+ * nodeGadgets v0.5.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:44:20 CET 2011
+ * Built on Sun Nov 6 14:04:32 CET 2011
  *
  */
  

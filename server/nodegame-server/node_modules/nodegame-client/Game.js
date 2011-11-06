@@ -102,7 +102,14 @@
 			node.on( OUT + say + 'HI', function(){
 				// Upon establishing a successful connection with the server
 				// Enter the first state
-				that.updateState(that.next());
+				if (that.automatic_step) {
+					that.updateState(that.next());
+				}
+				else {
+					// The game is ready to step when necessary;
+					that.gameState.is = GameState.iss.LOADED;
+					that.gsc.sendSTATE(GameMsg.actions.SAY, that.gameState);
+				}
 			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
@@ -266,14 +273,14 @@
 	
 	Game.prototype.isGameReady = function() {
 		
-		//console.log('STAAAAAAAAAAAAAAAAATES: ' + this.gameState.is);
+		//console.log('GameState is : ' + this.gameState.is);
 		
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
 		if (node.window) {
 			
-			//console.log('W ' + node.window.state);
+			//console.log('WindowState is ' + node.window.state);
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
 		

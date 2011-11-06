@@ -148,6 +148,10 @@ function Ultimatum () {
 					that.other = msg.text;
 				}
 				
+				else if (msg.data === 'SOLO') {
+					node.DONE();
+				}
+				
 			});
 		});
 			

@@ -87,6 +87,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
       	console.log(that.name + ' ----------------- Got Closed ' + id);
     	that.pl.remove(id);
     	that.gmm.sendPLIST(that);
+    	that.gmm.forwardPLIST(that);
     });
 	
 	// TODO: Check this
@@ -94,6 +95,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		log.log("Server is shutting down.");
 		that.pl.pl = {};
 		that.gmm.sendPLIST(that);
+		that.gmm.forwardPLIST(that);
 		log.close();
 	});
 };

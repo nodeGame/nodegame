@@ -45,7 +45,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        // console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
