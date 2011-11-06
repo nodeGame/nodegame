@@ -57,12 +57,12 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 		
-		console.log('NEXT OF THIS ' + gameState);
+		//console.log('NEXT OF THIS ' + gameState);
 		//console.log(this.limits);
 		
 		// Game has not started yet, do it!
 		if (gameState.state === 0) {
-			console.log('NEXT: NEW');
+			//console.log('NEXT: NEW');
 			return new GameState({
 								 state: 1,
 								 step: 1,
@@ -80,12 +80,12 @@
 		if (this.limits[idxLimit]['steps'] > gameState.step){
 			var newStep = Number(gameState.step)+1;
 	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-			console.log('NEXT STEP: '  + new GameState({
-														state: gameState.state,
-														step: newStep,
-														round: gameState.round
-			}));
-			
+//			console.log('NEXT STEP: '  + new GameState({
+//														state: gameState.state,
+//														step: newStep,
+//														round: gameState.round
+//			}));
+//			
 			return new GameState({
 				state: gameState.state,
 				step: newStep,

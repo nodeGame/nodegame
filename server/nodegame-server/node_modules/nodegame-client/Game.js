@@ -190,7 +190,7 @@
 //	};
 	
 	Game.prototype.publishState = function() {
-		console.log('Publishing ' + this.gameState);
+		//console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
@@ -201,7 +201,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		console.log('New state is going to be ' + new GameState(state));
+		//console.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -209,17 +209,7 @@
 			if (this.isGameReady()) {
 				node.emit('LOADED');
 			}
-		}
-			
-//			if (this.gameState.is === GameState.iss.LOADING_WINDOW) {
-//				this.gameState.is =  GameState.iss.LOADED
-//			}
-//			else {
-//				console.log('game last');
-//				node.emit('LOADED');
-//			}
-			
-		
+		}		
 		else {
 			console.log('error in stepping');
 			// TODO: implement sendERR
@@ -233,7 +223,6 @@
 	Game.prototype.step = function(state) {
 		
 		var gameState = state || this.next();
-		console.log('STEEE ------- Going to be: ' + gameState.state);
 		if (gameState) {
 			var func = this.gameLoop.getFunction(gameState);
 			

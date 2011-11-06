@@ -45,7 +45,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -105,7 +105,7 @@
 	    },
 	    
 	    clearLocalListeners: function() {
-	    	console.log('Cleaning Local Listeners');
+	    	//console.log('Cleaning Local Listeners');
 	    	for (var key in this._localListeners) {
 	    		if (this._localListeners.hasOwnProperty(key)) {
 	    			this.removeListener(key, this._localListeners[key]);

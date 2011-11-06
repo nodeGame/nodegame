@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5
+ * nodeGame-all v0.5.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:25:26 CET 2011
+ * Built on Sun Nov 6 12:44:19 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5
+ * nodeGame Client v0.5.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:25:26 CET 2011
+ * Built on Sun Nov 6 12:44:20 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -127,7 +127,7 @@
 	    },
 	    
 	    clearLocalListeners: function() {
-	    	console.log('Cleaning Local Listeners');
+	    	//console.log('Cleaning Local Listeners');
 	    	for (var key in this._localListeners) {
 	    		if (this._localListeners.hasOwnProperty(key)) {
 	    			this.removeListener(key, this._localListeners[key]);
@@ -769,12 +769,12 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 		
-		console.log('NEXT OF THIS ' + gameState);
+		//console.log('NEXT OF THIS ' + gameState);
 		//console.log(this.limits);
 		
 		// Game has not started yet, do it!
 		if (gameState.state === 0) {
-			console.log('NEXT: NEW');
+			//console.log('NEXT: NEW');
 			return new GameState({
 								 state: 1,
 								 step: 1,
@@ -792,12 +792,12 @@
 		if (this.limits[idxLimit]['steps'] > gameState.step){
 			var newStep = Number(gameState.step)+1;
 	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-			console.log('NEXT STEP: '  + new GameState({
-														state: gameState.state,
-														step: newStep,
-														round: gameState.round
-			}));
-			
+//			console.log('NEXT STEP: '  + new GameState({
+//														state: gameState.state,
+//														step: newStep,
+//														round: gameState.round
+//			}));
+//			
 			return new GameState({
 				state: gameState.state,
 				step: newStep,
@@ -1605,7 +1605,7 @@
 //	};
 	
 	Game.prototype.publishState = function() {
-		console.log('Publishing ' + this.gameState);
+		//console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
@@ -1616,7 +1616,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		console.log('New state is going to be ' + new GameState(state));
+		//console.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -1624,17 +1624,7 @@
 			if (this.isGameReady()) {
 				node.emit('LOADED');
 			}
-		}
-			
-//			if (this.gameState.is === GameState.iss.LOADING_WINDOW) {
-//				this.gameState.is =  GameState.iss.LOADED
-//			}
-//			else {
-//				console.log('game last');
-//				node.emit('LOADED');
-//			}
-			
-		
+		}		
 		else {
 			console.log('error in stepping');
 			// TODO: implement sendERR
@@ -1648,7 +1638,6 @@
 	Game.prototype.step = function(state) {
 		
 		var gameState = state || this.next();
-		console.log('STEEE ------- Going to be: ' + gameState.state);
 		if (gameState) {
 			var func = this.gameLoop.getFunction(gameState);
 			
@@ -2051,12 +2040,12 @@
  
  
 /*!
- * nodeWindow v0.5
+ * nodeWindow v0.5.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:25:26 CET 2011
+ * Built on Sun Nov 6 12:44:20 CET 2011
  *
  */
  
@@ -2393,171 +2382,27 @@
 	
 	
 	GameWindow.prototype.getElementById = function (id) {
-		console.log('getting element');
-		console.log(this.frame);
 		return this.frame.getElementById(id);
 	};
 	
-//	1. Load a Frame into the mainframe or other specified frame
-//	2. Wait until the frame is loaded
-//	3. Put a reference of the loaded frame.document into this.frame
-//	4. Exec the callback function
-//	GameWindow.prototype.loadFrame = function (url, func, frame) {
-//		var frame = this.frame || frame;
-//		var that = this;
-//		frame.location = url;
-//	
-//		frame.onload = function() {
-//			console.log('LOADING');
-//	    	if (func) {
-//	    		func.call(); // TODO: Pass the right this reference
-//	    		console.log('Frame Loaded correctly!');
-//	    	}
-//
-//		};
-//	};
-//	
 	
-	// TODO: frames are loaded taking into account also the path of the game in the server
-	
-	// FAKE ONLOAD  TODO: try to make it work with onload
-//	GameWindow.prototype.loadFrame = function (url, func, frame) {
-//		var that = this;	
-//		var frame = frame || this.frame;
-//		frame.location = url;
-//		
-//		var ii=0;
-//		var isFrameLoaded = setInterval( function() {
-//			if (frame.document.readyState === 'complete') {
-//			//if (window.frames[frame].document.readyState === 'complete') {
-//			//if (window.frames[frame].document) {	
-//				clearInterval(isFrameLoaded);
-//				//console.log('Interval cleared');
-//				
-//				// ???
-//				//frame = window.frames[frame].document;
-//				if (func) {
-//		    		func.call(); // TODO: Pass the right this reference
-//		    		//console.log('Frame Loaded correctly!');
-//		    	}
-//			}
-//			else {
-//				console.log('not yet ' + frame.document.readyState);
-//			}
-//		}, 100);
-//	};
- 	
-	
-// 	 FAKE ONLOAD  TODO: try to make it work with onload
-// 	GameWindow.prototype.loadFrame = function (url, func, frame) {
-// 		
-// 		this.state = GameState.iss.LOADING;
-// 		this.areLoading++; // keep track of nested call to loadFrame
-// 		
-//		var frame =  frame || this.mainframe;
-// 		var that = this;	
-// 		
-//		window.frames[frame].location = url;
-//		//window.frames[frame].location.href = url;
-//		
-//		// HERE! TODO: check this
-//		//this.frame = window.frames[frame].document;
-// 		
-//		var ii=0;
-// 		var isFrameLoaded = setInterval( function() {
-// 			console.log('IFrame State: ' + window.frames[frame].document.readyState);
-// 			console.log('IFrame State: ' + that.frame.readyState);
-// 			//if (that.frame.readyState === 'complete') {
-//			if (window.frames[frame].document.readyState === 'complete') {
-// 				clearInterval(isFrameLoaded);
-//				//console.log('Interval cleared');
-// 				
-// 				// Update the reference to the frame obj
-//				that.frame = window.frames[frame].document;
-// 				
-//				if (func) {
-// 		    		func.call(); // TODO: Pass the right this reference
-//		    		//console.log('Frame Loaded correctly!');
-// 		    	}
-// 				
-// 				that.areLoading--;
-// 				//console.log('ARE LOADING: ' + that.areLoading);
-// 				if (that.areLoading === 0) {
-// 					that.state = GameState.iss.LOADED;
-// 					node.emit('WINDOW_LOADED');
-// 				}
-// 				else {
-// 					console.log('still gw loading');
-// 				}
-// 			}
-// 			else {
-//				console.log('not yet ' + window.frames[frame].document.readyState);
-// 			}
-// 		}, 100);
-// 	};
-	
- 	
-// TRYING TO INTERCEPT THE CHANGE	
-	
- 	// FAKE ONLOAD  TODO: try to make it work with onload
- 	GameWindow.prototype.loadFrame = function (url, func, frame) {
+	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
  		
  		this.state = GameState.iss.LOADING;
  		this.areLoading++; // keep track of nested call to loadFrame
  		
 		var frame =  frame || this.mainframe;
  		var that = this;	
- 		
-		
-		//window.frames[frame].location.href = url;
-		
-		// HERE! TODO: check this
-		//this.frame = window.frames[frame].document;
- 		
-	
-		console.log('IFrame State: ' + window.frames[frame].document.readyState);
-		//console.log('IFrame State: ' + that.frame.readyState);
-		//if (that.frame.readyState === 'complete') {
-		
-		//var iframe = document.getElementById('mainframe');
-		//iframe.onreadystatechange = function() {
-//		
-//		if (window.frames[frame].document.readyState === 'complete') {
-//			console.log('already ready;')
-//			console.log(window.frames[frame].document);
-//			this.updateStatus(func,frame);
-//		}
-//		else {
-		
+ 				
+ 		// First add the onload event listener
 		var iframe = document.getElementById('mainframe');
 		iframe.onload = function() {
-			console.log('not ready;')
-			console.log(window.frames[frame].document);
 			that.updateStatus(func,frame);
-		}
-		
-//		iframe.onreadystatechange = function() {
-//			console.log('fuck');
-//		}
-		
-		window.frames[frame].location = url;
-		
-	//	}
-				
+		};
 	
-		
-		//window.frames[frame].content.onreadystatechange = function() {
-		//window.frames[frame].document.onreadystatechange = function() {
-			
-//			console.log('ah!');
-//			
-//			
-// 			else {
-//				console.log('not yet ' + window.frames[frame].document.readyState);
-// 			}
-//		};
- 			
-			
+		// Then update the frame location
+		window.frames[frame].location = url;
+ 						
  	};
  	
  	
@@ -2580,51 +2425,7 @@
 			console.log('still gw loading');
 		}
  	};
- 	
-// NEW VERSION 	
- 	
-//	// FAKE ONLOAD  TODO: try to make it work with onload
-//	GameWindow.prototype.loadFrame = function (url, func, frame) {
-//		var that = this;	
-//		var frame = frame || this.frame;
-//		frame.location = url;
-//		
-//		var ii=0;
-//		var isFrameLoaded = setInterval( function() {
-//			if (frame.document.readyState === 'complete') {
-//				clearInterval(isFrameLoaded);
-//				console.log('Completing...' + url);
-//				if (func) {
-//		    		func.call(); // TODO: Pass the right this reference
-//		    		console.log('Frame Loaded correctly!');
-//		    	}
-//			}
-//			else {
-//				console.log('not yet ' + frame.document.readyState);
-//			}
-//		}, 100);
-//	};
-	
-	GameWindow.prototype.loadPage = function (url, frame) {
-		var frame = this.mainframe || frame;
-		var that = this;
-		
-		// TODO: check which one are really necessary
-		window.frames[frame].src = url;
-		window.frames[frame].location = url;
-		window.frames[frame].location = url;
-		window.frames[frame].location.href = url;
-		
-		window.frames[frame].document.onreadystatechange = function() {
-		    if (this.readyState==='complete'){
-		    	that.frame = window.frames[frame].document;
-		    }
-		    else {
-		    	console.log('not yet ' + window.frames[frame].document.readyState);
-		    }
-		};
-	};
-	
+ 		
 	GameWindow.prototype.getFrame = function() {
 		return this.frame = window.frames['mainframe'].document;
 	};
@@ -2902,12 +2703,12 @@
  
  
 /*!
- * nodeGadgets v0.5
+ * nodeGadgets v0.5.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 12:25:26 CET 2011
+ * Built on Sun Nov 6 12:44:20 CET 2011
  *
  */
  
