@@ -277,14 +277,14 @@
 	
 	Game.prototype.isGameReady = function() {
 		
-		console.log('STAAAAAAAAAAAAAAAAATES: ' + this.gameState.is);
+		//console.log('STAAAAAAAAAAAAAAAAATES: ' + this.gameState.is);
 		
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
 		if (node.window) {
 			
-			console.log('W ' + node.window.state);
+			//console.log('W ' + node.window.state);
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
 		

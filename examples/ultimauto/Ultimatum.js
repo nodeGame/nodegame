@@ -44,8 +44,8 @@ function Ultimatum () {
 	var ultimatum = function(){
 		var that = this;		
 		
-		node.window.loadFrame('solo.html');
-		//node.window.loadFrame('solo.html', function(){
+		//node.window.loadFrame('solo.html');
+		node.window.loadFrame('solo.html', function(){
 			
 			node.onDATA (function(msg){
 						
@@ -149,7 +149,7 @@ function Ultimatum () {
 				}
 				
 			});
-		//});
+		});
 			
 	
 		console.log('Game1');

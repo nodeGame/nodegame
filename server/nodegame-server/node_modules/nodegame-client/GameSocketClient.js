@@ -21,13 +21,13 @@
 		this.servername = null;
 		this.game = null;
 		
-		this.io = this.connect();
-		
+		this.io = null; // will be created only after the game is loaded;
 		this.buffer = [];
 	}
 	
 	GameSocketClient.prototype.setGame = function(game) {
 		this.game = game;
+		this.io = this.connect();
 	};
 	
 	GameSocketClient.prototype.connect = function() {
@@ -71,7 +71,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			console.log('Debuffered ' + msg);
+			//console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -130,13 +130,13 @@
 			if (msg) { // Parsing successful
 				//console.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
-				if (that.game.isGameReady()) {
+				if (that.game && that.game.isGameReady()) {
 					//console.log('GM is now: ' + that.game.gameState.is);
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
-					console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					console.log('Buffering: ' + msg);
+					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
+					//console.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
