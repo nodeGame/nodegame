@@ -145,9 +145,11 @@
 	};
 	
 	// TODO: improve
-	//Returns true if all the players are on the same gameState = gameState
-	//and they are all GameState = DONE.
-	PlayerList.prototype.isStateDone = function(gameState) {
+	// Returns true if all the players are on the same gameState = gameState
+	// and they are all GameState = DONE.
+	// If strict is TRUE, also not initialized players are taken into account
+	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		var strict = strict || false;
 		
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
@@ -171,8 +173,30 @@
 		for (i=0; i<result.length;i++) {
 			sum = sum + Number(result[i]);
 		}
-		return (sum === this.size()) ? true : false;
 		
+		var total = (strict) ? this.size() : this.actives(); 
+		
+		return (sum === total) ? true : false;
+		
+	};
+	
+	// Returns the number of player whose state is different from 0:0:0
+	PlayerList.prototype.actives = function(gameState) {
+		var result = 0;
+		
+		this.forEach(function(p){
+			var gs = new GameState(p.state);
+			
+			// Player is done for his state
+			if (GameState.compare(gs, new GameState()) !== 0) {
+				result++;
+			}
+			
+		});
+		
+		console.log('ACTIVES: ' + result);
+		
+		return result;
 	};
 	
 	
