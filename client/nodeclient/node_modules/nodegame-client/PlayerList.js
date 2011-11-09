@@ -21,6 +21,10 @@
 			return Utils.getListSize(this.pl);
 		};
 		
+		if (this.isStateDone()) {
+			node.emit('STATEDONE');
+		}
+		
 	//	console.log('This is the size ' + this.size());
 	
 	}
@@ -55,6 +59,11 @@
 		// Check if the id exists
 		if (typeof(this.pl[connid]) !== 'undefined') {
 			delete this.pl[connid];
+			
+			if (this.isStateDone()) {
+				node.emit('STATEDONE');
+			}
+			
 			return true;
 		}
 		
@@ -94,12 +103,34 @@
 		
 		if (typeof(this.pl[player.id]) !== 'undefined') {
 			this.pl[connid] = player;
+
+			if (this.isStateDone()) {
+				node.emit('STATEDONE');
+			}
+			
 			return true;
 		}
 		
 		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
 		return false;
 	};
+	
+	PlayerList.prototype.updatePlayerState = function (pid, state) {
+		if (typeof(this.pl[pid]) !== 'undefined') {
+			this.pl[connid].state = state;
+			
+			if (this.isStateDone()) {
+				node.emit('STATEDONE');
+			}
+			
+			return true;
+		}
+		
+		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+		return false;
+	};
+	
+	
 	
 	// Returns an array of array of n groups of players {connid: name}
 	//The last group could have less elements.
@@ -149,6 +180,19 @@
 	// and they are all GameState = DONE.
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		
+		// Check whether a gameState variable is passed
+		// if not try to use the node.game.gameState as the default state
+		// if node.game has not been initialized yet return false
+		if ('undefined' === typeof gameState){
+			if ('undefined' === typeof node.game) {
+				return false;
+			}
+			else {
+				var gameState = node.game.gameState;
+			}
+		}
+		
 		var strict = strict || false;
 		
 		var result = this.map(function(p){

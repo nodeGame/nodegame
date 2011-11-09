@@ -1,6 +1,6 @@
 // Logs
 
-var sys = require("sys");
+var util = require('util');
 var fs = require('fs');
 var path = require('path');
 
@@ -71,7 +71,7 @@ ServerLog.prototype.console = function(data, type){
 			break;
 	}
 		
-	sys.log("\033[" + ATT + this.name + '\t' + data.toString() + "\033[0m");
+	util.log("\033[" + ATT + this.name + '\t' + data.toString() + "\033[0m");
 };
 
 
