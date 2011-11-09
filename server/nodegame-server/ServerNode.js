@@ -39,8 +39,8 @@ ServerNode.prototype.createHTTPServer = function (options) {
 			filePath = './nodegame/nodegame-all-latest.js';
 		}
 		
-		
-		var extname = path.extname(filePath);
+		// Added path.normalize here. TODO: Check if it works on windows.
+		var extname = path.extname(path.normalize(filePath));
 		
 		console.log(filePath);
 		
