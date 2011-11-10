@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 13:53:37 CET 2011
+ * Built on Do 10. Nov 18:22:30 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 13:53:37 CET 2011
+ * Built on Do 10. Nov 18:22:30 CET 2011
  *
  */
  
@@ -220,6 +220,43 @@
 			}
 		}
 	};
+	
+	Utils.objToArray = function (obj) {
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	           result.push(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Returns an array days, minutes, seconds, mi
+	 * @param ms time in milliseconds
+	 * @return array 
+	 */
+	Utils.parseMilliseconds = function (ms) {
+	  
+		var result = [];
+		var x = ms / 1000;
+		result[4] = x;
+		var seconds = x % 60;
+		result[3] = Math.floor(seconds);
+		var x = x /60;
+		var minutes = x % 60;
+		result[2] = Math.floor(minutes);
+		var x = x / 60;
+		var hours = x % 24;
+		result[1] = Math.floor(hours);
+		var x = x / 24;
+		var days = x;
+		result[1] = Math.floor(days);
+		
+	    return result;
+	};
+
+
 
 })('undefined' != typeof node ? node : module.exports); 
  
@@ -1405,6 +1442,8 @@
 		  }
 	  }
 	  
+	  if (this.dump(reverse))
+	  
 	  return true;
 	};
 	
@@ -1922,17 +1961,18 @@
 	    node.Game = require('./Game').Game;
 	    
 	    
-	    node.csv = require('ya-csv');
 	    
 	    /**
 	     * Enable file system operations
 	     */
 	
+	    node.csv = {};
+	    node.fs = {};
+	    
 	    var fs = require('fs');
 	    var path = require('path');
 	    var csv = require('ya-csv');
-	    	
-	    node.fs = {};
+	    
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;
@@ -2151,7 +2191,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 13:53:37 CET 2011
+ * Built on Do 10. Nov 18:22:30 CET 2011
  *
  */
  
@@ -2816,7 +2856,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 13:53:37 CET 2011
+ * Built on Do 10. Nov 18:22:30 CET 2011
  *
  */
  
@@ -2839,10 +2879,10 @@
 	ChernoffFaces.defaults.canvas.width = 100;
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
-	function ChernoffFaces(id, dims) {
+	function ChernoffFaces(options) {
 		
 		this.game = node.game;
-		this.id = id || 'ChernoffFaces';
+		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
 		this.version = '0.1';
 		
@@ -2852,8 +2892,8 @@
 		this.recipient = null;
 		
 		this.dims = {
-					width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
-					height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
+					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
 		};
 	};
 	
@@ -2885,7 +2925,7 @@
 										
 		// Add Gadget
 		var sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
-		sc = node.window.addGadget(sc,fieldset);
+		sc = node.window.addWidget(sc,fieldset);
 		
 		var that = this;
 	
@@ -4238,6 +4278,97 @@
 			that.updateState(state);
 		}); 
 	}; 
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	
+	/*
+	 * VisualTimer
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
+	
+	exports.VisualTimer	= VisualTimer;
+	
+	Utils = node.Utils;
+	
+	function VisualTimer(options) {
+		
+		this.game = node.game;
+		this.id = options.id || 'VisualTimer';
+		this.name = 'Visual Timer';
+		this.version = '0.1';
+		
+		this.milliseconds = options.milliseconds || 10000;
+		this.timePassed = 0;
+		this.update = options.update || 1000;
+		this.timer = null;
+		this.timerDiv = null;
+		this.root = null;
+		this.text = options.text || 'Time to go';
+		this.event = options.event || 'TIMEUP'; // event to be fire
+		
+		
+		// TODO: update and milliseconds must be multiple now
+		
+		this.recipient = null;
+	};
+	
+	VisualTimer.prototype.append = function (root, ids) {
+		var that = this;
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset';
+		var idTimerDiv = PREF + 'div';
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+		}
+		
+		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
+
+		this.timerDiv = node.window.addDiv(fieldset,idTimerDiv);
+		
+		// Init Timer
+		var time = Utils.parseMilliseconds(this.milliseconds);
+		this.timerDiv.innerHTML = time[2] + ':' + time[3];
+		
+		
+		this.timer = setInterval(function() {
+			that.timePassed = that.timePassed + that.update;
+			var time = that.milliseconds - that.timePassed;
+
+			if (time <= 0) {
+				if (that.event) {
+					node.emit(that.event);
+				}
+				clearInterval(that.timer);
+				time = 0;
+			}
+			//console.log(time);
+			time = Utils.parseMilliseconds(time);
+			that.timerDiv.innerHTML = time[2] + ':' + time[3];
+			
+		}, this.update);
+		
+		
+		return fieldset;
+		
+	};
+	
+	VisualTimer.prototype.listeners = function () {
+		var that = this;
+		var PREFIX = 'in.';
+		
+		node.onPLIST( function(msg) {
+				node.window.populateRecipientSelector(that.recipient,msg.data);
+			}); 
+	};
+	
 })(node.window.widgets); 
  
  

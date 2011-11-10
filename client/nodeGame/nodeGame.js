@@ -112,17 +112,18 @@
 	    node.Game = require('./Game').Game;
 	    
 	    
-	    node.csv = require('ya-csv');
 	    
 	    /**
 	     * Enable file system operations
 	     */
 	
+	    node.csv = {};
+	    node.fs = {};
+	    
 	    var fs = require('fs');
 	    var path = require('path');
 	    var csv = require('ya-csv');
-	    	
-	    node.fs = {};
+	    
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;

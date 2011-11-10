@@ -4,9 +4,9 @@ function PeerReviewGame () {
 	this.description = 'Create, submit, and evaluate contributions from your peers.';
 	this.version = '0.1';
 	
-	this.automatic_step = true;
+	this.automatic_step = false;
 	
-	this.minPlayers = 8;
+	this.minPlayers = 2;
 	this.maxPlayers = 8;
 	
 	this.init = function() {			
@@ -16,18 +16,24 @@ function PeerReviewGame () {
 	
 	
 	var pregame = function() {
+
+		
 		var frame = node.window.loadFrame('pregame.html');
+		node.emit('DONE');
 		console.log('Pregame');
 	};
 	
 	var instructions = function(){
 		var that = this;
 		node.window.loadFrame('instructions.html', function() {
+			
 			var b = node.window.getElementById('read');
+			
 			b.onclick = function() {
 				node.DONE('Instructions have been read.');
 				node.fire('WAIT');
 			};
+			
 		});
 		console.log('Instructions');
 	};
@@ -50,14 +56,27 @@ function PeerReviewGame () {
 			
 			var root = node.window.getElementById('root');
 			//'cf', {width: 500, height:500};
-			node.window.addWidget('ChernoffFaces',root);
-			//cf.append(root);
-	
+			var cf_options = { width: 300, height: 300 };
+			node.window.addWidget('ChernoffFaces', root, cf_options);
+			
+			// Add timer
+			var timerOptions = {event: 'DONE'};
+			node.window.addWidget('VisualTimer',root, timerOptions);
+			
 		});
-		
-		
+
 		console.log('Creation');
 	};
+	
+	
+	var submission = function() {
+		
+							
+		node.window.addWidget('VisualTimer',root, timerOptions);
+		
+		
+	};
+	
 	
 	var evaluation = function(){
 		var that = this;
