@@ -73,7 +73,7 @@
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
-					console.log('updatePlayer');
+					//console.log('updatePlayer');
 					that.pl.updatePlayerState(msg.from, msg.data);
 					node.emit('UPDATED_PLIST');
 					that.pl.checkState();
@@ -81,7 +81,7 @@
 				// Assume this is the server for now
 				// TODO: assign a string-id to the server
 				else {
-					console.log('updateState: ' + msg.from + ' -- ' + msg.data);
+					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
 					that.updateState(msg.data);
 				}
 			});
@@ -140,7 +140,7 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					console.log('WE PLAY AUTO');
+					//console.log('WE PLAY AUTO');
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					
 					if (morePlayers > 0 ) {
@@ -154,9 +154,9 @@
 						that.updateState(that.next());
 					}
 				}
-				else {
-					console.log('WAITING FOR MONITOR TO STEP');
-				}
+//				else {
+//					console.log('WAITING FOR MONITOR TO STEP');
+//				}
 			});
 			
 			node.on('DONE', function(msg) {
@@ -223,6 +223,7 @@
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
 		node.emit(stateEvent,this.gameState,'ALL');
+		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};
 	

@@ -61,7 +61,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		//that.log.log('onSTATE P ' + util.inspect(msg));
 		if (that.pl.exist(msg.from)){
 			// Do we need this?
-			//that.pl.updatePlayerState(msg.from,msg.data);
+			that.pl.updatePlayerState(msg.from,msg.data);
 
 			
 			that.gmm.send(msg);

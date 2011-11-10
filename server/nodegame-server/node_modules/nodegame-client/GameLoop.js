@@ -50,7 +50,7 @@
 			return false;
 		}
 		
-		console.log('This exist: ' + gameState);
+		//console.log('This exist: ' + gameState);
 			
 		return true;
 	};
@@ -158,6 +158,7 @@
 	};
 	
 	GameLoop.prototype.getFunction = function(gameState) {
+		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['loop'][gameState.step];
 	};
 

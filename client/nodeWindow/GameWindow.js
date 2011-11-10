@@ -6,6 +6,8 @@
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
 	var GameState = node.GameState;
+	var GameMsg = node.GameMsg;
+	var GameMsgGenerator = node.GameMsgGenerator;
 	
 	var Document = node.window.Document;
 	

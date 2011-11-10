@@ -28,7 +28,7 @@
 		this.root = root;
 		var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
 		this.board = node.window.addDiv(fieldset,this.id);
-		this.board.innerHTML = this.noPlayers;
+		this.updateBoard(node.game.pl);
 		
 	};
 	

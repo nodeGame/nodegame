@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 10:51:29 CET 2011
+ * Built on Do 10. Nov 13:53:37 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 10:51:29 CET 2011
+ * Built on Do 10. Nov 13:53:37 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -514,7 +514,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -839,7 +839,7 @@
 			return false;
 		}
 		
-		console.log('This exist: ' + gameState);
+		//console.log('This exist: ' + gameState);
 			
 		return true;
 	};
@@ -947,6 +947,7 @@
 	};
 	
 	GameLoop.prototype.getFunction = function(gameState) {
+		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['loop'][gameState.step];
 	};
 
@@ -1267,7 +1268,7 @@
 						that.attachMsgListeners(socket, msg.session);
 						
 						// Send own name to SERVER
-						that.sendHI(that.player);
+						that.sendHI(that.player, 'ALL');
 						// Ready to play
 						node.emit('out.say.HI');
 				   	 } 
@@ -1565,7 +1566,7 @@
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
-					console.log('updatePlayer');
+					//console.log('updatePlayer');
 					that.pl.updatePlayerState(msg.from, msg.data);
 					node.emit('UPDATED_PLIST');
 					that.pl.checkState();
@@ -1573,7 +1574,7 @@
 				// Assume this is the server for now
 				// TODO: assign a string-id to the server
 				else {
-					console.log('updateState: ' + msg.from + ' -- ' + msg.data);
+					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
 					that.updateState(msg.data);
 				}
 			});
@@ -1632,7 +1633,7 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					console.log('WE PLAY AUTO');
+					//console.log('WE PLAY AUTO');
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					
 					if (morePlayers > 0 ) {
@@ -1646,9 +1647,9 @@
 						that.updateState(that.next());
 					}
 				}
-				else {
-					console.log('WAITING FOR MONITOR TO STEP');
-				}
+//				else {
+//					console.log('WAITING FOR MONITOR TO STEP');
+//				}
 			});
 			
 			node.on('DONE', function(msg) {
@@ -1715,6 +1716,7 @@
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
 		node.emit(stateEvent,this.gameState,'ALL');
+		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};
 	
@@ -2149,7 +2151,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 10:51:29 CET 2011
+ * Built on Do 10. Nov 13:53:37 CET 2011
  *
  */
  
@@ -2413,6 +2415,8 @@
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
 	var GameState = node.GameState;
+	var GameMsg = node.GameMsg;
+	var GameMsgGenerator = node.GameMsgGenerator;
 	
 	var Document = node.window.Document;
 	
@@ -2812,7 +2816,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 10. Nov 10:51:29 CET 2011
+ * Built on Do 10. Nov 13:53:37 CET 2011
  *
  */
  
@@ -3661,7 +3665,7 @@
 		this.root = root;
 		var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
 		this.board = node.window.addDiv(fieldset,this.id);
-		this.board.innerHTML = this.noPlayers;
+		this.updateBoard(node.game.pl);
 		
 	};
 	
@@ -3689,8 +3693,6 @@
 		var that = this;
 		that.board.innerHTML = 'Updating...';
 
-		//var pl = new node.PlayerList(pl);
-		
 		//console.log(pl);
 		
 		if (pl.size() !== 0) {
