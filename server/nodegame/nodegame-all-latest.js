@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 9. Nov 15:23:07 CET 2011
+ * Built on Do 10. Nov 10:51:29 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 9. Nov 15:23:07 CET 2011
+ * Built on Do 10. Nov 10:51:29 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        // console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -327,11 +327,7 @@
 		this.size = function() {
 			return Utils.getListSize(this.pl);
 		};
-		
-		if (this.isStateDone()) {
-			node.emit('STATEDONE');
-		}
-		
+				
 	//	console.log('This is the size ' + this.size());
 	
 	}
@@ -347,30 +343,27 @@
 	};
 		
 	PlayerList.prototype.addPlayer = function (player) {
+		if (!player) return false;
 		return this.add(player.id, player.name);
 	};
 	
-	PlayerList.prototype.add = function (connid,name) {	
+	PlayerList.prototype.add = function (pid,name) {	
 		// Check if the id is unique
-		if (typeof(this.pl[connid]) === 'undefined') {
-			this.pl[connid] = new Player({id: connid, name: name});
-			console.log('Added Player ' + this.pl[connid]);
+		if (!this.exist(pid)) {
+			this.pl[pid] = new Player({id: pid, name: name});
+			//console.log('Added Player ' + this.pl[pid]);
 			return true;
 		}
 			
-		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);//[connid]);
+		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
 		return false;
 	};
 	
-	PlayerList.prototype.remove = function (connid) {	
+	PlayerList.prototype.remove = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			delete this.pl[connid];
-			
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
+		if (this.exist(pid)) {
+			delete this.pl[pid];
+		
 			return true;
 		}
 		
@@ -378,18 +371,21 @@
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (connid) {	
+	PlayerList.prototype.get = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			return this.pl[connid];
+		if (this.exist(pid)) {
+			return this.pl[pid];
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + connid);
+		console.log('W: Attempt to access a non-existing player from the the player list ' + pid);
+		return false;
 	};
 	
-	PlayerList.prototype.pop = function (connid) {	
-		var p = this.get(connid);
-		this.remove(connid);
+	PlayerList.prototype.pop = function (pid) {	
+		var p = this.get(pid);
+		if (p) {
+			this.remove(pid);
+		}
 		return p;
 	};
 	
@@ -408,13 +404,9 @@
 	
 	PlayerList.prototype.updatePlayer = function (player) {
 		
-		if (typeof(this.pl[player.id]) !== 'undefined') {
-			this.pl[connid] = player;
-
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
+		if (this.exist(pid)) {
+			this.pl[pid] = player;
+		
 			return true;
 		}
 		
@@ -423,23 +415,29 @@
 	};
 	
 	PlayerList.prototype.updatePlayerState = function (pid, state) {
-		if (typeof(this.pl[pid]) !== 'undefined') {
-			this.pl[connid].state = state;
-			
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
-			return true;
+				
+		if (!this.exist(pid)) {
+			console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+			return false;	
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
-		return false;
+		if ('undefined' === typeof state) {
+			console.log('W: Attempt to assign to a player an undefined state');
+			return false;
+		}
+		
+		//console.log(this.pl);
+		
+		this.pl[pid].state = state;	
+	
+		return true;
 	};
 	
+	PlayerList.prototype.exist = function (pid) {
+		return (typeof(this.pl[pid]) !== 'undefined') ? true : false;
+	};
 	
-	
-	// Returns an array of array of n groups of players {connid: name}
+	// Returns an array of array of n groups of players {pid: name}
 	//The last group could have less elements.
 	PlayerList.prototype.getNGroups = function (n) {
 		
@@ -476,10 +474,17 @@
 		return result;
 	};
 	
-	// Returns an array of array of groups of n players {connid: name};
+	// Returns an array of array of groups of n players {pid: name};
 	// The last group could have less elements.
 	PlayerList.prototype.getGroupsSizeN = function (n) {
 		// TODO: getGroupsSizeN
+	};
+	
+	
+	PlayerList.prototype.checkState = function(gameState,strict) {
+		if (this.isStateDone(gameState,strict)) {
+			node.emit('STATEDONE');
+		}
 	};
 	
 	// TODO: improve
@@ -487,6 +492,8 @@
 	// and they are all GameState = DONE.
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		
+		//console.log('1--------> ' + gameState);
 		
 		// Check whether a gameState variable is passed
 		// if not try to use the node.game.gameState as the default state
@@ -499,6 +506,8 @@
 				var gameState = node.game.gameState;
 			}
 		}
+		
+		//console.log('2--------> ' + gameState);
 		
 		var strict = strict || false;
 		
@@ -545,7 +554,7 @@
 			
 		});
 		
-		console.log('ACTIVES: ' + result);
+		//console.log('ACTIVES: ' + result);
 		
 		return result;
 	};
@@ -1228,7 +1237,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			console.log('Debuffered ' + msg);
+			//console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -1293,7 +1302,7 @@
 				}
 				else {
 					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					console.log('Buffering: ' + msg);
+					//console.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
@@ -1550,12 +1559,29 @@
 			
 			// Say
 
+			// If the message is from the server, update the game state
+			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function(msg){
-				that.updateState(msg.data);
+				
+				// Player exists
+				if (that.pl.exist(msg.from)) {
+					console.log('updatePlayer');
+					that.pl.updatePlayerState(msg.from, msg.data);
+					node.emit('UPDATED_PLIST');
+					that.pl.checkState();
+				}
+				// Assume this is the server for now
+				// TODO: assign a string-id to the server
+				else {
+					console.log('updateState: ' + msg.from + ' -- ' + msg.data);
+					that.updateState(msg.data);
+				}
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
 				that.pl = new PlayerList(msg.data);
+				node.emit('UPDATED_PLIST');
+				that.pl.checkState();
 			});
 		}();
 		
@@ -1606,8 +1632,8 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
-					var morePlayers = that.minPlayers - that.pl.size();
+					console.log('WE PLAY AUTO');
+					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					
 					if (morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -1616,13 +1642,13 @@
 					// TODO: differentiate between before the game starts and during the game
 					else {
 						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
-						console.log( this.minPlayers + ' players ready. Game can proceed');
+						console.log( that.pl.size() + ' players ready. Game can proceed');
 						that.updateState(that.next());
 					}
 				}
-	//			else {
-	//				console.log('WAITING FOR MONITOR TO STEP');
-	//			}
+				else {
+					console.log('WAITING FOR MONITOR TO STEP');
+				}
 			});
 			
 			node.on('DONE', function(msg) {
@@ -2123,7 +2149,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 9. Nov 15:23:07 CET 2011
+ * Built on Do 10. Nov 10:51:29 CET 2011
  *
  */
  
@@ -2786,7 +2812,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 9. Nov 15:23:07 CET 2011
+ * Built on Do 10. Nov 10:51:29 CET 2011
  *
  */
  
@@ -3612,6 +3638,9 @@
 	 */ 
 	
 	exports.GameBoard = GameBoard;
+	
+	GameState = node.GameState;
+	PlayerList = node.PlayerList;
 		
 	function GameBoard (id) {
 		
@@ -3619,7 +3648,7 @@
 		this.id = id || 'gboard';
 		this.name = 'GameBoard';
 		
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.board = null;
 		this.root = null;
@@ -3643,55 +3672,74 @@
 		var set = node.actions.SET + '.';
 		var get = node.actions.GET + '.'; 
 		
-		node.onPLIST( function (msg) {
-			console.log('I Updating Board ' + msg.text);
-			that.board.innerHTML = 'Updating...';
-			
-			var pl = new node.PlayerList(msg.data);
-			
-			//console.log(pl);
-			
-			if (pl.size() !== 0) {
-				that.board.innerHTML = '';
-				pl.forEach( function(p) {
-					//console.log(p);
-					var line = '[' + p.id + "|" + p.name + "]> \t"; 
-					
-					var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
-					pState += ' ';
-					
-					switch (p.state.is) {
-					
-					case node.states.UNKNOWN:
+		
+		node.on('UPDATED_PLIST', function () {
+			console.log('I Updating Board');
+			that.updateBoard(node.game.pl);
+
+		});
+		
+//		node.onPLIST( function (msg) {
+//			console.log('I Updating Board ' + msg.text);
+//			that.updateBoard(msg.data);
+//		});
+	};
+	
+	GameBoard.prototype.updateBoard = function (pl) {
+		var that = this;
+		that.board.innerHTML = 'Updating...';
+
+		//var pl = new node.PlayerList(pl);
+		
+		//console.log(pl);
+		
+		if (pl.size() !== 0) {
+			that.board.innerHTML = '';
+			pl.forEach( function(p) {
+				//console.log(p);
+				var line = '[' + p.id + "|" + p.name + "]> \t"; 
+				
+				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
+				pState += ' ';
+				
+				switch (p.state.is) {
+
+					case GameState.iss.UNKNOWN:
 						pState += '(unknown)';
 						break;
-					case node.states.PLAYING:
+						
+					case GameState.iss.LOADING:
+						pState += '(loading)';
+						break;
+						
+					case GameState.iss.LOADED:
+						pState += '(loaded)';
+						break;
+						
+					case GameState.iss.PLAYING:
 						pState += '(playing)';
 						break;
-					case node.states.DONE:
+					case GameState.iss.DONE:
 						pState += '(done)';
-						break;	
-					case node.states.PAUSE:
-						pState += '(pause)';
 						break;		
 					default:
 						pState += '('+p.state.is+')';
 						break;		
-					}
-					
-					if (p.state.paused) {
-						pState += ' (P)';
-					}
-					
-					that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
-				});
-				//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
 				}
-				else {
-					that.board.innerHTML = that.noPlayers;
+				
+				if (p.state.paused) {
+					pState += ' (P)';
 				}
+				
+				that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
 			});
-	};
+			//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
+		}
+		else {
+			that.board.innerHTML = that.noPlayers;
+		}
+	}
+	
 })(node.window.widgets); 
  
  

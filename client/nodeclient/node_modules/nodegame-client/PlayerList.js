@@ -20,11 +20,7 @@
 		this.size = function() {
 			return Utils.getListSize(this.pl);
 		};
-		
-		if (this.isStateDone()) {
-			node.emit('STATEDONE');
-		}
-		
+				
 	//	console.log('This is the size ' + this.size());
 	
 	}
@@ -40,30 +36,27 @@
 	};
 		
 	PlayerList.prototype.addPlayer = function (player) {
+		if (!player) return false;
 		return this.add(player.id, player.name);
 	};
 	
-	PlayerList.prototype.add = function (connid,name) {	
+	PlayerList.prototype.add = function (pid,name) {	
 		// Check if the id is unique
-		if (typeof(this.pl[connid]) === 'undefined') {
-			this.pl[connid] = new Player({id: connid, name: name});
-			console.log('Added Player ' + this.pl[connid]);
+		if (!this.exist(pid)) {
+			this.pl[pid] = new Player({id: pid, name: name});
+			//console.log('Added Player ' + this.pl[pid]);
 			return true;
 		}
 			
-		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);//[connid]);
+		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
 		return false;
 	};
 	
-	PlayerList.prototype.remove = function (connid) {	
+	PlayerList.prototype.remove = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			delete this.pl[connid];
-			
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
+		if (this.exist(pid)) {
+			delete this.pl[pid];
+		
 			return true;
 		}
 		
@@ -71,18 +64,21 @@
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (connid) {	
+	PlayerList.prototype.get = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			return this.pl[connid];
+		if (this.exist(pid)) {
+			return this.pl[pid];
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + connid);
+		console.log('W: Attempt to access a non-existing player from the the player list ' + pid);
+		return false;
 	};
 	
-	PlayerList.prototype.pop = function (connid) {	
-		var p = this.get(connid);
-		this.remove(connid);
+	PlayerList.prototype.pop = function (pid) {	
+		var p = this.get(pid);
+		if (p) {
+			this.remove(pid);
+		}
 		return p;
 	};
 	
@@ -101,13 +97,9 @@
 	
 	PlayerList.prototype.updatePlayer = function (player) {
 		
-		if (typeof(this.pl[player.id]) !== 'undefined') {
-			this.pl[connid] = player;
-
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
+		if (this.exist(pid)) {
+			this.pl[pid] = player;
+		
 			return true;
 		}
 		
@@ -116,23 +108,29 @@
 	};
 	
 	PlayerList.prototype.updatePlayerState = function (pid, state) {
-		if (typeof(this.pl[pid]) !== 'undefined') {
-			this.pl[connid].state = state;
-			
-			if (this.isStateDone()) {
-				node.emit('STATEDONE');
-			}
-			
-			return true;
+				
+		if (!this.exist(pid)) {
+			console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+			return false;	
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
-		return false;
+		if ('undefined' === typeof state) {
+			console.log('W: Attempt to assign to a player an undefined state');
+			return false;
+		}
+		
+		//console.log(this.pl);
+		
+		this.pl[pid].state = state;	
+	
+		return true;
 	};
 	
+	PlayerList.prototype.exist = function (pid) {
+		return (typeof(this.pl[pid]) !== 'undefined') ? true : false;
+	};
 	
-	
-	// Returns an array of array of n groups of players {connid: name}
+	// Returns an array of array of n groups of players {pid: name}
 	//The last group could have less elements.
 	PlayerList.prototype.getNGroups = function (n) {
 		
@@ -169,10 +167,17 @@
 		return result;
 	};
 	
-	// Returns an array of array of groups of n players {connid: name};
+	// Returns an array of array of groups of n players {pid: name};
 	// The last group could have less elements.
 	PlayerList.prototype.getGroupsSizeN = function (n) {
 		// TODO: getGroupsSizeN
+	};
+	
+	
+	PlayerList.prototype.checkState = function(gameState,strict) {
+		if (this.isStateDone(gameState,strict)) {
+			node.emit('STATEDONE');
+		}
 	};
 	
 	// TODO: improve
@@ -180,6 +185,8 @@
 	// and they are all GameState = DONE.
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		
+		//console.log('1--------> ' + gameState);
 		
 		// Check whether a gameState variable is passed
 		// if not try to use the node.game.gameState as the default state
@@ -192,6 +199,8 @@
 				var gameState = node.game.gameState;
 			}
 		}
+		
+		//console.log('2--------> ' + gameState);
 		
 		var strict = strict || false;
 		
@@ -238,7 +247,7 @@
 			
 		});
 		
-		console.log('ACTIVES: ' + result);
+		//console.log('ACTIVES: ' + result);
 		
 		return result;
 	};
