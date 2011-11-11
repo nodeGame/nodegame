@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.7
+ * nodeGame-all v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 12:37:47 CET 2011
+ * Built on Fr 11. Nov 18:26:45 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.7
+ * nodeGame Client v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 12:37:47 CET 2011
+ * Built on Fr 11. Nov 18:26:45 CET 2011
  *
  */
  
@@ -1418,8 +1418,10 @@
 	
 	
 	/**
-	 * Write data into the memory of a client
-	 * It overwrites the same key
+	 * Write data into the memory of a client.
+	 * It overwrites data with the same key.
+	 * @data can be an object, or an object containing other objects,
+	 * but these cannot contain other objects in turn.
 	 * 
 	 * @param {String} client
 	 * @data {Object}
@@ -1445,8 +1447,10 @@
 	  return true;
 	};
 	
-	// Reverse the memory: instead of the history of a player for all rounds,
-	// we get the history of a round of all players
+	/** 
+	 *  Reverse the memory: instead of the history of a player for all rounds,
+	 *  we get the history of a round of all players
+	 */
 	GameStorage.prototype.reverse = function () {
 		var reverse = {};
 		
@@ -1492,9 +1496,52 @@
 		for (var i in dump) {
 			if (dump.hasOwnProperty(i)) {
 				var line = this.getLine(i, dump);
+				//console.log(line);
 				for (var j in line) {
 					values.push(line[j]);
 				}
+			}
+		}
+		return values;
+	};
+	
+	/**
+	 * Returns an array of arrays. Each row is unique combination of:
+	 * 
+	 * A) state, client, key1, key2, value
+	 * 
+	 * or 
+	 * 
+	 * B) state, client, key1, value
+	 * 
+	 * Since getLine returns the same array of array, the task is here to merge
+	 * all together.
+	 * 
+	 */
+	GameStorage.prototype.getValues = function (reverse) {
+	
+		var values = [];
+		
+		var dump = this.dump(reverse);
+		for (var i in dump) {
+			if (dump.hasOwnProperty(i)) {
+				var line = this.getLine(i, dump);
+				for (var j in line) {
+
+					// We can have one or two nested arrays
+					// We need to open the first array to know it
+					for (var x in line[j]) {
+						if ('object' === typeof line[j][x]) {
+							values.push(line[j][x]);
+						}
+						else {
+							values.push(line[j]);
+							break; // do not add line[j] multiple times
+						}
+						
+					}
+					
+				}	
 			}
 		}
 		return values;
@@ -1505,23 +1552,43 @@
 		if (!storage[id]) return;
 		
 		var lines = [];
-		
+		// Clients or States
 		for (var i in storage[id]) {
 			if (storage[id].hasOwnProperty(i)) {
 				var line = [];
-				line.push(id);
-				line.push(i);
 				
+				// Variables
 				for (var j in storage[id][i]) {
 					if (storage[id][i].hasOwnProperty(j)) {
-						line.push(storage[id][i][j]);
+						
+						// Every row contains: client,variable and key1
+						// It could be that we have a nested array, and for this
+						// we need to check whether to a value or a pair key2,value
+						var inner_line = [id,i,j];
+						
+						// Is it a nested {} ?
+						if ('object' === typeof storage[id][i][j]) { 
+							for (var x in storage[id][i][j]) {
+								
+								if (storage[id][i][j].hasOwnProperty(x)) {
+									inner_line.push(x);
+									inner_line.push(storage[id][i][j][x]);
+									line.push(inner_line);
+									inner_line = [id,i,j]; // reset
+								}
+							}
+						}
+						else {
+							inner_line.push(storage[id][i][j]);
+							line.push(inner_line);
+							inner_line = [id,i,j]; // reset
+						}
 					}
 				}
-				
 				lines.push(line);
 			}
 		}
-		
+		//console.log(lines);
 		return lines;	
 	};
 })(
@@ -1978,6 +2045,8 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('DUMPINGGG');
+	    	console.log(obj);
 	    	for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
@@ -2083,6 +2152,22 @@
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
+	
+	
+	// If 'value' is not passed, it is assumed that we are passing
+	// already an object with 'key'
+//	node.set = function (key, value) {
+//		
+//		var data = {};
+//		if ('undefined' === value) {
+//			data = key;
+//		}
+//		else {
+//			data[key] = value; // necessary, otherwise the key is called key
+//		}
+//		
+//		that.emit('out.set.DATA', data);
+//	}
 
 	// TODO node.get
 	//node.get = function (key, value) {};
@@ -2184,12 +2269,12 @@
  
  
 /*!
- * nodeWindow v0.5.7
+ * nodeWindow v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 12:37:47 CET 2011
+ * Built on Fr 11. Nov 18:26:45 CET 2011
  *
  */
  
@@ -2849,12 +2934,12 @@
  
  
 /*!
- * nodeGadgets v0.5.7
+ * nodeGadgets v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 12:37:47 CET 2011
+ * Built on Fr 11. Nov 18:26:45 CET 2011
  *
  */
  

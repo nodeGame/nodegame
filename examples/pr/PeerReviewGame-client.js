@@ -61,9 +61,9 @@ function PeerReviewGame () {
 			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
 			
 			node.on('CREATION_DONE', function(){
-				console.log('cf_values');
+				console.log('cf_values');		
+				node.set('CF', that.cf.getAllValues());
 				console.log(that.cf.getAllValues());
-				node.set(that.cf.getAllValues());
 				node.emit('DONE');
 			});
 			

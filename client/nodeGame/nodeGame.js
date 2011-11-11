@@ -131,6 +131,8 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('DUMPINGGG');
+	    	console.log(obj);
 	    	for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
@@ -231,12 +233,18 @@
 		that.emit('out.say.' + event, p1, p2, p3);
 	}
 	
+	/**
+	 * Set the pair (key,value) into the server
+	 * @value can be an object literal.
+	 * 
+	 * 
+	 */
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
-
+	
 	// TODO node.get
 	//node.get = function (key, value) {};
 	
