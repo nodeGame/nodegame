@@ -17,21 +17,22 @@
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.1';
+		this.version = '0.2.1';
 		
+		this.timer = null; 		// the ID of the interval
+		this.timerDiv = null; 	// the DIV in which to display the timer
+		this.root = null;		// the parent element
+		
+		this.init(options);
+	};
+	
+	VisualTimer.prototype.init = function (options) {
 		this.milliseconds = options.milliseconds || 10000;
 		this.timePassed = 0;
 		this.update = options.update || 1000;
-		this.timer = null;
-		this.timerDiv = null;
-		this.root = null;
 		this.text = options.text || 'Time to go';
-		this.event = options.event || 'TIMEUP'; // event to be fire
-		
-		
+		this.event = options.event || 'TIMEUP'; // event to be fire		
 		// TODO: update and milliseconds must be multiple now
-		
-		this.recipient = null;
 	};
 	
 	VisualTimer.prototype.append = function (root, ids) {
@@ -46,9 +47,18 @@
 		}
 		
 		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
-
+		this.root = root;
 		this.timerDiv = node.window.addDiv(fieldset,idTimerDiv);
+			
+		this.start();
 		
+		return fieldset;
+		
+	};
+	
+	VisualTimer.prototype.start = function() {
+		var that = this;
+		console.log(this);
 		// Init Timer
 		var time = Utils.parseMilliseconds(this.milliseconds);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];
@@ -70,12 +80,13 @@
 			that.timerDiv.innerHTML = time[2] + ':' + time[3];
 			
 		}, this.update);
-		
-		
-		return fieldset;
-		
 	};
 	
+	VisualTimer.prototype.restart = function(options) {
+		this.init(options);
+		this.start();
+	};
+		
 	VisualTimer.prototype.listeners = function () {
 		var that = this;
 		var PREFIX = 'in.';

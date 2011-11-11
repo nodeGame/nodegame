@@ -68,7 +68,7 @@
 		for (var key in this.features) {
 			
 			if (this.features.hasOwnProperty(key)) {
-				console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
+				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
 				out[key] = Number(node.window.getElementById(key).value);
 			}
 		}

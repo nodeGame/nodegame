@@ -44,8 +44,6 @@
 		  }
 	  }
 	  
-	  if (this.dump(reverse))
-	  
 	  return true;
 	};
 	

@@ -26,7 +26,7 @@
 		this.bar = null;
 		this.root = null;
 		
-		this.recipient = null;
+		this.sc = null;
 		
 		this.dims = {
 					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
@@ -61,13 +61,14 @@
 		var button = node.window.addButton(fieldset,idButton);
 										
 		// Add Gadget
-		var sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
-		sc = node.window.addWidget(sc,fieldset);
+		this.sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
+		this.sc = node.window.addWidget(this.sc,fieldset);
+		
 		
 		var that = this;
 	
 		button.onclick = function() {		
-			var fv = sc.getAllValues();
+			var fv = that.sc.getAllValues();
 			console.log(fv);
 			var fv = new FaceVector(fv);
 			console.log(fv);
@@ -87,6 +88,10 @@
 	//		}); 
 	};
 	
+	
+	ChernoffFaces.prototype.getAllValues = function() {
+		return this.sc.getAllValues();
+	};
 	
 	/*!
 	* ChernoffFaces
