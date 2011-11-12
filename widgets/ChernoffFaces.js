@@ -61,8 +61,12 @@
 		var button = node.window.addButton(fieldset,idButton);
 										
 		// Add Gadget
-		this.sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
-		this.sc = node.window.addWidget(this.sc,fieldset);
+		var sc_options = {
+							id: 'cf_controls',
+							features: FaceVector.defaults
+		};
+		
+		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
 		
 		
 		var that = this;

@@ -77,19 +77,17 @@ function PeerReviewGame () {
 		var root = node.window.getElementById('root');
 		
 		var ctrl_options = { id: 'exhib',
+							 name: 'exhib',
 							 features: {
 										ex_A: { 
-										name: 'A',
-										value: 'A',
-										label: 'A'
+											value: 'A',
+											label: 'A'
 										},
 										ex_B: { 
-												name: 'B',
 												value: 'B',
 												label: 'B'
 										},
 										ex_C: { 
-												name: 'C',
 												value: 'C',
 												label: 'C'
 										}

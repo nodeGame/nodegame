@@ -116,10 +116,14 @@
 		this.name = 'RadioControls'
 		this.version = '0.1';
 		this.id = options.id || this.name;
+		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
-		console.log('eeh?');
+		// add the group name if not specified
+		if (!attributes.name) {
+			attributes.name = this.groupName;
+		}
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
