@@ -6,7 +6,7 @@ function Ultimatum () {
 	
 	this.automatic_step = false;
 	
-	this.minPlayers = 8;
+	this.minPlayers = 2;
 	this.maxPlayers = 10;
 	
 	this.BIDDER = 1;

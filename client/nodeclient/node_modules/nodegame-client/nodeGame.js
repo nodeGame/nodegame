@@ -112,17 +112,18 @@
 	    node.Game = require('./Game').Game;
 	    
 	    
-	    node.csv = require('ya-csv');
 	    
 	    /**
 	     * Enable file system operations
 	     */
 	
+	    node.csv = {};
+	    node.fs = {};
+	    
 	    var fs = require('fs');
 	    var path = require('path');
 	    var csv = require('ya-csv');
-	    	
-	    node.fs = {};
+	    
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;
@@ -130,6 +131,8 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('DUMPINGGG');
+	    	console.log(obj);
 	    	for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
@@ -230,12 +233,18 @@
 		that.emit('out.say.' + event, p1, p2, p3);
 	}
 	
+	/**
+	 * Set the pair (key,value) into the server
+	 * @value can be an object literal.
+	 * 
+	 * 
+	 */
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
-
+	
 	// TODO node.get
 	//node.get = function (key, value) {};
 	
@@ -299,9 +308,7 @@
 	
 	node.TXT = function (text, to) {
 		node.emit('out.say.TXT', text, to);
-	};
-	
-	
+	};	
 	
 	node.random = {};
 	
@@ -327,6 +334,10 @@
 	
 	node.goto = function(state) {
 		node.game.updateState(state);
+	};
+	
+	node.log = function(txt,level) {
+		console.log(txt);
 	};
 	
 })('undefined' != typeof node ? node : module.exports);

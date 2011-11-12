@@ -67,31 +67,29 @@
 			
 			// Say
 
+			// If the message is from the server, update the game state
+			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function(msg){
-				that.updateState(msg.data);
+				
+				// Player exists
+				if (that.pl.exist(msg.from)) {
+					//console.log('updatePlayer');
+					that.pl.updatePlayerState(msg.from, msg.data);
+					node.emit('UPDATED_PLIST');
+					that.pl.checkState();
+				}
+				// Assume this is the server for now
+				// TODO: assign a string-id to the server
+				else {
+					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
+					that.updateState(msg.data);
+				}
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
 				that.pl = new PlayerList(msg.data);
-				// If we go auto
-				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
-					var morePlayers = that.minPlayers - that.pl.size();
-					
-					if (morePlayers > 0 ) {
-						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to begin the game');
-						console.log( morePlayers + ' player/s still needed to begin the game');
-					}
-					// TODO: differentiate between before the game starts and during the game
-					else if (that.pl.isStateDone(that.gameState)) {		
-						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
-						console.log( this.minPlayers + ' players ready. Game can proceed');
-						that.updateState(that.next());
-					}
-				}
-	//			else {
-	//				console.log('WAITING FOR MONITOR TO STEP');
-	//			}
+				node.emit('UPDATED_PLIST');
+				that.pl.checkState();
 			});
 		}();
 		
@@ -138,6 +136,28 @@
 		}();
 		
 		var internalListeners = function() {
+			
+			node.on('STATEDONE', function() {
+				// If we go auto
+				if (that.automatic_step) {
+					//console.log('WE PLAY AUTO');
+					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
+					
+					if (morePlayers > 0 ) {
+						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
+						console.log( morePlayers + ' player/s still needed to play the game');
+					}
+					// TODO: differentiate between before the game starts and during the game
+					else {
+						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
+						console.log( that.pl.size() + ' players ready. Game can proceed');
+						that.updateState(that.next());
+					}
+				}
+//				else {
+//					console.log('WAITING FOR MONITOR TO STEP');
+//				}
+			});
 			
 			node.on('DONE', function(msg) {
 				that.gameState.is = GameState.iss.DONE;
@@ -203,6 +223,7 @@
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
 		node.emit(stateEvent,this.gameState,'ALL');
+		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};
 	

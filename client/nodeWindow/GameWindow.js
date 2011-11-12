@@ -6,6 +6,8 @@
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
 	var GameState = node.GameState;
+	var GameMsg = node.GameMsg;
+	var GameMsgGenerator = node.GameMsgGenerator;
 	
 	var Document = node.window.Document;
 	
@@ -33,6 +35,43 @@
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
+		
+		var that = this;
+		
+		var listeners = function() {
+			
+			node.on('HIDE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot hide element ' + id);
+					return;
+				}
+				el.style.visibility = 'hidden';    
+			});
+			
+			node.on('SHOW', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot show element ' + id);
+					return;
+				}
+				el.style.visibility = 'visible'; 
+			});
+			
+			node.on('TOGGLE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot toggle element ' + id);
+					return;
+				}
+				if (el.style.visibility === 'visible') {
+					el.style.visibility = 'hidden';
+				}
+				else {
+					el.style.visibility = 'visible';
+				}
+			});
+		}();
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -137,11 +176,23 @@
 	// Gadget
 	
 	GameWindow.prototype.addWidget = function (g, root, options) {
+		
+		//console.log(this.widgets);
+		
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			g = new this.widgets[g](options);
+			var tokens = g.split('.');
+			var i = 0;
+			var strg = 'g = new this.widgets';
+			for (;i<tokens.length;i++) {
+				strg += '[\''+tokens[i]+'\']';
+			}
+			strg+='(options);';
+			//console.log(strg);
+			eval(strg);
+			//g = new this.widgets[tokens](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);

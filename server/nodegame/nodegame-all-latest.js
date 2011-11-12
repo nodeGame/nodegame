@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.6
+ * nodeGame-all v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 16:32:00 CET 2011
+ * Built on Sat Nov 12 21:45:03 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.6
+ * nodeGame Client v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 16:32:00 CET 2011
+ * Built on Sat Nov 12 21:45:03 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        // console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -220,6 +220,43 @@
 			}
 		}
 	};
+	
+	Utils.objToArray = function (obj) {
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	           result.push(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Returns an array days, minutes, seconds, mi
+	 * @param ms time in milliseconds
+	 * @return array 
+	 */
+	Utils.parseMilliseconds = function (ms) {
+	  
+		var result = [];
+		var x = ms / 1000;
+		result[4] = x;
+		var seconds = x % 60;
+		result[3] = Math.floor(seconds);
+		var x = x /60;
+		var minutes = x % 60;
+		result[2] = Math.floor(minutes);
+		var x = x / 60;
+		var hours = x % 24;
+		result[1] = Math.floor(hours);
+		var x = x / 24;
+		var days = x;
+		result[1] = Math.floor(days);
+		
+	    return result;
+	};
+
+
 
 })('undefined' != typeof node ? node : module.exports); 
  
@@ -327,7 +364,7 @@
 		this.size = function() {
 			return Utils.getListSize(this.pl);
 		};
-		
+				
 	//	console.log('This is the size ' + this.size());
 	
 	}
@@ -343,25 +380,27 @@
 	};
 		
 	PlayerList.prototype.addPlayer = function (player) {
+		if (!player) return false;
 		return this.add(player.id, player.name);
 	};
 	
-	PlayerList.prototype.add = function (connid,name) {	
+	PlayerList.prototype.add = function (pid,name) {	
 		// Check if the id is unique
-		if (typeof(this.pl[connid]) === 'undefined') {
-			this.pl[connid] = new Player({id: connid, name: name});
-			console.log('Added Player ' + this.pl[connid]);
+		if (!this.exist(pid)) {
+			this.pl[pid] = new Player({id: pid, name: name});
+			//console.log('Added Player ' + this.pl[pid]);
 			return true;
 		}
 			
-		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);//[connid]);
+		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
 		return false;
 	};
 	
-	PlayerList.prototype.remove = function (connid) {	
+	PlayerList.prototype.remove = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			delete this.pl[connid];
+		if (this.exist(pid)) {
+			delete this.pl[pid];
+		
 			return true;
 		}
 		
@@ -369,18 +408,21 @@
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (connid) {	
+	PlayerList.prototype.get = function (pid) {	
 		// Check if the id exists
-		if (typeof(this.pl[connid]) !== 'undefined') {
-			return this.pl[connid];
+		if (this.exist(pid)) {
+			return this.pl[pid];
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + connid);
+		console.log('W: Attempt to access a non-existing player from the the player list ' + pid);
+		return false;
 	};
 	
-	PlayerList.prototype.pop = function (connid) {	
-		var p = this.get(connid);
-		this.remove(connid);
+	PlayerList.prototype.pop = function (pid) {	
+		var p = this.get(pid);
+		if (p) {
+			this.remove(pid);
+		}
 		return p;
 	};
 	
@@ -399,8 +441,9 @@
 	
 	PlayerList.prototype.updatePlayer = function (player) {
 		
-		if (typeof(this.pl[player.id]) !== 'undefined') {
-			this.pl[connid] = player;
+		if (this.exist(pid)) {
+			this.pl[pid] = player;
+		
 			return true;
 		}
 		
@@ -408,7 +451,30 @@
 		return false;
 	};
 	
-	// Returns an array of array of n groups of players {connid: name}
+	PlayerList.prototype.updatePlayerState = function (pid, state) {
+				
+		if (!this.exist(pid)) {
+			console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+			return false;	
+		}
+		
+		if ('undefined' === typeof state) {
+			console.log('W: Attempt to assign to a player an undefined state');
+			return false;
+		}
+		
+		//console.log(this.pl);
+		
+		this.pl[pid].state = state;	
+	
+		return true;
+	};
+	
+	PlayerList.prototype.exist = function (pid) {
+		return (typeof(this.pl[pid]) !== 'undefined') ? true : false;
+	};
+	
+	// Returns an array of array of n groups of players {pid: name}
 	//The last group could have less elements.
 	PlayerList.prototype.getNGroups = function (n) {
 		
@@ -445,10 +511,17 @@
 		return result;
 	};
 	
-	// Returns an array of array of groups of n players {connid: name};
+	// Returns an array of array of groups of n players {pid: name};
 	// The last group could have less elements.
 	PlayerList.prototype.getGroupsSizeN = function (n) {
 		// TODO: getGroupsSizeN
+	};
+	
+	
+	PlayerList.prototype.checkState = function(gameState,strict) {
+		if (this.isStateDone(gameState,strict)) {
+			node.emit('STATEDONE');
+		}
 	};
 	
 	// TODO: improve
@@ -456,12 +529,29 @@
 	// and they are all GameState = DONE.
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
+		
+		//console.log('1--------> ' + gameState);
+		
+		// Check whether a gameState variable is passed
+		// if not try to use the node.game.gameState as the default state
+		// if node.game has not been initialized yet return false
+		if ('undefined' === typeof gameState){
+			if ('undefined' === typeof node.game) {
+				return false;
+			}
+			else {
+				var gameState = node.game.gameState;
+			}
+		}
+		
+		//console.log('2--------> ' + gameState);
+		
 		var strict = strict || false;
 		
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -501,7 +591,7 @@
 			
 		});
 		
-		console.log('ACTIVES: ' + result);
+		//console.log('ACTIVES: ' + result);
 		
 		return result;
 	};
@@ -786,7 +876,7 @@
 			return false;
 		}
 		
-		console.log('This exist: ' + gameState);
+		//console.log('This exist: ' + gameState);
 			
 		return true;
 	};
@@ -894,6 +984,7 @@
 	};
 	
 	GameLoop.prototype.getFunction = function(gameState) {
+		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['loop'][gameState.step];
 	};
 
@@ -1214,7 +1305,7 @@
 						that.attachMsgListeners(socket, msg.session);
 						
 						// Send own name to SERVER
-						that.sendHI(that.player);
+						that.sendHI(that.player, 'ALL');
 						// Ready to play
 						node.emit('out.say.HI');
 				   	 } 
@@ -1327,8 +1418,10 @@
 	
 	
 	/**
-	 * Write data into the memory of a client
-	 * It overwrites the same key
+	 * Write data into the memory of a client.
+	 * It overwrites data with the same key.
+	 * @data can be an object, or an object containing other objects,
+	 * but these cannot contain other objects in turn.
 	 * 
 	 * @param {String} client
 	 * @data {Object}
@@ -1354,8 +1447,10 @@
 	  return true;
 	};
 	
-	// Reverse the memory: instead of the history of a player for all rounds,
-	// we get the history of a round of all players
+	/** 
+	 *  Reverse the memory: instead of the history of a player for all rounds,
+	 *  we get the history of a round of all players
+	 */
 	GameStorage.prototype.reverse = function () {
 		var reverse = {};
 		
@@ -1401,9 +1496,52 @@
 		for (var i in dump) {
 			if (dump.hasOwnProperty(i)) {
 				var line = this.getLine(i, dump);
+				//console.log(line);
 				for (var j in line) {
 					values.push(line[j]);
 				}
+			}
+		}
+		return values;
+	};
+	
+	/**
+	 * Returns an array of arrays. Each row is unique combination of:
+	 * 
+	 * A) state, client, key1, key2, value
+	 * 
+	 * or 
+	 * 
+	 * B) state, client, key1, value
+	 * 
+	 * Since getLine returns the same array of array, the task is here to merge
+	 * all together.
+	 * 
+	 */
+	GameStorage.prototype.getValues = function (reverse) {
+	
+		var values = [];
+		
+		var dump = this.dump(reverse);
+		for (var i in dump) {
+			if (dump.hasOwnProperty(i)) {
+				var line = this.getLine(i, dump);
+				for (var j in line) {
+
+					// We can have one or two nested arrays
+					// We need to open the first array to know it
+					for (var x in line[j]) {
+						if ('object' === typeof line[j][x]) {
+							values.push(line[j][x]);
+						}
+						else {
+							values.push(line[j]);
+							break; // do not add line[j] multiple times
+						}
+						
+					}
+					
+				}	
 			}
 		}
 		return values;
@@ -1414,23 +1552,43 @@
 		if (!storage[id]) return;
 		
 		var lines = [];
-		
+		// Clients or States
 		for (var i in storage[id]) {
 			if (storage[id].hasOwnProperty(i)) {
 				var line = [];
-				line.push(id);
-				line.push(i);
 				
+				// Variables
 				for (var j in storage[id][i]) {
 					if (storage[id][i].hasOwnProperty(j)) {
-						line.push(storage[id][i][j]);
+						
+						// Every row contains: client,variable and key1
+						// It could be that we have a nested array, and for this
+						// we need to check whether to a value or a pair key2,value
+						var inner_line = [id,i,j];
+						
+						// Is it a nested {} ?
+						if ('object' === typeof storage[id][i][j]) { 
+							for (var x in storage[id][i][j]) {
+								
+								if (storage[id][i][j].hasOwnProperty(x)) {
+									inner_line.push(x);
+									inner_line.push(storage[id][i][j][x]);
+									line.push(inner_line);
+									inner_line = [id,i,j]; // reset
+								}
+							}
+						}
+						else {
+							inner_line.push(storage[id][i][j]);
+							line.push(inner_line);
+							inner_line = [id,i,j]; // reset
+						}
 					}
 				}
-				
 				lines.push(line);
 			}
 		}
-		
+		//console.log(lines);
 		return lines;	
 	};
 })(
@@ -1506,31 +1664,29 @@
 			
 			// Say
 
+			// If the message is from the server, update the game state
+			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function(msg){
-				that.updateState(msg.data);
+				
+				// Player exists
+				if (that.pl.exist(msg.from)) {
+					//console.log('updatePlayer');
+					that.pl.updatePlayerState(msg.from, msg.data);
+					node.emit('UPDATED_PLIST');
+					that.pl.checkState();
+				}
+				// Assume this is the server for now
+				// TODO: assign a string-id to the server
+				else {
+					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
+					that.updateState(msg.data);
+				}
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
 				that.pl = new PlayerList(msg.data);
-				// If we go auto
-				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
-					var morePlayers = that.minPlayers - that.pl.size();
-					
-					if (morePlayers > 0 ) {
-						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to begin the game');
-						console.log( morePlayers + ' player/s still needed to begin the game');
-					}
-					// TODO: differentiate between before the game starts and during the game
-					else if (that.pl.isStateDone(that.gameState)) {		
-						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
-						console.log( this.minPlayers + ' players ready. Game can proceed');
-						that.updateState(that.next());
-					}
-				}
-	//			else {
-	//				console.log('WAITING FOR MONITOR TO STEP');
-	//			}
+				node.emit('UPDATED_PLIST');
+				that.pl.checkState();
 			});
 		}();
 		
@@ -1577,6 +1733,28 @@
 		}();
 		
 		var internalListeners = function() {
+			
+			node.on('STATEDONE', function() {
+				// If we go auto
+				if (that.automatic_step) {
+					//console.log('WE PLAY AUTO');
+					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
+					
+					if (morePlayers > 0 ) {
+						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
+						console.log( morePlayers + ' player/s still needed to play the game');
+					}
+					// TODO: differentiate between before the game starts and during the game
+					else {
+						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
+						console.log( that.pl.size() + ' players ready. Game can proceed');
+						that.updateState(that.next());
+					}
+				}
+//				else {
+//					console.log('WAITING FOR MONITOR TO STEP');
+//				}
+			});
 			
 			node.on('DONE', function(msg) {
 				that.gameState.is = GameState.iss.DONE;
@@ -1642,6 +1820,7 @@
 		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
 		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
 		node.emit(stateEvent,this.gameState,'ALL');
+		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};
 	
@@ -1847,17 +2026,18 @@
 	    node.Game = require('./Game').Game;
 	    
 	    
-	    node.csv = require('ya-csv');
 	    
 	    /**
 	     * Enable file system operations
 	     */
 	
+	    node.csv = {};
+	    node.fs = {};
+	    
 	    var fs = require('fs');
 	    var path = require('path');
 	    var csv = require('ya-csv');
-	    	
-	    node.fs = {};
+	    
 	    
 	    /**
 	     * Takes an obj and write it down to a csv file;
@@ -1865,6 +2045,8 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('DUMPINGGG');
+	    	console.log(obj);
 	    	for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
@@ -1965,12 +2147,18 @@
 		that.emit('out.say.' + event, p1, p2, p3);
 	}
 	
+	/**
+	 * Set the pair (key,value) into the server
+	 * @value can be an object literal.
+	 * 
+	 * 
+	 */
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
-
+	
 	// TODO node.get
 	//node.get = function (key, value) {};
 	
@@ -2034,9 +2222,7 @@
 	
 	node.TXT = function (text, to) {
 		node.emit('out.say.TXT', text, to);
-	};
-	
-	
+	};	
 	
 	node.random = {};
 	
@@ -2064,6 +2250,10 @@
 		node.game.updateState(state);
 	};
 	
+	node.log = function(txt,level) {
+		console.log(txt);
+	};
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -2071,12 +2261,12 @@
  
  
 /*!
- * nodeWindow v0.5.6
+ * nodeWindow v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 16:32:00 CET 2011
+ * Built on Sat Nov 12 21:45:03 CET 2011
  *
  */
  
@@ -2148,6 +2338,16 @@
 		return slider;
 	};
 	
+	
+	Document.prototype.addRadioButton = function (root, id, attributes) {
+		var radio = document.createElement('input');
+		radio.id = id;
+		radio.setAttribute('type', 'radio');
+		this.addAttributes2Elem(radio, attributes);
+		root.appendChild(radio);
+		return radio;
+	};
+	
 	Document.prototype.addJQuerySlider = function (root, id, attributes) {
 		var slider = document.createElement('div');
 		slider.id = id;
@@ -2164,19 +2364,19 @@
 		label.setAttribute('for', forElem);
 		this.addAttributes2Elem(label, attributes);
 		
-		var root = node.window.getElementById(forElem);
+//		var root = node.window.getElementById(forElem);
 		root.parentNode.insertBefore(label,root);
 		return label;
 		
-		// Add the label immediately before if no root elem has been provided
-		if (!root) {
-			var root = node.window.getElementById(forElem);
-			root.insertBefore(label);
-		}
-		else {
-			root.appendChild(label);
-		}
-		return label;
+//		// Add the label immediately before if no root elem has been provided
+//		if (!root) {
+//			var root = node.window.getElementById(forElem);
+//			root.insertBefore(label);
+//		}
+//		else {
+//			root.appendChild(label);
+//		}
+//		return label;
 	};
 	
 	Document.prototype.addSelect = function (root, id, attributes) {
@@ -2340,6 +2540,8 @@
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
 	var GameState = node.GameState;
+	var GameMsg = node.GameMsg;
+	var GameMsgGenerator = node.GameMsgGenerator;
 	
 	var Document = node.window.Document;
 	
@@ -2367,6 +2569,43 @@
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
+		
+		var that = this;
+		
+		var listeners = function() {
+			
+			node.on('HIDE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot hide element ' + id);
+					return;
+				}
+				el.style.visibility = 'hidden';    
+			});
+			
+			node.on('SHOW', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot show element ' + id);
+					return;
+				}
+				el.style.visibility = 'visible'; 
+			});
+			
+			node.on('TOGGLE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot toggle element ' + id);
+					return;
+				}
+				if (el.style.visibility === 'visible') {
+					el.style.visibility = 'hidden';
+				}
+				else {
+					el.style.visibility = 'visible';
+				}
+			});
+		}();
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -2471,11 +2710,23 @@
 	// Gadget
 	
 	GameWindow.prototype.addWidget = function (g, root, options) {
+		
+		//console.log(this.widgets);
+		
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			g = new this.widgets[g](options);
+			var tokens = g.split('.');
+			var i = 0;
+			var strg = 'g = new this.widgets';
+			for (;i<tokens.length;i++) {
+				strg += '[\''+tokens[i]+'\']';
+			}
+			strg+='(options);';
+			//console.log(strg);
+			eval(strg);
+			//g = new this.widgets[tokens](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
@@ -2692,6 +2943,8 @@
 		this.SECOND_LEVEL = 'dt';
 		this.THIRD_LEVEL = 'dd';
 	
+		this.root = this.createRoot(this.id);
+		
 		this.list = [];
 	}
 	
@@ -2704,9 +2957,7 @@
 	};
 	
 	List.prototype.write = function() {
-		
-		var root = document.createElement(this.FIRST_LEVEL);
-		
+				
 		var i = 0;
 		var len = list.length;
 		for (;i<len;i++) {
@@ -2719,11 +2970,23 @@
 	};
 	
 	List.prototype.getRoot = function() {
-		return document.createElement(this.FIRST_LEVEL);
+		return this.root;
 	};
 	
-	List.prototype.getItem = function() {
-		return document.createElement(this.SECOND_LEVEL);
+	List.prototype.createRoot = function(id) {
+		var root = document.createElement(this.FIRST_LEVEL);
+		if (id) {
+			root.id = id;
+		}
+		return root;
+	};
+	
+	List.prototype.createItem = function(id) {
+		var item = document.createElement(this.SECOND_LEVEL);
+		if (id) {
+			item.id = id;
+		}
+		return item;
 	};
 	
 })(node.window);
@@ -2734,12 +2997,12 @@
  
  
 /*!
- * nodeGadgets v0.5.6
+ * nodeGadgets v0.5.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Nov 6 16:32:00 CET 2011
+ * Built on Sat Nov 12 21:45:03 CET 2011
  *
  */
  
@@ -2762,21 +3025,21 @@
 	ChernoffFaces.defaults.canvas.width = 100;
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
-	function ChernoffFaces(id, dims) {
+	function ChernoffFaces(options) {
 		
 		this.game = node.game;
-		this.id = id || 'ChernoffFaces';
+		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
 		this.version = '0.1';
 		
 		this.bar = null;
 		this.root = null;
 		
-		this.recipient = null;
+		this.sc = null;
 		
 		this.dims = {
-					width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
-					height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
+					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
 		};
 	};
 	
@@ -2807,13 +3070,18 @@
 		var button = node.window.addButton(fieldset,idButton);
 										
 		// Add Gadget
-		var sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
-		sc = node.window.addGadget(sc,fieldset);
+		var sc_options = {
+							id: 'cf_controls',
+							features: FaceVector.defaults
+		};
+		
+		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
+		
 		
 		var that = this;
 	
 		button.onclick = function() {		
-			var fv = sc.getAllValues();
+			var fv = that.sc.getAllValues();
 			console.log(fv);
 			var fv = new FaceVector(fv);
 			console.log(fv);
@@ -2833,6 +3101,10 @@
 	//		}); 
 	};
 	
+	
+	ChernoffFaces.prototype.getAllValues = function() {
+		return this.sc.getAllValues();
+	};
 	
 	/*!
 	* ChernoffFaces
@@ -3476,6 +3748,182 @@
  
 (function (exports) {
 	
+
+	/**
+	 * Controls
+	 * 
+	 */
+	
+	exports.Controls = Controls;	
+	exports.Controls.Slider = SliderControls;
+	exports.Controls.Radio	= RadioControls;
+	
+		
+	function Controls (options) {
+		this.name = 'Controls'
+		this.version = '0.1';
+	
+
+		this.options = options;
+		this.id = options.id || this.name;
+		this.root = null;
+		
+		this.listRoot = null;
+		this.fieldset = null;
+		this.submit = null;
+		
+		this.init(options.features);
+	};
+
+	Controls.prototype.add = function (root, id, attributes) {
+		// TODO: node.window.addTextInput
+		//return node.window.addTextInput(root, id, attributes);
+	};
+	
+	Controls.prototype.init = function (features) {
+		if (this.options.fieldset) {
+			this.list = new node.window.List();
+		}
+		else {
+			
+			this.list = new node.window.List(this.id);
+		}
+		this.listRoot = this.list.getRoot();
+		
+		if (!features) return;
+		
+		this.features = features;
+		this.populate();
+	};
+	
+	Controls.prototype.append = function (root) {
+		this.root = root;
+		var toReturn = this.listRoot;
+		
+		if (this.options.fieldset) {
+			var idFieldset = this.options.fieldset.id || this.id;
+			var legend = this.options.fieldset.legend || 'Input';
+			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend);
+			// Updating root and return element
+			root = this.fieldset;
+			toReturn = this.fieldset;
+		}
+		
+		root.appendChild(this.listRoot);
+		
+		if (this.options.submit) {
+			var idButton = 'submit_' + this.id;
+			if (this.options.submit.id) {
+				var idButton = this.options.submit.id;
+				delete this.options.submit.id;
+			}
+			
+			this.submit = node.window.addButton(root, idButton, this.options.submit);
+		}		
+		
+		return toReturn;
+	};
+	
+	
+	Controls.prototype.populate = function () {
+		
+		for (var key in this.features) {
+			if (this.features.hasOwnProperty(key)) {
+				// Prepare the attributes vector
+				var attributes = this.features[key];
+				var id = key;
+				if (attributes.id) {
+					var id = attributes.id;
+					delete attributes.id;
+				}
+				
+				var item = this.list.createItem();
+				this.listRoot.appendChild(item);
+								
+				var elem = this.add(item, id, attributes);
+				
+				// If a label element is present it checks whether it is an
+				// object literal or a string.
+				// In the former case it scans the obj for additional properties
+				if (attributes.label) {
+					var labelId = 'label_' + id;
+					var labelText = attributes.label;
+					
+					if (typeof(attributes.label) === 'object') {
+						var labelText = attributes.label.text;
+						if (attributes.label.id) {
+							labelId = attributes.label.id; 
+						}
+					}	
+					node.window.addLabel(elem, labelId, labelText, id);
+				}
+			}
+		}
+	};
+	
+	Controls.prototype.listeners = function() {
+		var that = this;
+		node.on(this.id + '_DISABLE', function() {
+			
+		});
+				
+	};
+	
+	Controls.prototype.getAllValues = function() {
+		var out = {};
+		for (var key in this.features) {
+			
+			if (this.features.hasOwnProperty(key)) {
+				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
+				out[key] = Number(node.window.getElementById(key).value);
+			}
+		}
+		
+		return out;
+	};
+	
+	// Sub-classes
+	
+	SliderControls.prototype.__proto__ = Controls.prototype;
+	SliderControls.prototype.constructor = SliderControls;
+	
+	function SliderControls (options) {
+		Controls.call(this,options);
+		this.name = 'SliderControls'
+		this.version = '0.2';
+		this.id = options.id || this.name;
+	};
+	
+	SliderControls.prototype.add = function (root, id, attributes) {
+		return node.window.addSlider(root, id, attributes);
+	};
+	
+	RadioControls.prototype.__proto__ = Controls.prototype;
+	RadioControls.prototype.constructor = RadioControls;
+	
+	function RadioControls (options) {
+		Controls.call(this,options);
+		this.name = 'RadioControls'
+		this.version = '0.1';
+		this.id = options.id || this.name;
+		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
+	};
+	
+	RadioControls.prototype.add = function (root, id, attributes) {
+		// add the group name if not specified
+		if (!attributes.name) {
+			attributes.name = this.groupName;
+		}
+		return node.window.addRadioButton(root, id, attributes);	
+	};
+	
+	
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
 	
 	/*
 	 * DataBar
@@ -3565,6 +4013,9 @@
 	 */ 
 	
 	exports.GameBoard = GameBoard;
+	
+	GameState = node.GameState;
+	PlayerList = node.PlayerList;
 		
 	function GameBoard (id) {
 		
@@ -3572,7 +4023,7 @@
 		this.id = id || 'gboard';
 		this.name = 'GameBoard';
 		
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.board = null;
 		this.root = null;
@@ -3585,7 +4036,7 @@
 		this.root = root;
 		var fieldset = node.window.addFieldset(root, this.id + '_fieldset', 'Game State');
 		this.board = node.window.addDiv(fieldset,this.id);
-		this.board.innerHTML = this.noPlayers;
+		this.updateBoard(node.game.pl);
 		
 	};
 	
@@ -3596,55 +4047,72 @@
 		var set = node.actions.SET + '.';
 		var get = node.actions.GET + '.'; 
 		
-		node.onPLIST( function (msg) {
-			console.log('I Updating Board ' + msg.text);
-			that.board.innerHTML = 'Updating...';
-			
-			var pl = new node.PlayerList(msg.data);
-			
-			//console.log(pl);
-			
-			if (pl.size() !== 0) {
-				that.board.innerHTML = '';
-				pl.forEach( function(p) {
-					//console.log(p);
-					var line = '[' + p.id + "|" + p.name + "]> \t"; 
-					
-					var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
-					pState += ' ';
-					
-					switch (p.state.is) {
-					
-					case node.states.UNKNOWN:
+		
+		node.on('UPDATED_PLIST', function () {
+			console.log('I Updating Board');
+			that.updateBoard(node.game.pl);
+
+		});
+		
+//		node.onPLIST( function (msg) {
+//			console.log('I Updating Board ' + msg.text);
+//			that.updateBoard(msg.data);
+//		});
+	};
+	
+	GameBoard.prototype.updateBoard = function (pl) {
+		var that = this;
+		that.board.innerHTML = 'Updating...';
+
+		//console.log(pl);
+		
+		if (pl.size() !== 0) {
+			that.board.innerHTML = '';
+			pl.forEach( function(p) {
+				//console.log(p);
+				var line = '[' + p.id + "|" + p.name + "]> \t"; 
+				
+				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
+				pState += ' ';
+				
+				switch (p.state.is) {
+
+					case GameState.iss.UNKNOWN:
 						pState += '(unknown)';
 						break;
-					case node.states.PLAYING:
+						
+					case GameState.iss.LOADING:
+						pState += '(loading)';
+						break;
+						
+					case GameState.iss.LOADED:
+						pState += '(loaded)';
+						break;
+						
+					case GameState.iss.PLAYING:
 						pState += '(playing)';
 						break;
-					case node.states.DONE:
+					case GameState.iss.DONE:
 						pState += '(done)';
-						break;	
-					case node.states.PAUSE:
-						pState += '(pause)';
 						break;		
 					default:
 						pState += '('+p.state.is+')';
 						break;		
-					}
-					
-					if (p.state.paused) {
-						pState += ' (P)';
-					}
-					
-					that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
-				});
-				//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
 				}
-				else {
-					that.board.innerHTML = that.noPlayers;
+				
+				if (p.state.paused) {
+					pState += ' (P)';
 				}
+				
+				that.board.innerHTML += line + pState +'\n<hr style="color: #CCC;"/>\n';
 			});
-	};
+			//this.board.innerHTML = pl.toString('<hr style="color: #CCC;"/>');
+		}
+		else {
+			that.board.innerHTML = that.noPlayers;
+		}
+	}
+	
 })(node.window.widgets); 
  
  
@@ -3869,87 +4337,6 @@
  
 (function (exports) {
 	
-
-	/*!
-	 * Slider Controls
-	 * 
-	 */
-	
-	exports.SliderControls = SliderControls;	
-		
-	function SliderControls (id, features) {
-		this.name = 'Slider Controls'
-		this.version = '0.1';
-		
-		this.id = id;
-		this.features = features;
-		
-		this.list = new node.window.List();
-	};
-	
-	SliderControls.prototype.append = function(root) {
-		
-		var listRoot = this.list.getRoot();
-		root.appendChild(listRoot);
-		//debugger
-		for (var key in this.features) {
-			if (this.features.hasOwnProperty(key)) {
-				
-				var f = this.features[key];
-				var id = f.id || key;
-				
-				var item = this.list.getItem();
-				listRoot.appendChild(item);
-				
-				var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-				//var slider = node.window.addJQuerySlider(item, id, attributes);
-				var slider = node.window.addSlider(item, id, attributes);
-				
-				
-				// If a label element is present it checks whether it is an
-				// object literal or a string.
-				// In the former case it scans the obj for additional properties
-				if (f.label) {
-					var labelId = 'label_' + id;
-					var labelText = f.label;
-					
-					if (typeof(f.label) === 'object') {
-						var labelText = f.label.text;
-						if (f.label.id) {
-							labelId = f.label.id; 
-						}
-					}
-					
-					node.window.addLabel(slider, labelId, labelText, id);
-				}
-				
-				
-			}
-		}
-	};
-	
-	SliderControls.prototype.listeners = function() {
-		
-	};
-	
-	SliderControls.prototype.getAllValues = function() {
-		var out = {};
-		for (var key in this.features) {
-			
-			if (this.features.hasOwnProperty(key)) {
-				console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
-				out[key] = Number(node.window.getElementById(key).value);
-			}
-		}
-		
-		return out;
-	};
-})(node.window.widgets); 
- 
- 
- 
-(function (exports) {
-	
 	/*
 	 * StateBar
 	 * 
@@ -4141,6 +4528,108 @@
 			that.updateState(state);
 		}); 
 	}; 
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	
+	/*
+	 * VisualTimer
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
+	
+	exports.VisualTimer	= VisualTimer;
+	
+	Utils = node.Utils;
+	
+	function VisualTimer (options) {
+		
+		this.game = node.game;
+		this.id = options.id || 'VisualTimer';
+		this.name = 'Visual Timer';
+		this.version = '0.2.1';
+		
+		this.timer = null; 		// the ID of the interval
+		this.timerDiv = null; 	// the DIV in which to display the timer
+		this.root = null;		// the parent element
+		
+		this.init(options);
+	};
+	
+	VisualTimer.prototype.init = function (options) {
+		this.milliseconds = options.milliseconds || 10000;
+		this.timePassed = 0;
+		this.update = options.update || 1000;
+		this.text = options.text || 'Time to go';
+		this.event = options.event || 'TIMEUP'; // event to be fire		
+		// TODO: update and milliseconds must be multiple now
+	};
+	
+	VisualTimer.prototype.append = function (root, ids) {
+		var that = this;
+		var PREF = this.id + '_';
+		
+		var idFieldset = PREF + 'fieldset';
+		var idTimerDiv = PREF + 'div';
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+		}
+		
+		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
+		this.root = root;
+		this.timerDiv = node.window.addDiv(fieldset,idTimerDiv);
+			
+		this.start();
+		
+		return fieldset;
+		
+	};
+	
+	VisualTimer.prototype.start = function() {
+		var that = this;
+		console.log(this);
+		// Init Timer
+		var time = Utils.parseMilliseconds(this.milliseconds);
+		this.timerDiv.innerHTML = time[2] + ':' + time[3];
+		
+		
+		this.timer = setInterval(function() {
+			that.timePassed = that.timePassed + that.update;
+			var time = that.milliseconds - that.timePassed;
+
+			if (time <= 0) {
+				if (that.event) {
+					node.emit(that.event);
+				}
+				clearInterval(that.timer);
+				time = 0;
+			}
+			//console.log(time);
+			time = Utils.parseMilliseconds(time);
+			that.timerDiv.innerHTML = time[2] + ':' + time[3];
+			
+		}, this.update);
+	};
+	
+	VisualTimer.prototype.restart = function(options) {
+		this.init(options);
+		this.start();
+	};
+		
+	VisualTimer.prototype.listeners = function () {
+		var that = this;
+		var PREFIX = 'in.';
+		
+		node.onPLIST( function(msg) {
+				node.window.populateRecipientSelector(that.recipient,msg.data);
+			}); 
+	};
+	
 })(node.window.widgets); 
  
  

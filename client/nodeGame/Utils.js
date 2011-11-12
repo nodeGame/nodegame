@@ -59,5 +59,42 @@
 			}
 		}
 	};
+	
+	Utils.objToArray = function (obj) {
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	           result.push(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Returns an array days, minutes, seconds, mi
+	 * @param ms time in milliseconds
+	 * @return array 
+	 */
+	Utils.parseMilliseconds = function (ms) {
+	  
+		var result = [];
+		var x = ms / 1000;
+		result[4] = x;
+		var seconds = x % 60;
+		result[3] = Math.floor(seconds);
+		var x = x /60;
+		var minutes = x % 60;
+		result[2] = Math.floor(minutes);
+		var x = x / 60;
+		var hours = x % 24;
+		result[1] = Math.floor(hours);
+		var x = x / 24;
+		var days = x;
+		result[1] = Math.floor(days);
+		
+	    return result;
+	};
+
+
 
 })('undefined' != typeof node ? node : module.exports);

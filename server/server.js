@@ -23,14 +23,22 @@ sn.addChannel({
 			  	player: 'ultimatum2'
 });
 
-sn.addChannel({
-				name: '3',
-				admin: 'ultimatum3/admin',
-				player: 'ultimatum3'
-});
+//sn.addChannel({
+//				name: '3',
+//				admin: 'ultimatum3/admin',
+//				player: 'ultimatum3'
+//});
+
+//sn.addChannel({
+//				name: '4',
+//				admin: 'ultimatum4/admin',
+//				player: 'ultimatum4'
+//});
+
 
 sn.addChannel({
-				name: '4',
-				admin: 'ultimatum4/admin',
-				player: 'ultimatum4'
+        name: 'pr',
+        admin: 'pr/admin',
+        player: 'pr'
 });
+

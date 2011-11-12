@@ -16,21 +16,21 @@
 	ChernoffFaces.defaults.canvas.width = 100;
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
-	function ChernoffFaces(id, dims) {
+	function ChernoffFaces(options) {
 		
 		this.game = node.game;
-		this.id = id || 'ChernoffFaces';
+		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
 		this.version = '0.1';
 		
 		this.bar = null;
 		this.root = null;
 		
-		this.recipient = null;
+		this.sc = null;
 		
 		this.dims = {
-					width: (dims) ? dims.width : ChernoffFaces.defaults.canvas.width, 
-					height:(dims) ? dims.height : ChernoffFaces.defaults.canvas.heigth
+					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
 		};
 	};
 	
@@ -61,13 +61,18 @@
 		var button = node.window.addButton(fieldset,idButton);
 										
 		// Add Gadget
-		var sc = new exports.SliderControls('cf_controls', FaceVector.defaults);
-		sc = node.window.addGadget(sc,fieldset);
+		var sc_options = {
+							id: 'cf_controls',
+							features: FaceVector.defaults
+		};
+		
+		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
+		
 		
 		var that = this;
 	
 		button.onclick = function() {		
-			var fv = sc.getAllValues();
+			var fv = that.sc.getAllValues();
 			console.log(fv);
 			var fv = new FaceVector(fv);
 			console.log(fv);
@@ -87,6 +92,10 @@
 	//		}); 
 	};
 	
+	
+	ChernoffFaces.prototype.getAllValues = function() {
+		return this.sc.getAllValues();
+	};
 	
 	/*!
 	* ChernoffFaces

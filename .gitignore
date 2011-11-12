@@ -7,3 +7,4 @@ server/log/syslog
 client/releases/*
 jquery
 client/nodeclient/exit.csv
+*.csv

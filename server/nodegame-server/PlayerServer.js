@@ -59,13 +59,20 @@ PlayerServer.prototype.attachCustomListeners = function() {
     this.on(say+'STATE', function(msg) {
 		
 		//that.log.log('onSTATE P ' + util.inspect(msg));
-		var player = that.pl.get(msg.from);
-		if (player){
-			player.updateState(msg.data);
+		if (that.pl.exist(msg.from)){
+			// Do we need this?
+			that.pl.updatePlayerState(msg.from,msg.data);
 
-			that.gmm.sendPLIST(that);
 			
-			that.gmm.forwardPLIST(that);
+			that.gmm.send(msg);
+			
+			// This fucks things
+			that.gmm.forward(msg);
+			
+			// TODO: re-enable this when the transition to pure STATE msgs is complete
+			//that.gmm.sendPLIST(that);
+			
+			//that.gmm.forwardPLIST(that);
 		}
 	});	
     

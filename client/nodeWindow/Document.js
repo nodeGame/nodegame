@@ -65,6 +65,16 @@
 		return slider;
 	};
 	
+	
+	Document.prototype.addRadioButton = function (root, id, attributes) {
+		var radio = document.createElement('input');
+		radio.id = id;
+		radio.setAttribute('type', 'radio');
+		this.addAttributes2Elem(radio, attributes);
+		root.appendChild(radio);
+		return radio;
+	};
+	
 	Document.prototype.addJQuerySlider = function (root, id, attributes) {
 		var slider = document.createElement('div');
 		slider.id = id;
@@ -81,19 +91,19 @@
 		label.setAttribute('for', forElem);
 		this.addAttributes2Elem(label, attributes);
 		
-		var root = node.window.getElementById(forElem);
+//		var root = node.window.getElementById(forElem);
 		root.parentNode.insertBefore(label,root);
 		return label;
 		
-		// Add the label immediately before if no root elem has been provided
-		if (!root) {
-			var root = node.window.getElementById(forElem);
-			root.insertBefore(label);
-		}
-		else {
-			root.appendChild(label);
-		}
-		return label;
+//		// Add the label immediately before if no root elem has been provided
+//		if (!root) {
+//			var root = node.window.getElementById(forElem);
+//			root.insertBefore(label);
+//		}
+//		else {
+//			root.appendChild(label);
+//		}
+//		return label;
 	};
 	
 	Document.prototype.addSelect = function (root, id, attributes) {

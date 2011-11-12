@@ -101,7 +101,7 @@
 						that.attachMsgListeners(socket, msg.session);
 						
 						// Send own name to SERVER
-						that.sendHI(that.player);
+						that.sendHI(that.player, 'ALL');
 						// Ready to play
 						node.emit('out.say.HI');
 				   	 } 

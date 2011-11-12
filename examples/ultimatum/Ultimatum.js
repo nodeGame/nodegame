@@ -14,7 +14,7 @@ function Ultimatum () {
 	
 	this.init = function() {	
 		node.window.setup('PLAYER');
-		node.random.emit('DONE');
+		//node.random.emit('DONE');
 	};
 	
 	
@@ -42,84 +42,93 @@ function Ultimatum () {
 		
 	var ultimatum = function(){
 		var that = this;		
-		node.window.loadFrame('solo.html');
+		node.window.loadFrame('solo.html', function(){
 			
-		node.onDATA (function(msg){
+			node.onDATA (function(msg){
+						
+				if (msg.data === 'BIDDER') {
 					
-			if (msg.data === 'BIDDER') {
-				
-				node.set('ROLE','BIDDER');
-				
-				node.window.loadFrame('bidder.html', function() {
-
-					var root = node.window.getElementById('root');
-					var b = node.window.getElementById('submitOffer');
+					node.set('ROLE','BIDDER');
 					
-					b.onclick = function() {
-						var offer = node.window.getElementById('offer');
-						// Store the value in memory
-						node.set('offer', offer.value);
-						node.say('DATA','OFFER', that.other,offer.value);
-						node.window.write(root,' Your offer: ' +  offer.value);
-					};
+					node.window.loadFrame('bidder.html', function() {
+	
+						var root = node.window.getElementById('root');
+						var b = node.window.getElementById('submitOffer');
 						
-					node.onDATA (function(msg) {
-						
-						if (msg.data === 'ACCEPT') {
-							node.window.write(root, 'Your offer was accepted');
-							node.DONE();
-						}
-						
-						if (msg.data === 'REJECT') {
-							node.window.write(root, 'Your offer was rejected');
-							node.DONE();
-						}
-					});
-					
-				});
-				
-			}
-			else if (msg.data === 'RESPONDENT') {
-				
-				node.set('ROLE','RESPONDENT');
-				
-				node.window.loadFrame('resp.html', function(){
-				
-					node.onDATA( function(msg) {
-						
-						if (msg.data === 'OFFER') {			
-							var offered = node.window.getElementById('offered');
-							node.window.write(offered, 'You received an offer of ' + msg.text);
-							offered.style.display = '';
-						}
+						b.onclick = function() {
+							var offer = node.window.getElementById('offer');
+							// Store the value in memory
+							node.set('offer', offer.value);
+							node.say('DATA','OFFER', that.other,offer.value);
+							node.window.write(root,' Your offer: ' +  offer.value);
+						};
+							
+						node.onDATA (function(msg) {
+							
+							if (msg.data === 'ACCEPT') {
+								node.window.write(root, 'Your offer was accepted');
+								node.DONE();
+							}
+							
+							if (msg.data === 'REJECT') {
+								node.window.write(root, 'Your offer was rejected');
+								node.DONE();
+							}
+						});
 						
 					});
 					
+				}
+				else if (msg.data === 'RESPONDENT') {
 					
-					var accept = node.window.getElementById('accept');
-					var reject = node.window.getElementById('reject');
+					node.set('ROLE','RESPONDENT');
 					
+					node.window.loadFrame('resp.html', function(){
 					
-					accept.onclick = function() {
-						node.set('response','ACCEPT');
-						node.say('DATA', 'ACCEPT', that.other);
-						node.DONE();
-					};
-					
-					reject.onclick = function() {
-						node.set('response','REJECT');
-						node.say('DATA', 'REJECT', that.other);
-						node.DONE();
-					};
-					
-				});
-			
-			}
-			
-			else if (msg.data === 'OTHER') {
-				that.other = msg.text;
-			}
-			
+						node.onDATA( function(msg) {
+							
+							if (msg.data === 'OFFER') {			
+								var offered = node.window.getElementById('offered');
+								node.window.write(offered, 'You received an offer of ' + msg.text);
+								offered.style.display = '';
+							}
+							
+						});
+						
+						
+						var accept = node.window.getElementById('accept');
+						var reject = node.window.getElementById('reject');
+						
+						
+						accept.onclick = function() {
+							node.set('response','ACCEPT');
+							node.say('DATA', 'ACCEPT', that.other);
+							node.DONE();
+						};
+						
+						reject.onclick = function() {
+							node.set('response','REJECT');
+							node.say('DATA', 'REJECT', that.other);
+							node.DONE();
+						};
+						
+					});
+				
+				}
+				
+				else if (msg.data === 'OTHER') {
+					that.other = msg.text;
+				}
+				
+				else if (msg.data === 'SOLO') {
+					console.log('solodone');
+					node.DONE();
+				}
+				
+				else {
+					console.log(msg.data);
+				}
+			});
 		});
 			
 	
