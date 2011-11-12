@@ -48,8 +48,11 @@ function PeerReviewGame () {
 		node.window.loadFrame('creation.html', function(){
 			
 			var root = node.window.getElementById('root');
-			//'cf', {width: 500, height:500};
-			var cf_options = { width: 300, height: 300 };
+			var cf_options = { id: 'cf',
+								width: 300,
+								height: 300
+			};
+			
 			that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
 			
 			// Add timer
@@ -78,6 +81,14 @@ function PeerReviewGame () {
 		
 		var ctrl_options = { id: 'exhib',
 							 name: 'exhib',
+//							 fieldset: {
+//										legend: 'Exhibitions'
+//							 },
+							 fieldset: false,
+							 submit: false,
+//							 submit: {
+//								 		value: 'Submit'
+//							 },
 							 features: {
 										ex_A: { 
 											value: 'A',
@@ -105,7 +116,13 @@ function PeerReviewGame () {
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
+			node.emit('HIDE','exhib');
+			node.emit('HIDE','cf');
 			
+			setInterval(function(){
+				node.emit('TOGGLE','exhib');
+				node.emit('TOGGLE','cf');
+			},2000);
 		});
 		
 		

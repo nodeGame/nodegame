@@ -15,6 +15,8 @@
 		this.SECOND_LEVEL = 'dt';
 		this.THIRD_LEVEL = 'dd';
 	
+		this.root = this.createRoot(this.id);
+		
 		this.list = [];
 	}
 	
@@ -27,9 +29,7 @@
 	};
 	
 	List.prototype.write = function() {
-		
-		var root = document.createElement(this.FIRST_LEVEL);
-		
+				
 		var i = 0;
 		var len = list.length;
 		for (;i<len;i++) {
@@ -42,11 +42,23 @@
 	};
 	
 	List.prototype.getRoot = function() {
-		return document.createElement(this.FIRST_LEVEL);
+		return this.root;
 	};
 	
-	List.prototype.getItem = function() {
-		return document.createElement(this.SECOND_LEVEL);
+	List.prototype.createRoot = function(id) {
+		var root = document.createElement(this.FIRST_LEVEL);
+		if (id) {
+			root.id = id;
+		}
+		return root;
+	};
+	
+	List.prototype.createItem = function(id) {
+		var item = document.createElement(this.SECOND_LEVEL);
+		if (id) {
+			item.id = id;
+		}
+		return item;
 	};
 	
 })(node.window);

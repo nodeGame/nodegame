@@ -308,9 +308,7 @@
 	
 	node.TXT = function (text, to) {
 		node.emit('out.say.TXT', text, to);
-	};
-	
-	
+	};	
 	
 	node.random = {};
 	
@@ -336,6 +334,10 @@
 	
 	node.goto = function(state) {
 		node.game.updateState(state);
+	};
+	
+	node.log = function(txt,level) {
+		console.log(txt);
 	};
 	
 })('undefined' != typeof node ? node : module.exports);

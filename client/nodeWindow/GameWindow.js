@@ -35,6 +35,43 @@
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
+		
+		var that = this;
+		
+		var listeners = function() {
+			
+			node.on('HIDE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot hide element ' + id);
+					return;
+				}
+				el.style.visibility = 'hidden';    
+			});
+			
+			node.on('SHOW', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot show element ' + id);
+					return;
+				}
+				el.style.visibility = 'visible'; 
+			});
+			
+			node.on('TOGGLE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot toggle element ' + id);
+					return;
+				}
+				if (el.style.visibility === 'visible') {
+					el.style.visibility = 'hidden';
+				}
+				else {
+					el.style.visibility = 'visible';
+				}
+			});
+		}();
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {

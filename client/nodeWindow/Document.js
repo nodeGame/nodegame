@@ -85,8 +85,6 @@
 	
 	
 	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
-		console.log('forel');
-		console.log(forElem);
 		var label = document.createElement('label');
 		label.id = id;
 		label.appendChild(document.createTextNode(labelText));	
@@ -97,15 +95,15 @@
 		root.parentNode.insertBefore(label,root);
 		return label;
 		
-		// Add the label immediately before if no root elem has been provided
-		if (!root) {
-			var root = node.window.getElementById(forElem);
-			root.insertBefore(label);
-		}
-		else {
-			root.appendChild(label);
-		}
-		return label;
+//		// Add the label immediately before if no root elem has been provided
+//		if (!root) {
+//			var root = node.window.getElementById(forElem);
+//			root.insertBefore(label);
+//		}
+//		else {
+//			root.appendChild(label);
+//		}
+//		return label;
 	};
 	
 	Document.prototype.addSelect = function (root, id, attributes) {

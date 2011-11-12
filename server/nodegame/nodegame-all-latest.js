@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 12. Nov 16:42:43 CET 2011
+ * Built on Sa 12. Nov 18:18:25 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 12. Nov 16:42:43 CET 2011
+ * Built on Sa 12. Nov 18:18:25 CET 2011
  *
  */
  
@@ -2222,9 +2222,7 @@
 	
 	node.TXT = function (text, to) {
 		node.emit('out.say.TXT', text, to);
-	};
-	
-	
+	};	
 	
 	node.random = {};
 	
@@ -2252,6 +2250,10 @@
 		node.game.updateState(state);
 	};
 	
+	node.log = function(txt,level) {
+		console.log(txt);
+	};
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -2264,7 +2266,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 12. Nov 16:42:43 CET 2011
+ * Built on Sa 12. Nov 18:18:25 CET 2011
  *
  */
  
@@ -2356,8 +2358,6 @@
 	
 	
 	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
-		console.log('forel');
-		console.log(forElem);
 		var label = document.createElement('label');
 		label.id = id;
 		label.appendChild(document.createTextNode(labelText));	
@@ -2368,15 +2368,15 @@
 		root.parentNode.insertBefore(label,root);
 		return label;
 		
-		// Add the label immediately before if no root elem has been provided
-		if (!root) {
-			var root = node.window.getElementById(forElem);
-			root.insertBefore(label);
-		}
-		else {
-			root.appendChild(label);
-		}
-		return label;
+//		// Add the label immediately before if no root elem has been provided
+//		if (!root) {
+//			var root = node.window.getElementById(forElem);
+//			root.insertBefore(label);
+//		}
+//		else {
+//			root.appendChild(label);
+//		}
+//		return label;
 	};
 	
 	Document.prototype.addSelect = function (root, id, attributes) {
@@ -2569,6 +2569,43 @@
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
+		
+		var that = this;
+		
+		var listeners = function() {
+			
+			node.on('HIDE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot hide element ' + id);
+					return;
+				}
+				el.style.visibility = 'hidden';    
+			});
+			
+			node.on('SHOW', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot show element ' + id);
+					return;
+				}
+				el.style.visibility = 'visible'; 
+			});
+			
+			node.on('TOGGLE', function(id) {
+				var el = that.getElementById(id);
+				if (!el) {
+					node.log('Cannot toggle element ' + id);
+					return;
+				}
+				if (el.style.visibility === 'visible') {
+					el.style.visibility = 'hidden';
+				}
+				else {
+					el.style.visibility = 'visible';
+				}
+			});
+		}();
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -2906,6 +2943,8 @@
 		this.SECOND_LEVEL = 'dt';
 		this.THIRD_LEVEL = 'dd';
 	
+		this.root = this.createRoot(this.id);
+		
 		this.list = [];
 	}
 	
@@ -2918,9 +2957,7 @@
 	};
 	
 	List.prototype.write = function() {
-		
-		var root = document.createElement(this.FIRST_LEVEL);
-		
+				
 		var i = 0;
 		var len = list.length;
 		for (;i<len;i++) {
@@ -2933,11 +2970,23 @@
 	};
 	
 	List.prototype.getRoot = function() {
-		return document.createElement(this.FIRST_LEVEL);
+		return this.root;
 	};
 	
-	List.prototype.getItem = function() {
-		return document.createElement(this.SECOND_LEVEL);
+	List.prototype.createRoot = function(id) {
+		var root = document.createElement(this.FIRST_LEVEL);
+		if (id) {
+			root.id = id;
+		}
+		return root;
+	};
+	
+	List.prototype.createItem = function(id) {
+		var item = document.createElement(this.SECOND_LEVEL);
+		if (id) {
+			item.id = id;
+		}
+		return item;
 	};
 	
 })(node.window);
@@ -2953,7 +3002,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 12. Nov 16:42:43 CET 2011
+ * Built on Sa 12. Nov 18:18:25 CET 2011
  *
  */
  
@@ -3714,29 +3763,65 @@
 		this.name = 'Controls'
 		this.version = '0.1';
 	
+
+		this.options = options;
 		this.id = options.id || this.name;
+		this.root = null;
+		
 		this.listRoot = null;
+		this.fieldset = null;
+		this.submit = null;
+		
 		this.init(options.features);
 	};
 
 	Controls.prototype.add = function (root, id, attributes) {
-		console.log('nothing!!!!!');
 		// TODO: node.window.addTextInput
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
 	Controls.prototype.init = function (features) {
-		this.list = new node.window.List();	
+		if (this.options.fieldset) {
+			this.list = new node.window.List();
+		}
+		else {
+			
+			this.list = new node.window.List(this.id);
+		}
 		this.listRoot = this.list.getRoot();
+		
 		if (!features) return;
 		
 		this.features = features;
 		this.populate();
 	};
 	
-	Controls.prototype.append = function(root) {	
+	Controls.prototype.append = function (root) {
+		this.root = root;
+		var toReturn = this.listRoot;
+		
+		if (this.options.fieldset) {
+			var idFieldset = this.options.fieldset.id || this.id;
+			var legend = this.options.fieldset.legend || 'Input';
+			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend);
+			// Updating root and return element
+			root = this.fieldset;
+			toReturn = this.fieldset;
+		}
+		
 		root.appendChild(this.listRoot);
-		return this.listRoot;
+		
+		if (this.options.submit) {
+			var idButton = 'submit_' + this.id;
+			if (this.options.submit.id) {
+				var idButton = this.options.submit.id;
+				delete this.options.submit.id;
+			}
+			
+			this.submit = node.window.addButton(root, idButton, this.options.submit);
+		}		
+		
+		return toReturn;
 	};
 	
 	
@@ -3752,7 +3837,7 @@
 					delete attributes.id;
 				}
 				
-				var item = this.list.getItem();
+				var item = this.list.createItem();
 				this.listRoot.appendChild(item);
 								
 				var elem = this.add(item, id, attributes);
@@ -3776,7 +3861,13 @@
 		}
 	};
 	
-	Controls.prototype.listeners = function() {};
+	Controls.prototype.listeners = function() {
+		var that = this;
+		node.on(this.id + '_DISABLE', function() {
+			
+		});
+				
+	};
 	
 	Controls.prototype.getAllValues = function() {
 		var out = {};

@@ -15,29 +15,65 @@
 		this.name = 'Controls'
 		this.version = '0.1';
 	
+
+		this.options = options;
 		this.id = options.id || this.name;
+		this.root = null;
+		
 		this.listRoot = null;
+		this.fieldset = null;
+		this.submit = null;
+		
 		this.init(options.features);
 	};
 
 	Controls.prototype.add = function (root, id, attributes) {
-		console.log('nothing!!!!!');
 		// TODO: node.window.addTextInput
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
 	Controls.prototype.init = function (features) {
-		this.list = new node.window.List();	
+		if (this.options.fieldset) {
+			this.list = new node.window.List();
+		}
+		else {
+			
+			this.list = new node.window.List(this.id);
+		}
 		this.listRoot = this.list.getRoot();
+		
 		if (!features) return;
 		
 		this.features = features;
 		this.populate();
 	};
 	
-	Controls.prototype.append = function(root) {	
+	Controls.prototype.append = function (root) {
+		this.root = root;
+		var toReturn = this.listRoot;
+		
+		if (this.options.fieldset) {
+			var idFieldset = this.options.fieldset.id || this.id;
+			var legend = this.options.fieldset.legend || 'Input';
+			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend);
+			// Updating root and return element
+			root = this.fieldset;
+			toReturn = this.fieldset;
+		}
+		
 		root.appendChild(this.listRoot);
-		return this.listRoot;
+		
+		if (this.options.submit) {
+			var idButton = 'submit_' + this.id;
+			if (this.options.submit.id) {
+				var idButton = this.options.submit.id;
+				delete this.options.submit.id;
+			}
+			
+			this.submit = node.window.addButton(root, idButton, this.options.submit);
+		}		
+		
+		return toReturn;
 	};
 	
 	
@@ -53,7 +89,7 @@
 					delete attributes.id;
 				}
 				
-				var item = this.list.getItem();
+				var item = this.list.createItem();
 				this.listRoot.appendChild(item);
 								
 				var elem = this.add(item, id, attributes);
@@ -77,7 +113,13 @@
 		}
 	};
 	
-	Controls.prototype.listeners = function() {};
+	Controls.prototype.listeners = function() {
+		var that = this;
+		node.on(this.id + '_DISABLE', function() {
+			
+		});
+				
+	};
 	
 	Controls.prototype.getAllValues = function() {
 		var out = {};
