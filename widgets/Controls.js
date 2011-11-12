@@ -14,64 +14,37 @@
 	function Controls (options) {
 		this.name = 'Controls'
 		this.version = '0.1';
-		
+	
 		this.id = options.id || this.name;
-		
-		this.add = null;
-		
-		// Init the list
-		if (options.features) {
-			this.init(features);
-		}
-		
+		this.listRoot = null;
+		this.init(options.features);
 	};
 
-	SliderControls.prototype.__proto__ = Controls.prototype;
-	SliderControls.prototype.constructor = SliderControls;
-	
-	function SliderControls (options) {
-		Controls.call(this,options);
-		this.name = 'SliderControls'
-		this.version = '0.2';
-		this.id = options.id || this.name;
-		
-		this.add = function (root, id, attributes) {
-			node.window.addSlider(root, id, attributes);
-		};
-	};
-	
-	RadioControls.prototype.__proto__ = Controls.prototype;
-	RadioControls.prototype.constructor = RadioControls;
-	
-	function RadioControls (options) {
-		Controls.call(this,options);
-		this.name = 'RadioControls'
-		this.version = '0.1';
-		this.id = options.id || this.name;
-		
-		this.add = function (root, id, attributes) {
-			node.window.addRadioButton(root, id, attributes);
-		};
+	Controls.prototype.add = function (root, id, attributes) {
+		console.log('nothing!!!!!');
+		// TODO: node.window.addTextInput
+		//return node.window.addTextInput(root, id, attributes);
 	};
 	
 	Controls.prototype.init = function (features) {
+		this.list = new node.window.List();	
+		this.listRoot = this.list.getRoot();
+		if (!features) return;
+		
 		this.features = features;
-		this.list = new node.window.List();
 		this.populate();
 	};
 	
 	Controls.prototype.append = function(root) {	
-		var listRoot = this.list.getRoot();
-		root.appendChild(listRoot);
-		this.populate();
+		root.appendChild(this.listRoot);
+		return this.listRoot;
 	};
 	
 	
 	Controls.prototype.populate = function () {
-		//debugger
+		
 		for (var key in this.features) {
 			if (this.features.hasOwnProperty(key)) {
-				
 				// Prepare the attributes vector
 				var attributes = this.features[key];
 				var id = key;
@@ -81,34 +54,25 @@
 				}
 				
 				var item = this.list.getItem();
-				listRoot.appendChild(item);
-				
-				//var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
-				//var slider = node.window.addJQuerySlider(item, id, attributes);
-				
+				this.listRoot.appendChild(item);
+								
 				var elem = this.add(item, id, attributes);
-				
-				//var slider = node.window.addSlider(item, id, attributes);
-				
 				
 				// If a label element is present it checks whether it is an
 				// object literal or a string.
 				// In the former case it scans the obj for additional properties
-				if (f.label) {
+				if (attributes.label) {
 					var labelId = 'label_' + id;
-					var labelText = f.label;
+					var labelText = attributes.label;
 					
-					if (typeof(f.label) === 'object') {
-						var labelText = f.label.text;
-						if (f.label.id) {
-							labelId = f.label.id; 
+					if (typeof(attributes.label) === 'object') {
+						var labelText = attributes.label.text;
+						if (attributes.label.id) {
+							labelId = attributes.label.id; 
 						}
-					}
-					
+					}	
 					node.window.addLabel(elem, labelId, labelText, id);
 				}
-				
-				
 			}
 		}
 	};
@@ -126,6 +90,37 @@
 		}
 		
 		return out;
+	};
+	
+	// Sub-classes
+	
+	SliderControls.prototype.__proto__ = Controls.prototype;
+	SliderControls.prototype.constructor = SliderControls;
+	
+	function SliderControls (options) {
+		Controls.call(this,options);
+		this.name = 'SliderControls'
+		this.version = '0.2';
+		this.id = options.id || this.name;
+	};
+	
+	SliderControls.prototype.add = function (root, id, attributes) {
+		return node.window.addSlider(root, id, attributes);
+	};
+	
+	RadioControls.prototype.__proto__ = Controls.prototype;
+	RadioControls.prototype.constructor = RadioControls;
+	
+	function RadioControls (options) {
+		Controls.call(this,options);
+		this.name = 'RadioControls'
+		this.version = '0.1';
+		this.id = options.id || this.name;
+	};
+	
+	RadioControls.prototype.add = function (root, id, attributes) {
+		console.log('eeh?');
+		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
 	
