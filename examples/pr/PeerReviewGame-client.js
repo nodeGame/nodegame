@@ -76,6 +76,23 @@ function PeerReviewGame () {
 		var that = this;
 		var root = node.window.getElementById('root');
 		
+		var features = {
+						ex_A: { 
+							name: 'A',
+							value: 'A'
+						},
+						ex_B: { 
+								name: 'B',
+								value: 'B'
+						},
+						ex_C: { 
+								name: 'C',
+								value: 'C'
+						}
+		};
+		
+		node.window.addWidget('Controls.Radio',root,features);
+		
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
@@ -85,7 +102,7 @@ function PeerReviewGame () {
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
-			console.log('values ' + that.cf.getAllValues());
+			
 		});
 		
 		

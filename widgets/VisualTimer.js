@@ -12,7 +12,7 @@
 	
 	Utils = node.Utils;
 	
-	function VisualTimer(options) {
+	function VisualTimer (options) {
 		
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';

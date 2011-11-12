@@ -65,6 +65,16 @@
 		return slider;
 	};
 	
+	
+	Document.prototype.addRadioButton = function (root, id, attributes) {
+		var radio = document.createElement('input');
+		radio.id = id;
+		radio.setAttribute('type', 'radio');
+		this.addAttributes2Elem(radio, attributes);
+		root.appendChild(radio);
+		return radio;
+	};
+	
 	Document.prototype.addJQuerySlider = function (root, id, attributes) {
 		var slider = document.createElement('div');
 		slider.id = id;

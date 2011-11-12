@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 18:26:45 CET 2011
+ * Built on Sa 12. Nov 13:02:19 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 18:26:45 CET 2011
+ * Built on Sa 12. Nov 13:02:19 CET 2011
  *
  */
  
@@ -2147,28 +2147,18 @@
 		that.emit('out.say.' + event, p1, p2, p3);
 	}
 	
+	/**
+	 * Set the pair (key,value) into the server
+	 * @value can be an object literal.
+	 * 
+	 * 
+	 */
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
 		that.emit('out.set.DATA', data);
 	}
 	
-	
-	// If 'value' is not passed, it is assumed that we are passing
-	// already an object with 'key'
-//	node.set = function (key, value) {
-//		
-//		var data = {};
-//		if ('undefined' === value) {
-//			data = key;
-//		}
-//		else {
-//			data[key] = value; // necessary, otherwise the key is called key
-//		}
-//		
-//		that.emit('out.set.DATA', data);
-//	}
-
 	// TODO node.get
 	//node.get = function (key, value) {};
 	
@@ -2274,7 +2264,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 18:26:45 CET 2011
+ * Built on Sa 12. Nov 13:02:19 CET 2011
  *
  */
  
@@ -2344,6 +2334,16 @@
 		this.addAttributes2Elem(slider, attributes);
 		root.appendChild(slider);
 		return slider;
+	};
+	
+	
+	Document.prototype.addRadioButton = function (root, id, attributes) {
+		var radio = document.createElement('input');
+		radio.id = id;
+		radio.setAttribute('type', 'radio');
+		this.addAttributes2Elem(radio, attributes);
+		root.appendChild(radio);
+		return radio;
 	};
 	
 	Document.prototype.addJQuerySlider = function (root, id, attributes) {
@@ -2939,7 +2939,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 11. Nov 18:26:45 CET 2011
+ * Built on Sa 12. Nov 13:02:19 CET 2011
  *
  */
  
@@ -3681,6 +3681,141 @@
  
 (function (exports) {
 	
+
+	/**
+	 * Controls
+	 * 
+	 */
+	
+	exports.Controls = Controls;	
+	exports.Controls.Slider = SliderControls;
+	exports.Controls.Radio	= RadioControls;
+	
+		
+	function Controls (options) {
+		this.name = 'Controls'
+		this.version = '0.1';
+		
+		this.id = options.id || this.name;
+		
+		this.add = null;
+		
+		// Init the list
+		if (options.features) {
+			this.init(features);
+		}
+		
+	};
+
+	SliderControls.prototype.__proto__ = Controls.prototype;
+	SliderControls.prototype.constructor = SliderControls;
+	
+	function SliderControls (options) {
+		Controls.call(this,options);
+		this.name = 'SliderControls'
+		this.version = '0.2';
+		this.id = options.id || this.name;
+		
+		this.add = function (root, id, attributes) {
+			node.window.addSlider(root, id, attributes);
+		};
+	};
+	
+	RadioControls.prototype.__proto__ = Controls.prototype;
+	RadioControls.prototype.constructor = RadioControls;
+	
+	function RadioControls (options) {
+		Controls.call(this,options);
+		this.name = 'RadioControls'
+		this.version = '0.1';
+		this.id = options.id || this.name;
+		
+		this.add = function (root, id, attributes) {
+			node.window.addRadioButton(root, id, attributes);
+		};
+	};
+	
+	Controls.prototype.init = function (features) {
+		this.features = features;
+		this.list = new node.window.List();
+		this.populate();
+	};
+	
+	Controls.prototype.append = function(root) {	
+		var listRoot = this.list.getRoot();
+		root.appendChild(listRoot);
+		this.populate();
+	};
+	
+	
+	Controls.prototype.populate = function () {
+		//debugger
+		for (var key in this.features) {
+			if (this.features.hasOwnProperty(key)) {
+				
+				// Prepare the attributes vector
+				var attributes = this.features[key];
+				var id = key;
+				if (attributes.id) {
+					var id = attributes.id;
+					delete attributes.id;
+				}
+				
+				var item = this.list.getItem();
+				listRoot.appendChild(item);
+				
+				//var attributes = {min: f.min, max: f.max, step: f.step, value: f.value};
+				//var slider = node.window.addJQuerySlider(item, id, attributes);
+				
+				var elem = this.add(item, id, attributes);
+				
+				//var slider = node.window.addSlider(item, id, attributes);
+				
+				
+				// If a label element is present it checks whether it is an
+				// object literal or a string.
+				// In the former case it scans the obj for additional properties
+				if (f.label) {
+					var labelId = 'label_' + id;
+					var labelText = f.label;
+					
+					if (typeof(f.label) === 'object') {
+						var labelText = f.label.text;
+						if (f.label.id) {
+							labelId = f.label.id; 
+						}
+					}
+					
+					node.window.addLabel(elem, labelId, labelText, id);
+				}
+				
+				
+			}
+		}
+	};
+	
+	Controls.prototype.listeners = function() {};
+	
+	Controls.prototype.getAllValues = function() {
+		var out = {};
+		for (var key in this.features) {
+			
+			if (this.features.hasOwnProperty(key)) {
+				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
+				out[key] = Number(node.window.getElementById(key).value);
+			}
+		}
+		
+		return out;
+	};
+	
+	
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
 	
 	/*
 	 * DataBar
@@ -4169,6 +4304,8 @@
 		
 		return out;
 	};
+	
+	
 })(node.window.widgets); 
  
  
@@ -4384,7 +4521,7 @@
 	
 	Utils = node.Utils;
 	
-	function VisualTimer(options) {
+	function VisualTimer (options) {
 		
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
