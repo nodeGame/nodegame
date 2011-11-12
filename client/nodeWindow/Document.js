@@ -85,13 +85,15 @@
 	
 	
 	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
+		console.log('forel');
+		console.log(forElem);
 		var label = document.createElement('label');
 		label.id = id;
 		label.appendChild(document.createTextNode(labelText));	
 		label.setAttribute('for', forElem);
 		this.addAttributes2Elem(label, attributes);
 		
-		var root = node.window.getElementById(forElem);
+//		var root = node.window.getElementById(forElem);
 		root.parentNode.insertBefore(label,root);
 		return label;
 		

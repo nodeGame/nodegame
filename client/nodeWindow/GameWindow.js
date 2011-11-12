@@ -139,11 +139,23 @@
 	// Gadget
 	
 	GameWindow.prototype.addWidget = function (g, root, options) {
+		
+		//console.log(this.widgets);
+		
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			g = new this.widgets[g](options);
+			var tokens = g.split('.');
+			var i = 0;
+			var strg = 'g = new this.widgets';
+			for (;i<tokens.length;i++) {
+				strg += '[\''+tokens[i]+'\']';
+			}
+			strg+='(options);';
+			//console.log(strg);
+			eval(strg);
+			//g = new this.widgets[tokens](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);

@@ -76,22 +76,27 @@ function PeerReviewGame () {
 		var that = this;
 		var root = node.window.getElementById('root');
 		
-		var features = {
-						ex_A: { 
-							name: 'A',
-							value: 'A'
-						},
-						ex_B: { 
-								name: 'B',
-								value: 'B'
-						},
-						ex_C: { 
-								name: 'C',
-								value: 'C'
-						}
+		var ctrl_options = { id: 'exhib',
+							 features: {
+										ex_A: { 
+										name: 'A',
+										value: 'A',
+										label: 'A'
+										},
+										ex_B: { 
+												name: 'B',
+												value: 'B',
+												label: 'B'
+										},
+										ex_C: { 
+												name: 'C',
+												value: 'C',
+												label: 'C'
+										}
+							}
 		};
 		
-		node.window.addWidget('Controls.Radio',root,features);
+		node.window.addWidget('Controls.Radio',root,ctrl_options);
 		
 		// Add timer
 		var timerOptions = {
