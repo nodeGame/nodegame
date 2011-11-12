@@ -71,7 +71,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			console.log('Debuffered ' + msg);
+			//console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -136,7 +136,7 @@
 				}
 				else {
 					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					console.log('Buffering: ' + msg);
+					//console.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
