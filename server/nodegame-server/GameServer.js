@@ -97,14 +97,15 @@ GameServer.prototype.attachListeners = function() {
 					if (msg) { // Parsing Successful
 						// that.log.log('JUST RECEIVED P ' + util.inspect(msg));
 
+						var target = (this.target === GameMsg.targets.DATA) ? this.text : this.target;
+						
 						// TODO: KEEP THE
 						// FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ?
 						// that.gmm.forward(msg);
-						console.log(that.name + ' About to emit '
-								+ msg.toEvent());
+						console.log(that.name + ' About to emit ' + msg.toEvent());
 
-						that.log.log(msg.toEvent() + ' ' + msg.to + '-> '
-								+ msg.from);
+						that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
+						
 						that.emit(msg.toEvent(), msg);
 					}
 				});

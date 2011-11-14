@@ -64,9 +64,7 @@ function PeerReviewGame () {
 			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
 			
 			node.on('CREATION_DONE', function(){
-				console.log('cf_values');		
 				node.set('CF', that.cf.getAllValues());
-				console.log(that.cf.getAllValues());
 				node.emit('DONE');
 			});
 			
@@ -117,12 +115,8 @@ function PeerReviewGame () {
 		
 		node.on('SUBMISSION_DONE', function(){
 			node.emit('HIDE','exhib');
-			node.emit('HIDE','cf');
 			node.emit('INPUT_DISABLE');
-			setInterval(function(){
-				node.emit('TOGGLE','exhib');
-				node.emit('INPUT_TOGGLE');
-			},2000);
+			node.DONE();
 		});
 		
 		

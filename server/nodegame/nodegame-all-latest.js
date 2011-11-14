@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 14. Nov 11:59:33 CET 2011
+ * Built on Mo 14. Nov 15:02:16 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 14. Nov 11:59:33 CET 2011
+ * Built on Mo 14. Nov 15:02:16 CET 2011
  *
  */
  
@@ -818,7 +818,7 @@
 	GameMsg.prototype.toEvent = function () {
 		return this.action + '.' + this.target;
 	}; 
-
+	
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
@@ -1268,7 +1268,7 @@
 		}
 		
 	};
-	
+		
 	GameSocketClient.prototype.clearBuffer = function () {
 		
 		var nelem = this.buffer.length;
@@ -1336,6 +1336,17 @@
 				// Wait to fire the msgs if the game state is loading
 				if (that.game && that.game.isGameReady()) {
 					//console.log('GM is now: ' + that.game.gameState.is);
+					
+//					var event = msg.toInEvent();
+//					
+//					
+//					if (event !== 'in.say.DATA') {
+//						node.emit(event, msg);
+//					}
+//					else {
+//						node.emit('in.' +  msg.action + '.' + msg.text, msg);
+//					}
+					
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
@@ -1367,6 +1378,7 @@
 	
 	GameSocketClient.prototype.sendDATA = function (action, data, to, msg) {
 		var to = to || 'SERVER';
+		var msg = msg || 'DATA';
 		var msg = this.gmg.createDATA(action, data, to, msg);
 		this.send(msg);
 	};
@@ -1716,8 +1728,8 @@
 				that.gsc.sendTXT(text,to);
 			});
 			
-			node.on( OUT + say + 'DATA', function (data, to, msg) {
-				that.gsc.sendDATA(GameMsg.actions.SAY, data,to,msg);
+			node.on( OUT + say + 'DATA', function (data, to, id) {
+				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, id);
 			});
 			
 			// SET
@@ -1726,8 +1738,8 @@
 				that.gsc.sendSTATE(GameMsg.actions.SET, state, to);
 			});
 			
-			node.on( OUT + set + 'DATA', function (data, to) {
-				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
+			node.on( OUT + set + 'DATA', function (data, to, msg) {
+				that.gsc.sendDATA(GameMsg.actions.SET, data, to, msg);
 			});
 			
 		}();
@@ -2143,9 +2155,9 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
-	node.say = function (event, p1, p2, p3) {
-		that.emit('out.say.' + event, p1, p2, p3);
-	}
+	node.say = function (data, what, whom) {
+		that.emit('out.say.DATA', data, whom, what);
+	};
 	
 	/**
 	 * Set the pair (key,value) into the server
@@ -2156,7 +2168,8 @@
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
-		that.emit('out.set.DATA', data);
+		// TODO: parameter to say who will get the msg
+		that.emit('out.set.DATA', data, null, key);
 	}
 	
 	// TODO node.get
@@ -2192,8 +2205,14 @@
 		});
 	};
 	
-	node.onDATA = function(func) {
-		node.on("in.say.DATA", function(msg) {
+	node.onDATA = function(text, func) {
+		node.on('in.say.DATA', function(text, msg) {
+			if (text && msg.text === text) {
+				func.call(that.game,msg);
+			}
+		});
+		
+		node.on('in.set.DATA', function(msg) {
 			func.call(that.game,msg);
 		});
 	};
@@ -2266,7 +2285,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 14. Nov 11:59:33 CET 2011
+ * Built on Mo 14. Nov 15:02:16 CET 2011
  *
  */
  
@@ -3058,7 +3077,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 14. Nov 11:59:33 CET 2011
+ * Built on Mo 14. Nov 15:02:16 CET 2011
  *
  */
  

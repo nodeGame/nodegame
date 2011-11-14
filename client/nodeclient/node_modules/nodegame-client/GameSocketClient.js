@@ -64,7 +64,7 @@
 		}
 		
 	};
-	
+		
 	GameSocketClient.prototype.clearBuffer = function () {
 		
 		var nelem = this.buffer.length;
@@ -132,6 +132,17 @@
 				// Wait to fire the msgs if the game state is loading
 				if (that.game && that.game.isGameReady()) {
 					//console.log('GM is now: ' + that.game.gameState.is);
+					
+//					var event = msg.toInEvent();
+//					
+//					
+//					if (event !== 'in.say.DATA') {
+//						node.emit(event, msg);
+//					}
+//					else {
+//						node.emit('in.' +  msg.action + '.' + msg.text, msg);
+//					}
+					
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
@@ -163,6 +174,7 @@
 	
 	GameSocketClient.prototype.sendDATA = function (action, data, to, msg) {
 		var to = to || 'SERVER';
+		var msg = msg || 'DATA';
 		var msg = this.gmg.createDATA(action, data, to, msg);
 		this.send(msg);
 	};

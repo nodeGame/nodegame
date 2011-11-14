@@ -229,9 +229,9 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
-	node.say = function (event, p1, p2, p3) {
-		that.emit('out.say.' + event, p1, p2, p3);
-	}
+	node.say = function (data, what, whom) {
+		that.emit('out.say.DATA', data, whom, what);
+	};
 	
 	/**
 	 * Set the pair (key,value) into the server
@@ -242,7 +242,8 @@
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
-		that.emit('out.set.DATA', data);
+		// TODO: parameter to say who will get the msg
+		that.emit('out.set.DATA', data, null, key);
 	}
 	
 	// TODO node.get
@@ -278,8 +279,14 @@
 		});
 	};
 	
-	node.onDATA = function(func) {
-		node.on("in.say.DATA", function(msg) {
+	node.onDATA = function(text, func) {
+		node.on('in.say.DATA', function(text, msg) {
+			if (text && msg.text === text) {
+				func.call(that.game,msg);
+			}
+		});
+		
+		node.on('in.set.DATA', function(msg) {
 			func.call(that.game,msg);
 		});
 	};
