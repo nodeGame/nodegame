@@ -110,7 +110,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 3000
+							milliseconds: 1000
 		};
 		
 		this.timer.restart(timerOptions);
@@ -118,10 +118,10 @@ function PeerReviewGame () {
 		node.on('SUBMISSION_DONE', function(){
 			node.emit('HIDE','exhib');
 			node.emit('HIDE','cf');
-			
+			node.emit('INPUT_DISABLE');
 			setInterval(function(){
 				node.emit('TOGGLE','exhib');
-				node.emit('TOGGLE','cf');
+				node.emit('INPUT_TOGGLE');
 			},2000);
 		});
 		
@@ -131,15 +131,18 @@ function PeerReviewGame () {
 	
 	var evaluation = function(){
 		var that = this;
-		//node.window.loadFrame('evaluation.html');
+		node.window.loadFrame('evaluation.html', function(){
 		
-		var root = node.window.getElementById('root');
-		// Add timer
-		var timerOptions = {
-							event: 'EVALUATION_DONE',
-							milliseconds: 2000
-		};
-		this.timer.restart(timerOptions);
+			// Add timer
+			var timerOptions = {
+								event: 'EVALUATION_DONE',
+								milliseconds: 2000
+			};
+			this.timer.restart(timerOptions);
+		
+			var root = node.window.getElementById('root');
+			
+		});
 		
 		console.log('Evaluation');
 	};
