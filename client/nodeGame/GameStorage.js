@@ -26,15 +26,19 @@
 	 * but these cannot contain other objects in turn.
 	 * 
 	 * @param {String} client
-	 * @data {Object}
+	 * @param {Object} data
+	 * @param {String} state
+	 * 
 	 * @api public
 	 */
 	
-	GameStorage.prototype.add = function (client, data) {
+	GameStorage.prototype.add = function (client, data, state) {
 	  if (!this.clients[client]) {
 	    this.clients[client] = {};
 	  }
-	  var state = this.game.gameState.toString();
+	  
+	  var state = state || this.game.gameState.toString();
+	  
 	  if (!this.clients[client][state]) {
 		  this.clients[client][state] = {};
 	  }
@@ -42,7 +46,7 @@
 	  for (var i in data) {
 		  if (data.hasOwnProperty(i)) {
 			  this.clients[client][state][i] = data[i];
-			  console.log('Added ' +  i + ' ' + data[i]);
+			  //console.log('Added ' +  i + ' ' + data[i]);
 		  }
 	  }
 	  
@@ -193,6 +197,98 @@
 		//console.log(lines);
 		return lines;	
 	};
+	
+	/**
+	 * Retrieves specific information of combinations of the keys @client,
+	 * @state, and @id
+	 * 
+	 */
+	GameStorage.prototype.get = function (client, state, id) {
+		
+		var storage = this.clients;
+		
+		if (client) {
+			storage = this.getClient(client, storage);
+		}
+		
+		if (state) {
+			storage = this.getState(state, storage);
+		}
+		
+		if (id) {
+			storage = this.getId(id, storage);
+		}
+		
+		return storage;
+	};
+	
+	/** 
+	 * Retrives all the information associated to client @client.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @client at the /first/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getClient = function (client, storage) {
+		if (!client) return;
+		var storage = storage || this.clients;
+		return ('undefined' !== typeof storage[client]) ? storage[client] : false;
+	};
+	
+	/** 
+	 * Retrives all the information associated to state @state.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @state at the /second/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getState = function (state, storage) {
+		if (!state) return;
+		var storage = storage || this.clients;
+		var out = [];
+		
+		// Loop along all the clients
+		for (var c in storage) {
+			if (storage.hasOwnProperty(c)) {
+	
+				if ('undefined' !== typeof storage[c][state]) {
+					out.push(storage[c][state]);
+				}
+			}
+		}
+		
+		return (out.length !== 0) ? out : false;
+	};
+	
+	/** 
+	 * Retrives all the information associated to state @id.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @id at the /third/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getId = function (id, storage) {
+		if (!id) return;
+		var storage = storage || this.clients;
+		var out = [];
+		
+		// Loop along all the clients
+		for (var c in storage) {
+			if (storage.hasOwnProperty(c)) {
+				// Loop along all states
+				for (var s in storage.c) {
+					if (storage.c.hasOwnProperty(s)) {	
+						
+						if ('undefined' !== typeof storage[c][s][id]) {
+							out.push(storage[c][s][id]);
+						}
+					}
+				}
+			}
+		}
+		
+		return (out.length !== 0) ? out : false;
+	};
+	
+	
+	
 })(
 	'undefined' != typeof node ? node : module.exports
 );
