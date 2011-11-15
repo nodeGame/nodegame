@@ -26,15 +26,19 @@
 	 * but these cannot contain other objects in turn.
 	 * 
 	 * @param {String} client
-	 * @data {Object}
+	 * @param {Object} data
+	 * @param {String} state
+	 * 
 	 * @api public
 	 */
 	
-	GameStorage.prototype.add = function (client, data) {
+	GameStorage.prototype.add = function (client, data, state) {
 	  if (!this.clients[client]) {
 	    this.clients[client] = {};
 	  }
-	  var state = this.game.gameState.toString();
+	  
+	  var state = state || this.game.gameState.toString();
+	  
 	  if (!this.clients[client][state]) {
 		  this.clients[client][state] = {};
 	  }
@@ -42,7 +46,7 @@
 	  for (var i in data) {
 		  if (data.hasOwnProperty(i)) {
 			  this.clients[client][state][i] = data[i];
-			  console.log('Added ' +  i + ' ' + data[i]);
+			  //console.log('Added ' +  i + ' ' + data[i]);
 		  }
 	  }
 	  
@@ -90,22 +94,22 @@
 		return (reverse) ? this.reverse() : this.clients;
 	};
 	
-	GameStorage.prototype.getValues = function (reverse) {
-		
-		var values = [];
-		
-		var dump = this.dump(reverse);
-		for (var i in dump) {
-			if (dump.hasOwnProperty(i)) {
-				var line = this.getLine(i, dump);
-				//console.log(line);
-				for (var j in line) {
-					values.push(line[j]);
-				}
-			}
-		}
-		return values;
-	};
+//	GameStorage.prototype.getValues = function (reverse) {
+//		
+//		var values = [];
+//		
+//		var dump = this.dump(reverse);
+//		for (var i in dump) {
+//			if (dump.hasOwnProperty(i)) {
+//				var line = this.getLine(i, dump);
+//				//console.log(line);
+//				for (var j in line) {
+//					values.push(line[j]);
+//				}
+//			}
+//		}
+//		return values;
+//	};
 	
 	/**
 	 * Returns an array of arrays. Each row is unique combination of:
@@ -193,6 +197,168 @@
 		//console.log(lines);
 		return lines;	
 	};
+	
+	/**
+	 * Retrieves specific information of combinations of the keys @client,
+	 * @state, and @id
+	 * 
+	 */
+	GameStorage.prototype.get = function (client, state, id) {
+		
+		var storage = this.clients;
+		
+		if (client) {
+			storage = this.getClient(client, storage);
+		}
+		
+		if (state) {
+			storage = this.getState(state, storage);
+		}
+		
+		if (id) {
+			storage = this.getId(id, storage);
+		}
+		
+		return storage;
+	};
+	
+	/** 
+	 * Retrives all the information associated to client @client.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @client at the /first/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getClient = function (client, storage) {
+		if (!client) return;
+		var storage = storage || this.clients;
+		return ('undefined' !== typeof storage[client]) ? storage[client] : false;
+	};
+	
+	/** 
+	 * Retrives all the information associated to state @state.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @state at the /second/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getState = function (state, storage) {
+		if (!state) return;
+		var storage = storage || this.clients;
+		var out = [];
+		
+		// Loop along all the clients
+		for (var c in storage) {
+			if (storage.hasOwnProperty(c)) {
+	
+				if ('undefined' !== typeof storage[c][state]) {
+					out.push(storage[c][state]);
+					console.log('S ' + storage[c][state]);
+				}
+			}
+		}
+		
+		return (out.length !== 0) ? out : false;
+	};
+	
+	/** 
+	 * Retrives all the information associated to state @id.
+	 * Notice that, in fact, this method returns all the information 
+	 * associated with key @id at the /third/ level of the @storage obj.
+	 * 
+	 */
+	GameStorage.prototype.getId = function (id, storage) {
+		if (!id) return;
+		var storage = storage || this.clients;
+		var out = [];
+		
+		// Loop along all the clients
+		for (var c in storage) {
+			if (storage.hasOwnProperty(c)) {
+				// Loop along all states
+				for (var s in storage.c) {
+					if (storage.c.hasOwnProperty(s)) {	
+						
+						if ('undefined' !== typeof storage[c][s][id]) {
+							out.push(storage[c][s][id]);
+						}
+					}
+				}
+			}
+		}
+		
+		return (out.length !== 0) ? out : false;
+	};
+	
+	
+	function GameBit (options) {
+		
+		this.state = options.state;
+		this.player = options.player;
+		this.key = options.key;
+		this.value = options.value;
+	};
+	
+	GameBit.prototype.isComplex = function() {
+		return ('object' === typeof this.value) ? true : false;
+	};
+	
+	GameBit.prototype.getValues = function() {
+		
+		if (!this.isComplex()) return this.value;
+		
+		var out = [];
+		for (var i in this.value) {
+			if (this.value.hasOwnProperty(i)) {
+				out.push(this.value[i]);
+			}
+		}
+		
+		return out;
+	};
+	
+	GameBit.prototype.getKeyValues = function() {
+		
+		var out = [];
+		
+		if (!this.isComplex()){
+			out[this.key] = this.value;
+			return out;
+		}
+		
+		var line = [];
+		for (var i in this.value) {
+			if (this.value.hasOwnProperty(i)) {
+				line.push(this.key);
+				line.push(i),
+				line.push(this.value[i]);
+			}
+			out.push(line);
+			line = [];
+		}
+		
+		return out;
+	};
+	
+	GameBit.prototype.toString = function () {
+		var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
+		
+		if (this.paused) {
+			out += ' (P)';
+		}
+		return out;
+	};
+	
+	/** 
+	 *  Compares the GameState of two GameBits. 
+	 *  If they are equal returns 0,
+	 *  If gb1 is more ahead returns 1, vicersa -1;
+	 *  
+	 */
+	GameBit.compare = function (gb1, gb2) {
+		return GameState.compare(gb1.state, gb2.state);
+	};
+	
+	
+	
 })(
 	'undefined' != typeof node ? node : module.exports
 );

@@ -58,15 +58,13 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 1000
+								milliseconds: 2000
 			};
 			
 			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
 			
 			node.on('CREATION_DONE', function(){
-				console.log('cf_values');		
 				node.set('CF', that.cf.getAllValues());
-				console.log(that.cf.getAllValues());
 				node.emit('DONE');
 			});
 			
@@ -110,19 +108,15 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 3000
+							milliseconds: 1000
 		};
 		
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
 			node.emit('HIDE','exhib');
-			node.emit('HIDE','cf');
-			
-			setInterval(function(){
-				node.emit('TOGGLE','exhib');
-				node.emit('TOGGLE','cf');
-			},2000);
+			node.emit('INPUT_DISABLE');
+			node.DONE();
 		});
 		
 		
@@ -131,15 +125,18 @@ function PeerReviewGame () {
 	
 	var evaluation = function(){
 		var that = this;
-		//node.window.loadFrame('evaluation.html');
+		node.window.loadFrame('evaluation.html', function(){
 		
-		var root = node.window.getElementById('root');
-		// Add timer
-		var timerOptions = {
-							event: 'EVALUATION_DONE',
-							milliseconds: 2000
-		};
-		this.timer.restart(timerOptions);
+			// Add timer
+			var timerOptions = {
+								event: 'EVALUATION_DONE',
+								milliseconds: 2000
+			};
+			this.timer.restart(timerOptions);
+		
+			var root = node.window.getElementById('root');
+			
+		});
 		
 		console.log('Evaluation');
 	};

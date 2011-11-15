@@ -115,9 +115,7 @@
 	
 	Controls.prototype.listeners = function() {
 		var that = this;
-		node.on(this.id + '_DISABLE', function() {
-			
-		});
+	
 				
 	};
 	

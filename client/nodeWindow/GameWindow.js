@@ -71,7 +71,60 @@
 					el.style.visibility = 'visible';
 				}
 			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_DISABLE', function(id) {
+				that.toggleInputs(id, true);			
+			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_ENABLE', function(id) {
+				that.toggleInputs(id, false);
+			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_TOGGLE', function(id) {
+				that.toggleInputs(id);
+			});
+			
+			
 		}();
+	};
+	
+	/**
+	 * Enable / Disable all input in a container with id @id.
+	 * If no container with id @id is found, then the whole document is used.
+	 * 
+	 * If @op is defined, all the input are set to @op, otherwise, the disabled
+	 * property is toggled. (i.e. false means enable, true means disable) 
+	 * 
+	 */
+	GameWindow.prototype.toggleInputs = function(id, op) {
+		
+		var container = this.getElementById(id) || this;			
+		if (!container) return;
+
+		var inputTags = ['button', 'select', 'textarea', 'input'];
+
+		var j=0;
+		for (;j<inputTags.length;j++) {
+			var all = container.getElementsByTagName(inputTags[j]);
+			var i=0;
+			var max = all.length;
+			for (; i < max; i++) {
+				//node.log(all[i]);
+				
+				// If op is defined do that
+				var state = op;
+				
+				// Otherwise toggle
+				if (!state) {
+					state = all[i].disabled ? false : true;
+				}
+				
+				all[i].disabled = state;
+			}
+		}
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -121,6 +174,9 @@
 		return this.frame.getElementById(id);
 	};
 	
+	GameWindow.prototype.getElementsByTagName = function (tag) {
+		return this.frame.getElementsByTagName(tag);
+	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
  		
@@ -131,7 +187,7 @@
  		var that = this;	
  				
  		// First add the onload event listener
-		var iframe = document.getElementById('mainframe');
+		var iframe = document.getElementById(frame);
 		iframe.onload = function() {
 			that.updateStatus(func,frame);
 		};

@@ -125,7 +125,7 @@
 	GameMsg.prototype.toEvent = function () {
 		return this.action + '.' + this.target;
 	}; 
-
+	
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports

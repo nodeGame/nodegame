@@ -4,7 +4,11 @@
  *
  * Copyright 2011, Stefano Balietti
  *
+<<<<<<< HEAD
  * Built on Sat Nov 12 21:45:03 CET 2011
+=======
+ * Built on Mo 14. Nov 15:02:16 CET 2011
+>>>>>>> d708dcb21462a73eb387009ae9f7ef9a0558f64e
  *
  */
  
@@ -15,7 +19,11 @@
  *
  * Copyright 2011, Stefano Balietti
  *
+<<<<<<< HEAD
  * Built on Sat Nov 12 21:45:03 CET 2011
+=======
+ * Built on Mo 14. Nov 15:02:16 CET 2011
+>>>>>>> d708dcb21462a73eb387009ae9f7ef9a0558f64e
  *
  */
  
@@ -818,7 +826,7 @@
 	GameMsg.prototype.toEvent = function () {
 		return this.action + '.' + this.target;
 	}; 
-
+	
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
@@ -1268,7 +1276,7 @@
 		}
 		
 	};
-	
+		
 	GameSocketClient.prototype.clearBuffer = function () {
 		
 		var nelem = this.buffer.length;
@@ -1336,6 +1344,17 @@
 				// Wait to fire the msgs if the game state is loading
 				if (that.game && that.game.isGameReady()) {
 					//console.log('GM is now: ' + that.game.gameState.is);
+					
+//					var event = msg.toInEvent();
+//					
+//					
+//					if (event !== 'in.say.DATA') {
+//						node.emit(event, msg);
+//					}
+//					else {
+//						node.emit('in.' +  msg.action + '.' + msg.text, msg);
+//					}
+					
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
@@ -1367,6 +1386,7 @@
 	
 	GameSocketClient.prototype.sendDATA = function (action, data, to, msg) {
 		var to = to || 'SERVER';
+		var msg = msg || 'DATA';
 		var msg = this.gmg.createDATA(action, data, to, msg);
 		this.send(msg);
 	};
@@ -1716,8 +1736,8 @@
 				that.gsc.sendTXT(text,to);
 			});
 			
-			node.on( OUT + say + 'DATA', function (data, to, msg) {
-				that.gsc.sendDATA(GameMsg.actions.SAY, data,to,msg);
+			node.on( OUT + say + 'DATA', function (data, to, id) {
+				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, id);
 			});
 			
 			// SET
@@ -1726,8 +1746,8 @@
 				that.gsc.sendSTATE(GameMsg.actions.SET, state, to);
 			});
 			
-			node.on( OUT + set + 'DATA', function (data, to) {
-				that.gsc.sendDATA(GameMsg.actions.SET , data, to);
+			node.on( OUT + set + 'DATA', function (data, to, msg) {
+				that.gsc.sendDATA(GameMsg.actions.SET, data, to, msg);
 			});
 			
 		}();
@@ -2143,9 +2163,9 @@
 		that.emit(event, p1, p2, p3);
 	};	
 	
-	node.say = function (event, p1, p2, p3) {
-		that.emit('out.say.' + event, p1, p2, p3);
-	}
+	node.say = function (data, what, whom) {
+		that.emit('out.say.DATA', data, whom, what);
+	};
 	
 	/**
 	 * Set the pair (key,value) into the server
@@ -2156,7 +2176,8 @@
 	node.set = function (key, value) {
 		var data = {}; // necessary, otherwise the key is called key
 		data[key] = value;
-		that.emit('out.set.DATA', data);
+		// TODO: parameter to say who will get the msg
+		that.emit('out.set.DATA', data, null, key);
 	}
 	
 	// TODO node.get
@@ -2192,8 +2213,14 @@
 		});
 	};
 	
-	node.onDATA = function(func) {
-		node.on("in.say.DATA", function(msg) {
+	node.onDATA = function(text, func) {
+		node.on('in.say.DATA', function(text, msg) {
+			if (text && msg.text === text) {
+				func.call(that.game,msg);
+			}
+		});
+		
+		node.on('in.set.DATA', function(msg) {
 			func.call(that.game,msg);
 		});
 	};
@@ -2266,7 +2293,11 @@
  *
  * Copyright 2011, Stefano Balietti
  *
+<<<<<<< HEAD
  * Built on Sat Nov 12 21:45:03 CET 2011
+=======
+ * Built on Mo 14. Nov 15:02:16 CET 2011
+>>>>>>> d708dcb21462a73eb387009ae9f7ef9a0558f64e
  *
  */
  
@@ -2605,7 +2636,60 @@
 					el.style.visibility = 'visible';
 				}
 			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_DISABLE', function(id) {
+				that.toggleInputs(id, true);			
+			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_ENABLE', function(id) {
+				that.toggleInputs(id, false);
+			});
+			
+			// Disable all the input forms found within a given id element
+			node.on('INPUT_TOGGLE', function(id) {
+				that.toggleInputs(id);
+			});
+			
+			
 		}();
+	};
+	
+	/**
+	 * Enable / Disable all input in a container with id @id.
+	 * If no container with id @id is found, then the whole document is used.
+	 * 
+	 * If @op is defined, all the input are set to @op, otherwise, the disabled
+	 * property is toggled. (i.e. false means enable, true means disable) 
+	 * 
+	 */
+	GameWindow.prototype.toggleInputs = function(id, op) {
+		
+		var container = this.getElementById(id) || this;			
+		if (!container) return;
+
+		var inputTags = ['button', 'select', 'textarea', 'input'];
+
+		var j=0;
+		for (;j<inputTags.length;j++) {
+			var all = container.getElementsByTagName(inputTags[j]);
+			var i=0;
+			var max = all.length;
+			for (; i < max; i++) {
+				//node.log(all[i]);
+				
+				// If op is defined do that
+				var state = op;
+				
+				// Otherwise toggle
+				if (!state) {
+					state = all[i].disabled ? false : true;
+				}
+				
+				all[i].disabled = state;
+			}
+		}
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
@@ -2655,6 +2739,9 @@
 		return this.frame.getElementById(id);
 	};
 	
+	GameWindow.prototype.getElementsByTagName = function (tag) {
+		return this.frame.getElementsByTagName(tag);
+	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
  		
@@ -2665,7 +2752,7 @@
  		var that = this;	
  				
  		// First add the onload event listener
-		var iframe = document.getElementById('mainframe');
+		var iframe = document.getElementById(frame);
 		iframe.onload = function() {
 			that.updateStatus(func,frame);
 		};
@@ -3002,7 +3089,11 @@
  *
  * Copyright 2011, Stefano Balietti
  *
+<<<<<<< HEAD
  * Built on Sat Nov 12 21:45:03 CET 2011
+=======
+ * Built on Mo 14. Nov 15:02:16 CET 2011
+>>>>>>> d708dcb21462a73eb387009ae9f7ef9a0558f64e
  *
  */
  
@@ -3863,9 +3954,7 @@
 	
 	Controls.prototype.listeners = function() {
 		var that = this;
-		node.on(this.id + '_DISABLE', function() {
-			
-		});
+	
 				
 	};
 	
