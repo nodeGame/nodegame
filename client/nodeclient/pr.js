@@ -1,4 +1,6 @@
-var nodegame = require('nodegame-client');
+var node = require('nodegame-client');
+module.exports = node;
+
 var Pr = require('peerreview');
 
 var conf = {
@@ -8,4 +10,4 @@ var conf = {
 
 
 
-nodegame.play(conf, new Pr());
+node.play(conf, new Pr());
