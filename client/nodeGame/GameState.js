@@ -58,13 +58,13 @@
 			
 		var result = gs1.state - gs2.state;
 		
-		if (result === 0) {
+		if (result === 0 && 'undefined' !== typeof gs1.round) {
 			result = gs1.round - gs2.round;
 			
-			if (result === 0) {
+			if (result === 0 && 'undefined' !== typeof gs1.step) {
 				result = gs1.step - gs2.step;
 				
-				if (strict && result === 0) {
+				if (strict && result === 0 && 'undefined' !== typeof gs1.is) {
 					result = gs1.is - gs2.is;
 				}
 			}
