@@ -138,8 +138,8 @@
 	    	}
 	    };
 	    
-	    node.memory.dump = function (path, reverse) {
-			node.fs.writeCsv(path, node.memory.getValues(reverse));
+	    node.memory.dump = function (path) {
+			node.fs.writeCsv(path, node.memory.getValues());
 	    }
 	  }
 	  // end node
@@ -240,10 +240,8 @@
 	 * 
 	 */
 	node.set = function (key, value) {
-		var data = {}; // necessary, otherwise the key is called key
-		data[key] = value;
 		// TODO: parameter to say who will get the msg
-		that.emit('out.set.DATA', data, null, key);
+		that.emit('out.set.DATA', value, null, key);
 	}
 	
 	// TODO node.get

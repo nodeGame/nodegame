@@ -81,6 +81,7 @@
 		return out;
 	};	
 	
+	// Get Objects
 	
 	/**
 	 * Retrieves specific information of combinations of the keys @client,
@@ -88,11 +89,11 @@
 	 * 
 	 */
 	GameStorage.prototype.get = function (gamebit) {
-		if (!value) return false;
+		if (!gamebit) return this.storage;
 		var out = [];
 		
 		for (var i=0; i< this.storage.length; i++) {
-			if (GameBit.compare(gamebit,this.storage[i]) === 0){
+			if (GameBit.compare(gamebit,this.storage[i])){
 				out.push(this.storage[i]);
 			}
 		}	
@@ -111,9 +112,53 @@
 		return this.get(new GameBit({key:key}));
 	};
 	
-	
+	// Get Values
 
+	GameStorage.prototype.getValues = function (gamebit, key) {
+		var storage = this.get(gamebit);
+		if (!storage) return false;
+		
+		switch (key) {
+			case 'VALUES_ONLY': 
+				var func = GameBit.prototype.getValues;
+				break;
+			case 'KEY_VALUES':
+				var func = GameBit.prototype.getKeyValues; 
+				break;
+			case 'FULL':
+				var func = GameBit.prototype.toArray;
+				break;
+			default:
+				var func = GameBit.prototype.toArray;
+		}
+		
+		var out = [];
+		
+		for (var i=0; i < storage.length; i++) {
+			var line = func.call(storage[i]);
+			for (var j=0; j < line.length; j++) {
+				// We can have one or two nested arrays
+				// We need to open the first array to know it
+				if ('object' === typeof line[j]) {
+					out.push(line[j]);
+				}
+				else {
+					out.push(line);
+					break; // do not add line[j] multiple times
+				}
+				
+			}
+		}	
+		
+		//console.log(out);
+		
+		return out;
+	};
 	
+	GameStorage.prototype.getKeyValues = function (gamebit) {
+		return this.getValues(gamebit,true);
+	};
+		
 	/**
 	 * Write data into the memory of a client.
 	 * It overwrites data with the same key.
@@ -457,63 +502,61 @@
 		return ('object' === typeof this.value) ? true : false;
 	};
 	
-	GameBit.prototype.getValues = function() {
-		
-		if (!this.isComplex()) return this.value;
-		
-		var out = [];
-		for (var i in this.value) {
-			if (this.value.hasOwnProperty(i)) {
-				out.push(this.value[i]);
-			}
-		}
-		
-		return out;
-	};
 	
-	GameBit.prototype.getKeyValues = function() {
+	GameBit.prototype.getValues = function (head) {		
+		var head = head || [];
 		
-		var out = [];
-		
-		if (!this.isComplex()){
-			out[this.key] = this.value;
+		if (!this.isComplex()) {
+			var out = head;
+			out.push(this.value);
 			return out;
 		}
 		
-		var line = [];
+		var out = [];
+		var line = head.slice(0); // Clone the head array without pointing to same ref
+		
 		for (var i in this.value) {
 			if (this.value.hasOwnProperty(i)) {
-				line.push(this.key);
-				line.push(i),
+				line.push(i);
 				line.push(this.value[i]);
+				out.push(line);
+				line = head.slice(0);
 			}
-			out.push(line);
-			line = [];
 		}
-		
+		//console.log(out);
 		return out;
+	};
+	
+	GameBit.prototype.toArray = function() {
+		var head = [this.player,this.state.toString(),this.key];
+		return this.getValues(head);
+	};
+	
+	GameBit.prototype.getKeyValues = function() {
+		return this.getValues([this.key]);
 	};
 	
 	GameBit.prototype.toString = function () {
 //		console.log(GameState.stringify(this.state));
-		return GameState.stringify(this.state) + ', ' + this.player + ', ' + this.key + ', ' + this.value;
+		return this.player + ', ' + GameState.stringify(this.state) + ', ' + this.key + ', ' + this.value;
 	};
 	
 	/** 
 	 * Compares two GameBit objects.
 	 * The Comparison is made only if the attributes are set in the first object
-	 * Return true if player, state, and key are identical. 
+	 * Return true if the attributes of gb1 (player, state, and key) are identical. 
+	 * Undefined values are skip.
 	 *  
 	 * If strict is set, it compares also the values of the two objects.
 	 *  
 	 */
 	GameBit.compare = function (gb1, gb2, strict) {
-		if (gb1.player && GameState.comparePlayer(gb1, gb2) !== 0) return false;
-		if (gb1.state && GameState.compareState(gb1, gb2) !== 0) return false;
-		if (gb1.key && GameState.compareKey(gb1, gb2) !== 0) return false;
-		
-		if (strict && gb1.value && GameState.compareValue(gb1, gb2) !== 0) return false;
-		
+		if(!gb1 || !gb2) return false;
+		var strict = strict || false;
+		if (gb1.player && GameBit.comparePlayer(gb1, gb2) !== 0) return false;
+		if (gb1.state && GameBit.compareState(gb1, gb2) !== 0) return false;
+		if (gb1.key && GameBit.compareKey(gb1, gb2) !== 0) return false;
+		if (strict && gb1.value && GameBit.compareValue(gb1, gb2) !== 0) return false;
 		return true;	
 	};
 	
@@ -525,7 +568,7 @@
 	};
 	
 	GameBit.compareState = function (gb1, gb2) {
-		return GameState.compare(gb1,gb2);
+		return GameState.compare(gb1.state,gb2.state);
 	};
 	
 	GameBit.compareKey = function (gb1, gb2) {

@@ -55,7 +55,8 @@
 	// If strict is set, also the is property is compared
 	GameState.compare = function (gs1, gs2, strict) {
 		var strict = strict || false;
-			
+//		console.log(gs1);
+//		console.log(gs2);
 		var result = gs1.state - gs2.state;
 		
 		if (result === 0 && 'undefined' !== typeof gs1.round) {

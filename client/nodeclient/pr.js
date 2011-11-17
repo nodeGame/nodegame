@@ -1,5 +1,5 @@
 var node = require('nodegame-client');
-module.exports = node;
+module.exports.node = node;
 
 var Pr = require('peerreview');
 

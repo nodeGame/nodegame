@@ -58,11 +58,11 @@
 			
 			// Set
 			node.on( IN + set + 'STATE', function(msg){
-				that.memory.add(msg.from, msg.data);
+				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
 			node.on( IN + set + 'DATA', function(msg){
-				that.memory.add(msg.from, msg.data);
+				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
 			// Say
@@ -119,8 +119,8 @@
 				that.gsc.sendTXT(text,to);
 			});
 			
-			node.on( OUT + say + 'DATA', function (data, to, id) {
-				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, id);
+			node.on( OUT + say + 'DATA', function (data, to, key) {
+				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
 			});
 			
 			// SET
@@ -129,8 +129,8 @@
 				that.gsc.sendSTATE(GameMsg.actions.SET, state, to);
 			});
 			
-			node.on( OUT + set + 'DATA', function (data, to, msg) {
-				that.gsc.sendDATA(GameMsg.actions.SET, data, to, msg);
+			node.on( OUT + set + 'DATA', function (data, to, key) {
+				that.gsc.sendDATA(GameMsg.actions.SET, data, to, key);
 			});
 			
 		}();
