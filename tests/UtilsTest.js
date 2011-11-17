@@ -21,5 +21,8 @@ var func = function(a) {
 //var out = utils.getGroupsSizeN(biggroup, 4);
 //console.log(out);
 
-var out = utils.matchN(biggroup, 4);
+var out = utils.getNRandom(biggroup, 4);
 console.log(out);
+
+//var out = utils.matchN(biggroup, 4);
+//console.log(out);

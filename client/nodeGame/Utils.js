@@ -162,7 +162,8 @@
 			copy.splice(i,1);
 			var group = Utils.getNRandom(copy,N);
 			group.splice(0,1,array[i]);
-			
+			console.log('G');
+			console.log(group);
 			//Update
 			result.push(group);
 			group = [];
@@ -170,15 +171,27 @@
 		return result;
 	};
 	
-	Utils.getNRandom = function (array, N, callback) {
-		
-		var randomElements = array.sort(function(){ 
-			return Math.round(Math.random())-0.5;
-		}).slice(0,N);
-		
-		return randomElements;
+	/**
+	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	 * 
+	 */
+	Utils.shuffle = function (array, N, callback) {
+		var copy = array.slice(0);
+		var len = array.length-1; // ! -1
+		for (var i = len; i > 0; i--) {
+			var j = Math.floor(Math.random(0,1)*i);
+			var tmp = copy[j];
+			copy[j] = copy[i];
+			copy[i] = tmp;
+			console.log(copy);
+		}
+		return copy;
 	};
 	
+	Utils.getNRandom = function (array, N, callback) {
+		return Utils.shuffle(array).slice(0,N);
+	};                           
+	                           	
 	Utils.generateCombinations = function (array, r, callback) {
 	    function equal(a, b) {
 	        for (var i = 0; i < a.length; i++) {
