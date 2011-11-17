@@ -95,6 +95,116 @@
 	    return result;
 	};
 
+	/**
+	 * Returns an array of N array containing the same number of elements
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	Utils.getNGroups = function (array, N) {
+		return Utils.getGroupsSizeN(array, Math.floor(array.length / N));
+	};
+	
+	/**
+	 * Returns an array of array containing N elements each
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	Utils.getGroupsSizeN = function (array, N) {
+		
+		var copy = array.slice(0);
+		var len = copy.length;
+		var originalLen = copy.length;
+		var result = [];
+		
+		// Init values for the loop algorithm
+		var i;
+		var idx;
+		var group = [];
+		var count = 0;
+		for (i=0; i < originalLen; i++) {
+			
+			// Get a random idx between 0 and array length
+			idx = Math.floor(Math.random()*len);
+			
+			// Prepare the array container for the elements of a new group
+			if (count >= N) {
+				result.push(group);
+				count = 0;
+				group = [];
+			}
+			
+			// Insert element in the group
+			group.push(copy[idx]);
+			
+			// Update
+			copy.splice(idx,1);
+			len = copy.length;
+			count++;
+		}
+		
+		// Add any remaining element
+		if (group.length > 0) {
+			result.push(group);
+		}
+		
+		return result;
+	};
+	
+	/**
+	 * Match each element of the array with N random others
+	 * 
+	 */
+	Utils.matchN = function (array, N) {
+		var result = []
+		var len = array.length;
+		for (var i = 0 ; i < len ; i++) {
+			var copy = array.slice(0);
+			copy.splice(i,1);
+			var group = Utils.getNRandom(copy,N);
+			group.splice(0,1,array[i]);
+			
+			//Update
+			result.push(group);
+			group = [];
+		}
+		return result;
+	};
+	
+	Utils.getNRandom = function (array, N, callback) {
+		
+		var randomElements = array.sort(function(){ 
+			return Math.round(Math.random())-0.5;
+		}).slice(0,N);
+		
+		return randomElements;
+	};
+	
+	Utils.generateCombinations = function (array, r, callback) {
+	    function equal(a, b) {
+	        for (var i = 0; i < a.length; i++) {
+	            if (a[i] != b[i]) return false;
+	        }
+	        return true;
+	    }
+	    function values(i, a) {
+	        var ret = [];
+	        for (var j = 0; j < i.length; j++) ret.push(a[i[j]]);
+	        return ret;
+	    }
+	    var n = array.length;
+	    var indices = [];
+	    for (var i = 0; i < r; i++) indices.push(i);
+	    var final = [];
+	    for (var i = n - r; i < n; i++) final.push(i);
+	    while (!equal(indices, final)) {
+	        callback(values(indices, array));
+	        var i = r - 1;
+	        while (indices[i] == n - r + i) i -= 1;
+	        indices[i] += 1;
+	        for (var j = i + 1; j < r; j++) indices[j] = indices[i] + j - i;
+	    }
+	    callback(values(indices, array));
+	}
 
 
 })('undefined' != typeof node ? node : module.exports);

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 11:35:20 CET 2011
+ * Built on Do 17. Nov 12:30:52 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 11:35:20 CET 2011
+ * Built on Do 17. Nov 12:30:52 CET 2011
  *
  */
  
@@ -256,6 +256,32 @@
 	    return result;
 	};
 
+	Utils.generateCombinations = function (array, r, callback) {
+	    function equal(a, b) {
+	        for (var i = 0; i < a.length; i++) {
+	            if (a[i] != b[i]) return false;
+	        }
+	        return true;
+	    }
+	    function values(i, a) {
+	        var ret = [];
+	        for (var j = 0; j < i.length; j++) ret.push(a[i[j]]);
+	        return ret;
+	    }
+	    var n = array.length;
+	    var indices = [];
+	    for (var i = 0; i < r; i++) indices.push(i);
+	    var final = [];
+	    for (var i = n - r; i < n; i++) final.push(i);
+	    while (!equal(indices, final)) {
+	        callback(values(indices, array));
+	        var i = r - 1;
+	        while (indices[i] == n - r + i) i -= 1;
+	        indices[i] += 1;
+	        for (var j = i + 1; j < r; j++) indices[j] = indices[i] + j - i;
+	    }
+	    callback(values(indices, array));
+	}
 
 
 })('undefined' != typeof node ? node : module.exports); 
@@ -1442,13 +1468,7 @@
 										value: value,
 										state: state
 		}));
-	  
-//		console.log('Added ' + new GameBit({
-//										player: player, 
-//										key: key,
-//										value: value,
-//										state: state
-//		}));
+
 		return true;
 	};
 	
@@ -2452,9 +2472,7 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
-	    	console.log('DUMPINGGG');
-	    	console.log(obj);
-	    	for (i=0;i<obj.length;i++) {
+	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
@@ -2678,7 +2696,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 11:35:20 CET 2011
+ * Built on Do 17. Nov 12:30:52 CET 2011
  *
  */
  
@@ -3470,7 +3488,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 11:35:20 CET 2011
+ * Built on Do 17. Nov 12:30:52 CET 2011
  *
  */
  

@@ -31,13 +31,7 @@
 										value: value,
 										state: state
 		}));
-	  
-//		console.log('Added ' + new GameBit({
-//										player: player, 
-//										key: key,
-//										value: value,
-//										state: state
-//		}));
+
 		return true;
 	};
 	

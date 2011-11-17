@@ -35,7 +35,7 @@
 	     * @api public
 	     */
 	
-	    node.Utils = require('./Utils').Utils;
+	    node.utils = node.Utils = require('./Utils').Utils;
 	
 	    /**
 	     * Expose GameState.
@@ -131,9 +131,7 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
-	    	console.log('DUMPINGGG');
-	    	console.log(obj);
-	    	for (i=0;i<obj.length;i++) {
+	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
