@@ -32,6 +32,8 @@
 					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
 					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
 		};
+		
+		this.features = options.features;
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {
@@ -63,7 +65,7 @@
 		// Add Gadget
 		var sc_options = {
 							id: 'cf_controls',
-							features: FaceVector.defaults
+							features: this.features || FaceVector.defaults
 		};
 		
 		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);

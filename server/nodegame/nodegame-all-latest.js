@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 12:30:52 CET 2011
+ * Built on Do 17. Nov 18:32:57 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 12:30:52 CET 2011
+ * Built on Do 17. Nov 18:32:57 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -256,6 +256,102 @@
 	    return result;
 	};
 
+	/**
+	 * Returns an array of N array containing the same number of elements
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	Utils.getNGroups = function (array, N) {
+		return Utils.getGroupsSizeN(array, Math.floor(array.length / N));
+	};
+	
+	/**
+	 * Returns an array of array containing N elements each
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	Utils.getGroupsSizeN = function (array, N) {
+		
+		var copy = array.slice(0);
+		var len = copy.length;
+		var originalLen = copy.length;
+		var result = [];
+		
+		// Init values for the loop algorithm
+		var i;
+		var idx;
+		var group = [];
+		var count = 0;
+		for (i=0; i < originalLen; i++) {
+			
+			// Get a random idx between 0 and array length
+			idx = Math.floor(Math.random()*len);
+			
+			// Prepare the array container for the elements of a new group
+			if (count >= N) {
+				result.push(group);
+				count = 0;
+				group = [];
+			}
+			
+			// Insert element in the group
+			group.push(copy[idx]);
+			
+			// Update
+			copy.splice(idx,1);
+			len = copy.length;
+			count++;
+		}
+		
+		// Add any remaining element
+		if (group.length > 0) {
+			result.push(group);
+		}
+		
+		return result;
+	};
+	
+	/**
+	 * Match each element of the array with N random others
+	 * 
+	 */
+	Utils.matchN = function (array, N) {
+		var result = []
+		var len = array.length;
+		for (var i = 0 ; i < len ; i++) {
+			var copy = array.slice(0);
+			copy.splice(i,1);
+			var group = Utils.getNRandom(copy,N);
+			group.splice(0,0,array[i]);
+			
+			//Update
+			result.push(group);
+			group = [];
+		}
+		return result;
+	};
+	
+	/**
+	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	 * 
+	 */
+	Utils.shuffle = function (array, N, callback) {
+		var copy = array.slice(0);
+		var len = array.length-1; // ! -1
+		for (var i = len; i > 0; i--) {
+			var j = Math.floor(Math.random(0,1)*i);
+			var tmp = copy[j];
+			copy[j] = copy[i];
+			copy[i] = tmp;
+			console.log(copy);
+		}
+		return copy;
+	};
+	
+	Utils.getNRandom = function (array, N, callback) {
+		return Utils.shuffle(array).slice(0,N);
+	};                           
+	                           	
 	Utils.generateCombinations = function (array, r, callback) {
 	    function equal(a, b) {
 	        for (var i = 0; i < a.length; i++) {
@@ -2376,7 +2472,7 @@
 	     * @api public
 	     */
 	
-	    node.Utils = require('./Utils').Utils;
+	    node.utils = node.Utils = require('./Utils').Utils;
 	
 	    /**
 	     * Expose GameState.
@@ -2617,7 +2713,7 @@
 	};
 	
 	node.onDATA = function(text, func) {
-		node.on('in.say.DATA', function(text, msg) {
+		node.on('in.say.DATA', function(msg) {
 			if (text && msg.text === text) {
 				func.call(that.game,msg);
 			}
@@ -2696,7 +2792,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 12:30:52 CET 2011
+ * Built on Do 17. Nov 18:32:57 CET 2011
  *
  */
  
@@ -3488,7 +3584,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 12:30:52 CET 2011
+ * Built on Do 17. Nov 18:32:57 CET 2011
  *
  */
  
@@ -3527,6 +3623,8 @@
 					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
 					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
 		};
+		
+		this.features = options.features;
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {
@@ -3558,7 +3656,7 @@
 		// Add Gadget
 		var sc_options = {
 							id: 'cf_controls',
-							features: FaceVector.defaults
+							features: this.features || FaceVector.defaults
 		};
 		
 		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
@@ -5076,7 +5174,6 @@
 	
 	VisualTimer.prototype.start = function() {
 		var that = this;
-		console.log(this);
 		// Init Timer
 		var time = Utils.parseMilliseconds(this.milliseconds);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];

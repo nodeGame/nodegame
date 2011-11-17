@@ -276,7 +276,7 @@
 	};
 	
 	node.onDATA = function(text, func) {
-		node.on('in.say.DATA', function(text, msg) {
+		node.on('in.say.DATA', function(msg) {
 			if (text && msg.text === text) {
 				func.call(that.game,msg);
 			}

@@ -217,6 +217,41 @@
 	    }
 	    callback(values(indices, array));
 	}
+	
+	Utils.clone = function (obj) {
+		var clone = {};
+		for (var i in obj) {
+			if ( 'object' === typeof obj[i] ) {
+				clone[i] = Utils.clone(obj[i]);
+			}
+			else {
+				clone[i] = obj[i];
+			}
+		}
+		return clone;
+	};
+	
+	Utils.join = function (obj1, obj2) {
+		var clone = Utils.clone(obj1);
+		for (var i in clone) {
+			if (clone.hasOwnProperty(i)) {
+				if ('undefined' !== obj2[i]) {
+					clone[i] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	Utils.merge = function (obj1, obj2) {
+		var clone = Utils.clone(obj1);
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				clone[i] = obj2[i];
+			}
+		}
+		return clone;
+	};
 
 
 })('undefined' != typeof node ? node : module.exports);

@@ -58,7 +58,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 2000
+								milliseconds: 10000
 			};
 			
 			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
@@ -108,17 +108,16 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 1000
+							milliseconds: 2000
 		};
 		
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
-			node.emit('HIDE','exhib');
+			//node.emit('HIDE','exhib');
 			node.emit('INPUT_DISABLE');
 			node.DONE();
 		});
-		
 		
 		console.log('Submission');
 	};	
@@ -132,9 +131,30 @@ function PeerReviewGame () {
 								event: 'EVALUATION_DONE',
 								milliseconds: 2000
 			};
-			this.timer.restart(timerOptions);
+			that.timer.restart(timerOptions);
 		
 			var root = node.window.getElementById('root');
+			
+
+			
+			node.onDATA('CF', function(msg) {
+				
+				console.log('AAAAAAAAAAAAAAAAA');
+				console.log(msg.data);
+				
+				var cf_options = { id: 'cf',
+						width: 300,
+						height: 300,
+						features: msg.data
+				};
+	
+				that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+			});
+			
+			node.on('in.say.DATA', function(msg) {
+				console.log('BBBBBBBBBB');
+				console.log(msg.data);
+			});
 			
 		});
 		
@@ -144,6 +164,11 @@ function PeerReviewGame () {
 	var dissemination = function(){
 		var that = this;
 		node.window.loadFrame('dissemination.html');
+		
+//		node.on('in.say.DATA', function(msg) {
+//			console.log('AAAAAAAAAAAAAAAAA');
+//			console.log(msg.data);
+//		});
 		
 		console.log('Dissemination');
 	};
@@ -174,7 +199,7 @@ function PeerReviewGame () {
 		1: creation,
 		2: submission,
 		3: evaluation,
-		3: dissemination
+		4: dissemination
 	};
 	
 	var postgameloop = {

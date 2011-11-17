@@ -58,7 +58,6 @@
 	
 	VisualTimer.prototype.start = function() {
 		var that = this;
-		console.log(this);
 		// Init Timer
 		var time = Utils.parseMilliseconds(this.milliseconds);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];

@@ -21,8 +21,21 @@ var func = function(a) {
 //var out = utils.getGroupsSizeN(biggroup, 4);
 //console.log(out);
 
-var out = utils.getNRandom(biggroup, 4);
-console.log(out);
+//var out = utils.getNRandom(biggroup, 4);
+//console.log(out);
 
 //var out = utils.matchN(biggroup, 4);
 //console.log(out);
+
+
+var obj1 = {a: 1, b: 2, c:3};
+var obj2 = {a: 9, b: 8, d:7};
+
+var out = utils.clone(obj1);
+console.log(out);
+
+var out = utils.join(obj1,obj2);
+console.log(out);
+
+var out = utils.merge(obj1,obj2);
+console.log(out);
