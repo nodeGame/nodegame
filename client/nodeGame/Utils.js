@@ -161,9 +161,8 @@
 			var copy = array.slice(0);
 			copy.splice(i,1);
 			var group = Utils.getNRandom(copy,N);
-			group.splice(0,1,array[i]);
-			console.log('G');
-			console.log(group);
+			group.splice(0,0,array[i]);
+			
 			//Update
 			result.push(group);
 			group = [];
