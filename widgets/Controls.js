@@ -36,8 +36,7 @@
 		if (this.options.fieldset) {
 			this.list = new node.window.List();
 		}
-		else {
-			
+		else {		
 			this.list = new node.window.List(this.id);
 		}
 		this.listRoot = this.list.getRoot();
@@ -131,6 +130,7 @@
 		
 		return out;
 	};
+	
 	
 	// Sub-classes
 	

@@ -275,6 +275,25 @@
 		}
 		return clone;
 	};
-
+	
+	/**
+	 * Set the.
+	 */
+	Utils.mergeOnKey = function (obj1, obj2, key) {
+		var clone = Utils.clone(obj1);
+		if (!obj2 || !key) return clone;		
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj1[i] ) {
+					clone[i][key] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	Utils.mergeOnValue = function (obj1, obj2) {
+		return Utils.mergeOnKey(obj1, obj2, 'value');
+	};
 
 })('undefined' != typeof node ? node : module.exports);

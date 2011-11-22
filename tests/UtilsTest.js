@@ -28,8 +28,8 @@ var func = function(a) {
 //console.log(out);
 
 
-var obj1 = {a: 1, b: 2, c:3};
-var obj2 = {a: 9, b: 8, d:7};
+var obj1 = {a: 1, b: {l: 9, k: 2, h: 0}, c:3};
+var obj2 = {a: 9, b: {l: 1, k: 2, j: 3}, d:7};
 
 var out = utils.clone(obj1);
 console.log(out);

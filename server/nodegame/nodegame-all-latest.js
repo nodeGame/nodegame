@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 18:32:57 CET 2011
+ * Built on Di 22. Nov 18:26:55 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 18:32:57 CET 2011
+ * Built on Di 22. Nov 18:26:55 CET 2011
  *
  */
  
@@ -378,7 +378,84 @@
 	    }
 	    callback(values(indices, array));
 	}
-
+	
+	/**
+	 * Creates a perfect copy of the obj
+	 */
+	Utils.clone = function (obj) {
+		var clone = {};
+		for (var i in obj) {
+			if ( 'object' === typeof obj[i] ) {
+				clone[i] = Utils.clone(obj[i]);
+			}
+			else {
+				clone[i] = obj[i];
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Performs a left join on the keys of two objects. In case keys overlaps
+	 *  the values from obj2 are taken.
+	 */
+	Utils.join = function (obj1, obj2) {
+		var clone = Utils.clone(obj1);
+		if (!obj2) return clone;
+		for (var i in clone) {
+			if (clone.hasOwnProperty(i)) {
+				if ('undefined' !== typeof obj2[i]) {
+					if ( 'object' === typeof obj2[i] ) {
+						clone[i] = Utils.join(clone[i], obj2[i]);
+					}
+					else {
+						clone[i] = obj2[i];
+					}
+				}
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Merges two objects in one. In case keys overlaps the values from 
+	 * obj2 are taken.
+	 */
+	Utils.merge = function (obj1, obj2) {
+		var clone = Utils.clone(obj1);
+		if (!obj2) return clone;
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj2[i] ) {
+					clone[i] = Utils.merge(obj1[i],obj2[i]);
+				}
+				else {
+					clone[i] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Set the.
+	 */
+	Utils.mergeOnKey = function (obj1, obj2, key) {
+		var clone = Utils.clone(obj1);
+		if (!obj2 || !key) return clone;		
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj1[i] ) {
+					clone[i][key] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	Utils.mergeOnValue = function (obj1, obj2) {
+		return Utils.mergeOnKey(obj1, obj2, 'value');
+	};
 
 })('undefined' != typeof node ? node : module.exports); 
  
@@ -1686,330 +1763,8 @@
 		return this.getValues(gamebit,true);
 	};
 		
-	/**
-	 * Write data into the memory of a client.
-	 * It overwrites data with the same key.
-	 * @data can be an object, or an object containing other objects,
-	 * but these cannot contain other objects in turn.
-	 * 
-	 * @param {String} client
-	 * @param {Object} data
-	 * @param {String} state
-	 * 
-	 * @api public
-	 */
-	
-//	GameStorage.prototype.add = function (client, data, state) {
-//	  if (!this.clients[client]) {
-//	    this.clients[client] = {};
-//	  }
-//	  
-//	  var state = state || this.game.gameState.toString();
-//	  
-//	  if (!this.clients[client][state]) {
-//		  this.clients[client][state] = {};
-//	  }
-//	  
-//	  for (var i in data) {
-//		  if (data.hasOwnProperty(i)) {
-//			  this.clients[client][state][i] = data[i];
-//			  //console.log('Added ' +  i + ' ' + data[i]);
-//		  }
-//	  }
-//	  
-//	  return true;
-//	};
 	
 
-	
-	/** 
-	 *  Reverse the memory: instead of the history of a player for all rounds,
-	 *  we get the history of a round of all players
-	 */
-//	GameStorage.prototype.reverse = function () {
-//		var reverse = {};
-//		
-//		for( var c in this.clients) {
-//			if (this.clients.hasOwnProperty(c)) {
-//				for (var s in this.clients[c]) {
-//					if (this.clients[c].hasOwnProperty(s)) {
-//						
-//						if (!reverse[s]) {
-//							reverse[s] = {};
-//						}
-//						
-//						if (!reverse[s][c]) {
-//							reverse[s][c] = {};
-//						}
-//						
-//						var data = this.clients[c][s];
-//						
-//						for (var i in data) {
-//						  if (data.hasOwnProperty(i)) {
-//							  reverse[s][c][i] = data[i]; 
-//							  console.log('Reversed ' +  i + ' ' + data[i]);
-//						  }
-//						}
-//					}
-//			    }
-//			}
-//		}
-//		
-//		return reverse;
-//	};
-		
-//	GameStorage.prototype.dump = function (reverse) {
-//		
-//		return (reverse) ? this.reverse() : this.clients;
-//	};
-
-	
-//	GameStorage.prototype.getValues = function (reverse) {
-//		
-//		var values = [];
-//		
-//		var dump = this.dump(reverse);
-//		for (var i in dump) {
-//			if (dump.hasOwnProperty(i)) {
-//				var line = this.getLine(i, dump);
-//				//console.log(line);
-//				for (var j in line) {
-//					values.push(line[j]);
-//				}
-//			}
-//		}
-//		return values;
-//	};
-	
-	/**
-	 * Returns an array of arrays. Each row is unique combination of:
-	 * 
-	 * A) state, client, key1, key2, value
-	 * 
-	 * or 
-	 * 
-	 * B) state, client, key1, value
-	 * 
-	 * Since getLine returns the same array of array, the task is here to merge
-	 * all together.
-	 * 
-	 */
-//	GameStorage.prototype.getValues = function (reverse) {
-//	
-//		var values = [];
-//		
-//		var dump = this.dump(reverse);
-//		for (var i in dump) {
-//			if (dump.hasOwnProperty(i)) {
-//				var line = this.getLine(i, dump);
-//				for (var j in line) {
-//
-//					// We can have one or two nested arrays
-//					// We need to open the first array to know it
-//					for (var x in line[j]) {
-//						if ('object' === typeof line[j][x]) {
-//							values.push(line[j][x]);
-//						}
-//						else {
-//							values.push(line[j]);
-//							break; // do not add line[j] multiple times
-//						}
-//						
-//					}
-//					
-//				}	
-//			}
-//		}
-//		return values;
-//	};
-	
-//	GameStorage.prototype.getValues = function (reverse) {
-//		
-//		var values = [];
-//		
-//		var dump = this.dump(reverse);
-//		for (var i in dump) {
-//			if (dump.hasOwnProperty(i)) {
-//				var line = this.getLine(i, dump);
-//				for (var j in line) {
-//
-//					// We can have one or two nested arrays
-//					// We need to open the first array to know it
-//					for (var x in line[j]) {
-//						if ('object' === typeof line[j][x]) {
-//							values.push(line[j][x]);
-//						}
-//						else {
-//							values.push(line[j]);
-//							break; // do not add line[j] multiple times
-//						}
-//						
-//					}
-//					
-//				}	
-//			}
-//		}
-//		return values;
-//	};
-//	
-//	GameStorage.prototype.getLine = function (id, storage) {
-//		var storage = storage || this.clients;
-//		if (!storage[id]) return;
-//		
-//		var lines = [];
-//		// Clients or States
-//		for (var i in storage[id]) {
-//			if (storage[id].hasOwnProperty(i)) {
-//				var line = [];
-//				
-//				// Variables
-//				for (var j in storage[id][i]) {
-//					if (storage[id][i].hasOwnProperty(j)) {
-//						
-//						// Every row contains: client,variable and key1
-//						// It could be that we have a nested array, and for this
-//						// we need to check whether to a value or a pair key2,value
-//						var inner_line = [id,i,j];
-//						
-//						// Is it a nested {} ?
-//						if ('object' === typeof storage[id][i][j]) { 
-//							for (var x in storage[id][i][j]) {
-//								
-//								if (storage[id][i][j].hasOwnProperty(x)) {
-//									inner_line.push(x);
-//									inner_line.push(storage[id][i][j][x]);
-//									line.push(inner_line);
-//									inner_line = [id,i,j]; // reset
-//								}
-//							}
-//						}
-//						else {
-//							inner_line.push(storage[id][i][j]);
-//							line.push(inner_line);
-//							inner_line = [id,i,j]; // reset
-//						}
-//					}
-//				}
-//				lines.push(line);
-//			}
-//		}
-//		//console.log(lines);
-//		return lines;	
-//	};
-	
-//	/**
-//	 * Retrieves specific information of combinations of the keys @client,
-//	 * @state, and @id
-//	 * 
-//	 */
-//	GameStorage.prototype.get = function (client, state, id) {
-//		
-//		var storage = this.clients;
-//		
-//		if (client) {
-//			storage = this.getClient(client, storage);
-//		}
-//		
-//		if (state) {
-//			storage = this.getState(state, storage);
-//		}
-//		
-//		if (id) {
-//			storage = this.getId(id, storage);
-//		}
-//		
-//		return storage;
-//	};
-	
-//	/**
-//	 * Retrieves specific information of combinations of the keys @client,
-//	 * @state, and @id
-//	 * 
-//	 */
-//	GameStorage.prototype.get = function (player, state, key, storage) {
-//		var gb = new GameBit({player: player, state: state, key: key});
-//		
-//		var storage = storage || this.clients;
-//		var out = [];
-//		for (var i = 0; i < storage.length; i++) {
-//			if (GameBit.compare(gb, storage[i])) {
-//				out.push(storage[i]);
-//		};
-//		
-//		return out;
-//	};
-//	
-//	/** 
-//	 * Retrives all the information associated to client @client.
-//	 * Notice that, in fact, this method returns all the information 
-//	 * associated with key @client at the /first/ level of the @storage obj.
-//	 * 
-//	 */
-////	GameStorage.prototype.getClient = function (client, storage) {
-////		if (!client) return;
-////		var storage = storage || this.clients;
-////		return ('undefined' !== typeof storage[client]) ? storage[client] : false;
-////	};
-//	GameStorage.prototype.getClient = function (client, storage) {
-//		if (!client) return;
-//		var storage = storage || this.clients;
-//		for ()
-//		return ('undefined' !== typeof storage[client]) ? storage[client] : false;
-//	};
-//	
-//	/** 
-//	 * Retrives all the information associated to state @state.
-//	 * Notice that, in fact, this method returns all the information 
-//	 * associated with key @state at the /second/ level of the @storage obj.
-//	 * 
-//	 */
-//	GameStorage.prototype.getState = function (state, storage) {
-//		if (!state) return;
-//		var storage = storage || this.clients;
-//		var out = [];
-//		
-//		// Loop along all the clients
-//		for (var c in storage) {
-//			if (storage.hasOwnProperty(c)) {
-//	
-//				if ('undefined' !== typeof storage[c][state]) {
-//					out.push(storage[c][state]);
-//					console.log('S ' + storage[c][state]);
-//				}
-//			}
-//		}
-//		
-//		return (out.length !== 0) ? out : false;
-//	};
-//	
-//	/** 
-//	 * Retrives all the information associated to state @id.
-//	 * Notice that, in fact, this method returns all the information 
-//	 * associated with key @id at the /third/ level of the @storage obj.
-//	 * 
-//	 */
-//	GameStorage.prototype.getId = function (id, storage) {
-//		if (!id) return;
-//		var storage = storage || this.clients;
-//		var out = [];
-//		
-//		// Loop along all the clients
-//		for (var c in storage) {
-//			if (storage.hasOwnProperty(c)) {
-//				// Loop along all states
-//				for (var s in storage.c) {
-//					if (storage.c.hasOwnProperty(s)) {	
-//						
-//						if ('undefined' !== typeof storage[c][s][id]) {
-//							out.push(storage[c][s][id]);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		return (out.length !== 0) ? out : false;
-//	};
 	
 	/**
 	 * GameBit
@@ -2116,7 +1871,45 @@
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
-); 
+);
+
+// @TODO check this comments
+
+/**
+ * Write data into the memory of a client.
+ * It overwrites data with the same key.
+ * @data can be an object, or an object containing other objects,
+ * but these cannot contain other objects in turn.
+ * 
+ * @param {String} client
+ * @param {Object} data
+ * @param {String} state
+ * 
+ * @api public
+ */
+
+
+/** 
+ *  Reverse the memory: instead of the history of a player for all rounds,
+ *  we get the history of a round of all players
+ */
+
+
+/**
+ * Returns an array of arrays. Each row is unique combination of:
+ * 
+ * A) state, client, key1, key2, value
+ * 
+ * or 
+ * 
+ * B) state, client, key1, value
+ * 
+ * Since getLine returns the same array of array, the task is here to merge
+ * all together.
+ * 
+ */
+
+ 
  
 (function (exports, node) {
 	
@@ -2792,7 +2585,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 18:32:57 CET 2011
+ * Built on Di 22. Nov 18:26:55 CET 2011
  *
  */
  
@@ -3584,7 +3377,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 17. Nov 18:32:57 CET 2011
+ * Built on Di 22. Nov 18:26:56 CET 2011
  *
  */
  
@@ -3627,6 +3420,11 @@
 		this.features = options.features;
 	};
 	
+	ChernoffFaces.prototype.init = function(options) {
+		
+		
+	};
+	
 	ChernoffFaces.prototype.append = function (root, ids) {
 		
 		var PREF = this.id + '_';
@@ -3647,16 +3445,24 @@
 		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
 		
 		var fp = new FacePainter(canvas);
-		var fv = new FaceVector();
+		var fv = new FaceVector(this.features);
 		
 		fp.draw(fv);
 		
 		var button = node.window.addButton(fieldset,idButton);
-										
+			
+		node.log('Default');
+		node.log(FaceVector.defaults);
+		node.log('Feat');
+		node.log(this.features);
+		node.log('Merging');
+		var a = Utils.mergeOnValue(FaceVector.defaults, this.features);
+		node.log(a);
+		
 		// Add Gadget
 		var sc_options = {
 							id: 'cf_controls',
-							features: this.features || FaceVector.defaults
+							features: Utils.mergeOnValue(FaceVector.defaults, this.features)
 		};
 		
 		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
@@ -3666,9 +3472,9 @@
 	
 		button.onclick = function() {		
 			var fv = that.sc.getAllValues();
-			console.log(fv);
+			//console.log(fv);
 			var fv = new FaceVector(fv);
-			console.log(fv);
+			//console.log(fv);
 			fp.redraw(fv);
 		};
 		
@@ -3711,7 +3517,7 @@
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
 		
-		console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
+		//console.log('Face Scale ' + face.scaleY + ' ' + face.scaleX );
 		
 		var x = x || this.canvas.centerX;
 		var y = y || this.canvas.centerY;
@@ -3926,170 +3732,7 @@
 	* describe a Chernoff face.  
 	*
 	*/
-	
-	//FaceVector.defaults = {
-	//		// Head
-	//		head_radius: {
-	//			// id can be specified otherwise is taken head_radius
-	//			min: 10,
-	//			max: 100,
-	//			step: 0.01,
-	//			value: 30,
-	//			label: 'Face radius'
-	//		},
-	//		head_scale_x: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.1,
-	//			value: 0.5,
-	//			label: 'Scale head horizontally'
-	//		},
-	//		head_scale_y: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.1,
-	//			value: 1,
-	//			label: 'Scale head vertically'
-	//		},
-	//		// Eye
-	//		eye_height: {
-	//			min: 0.1,
-	//			max: 0.9,
-	//			step: 0.1,
-	//			value: 0.4,
-	//			label: 'Eye height'
-	//		},
-	//		eye_radius: {
-	//			min: 2,
-	//			max: 30,
-	//			step: 1,
-	//			value: 5,
-	//			label: 'Eye radius'
-	//		},
-	//		eye_spacing: {
-	//			min: 0,
-	//			max: 50,
-	//			step: 2,
-	//			value: 10,
-	//			label: 'Eye spacing'
-	//		},
-	//		eye_scale_x: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.2,
-	//			value: 1,
-	//			label: 'Scale eyes horizontally'
-	//		},
-	//		eye_scale_y: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.2,
-	//			value: 1,
-	//			label: 'Scale eyes vertically'
-	//		},
-	//		// Pupil
-	//		pupil_radius: {
-	//			min: 1,
-	//			max: 9,
-	//			step: 1,
-	//			value: 1,  //this.eye_radius;
-	//			label: 'Pupil radius'
-	//		},
-	//		pupil_scale_x: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.2,
-	//			value: 1,
-	//			label: 'Scale pupils horizontally'
-	//		},
-	//		pupil_scale_y: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.2,
-	//			value: 1,
-	//			label: 'Scale pupils vertically'
-	//		},
-	//		// Eyebrow
-	//		eyebrow_length: {
-	//			min: 1,
-	//			max: 30,
-	//			step: 1,
-	//			value: 10,
-	//			label: 'Eyebrow length'
-	//		},
-	//		eyebrow_eyedistance: {
-	//			min: 0.3,
-	//			max: 10,
-	//			step: 0.2,
-	//			value: 3, // From the top of the eye
-	//			label: 'Eyebrow from eye'
-	//		},
-	//		eyebrow_angle: {
-	//			min: -2,
-	//			max: 2,
-	//			step: 0.2,
-	//			value: -0.5,
-	//			label: 'Eyebrow angle'
-	//		},
-	//		eyebrow_spacing: {
-	//			min: 0,
-	//			max: 20,
-	//			step: 1,
-	//			value: 5,
-	//			label: 'Eyebrow spacing'
-	//		},
-	//		// Nose
-	//		nose_height: {
-	//			min: 0.4,
-	//			max: 1,
-	//			step: 0.1,
-	//			value: 0.4,
-	//			label: 'Nose height'
-	//		},
-	//		nose_length: {
-	//			min: 0.2,
-	//			max: 30,
-	//			step: 0.2,
-	//			value: 15,
-	//			label: 'Nose length'
-	//		},
-	//		nose_width: {
-	//			min: 0,
-	//			max: 30,
-	//			step: 2,
-	//			value: 10,
-	//			label: 'Nose width'
-	//		},
-	//		// Mouth
-	//		mouth_height: {
-	//			min: 0.2,
-	//			max: 2,
-	//			step: 0.1,
-	//			value: 0.75, 
-	//			label: 'Mouth height'
-	//		},
-	//		mouth_width: {
-	//			min: 2,
-	//			max: 100,
-	//			step: 2,
-	//			value: 20,
-	//			label: 'Mouth width'
-	//		},
-	//		mouth_top_y: {
-	//			min: -10,
-	//			max: 30,
-	//			step: 0.5,
-	//			value: -2,
-	//			label: 'Upper lip'
-	//		},
-	//		mouth_bottom_y: {
-	//			min: -10,
-	//			max: 30,
-	//			step: 0.5,
-	//			value: 20,
-	//			label: 'Lower lip'
-	//		}					
-	//};
+
 	
 	FaceVector.defaults = {
 			// Head
@@ -4283,6 +3926,7 @@
 		
 			
 	};
+
 	
 	//Constructs a random face vector.
 	FaceVector.prototype.shuffle = function () {
@@ -4326,7 +3970,7 @@
 		return out;
 	};
 
-})(node.window.widgets); 
+})('object' === typeof module ? module.exports : node.window.widgets); 
  
  
  
@@ -4368,8 +4012,7 @@
 		if (this.options.fieldset) {
 			this.list = new node.window.List();
 		}
-		else {
-			
+		else {		
 			this.list = new node.window.List(this.id);
 		}
 		this.listRoot = this.list.getRoot();
@@ -4463,6 +4106,7 @@
 		
 		return out;
 	};
+	
 	
 	// Sub-classes
 	
