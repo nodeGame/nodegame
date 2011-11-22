@@ -218,6 +218,9 @@
 	    callback(values(indices, array));
 	}
 	
+	/**
+	 * Creates a perfect copy of the obj
+	 */
 	Utils.clone = function (obj) {
 		var clone = {};
 		for (var i in obj) {
@@ -231,11 +234,15 @@
 		return clone;
 	};
 	
+	/**
+	 * Performs a left join on the keys of two objects. In case keys overlaps
+	 *  the values from obj2 are taken.
+	 */
 	Utils.join = function (obj1, obj2) {
 		var clone = Utils.clone(obj1);
 		for (var i in clone) {
 			if (clone.hasOwnProperty(i)) {
-				if ('undefined' !== obj2[i]) {
+				if ('undefined' !== typeof obj2[i]) {
 					clone[i] = obj2[i];
 				}
 			}
@@ -243,6 +250,10 @@
 		return clone;
 	};
 	
+	/**
+	 * Merges two objects in one. In case keys overlaps the values from 
+	 * obj2 are taken.
+	 */
 	Utils.merge = function (obj1, obj2) {
 		var clone = Utils.clone(obj1);
 		for (var i in obj2) {
