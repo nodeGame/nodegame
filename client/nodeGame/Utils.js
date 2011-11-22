@@ -240,10 +240,16 @@
 	 */
 	Utils.join = function (obj1, obj2) {
 		var clone = Utils.clone(obj1);
+		if (!obj2) return clone;
 		for (var i in clone) {
 			if (clone.hasOwnProperty(i)) {
 				if ('undefined' !== typeof obj2[i]) {
-					clone[i] = obj2[i];
+					if ( 'object' === typeof obj2[i] ) {
+						clone[i] = Utils.join(clone[i], obj2[i]);
+					}
+					else {
+						clone[i] = obj2[i];
+					}
 				}
 			}
 		}
@@ -256,9 +262,15 @@
 	 */
 	Utils.merge = function (obj1, obj2) {
 		var clone = Utils.clone(obj1);
+		if (!obj2) return clone;
 		for (var i in obj2) {
 			if (obj2.hasOwnProperty(i)) {
-				clone[i] = obj2[i];
+				if ( 'object' === typeof obj2[i] ) {
+					clone[i] = Utils.merge(obj1[i],obj2[i]);
+				}
+				else {
+					clone[i] = obj2[i];
+				}
 			}
 		}
 		return clone;
