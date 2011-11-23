@@ -8,6 +8,40 @@
 	
 	function Utils(){};
 	
+	// Add the filter method to Array objects in case the method is not
+	// supported natively. 
+	// See https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter#Compatibility
+	
+    if (!Array.prototype.filter)  
+    {  
+      Array.prototype.filter = function(fun /*, thisp */)  
+      {  
+        "use strict";  
+      
+        if (this === void 0 || this === null)  
+          throw new TypeError();  
+      
+        var t = Object(this);  
+        var len = t.length >>> 0;  
+        if (typeof fun !== "function")  
+          throw new TypeError();  
+      
+        var res = [];  
+        var thisp = arguments[1];  
+        for (var i = 0; i < len; i++)  
+        {  
+          if (i in t)  
+          {  
+            var val = t[i]; // in case fun mutates this  
+            if (fun.call(thisp, val, i, t))  
+              res.push(val);  
+          }  
+        }  
+      
+        return res;  
+      };  
+    }  
+	
 	Utils.getDate = function() {
 		var d = new Date();
 		var date = d.getUTCDate() + '-' + (d.getUTCMonth()+1) + '-' + d.getUTCFullYear() + ' ' 
@@ -151,23 +185,90 @@
 	};
 	
 	/**
-	 * Match each element of the array with N random others
-	 * 
+	 * Match each element of the array with N random others.
+	 * If strict is equal to true, elements cannot be matched multiple times.
 	 */
-	Utils.matchN = function (array, N) {
+	Utils.matchN = function (array, N, strict) {
 		var result = []
 		var len = array.length;
+		var found = [];
 		for (var i = 0 ; i < len ; i++) {
+			// Recreate the array
 			var copy = array.slice(0);
 			copy.splice(i,1);
+			if (strict) {
+				copy = Utils.arrayDiff(copy,found);
+			}
 			var group = Utils.getNRandom(copy,N);
+			// Add to the set of used elements
+			found = found.concat(group);
+			// Re-add the current element
 			group.splice(0,0,array[i]);
+			result.push(group);
 			
 			//Update
-			result.push(group);
 			group = [];
+			
 		}
 		return result;
+	};
+	
+	Utils.arraySelfConcat = function(array) {
+		var i = 0;
+		var len = array.length;
+		var result = []
+		for (;i<len;i++) {
+			result = result.concat(array[i]);
+		}
+		return result;
+	};
+	
+//	Utils.matchN = function (array, N, strict) {
+//		var result = []
+//		var len = array.length;
+//		var copy = array.slice(0);
+//		for (var i = 0 ; i < len ; i++) {
+//			
+//			// Remove the current element from copy if still present
+//			var idx = copy.indexOf(array[i]);
+//			if (idx > 0) {
+//				copy.splice(idx,1);
+//			}
+//			console.log(idx);
+//			console.log(copy);
+//			
+//			// Find N random elem
+//			var group = Utils.getNRandom(copy,N);
+//			
+//			// Update copy
+//			if (strict) {
+//				copy = Utils.arrayDiff(copy,group);
+//			}
+//			else {
+//				copy = array.slice(0);
+//			}
+//			
+//			// Update results
+//			if (idx > 0) {
+//				group.splice(idx,0,array[i]);
+//			}
+//			// Push
+//			result.push(group);
+//			group = [];
+//			
+//		}
+//		return result;
+//	};
+	
+	/**
+	 * Performs a diff between two arrays. 
+	 * Returns all the values of the first array which are not present 
+	 * in the second one.
+	 */
+	Utils.arrayDiff = function(a1, a2) {
+		return a1.filter( function(i) {
+			return !(a2.indexOf(i) > -1);
+		});
 	};
 	
 	/**
@@ -178,11 +279,11 @@
 		var copy = array.slice(0);
 		var len = array.length-1; // ! -1
 		for (var i = len; i > 0; i--) {
-			var j = Math.floor(Math.random(0,1)*i);
+			var j = Math.floor(Math.random()*(i+1));
 			var tmp = copy[j];
 			copy[j] = copy[i];
 			copy[i] = tmp;
-			console.log(copy);
+			//console.log(copy);
 		}
 		return copy;
 	};
