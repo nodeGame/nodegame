@@ -139,22 +139,16 @@ function PeerReviewGame () {
 			
 			node.onDATA('CF', function(msg) {
 				
-				console.log('AAAAAAAAAAAAAAAAA');
-				console.log(msg.data);
-				
 				var cf_options = { id: 'cf',
-						width: 300,
-						height: 300,
-						features: msg.data
+								   width: 300,
+								   height: 300,
+								   features: msg.data,
+								   controls: false
 				};
 	
 				that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
 			});
 			
-			node.on('in.say.DATA', function(msg) {
-				console.log('BBBBBBBBBB');
-				console.log(msg.data);
-			});
 			
 		});
 		

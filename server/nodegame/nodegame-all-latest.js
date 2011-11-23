@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 17:50:45 CET 2011
+ * Built on Mi 23. Nov 18:37:23 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 17:50:45 CET 2011
+ * Built on Mi 23. Nov 18:37:23 CET 2011
  *
  */
  
@@ -2686,7 +2686,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 17:50:45 CET 2011
+ * Built on Mi 23. Nov 18:37:23 CET 2011
  *
  */
  
@@ -3478,7 +3478,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 17:50:45 CET 2011
+ * Built on Mi 23. Nov 18:37:23 CET 2011
  *
  */
  
@@ -3521,6 +3521,8 @@
 		
 		this.features = options.features;
 		this.change = options.change || 'CF_CHANGE';
+		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
+		this.options = options;
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
@@ -3546,30 +3548,23 @@
 		var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
 		
 		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-		
 		this.fp = new FacePainter(canvas);		
 		this.fp.draw(new FaceVector(this.features));
 		
-		var button = node.window.addButton(fieldset,idButton);
-		
-		// Add Gadget
-		var sc_options = {
-							id: 'cf_controls',
-							features: Utils.mergeOnValue(FaceVector.defaults, this.features),
-							change: this.change
-		};
-		
-		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
-		
-		
-		var that = this;
-	
-		button.onclick = function() {		
-			var fv = that.sc.getAllValues();
-			var fv = new FaceVector(fv);
-			that.fp.redraw(fv);
-		};
-		
+		if (this.controls) {
+			
+			//var button = node.window.addButton(fieldset,idButton);
+			
+			var sc_options = {
+								id: 'cf_controls',
+								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+								change: this.change,
+								submit: 'Send'
+			};
+			
+			this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
+		}
+
 		return fieldset;
 		
 	};
@@ -4138,6 +4133,13 @@
 			}
 			
 			this.submit = node.window.addButton(root, idButton, this.options.submit);
+			
+			var that = this;
+			this.submit.onclick = function() {
+				if (that.options.change) {
+					node.emit(that.options.change);
+				}
+			};
 		}		
 		
 		return toReturn;

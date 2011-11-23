@@ -70,6 +70,13 @@
 			}
 			
 			this.submit = node.window.addButton(root, idButton, this.options.submit);
+			
+			var that = this;
+			this.submit.onclick = function() {
+				if (that.options.change) {
+					node.emit(that.options.change);
+				}
+			};
 		}		
 		
 		return toReturn;
