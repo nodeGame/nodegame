@@ -26,7 +26,8 @@
 		this.bar = null;
 		this.root = null;
 		
-		this.sc = null;
+		this.sc = null; // Slider Controls
+		this.fp = null; // Face Painter
 		
 		this.dims = {
 					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
@@ -34,6 +35,7 @@
 		};
 		
 		this.features = options.features;
+		this.change = options.change || 'CF_CHANGE';
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
@@ -60,25 +62,16 @@
 		
 		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
 		
-		var fp = new FacePainter(canvas);
-		var fv = new FaceVector(this.features);
-		
-		fp.draw(fv);
+		this.fp = new FacePainter(canvas);		
+		this.fp.draw(new FaceVector(this.features));
 		
 		var button = node.window.addButton(fieldset,idButton);
-			
-		node.log('Default');
-		node.log(FaceVector.defaults);
-		node.log('Feat');
-		node.log(this.features);
-		node.log('Merging');
-		var a = Utils.mergeOnValue(FaceVector.defaults, this.features);
-		node.log(a);
 		
 		// Add Gadget
 		var sc_options = {
 							id: 'cf_controls',
-							features: Utils.mergeOnValue(FaceVector.defaults, this.features)
+							features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+							change: this.change
 		};
 		
 		this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
@@ -88,10 +81,8 @@
 	
 		button.onclick = function() {		
 			var fv = that.sc.getAllValues();
-			//console.log(fv);
 			var fv = new FaceVector(fv);
-			//console.log(fv);
-			fp.redraw(fv);
+			that.fp.redraw(fv);
 		};
 		
 		return fieldset;
@@ -100,11 +91,11 @@
 	
 	ChernoffFaces.prototype.listeners = function () {
 		var that = this;
-	//	
-	//	node.on( 'input', function(msg) {
-	//			var fv = new FaceVector(sc.getAllValues());
-	//			fp.redraw(fv);
-	//		}); 
+		
+		node.on( that.change, function(msg) {
+				var fv = new FaceVector(that.sc.getAllValues());
+				that.fp.redraw(fv);
+			}); 
 	};
 	
 	

@@ -77,6 +77,7 @@
 	
 	
 	Controls.prototype.populate = function () {
+		var that = this;
 		
 		for (var key in this.features) {
 			if (this.features.hasOwnProperty(key)) {
@@ -90,8 +91,16 @@
 				
 				var item = this.list.createItem();
 				this.listRoot.appendChild(item);
-								
+					
+				// Add a different element according to the subclass instantiated
 				var elem = this.add(item, id, attributes);
+				
+				// Fire the onChange event, if one defined
+				if (this.options.change) {
+					elem.onchange = function() {
+						node.emit(that.options.change);
+					};
+				}
 				
 				// If a label element is present it checks whether it is an
 				// object literal or a string.
