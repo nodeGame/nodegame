@@ -14,6 +14,8 @@ function PeerReviewGame () {
 		node.window.setup('PLAYER');
 		this.cf = null;
 		this.timer = null;
+		this.header = document.getElementById('gn_header');
+		this.vs = node.window.addWidget('VisualState', this.header);
 	};
 	
 	
@@ -58,7 +60,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: 1000
 			};
 			
 			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
@@ -108,7 +110,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 2000
+							milliseconds: 1000
 		};
 		
 		this.timer.restart(timerOptions);
@@ -124,45 +126,59 @@ function PeerReviewGame () {
 	
 	var evaluation = function() {
 		var that = this;
-		node.window.loadFrame('evaluation.html', function(){
+		var evas = {};
+		var evaAttr = {
+				min: 1,
+				max: 9,
+				step: 0.5,
+				value: 4.5,
+				label: 'Evaluation'
+		};
 		
-			// Add timer
-			var timerOptions = {
-								event: 'EVALUATION_DONE',
-								milliseconds: 2000
-			};
-			that.timer.restart(timerOptions);
+		node.window.loadFrame('evaluation.html', function(){
 		
 			var root = node.window.getElementById('root');
 			
-
+			// Add timer
+			var timerOptions = {
+								event: 'EVALUATION_DONE',
+								milliseconds: 10000
+			};			
+			var header = document.getElementById('gn_header');
+			that.timer = node.window.addWidget('VisualTimer', header, timerOptions);
 			
 			node.onDATA('CF', function(msg) {
 				console.log(msg);
 				var cf_options = { id: 'cf',
 								   width: 300,
 								   height: 300,
-								   features: msg.data,
+								   features: msg.data.face,
 								   controls: false
 				};
 	
-				that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+				node.window.addWidget('ChernoffFaces', root, cf_options);
 				
+				 
 				
-				
-				var evaId = 'eva_msg';
-				var evaAttr = {
-					min: 1,
-					max: 9,
-					step: 0.5,
-					value: 4.5,
-					label: 'Evaluation'
-				};
+				var evaId = 'eva_' + msg.data.from;
 				node.window.writeln(root);
-				node.window.addSlider(root, evaId, evaAttr);
+				
+				// Add the slider to the container
+				evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
 			});
 			
 			
+			node.on('EVALUATION_DONE', function(){
+				
+				for (var i in evas) {
+					if (evas.hasOwnProperty(i)) {	
+						node.set('EVA', {from: i,
+										 eva: evas[i].value
+						});
+					}
+				}
+				node.emit('DONE');
+			});
 		});
 		
 		console.log('Evaluation');

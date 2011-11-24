@@ -32,6 +32,7 @@
 		Document.call(this);
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
+		this.header = this.generateHeader();
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
@@ -131,8 +132,11 @@
 		// We assume that the BODY element always exists
 		// TODO: Check if body element does not exist and add it
 		var root = Math.floor(Math.random()*10000);
-		var rootEl = this.addElement('div', document.body, root);
-		return rootEl;
+		return rootEl = this.addElement('div', document.body, root);
+	};
+	
+	GameWindow.prototype.generateHeader = function () {
+		return headerEl = this.addElement('div', this.root, 'gn_header');
 	};
 	
 	GameWindow.prototype.setup = function (type){
@@ -242,7 +246,10 @@
 			return that.addFieldset(root, idFieldset, legend, options.attributes);
 		};
 		
+		// Init default values
 		var root = root || this.root;
+		var options = options || {};
+		
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
