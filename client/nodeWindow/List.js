@@ -8,14 +8,17 @@
 	
 	exports.List = List;
 	
-	function List(id) {
-		this.id = id || 'list';
+	function List (options) {
+		
+		this.id = options.id || 'list';
 		
 		this.FIRST_LEVEL = 'dl';
 		this.SECOND_LEVEL = 'dt';
 		this.THIRD_LEVEL = 'dd';
 	
-		this.root = this.createRoot(this.id);
+
+		
+		this.root = this.createRoot(this.id, options);
 		
 		this.list = [];
 	}
@@ -45,11 +48,17 @@
 		return this.root;
 	};
 	
-	List.prototype.createRoot = function(id) {
+	List.prototype.createRoot = function(id, options) {
 		var root = document.createElement(this.FIRST_LEVEL);
 		if (id) {
 			root.id = id;
 		}
+
+		if (options.attributes) {
+			
+			node.window.addAttributes2Elem(root, options.attributes);
+		}
+		
 		return root;
 	};
 	

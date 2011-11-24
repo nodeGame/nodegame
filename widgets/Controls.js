@@ -24,7 +24,7 @@
 		this.fieldset = null;
 		this.submit = null;
 		
-		this.init(options.features);
+		this.init(options);
 	};
 
 	Controls.prototype.add = function (root, id, attributes) {
@@ -32,18 +32,20 @@
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
-	Controls.prototype.init = function (features) {
-		if (this.options.fieldset) {
-			this.list = new node.window.List();
-		}
-		else {		
-			this.list = new node.window.List(this.id);
-		}
+	Controls.prototype.init = function (options) {
+//		if (options.fieldset) {
+//			this.list = new node.window.List();
+//		}
+//		else {		
+//			this.list = new node.window.List(this.id);
+//		}
+		
+		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
-		if (!features) return;
+		if (!options.features) return;
 		
-		this.features = features;
+		this.features = options.features;
 		this.populate();
 	};
 	
@@ -51,14 +53,15 @@
 		this.root = root;
 		var toReturn = this.listRoot;
 		
-		if (this.options.fieldset) {
-			var idFieldset = this.options.fieldset.id || this.id;
-			var legend = this.options.fieldset.legend || 'Input';
-			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend);
-			// Updating root and return element
-			root = this.fieldset;
-			toReturn = this.fieldset;
-		}
+//		if (this.options.fieldset) {
+//			var idFieldset = this.options.fieldset.id || this.id;
+//			var legend = this.options.fieldset.legend || 'Input';
+//			var attributes = this.options.fieldset.attributes || {}; 
+//			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend, attributes);
+//			// Updating root and return element
+//			root = this.fieldset;
+//			toReturn = this.fieldset;
+//		}
 		
 		root.appendChild(this.listRoot);
 		
@@ -68,8 +71,7 @@
 				var idButton = this.options.submit.id;
 				delete this.options.submit.id;
 			}
-			
-			this.submit = node.window.addButton(root, idButton, this.options.submit);
+			this.submit = node.window.addButton(root, idButton, this.options.submit, this.options.attributes);
 			
 			var that = this;
 			this.submit.onclick = function() {
@@ -112,18 +114,18 @@
 				// If a label element is present it checks whether it is an
 				// object literal or a string.
 				// In the former case it scans the obj for additional properties
-				if (attributes.label) {
-					var labelId = 'label_' + id;
-					var labelText = attributes.label;
-					
-					if (typeof(attributes.label) === 'object') {
-						var labelText = attributes.label.text;
-						if (attributes.label.id) {
-							labelId = attributes.label.id; 
-						}
-					}	
-					node.window.addLabel(elem, labelId, labelText, id);
-				}
+//				if (attributes.label) {
+//					var labelId = 'label_' + id;
+//					var labelText = attributes.label;
+//					
+//					if (typeof(attributes.label) === 'object') {
+//						var labelText = attributes.label.text;
+//						if (attributes.label.id) {
+//							labelId = attributes.label.id; 
+//						}
+//					}	
+//					node.window.addLabel(elem, labelId, labelText, id);
+//				}
 			}
 		}
 	};

@@ -232,8 +232,15 @@
 	// Gadget
 	
 	GameWindow.prototype.addWidget = function (g, root, options) {
-		
+		var that = this;
 		//console.log(this.widgets);
+		
+		function appendFieldset(root, options, g) {
+			if (!options) return root;
+			var idFieldset = options.id || g.id + '_fieldset';
+			var legend = options.legend || g.legend;
+			return that.addFieldset(root, idFieldset, legend, options.attributes);
+		};
 		
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
@@ -253,6 +260,9 @@
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
+			// options exists and options.fieldset exist
+			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root,fieldsetOptions);
 			g.append(root);
 			g.listeners();
 		}

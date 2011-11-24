@@ -55,13 +55,13 @@
 		root.appendChild(canvas);
 		return canvas;
 	};
-	
+		
 	Document.prototype.addSlider = function (root, id, attributes) {
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		this.addAttributes2Elem(slider, attributes);
 		root.appendChild(slider);
+		this.addAttributes2Elem(slider, attributes);
 		return slider;
 	};
 	
@@ -70,8 +70,8 @@
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		this.addAttributes2Elem(radio, attributes);
 		root.appendChild(radio);
+		this.addAttributes2Elem(radio, attributes);
 		return radio;
 	};
 	
@@ -93,6 +93,7 @@
 		
 //		var root = node.window.getElementById(forElem);
 		root.parentNode.insertBefore(label,root);
+		
 		return label;
 		
 //		// Add the label immediately before if no root elem has been provided
@@ -123,14 +124,15 @@
 	};
 	
 	Document.prototype.write = function (root, text) {
+		var text = (text) ? text : '';
 		var tn = document.createTextNode(text);
 		root.appendChild(tn);
 		return tn;
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {
-		var RC = rc || '<br />';
-		return this.write(root, text+RC);
+		var br = this.addBreak(root,rc);
+		return (text) ? this.write(root, text) : br;
 	};
 	
 	// IFRAME
@@ -143,9 +145,11 @@
 	
 	// BR
 	
-	Document.prototype.addBr = function (root) {
-		var br = document.createElement('br');
-		return this.insertAfter(br,root);
+	Document.prototype.addBreak = function (root,rc) {
+		var RC = rc || 'br';
+		var br = document.createElement(RC);
+		return root.appendChild(br);
+		//return this.insertAfter(br,root);
 	};
 	
 	// CSS
@@ -233,7 +237,25 @@
 		
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
-				e.setAttribute(key,a[key]);
+				if (key !== 'label') {
+					e.setAttribute(key,a[key]);
+				}
+				else {
+					// If a label element is present it checks whether it is an
+					// object literal or a string.
+					// In the former case it scans the obj for additional properties
+					
+					var labelId = 'label_' + e.id;
+					var labelText = a.label;
+					
+					if (typeof(a[key]) === 'object') {
+						var labelText = a.text;
+						if (a.id) {
+							labelId = a.id; 
+						}
+					}	
+					this.addLabel(e, labelId, labelText, e.id);
+				}
 			}
 		}
 		return e;

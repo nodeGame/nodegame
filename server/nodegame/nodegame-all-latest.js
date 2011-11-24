@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 18:37:23 CET 2011
+ * Built on Do 24. Nov 12:37:42 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 18:37:23 CET 2011
+ * Built on Do 24. Nov 12:37:42 CET 2011
  *
  */
  
@@ -2686,7 +2686,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 18:37:23 CET 2011
+ * Built on Do 24. Nov 12:37:42 CET 2011
  *
  */
  
@@ -2748,13 +2748,13 @@
 		root.appendChild(canvas);
 		return canvas;
 	};
-	
+		
 	Document.prototype.addSlider = function (root, id, attributes) {
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		this.addAttributes2Elem(slider, attributes);
 		root.appendChild(slider);
+		this.addAttributes2Elem(slider, attributes);
 		return slider;
 	};
 	
@@ -2763,8 +2763,8 @@
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		this.addAttributes2Elem(radio, attributes);
 		root.appendChild(radio);
+		this.addAttributes2Elem(radio, attributes);
 		return radio;
 	};
 	
@@ -2784,8 +2784,12 @@
 		label.setAttribute('for', forElem);
 		this.addAttributes2Elem(label, attributes);
 		
+		console.log('RRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOT>');
+		console.log(root);
+		
 //		var root = node.window.getElementById(forElem);
 		root.parentNode.insertBefore(label,root);
+		
 		return label;
 		
 //		// Add the label immediately before if no root elem has been provided
@@ -2816,14 +2820,15 @@
 	};
 	
 	Document.prototype.write = function (root, text) {
+		var text = (text) ? text : '';
 		var tn = document.createTextNode(text);
 		root.appendChild(tn);
 		return tn;
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {
-		var RC = rc || '<br />';
-		return this.write(root, text+RC);
+		var br = this.addBreak(root,rc);
+		return (text) ? this.write(root, text) : br;
 	};
 	
 	// IFRAME
@@ -2836,9 +2841,11 @@
 	
 	// BR
 	
-	Document.prototype.addBr = function (root) {
-		var br = document.createElement('br');
-		return this.insertAfter(br,root);
+	Document.prototype.addBreak = function (root,rc) {
+		var RC = rc || 'br';
+		var br = document.createElement(RC);
+		return root.appendChild(br);
+		//return this.insertAfter(br,root);
 	};
 	
 	// CSS
@@ -2926,7 +2933,25 @@
 		
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
-				e.setAttribute(key,a[key]);
+				if (key !== 'label') {
+					e.setAttribute(key,a[key]);
+				}
+				else {
+					// If a label element is present it checks whether it is an
+					// object literal or a string.
+					// In the former case it scans the obj for additional properties
+					
+					var labelId = 'label_' + e.id;
+					var labelText = a.label;
+					
+					if (typeof(a[key]) === 'object') {
+						var labelText = a.text;
+						if (a.id) {
+							labelId = a.id; 
+						}
+					}	
+					this.addLabel(e, labelId, labelText, e.id);
+				}
 			}
 		}
 		return e;
@@ -3186,8 +3211,15 @@
 	// Gadget
 	
 	GameWindow.prototype.addWidget = function (g, root, options) {
-		
+		var that = this;
 		//console.log(this.widgets);
+		
+		function appendFieldset(root, options, g) {
+			if (!options) return root;
+			var idFieldset = options.id || g.id + '_fieldset';
+			var legend = options.legend || g.legend;
+			return that.addFieldset(root, idFieldset, legend, options.attributes);
+		};
 		
 		var root = root || this.root;
 		// Check if it is a object (new gadget)
@@ -3207,6 +3239,9 @@
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
+			// options exists and options.fieldset exist
+			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root,fieldsetOptions);
 			g.append(root);
 			g.listeners();
 		}
@@ -3412,14 +3447,17 @@
 	
 	exports.List = List;
 	
-	function List(id) {
-		this.id = id || 'list';
+	function List (options) {
+		
+		this.id = options.id || 'list';
 		
 		this.FIRST_LEVEL = 'dl';
 		this.SECOND_LEVEL = 'dt';
 		this.THIRD_LEVEL = 'dd';
 	
-		this.root = this.createRoot(this.id);
+
+		
+		this.root = this.createRoot(this.id, options);
 		
 		this.list = [];
 	}
@@ -3449,11 +3487,17 @@
 		return this.root;
 	};
 	
-	List.prototype.createRoot = function(id) {
+	List.prototype.createRoot = function(id, options) {
 		var root = document.createElement(this.FIRST_LEVEL);
 		if (id) {
 			root.id = id;
 		}
+
+		if (options.attributes) {
+			
+			node.window.addAttributes2Elem(root, options.attributes);
+		}
+		
 		return root;
 	};
 	
@@ -3478,7 +3522,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 23. Nov 18:37:23 CET 2011
+ * Built on Do 24. Nov 12:37:42 CET 2011
  *
  */
  
@@ -3508,6 +3552,8 @@
 		this.name = 'Chernoff Faces';
 		this.version = '0.1';
 		
+		//this.fieldset = { id: this.id, legend: this.name};
+		
 		this.bar = null;
 		this.root = null;
 		
@@ -3525,6 +3571,10 @@
 		this.options = options;
 	};
 	
+	ChernoffFaces.prototype.getRoot = function() {
+		return this.root;
+	};
+	
 	ChernoffFaces.prototype.init = function(options) {
 		
 		
@@ -3539,33 +3589,39 @@
 		var idButton = PREF + 'button';
 	
 		
+		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+		
 		if (ids !== null && ids !== undefined) {
 			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
 			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
 			if (ids.hasOwnProperty('button')) idButton = ids.button;
 		}
 		
-		var fieldset = node.window.addFieldset(root, idFieldset, 'Chernoff Box', {style: 'float:left'});
 		
 		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
 		this.fp = new FacePainter(canvas);		
 		this.fp.draw(new FaceVector(this.features));
 		
 		if (this.controls) {
-			
-			//var button = node.window.addButton(fieldset,idButton);
+			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
 			
 			var sc_options = {
 								id: 'cf_controls',
 								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
 								change: this.change,
+								fieldset: {id: idFieldset, 
+										   legend: 'Chernoff Box',
+										   attributes: {style: 'float:left'}
+								},
+								//attributes: {style: 'float:left'},
 								submit: 'Send'
 			};
 			
-			this.sc = node.window.addWidget('Controls.Slider',fieldset, sc_options);
+			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
 		}
 
-		return fieldset;
+		this.root = root;
+		return root;
 		
 	};
 	
@@ -4087,7 +4143,7 @@
 		this.fieldset = null;
 		this.submit = null;
 		
-		this.init(options.features);
+		this.init(options);
 	};
 
 	Controls.prototype.add = function (root, id, attributes) {
@@ -4095,18 +4151,20 @@
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
-	Controls.prototype.init = function (features) {
-		if (this.options.fieldset) {
-			this.list = new node.window.List();
-		}
-		else {		
-			this.list = new node.window.List(this.id);
-		}
+	Controls.prototype.init = function (options) {
+//		if (options.fieldset) {
+//			this.list = new node.window.List();
+//		}
+//		else {		
+//			this.list = new node.window.List(this.id);
+//		}
+		
+		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
-		if (!features) return;
+		if (!options.features) return;
 		
-		this.features = features;
+		this.features = options.features;
 		this.populate();
 	};
 	
@@ -4114,14 +4172,15 @@
 		this.root = root;
 		var toReturn = this.listRoot;
 		
-		if (this.options.fieldset) {
-			var idFieldset = this.options.fieldset.id || this.id;
-			var legend = this.options.fieldset.legend || 'Input';
-			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend);
-			// Updating root and return element
-			root = this.fieldset;
-			toReturn = this.fieldset;
-		}
+//		if (this.options.fieldset) {
+//			var idFieldset = this.options.fieldset.id || this.id;
+//			var legend = this.options.fieldset.legend || 'Input';
+//			var attributes = this.options.fieldset.attributes || {}; 
+//			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend, attributes);
+//			// Updating root and return element
+//			root = this.fieldset;
+//			toReturn = this.fieldset;
+//		}
 		
 		root.appendChild(this.listRoot);
 		
@@ -4131,8 +4190,7 @@
 				var idButton = this.options.submit.id;
 				delete this.options.submit.id;
 			}
-			
-			this.submit = node.window.addButton(root, idButton, this.options.submit);
+			this.submit = node.window.addButton(root, idButton, this.options.submit, this.options.attributes);
 			
 			var that = this;
 			this.submit.onclick = function() {
@@ -4175,18 +4233,18 @@
 				// If a label element is present it checks whether it is an
 				// object literal or a string.
 				// In the former case it scans the obj for additional properties
-				if (attributes.label) {
-					var labelId = 'label_' + id;
-					var labelText = attributes.label;
-					
-					if (typeof(attributes.label) === 'object') {
-						var labelText = attributes.label.text;
-						if (attributes.label.id) {
-							labelId = attributes.label.id; 
-						}
-					}	
-					node.window.addLabel(elem, labelId, labelText, id);
-				}
+//				if (attributes.label) {
+//					var labelId = 'label_' + id;
+//					var labelText = attributes.label;
+//					
+//					if (typeof(attributes.label) === 'object') {
+//						var labelText = attributes.label.text;
+//						if (attributes.label.id) {
+//							labelId = attributes.label.id; 
+//						}
+//					}	
+//					node.window.addLabel(elem, labelId, labelText, id);
+//				}
 			}
 		}
 	};

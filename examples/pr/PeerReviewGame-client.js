@@ -122,7 +122,7 @@ function PeerReviewGame () {
 		console.log('Submission');
 	};	
 	
-	var evaluation = function(){
+	var evaluation = function() {
 		var that = this;
 		node.window.loadFrame('evaluation.html', function(){
 		
@@ -138,7 +138,7 @@ function PeerReviewGame () {
 
 			
 			node.onDATA('CF', function(msg) {
-				
+				console.log(msg);
 				var cf_options = { id: 'cf',
 								   width: 300,
 								   height: 300,
@@ -147,6 +147,19 @@ function PeerReviewGame () {
 				};
 	
 				that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+				
+				
+				
+				var evaId = 'eva_msg';
+				var evaAttr = {
+					min: 1,
+					max: 9,
+					step: 0.5,
+					value: 4.5,
+					label: 'Evaluation'
+				};
+				node.window.writeln(root);
+				node.window.addSlider(root, evaId, evaAttr);
 			});
 			
 			
