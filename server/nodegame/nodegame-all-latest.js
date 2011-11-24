@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.1
+ * nodeGame-all v0.5.9.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 15:05:43 CET 2011
+ * Built on Do 24. Nov 16:24:33 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.1
+ * nodeGame Client v0.5.9.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 15:05:43 CET 2011
+ * Built on Do 24. Nov 16:24:33 CET 2011
  *
  */
  
@@ -1143,6 +1143,22 @@
 	
 	exports.GameLoop = GameLoop;
 	
+//	function GameLoop (loop) {
+//		this.loop = loop;
+//		
+//		this.limits = Array();
+//		
+//		for (var key in this.loop) {
+//			if (this.loop.hasOwnProperty(key)) {
+//				var round = loop[key].rounds || 1;
+//				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
+//			}
+//		}
+//		
+//		this.nStates = this.limits.length;
+//		
+//	}
+	
 	function GameLoop (loop) {
 		this.loop = loop;
 		
@@ -1150,13 +1166,26 @@
 		
 		for (var key in this.loop) {
 			if (this.loop.hasOwnProperty(key)) {
-				var round = loop[key].rounds || 1;
-				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
+				
+				// Transform the loop obj if necessary.
+				// When a state executes only one step,
+				// it is allowed to pass directly the name of the function.
+				// So such function must be incapsulated in a obj here.
+				var loop = this.loop[key]['state'];
+				if ('function' === typeof loop) {
+					var steps = 1;
+					this.loop[key]['state'] = {1: {state: loop}};
+				}
+				
+				var steps = Utils.getListSize(this.loop[key]['state'])
+				
+				
+				var round = this.loop[key].rounds || 1;
+				this.limits.push({rounds:round,steps:steps});
 			}
 		}
 		
 		this.nStates = this.limits.length;
-		
 	}
 	
 	
@@ -1167,7 +1196,7 @@
 			return false;
 		}
 		
-		if (typeof(this.loop[gameState.state]['loop'][gameState.step]) === 'undefined'){
+		if (typeof(this.loop[gameState.state]['state'][gameState.step]) === 'undefined'){
 			console.log('(E): Unexisting step: ' + gameState.step);
 			return false;
 		}
@@ -1286,7 +1315,7 @@
 	
 	GameLoop.prototype.getFunction = function(gameState) {
 		if (!this.exist(gameState)) return false;
-		return this.loop[gameState.state]['loop'][gameState.step];
+		return this.loop[gameState.state]['state'][gameState.step]['state'];
 	};
 
 })(
@@ -2269,7 +2298,6 @@
 			var func = this.gameLoop.getFunction(gameState);
 			
 			if (func) {
-			
 				gameState.is = GameState.iss.LOADING;
 				this.gameState = gameState;
 			
@@ -2681,12 +2709,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.1
+ * nodeWindow v0.5.9.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 15:05:43 CET 2011
+ * Built on Do 24. Nov 16:24:33 CET 2011
  *
  */
  
@@ -3521,12 +3549,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.1
+ * nodeGadgets v0.5.9.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 15:05:43 CET 2011
+ * Built on Do 24. Nov 16:24:33 CET 2011
  *
  */
  

@@ -208,38 +208,90 @@ function PeerReviewGame () {
 	};
 	
 	
-	// Assigning Functions to Loops
+//	// Assigning Functions to Loops
+//	
+//	var pregameloop = {
+//		1: pregame
+//	};
+//	
+//	var instructionsloop = {
+//		1: instructions
+//	};
+//	
+//	var gameloop = { // The different, subsequent phases in each round
+//		1: creation,
+//		2: submission,
+//		3: evaluation,
+//		4: dissemination
+//	};
+//	
+//	var postgameloop = {
+//		1: questionnaire
+//	};
+//	
+//	var endgameloop = {
+//		1: endgame
+//	};
+//	
+//	
+//	// LOOPS
+//	this.loops = {
+//			1: {loop:pregameloop},
+//			2: {loop:instructionsloop},
+//			3: {rounds:10, loop:gameloop},
+//			4: {loop:postgameloop},
+//			5: {loop:endgameloop}
+//		};	
 	
-	var pregameloop = {
-		1: pregame
-	};
 	
-	var instructionsloop = {
-		1: instructions
-	};
+// Assigning Functions to Loops
+	
 	
 	var gameloop = { // The different, subsequent phases in each round
-		1: creation,
-		2: submission,
-		3: evaluation,
-		4: dissemination
+		
+		1: {state: creation,
+			name: 'Creation'
+		},
+		
+		2: {state: submission,
+			name: 'Submission'
+		},
+		
+		3: {state: evaluation,
+			name: 'Evaluation'
+		},
+		
+		4: {state: dissemination,
+			name: 'Exhibition'
+		}
 	};
-	
-	var postgameloop = {
-		1: questionnaire
-	};
-	
-	var endgameloop = {
-		1: endgame
-	};
-	
+
+
 	
 	// LOOPS
 	this.loops = {
-			1: {loop:pregameloop},
-			2: {loop:instructionsloop},
-			3: {rounds:10, loop:gameloop},
-			4: {loop:postgameloop},
-			5: {loop:endgameloop}
-		};	
+			
+			
+			1: {state:	pregame,
+				name:	'Game will start soon'
+			},
+			
+			2: {state: 	instructions,
+				name: 	'Instructions'
+			},
+				
+			3: {rounds:	10, 
+				state: 	gameloop,
+				name: 	'Game'
+			},
+			
+			4: {state:	questionnaire,
+				name: 	'Questionnaire'
+			},
+				
+			5: {state:	endgame,
+				name: 	'Thank you'
+			}
+			
+	};	
 }

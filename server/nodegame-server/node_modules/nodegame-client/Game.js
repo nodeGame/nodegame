@@ -255,7 +255,6 @@
 			var func = this.gameLoop.getFunction(gameState);
 			
 			if (func) {
-			
 				gameState.is = GameState.iss.LOADING;
 				this.gameState = gameState;
 			
