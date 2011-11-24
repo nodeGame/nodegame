@@ -47,7 +47,9 @@
 				var loop = this.loop[key]['state'];
 				if ('function' === typeof loop) {
 					var steps = 1;
-					this.loop[key]['state'] = {1: {state: loop}};
+					this.loop[key]['state'] = {1: {state: loop,
+												   name: this.loop[key].name || key + '.1.1'
+												}};
 				}
 				
 				var steps = Utils.getListSize(this.loop[key]['state'])
@@ -184,6 +186,11 @@
 		}
 		
 		return false; // game init
+	};
+	
+	GameLoop.prototype.getName = function(gameState) {
+		if (!this.exist(gameState)) return false;
+		return this.loop[gameState.state]['state'][gameState.step]['name'];
 	};
 	
 	GameLoop.prototype.getFunction = function(gameState) {

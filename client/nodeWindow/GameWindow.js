@@ -269,7 +269,7 @@
 		try {
 			// options exists and options.fieldset exist
 			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root,fieldsetOptions);
+			root = appendFieldset(root,fieldsetOptions,g);
 			g.append(root);
 			g.listeners();
 		}

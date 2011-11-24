@@ -20,19 +20,14 @@
 		this.version = '0.1';
 		this.gameLoop = this.game.gameLoop;
 		
+		this.fieldset = {legend: 'State'};
+		
 		this.root = null;		// the parent element
 		
 		//this.init(options);
 	};
 	
-	VisualState.prototype.init = function (options) {
-		this.milliseconds = options.milliseconds || 10000;
-		this.timePassed = 0;
-		this.update = options.update || 1000;
-		this.text = options.text || 'Time to go';
-		this.event = options.event || 'TIMEUP'; // event to be fire		
-		// TODO: update and milliseconds must be multiple now
-	};
+	VisualState.prototype.init = function (options) {};
 	
 	VisualState.prototype.append = function (root, ids) {
 		var that = this;
@@ -43,7 +38,7 @@
 		
 
 		this.stateDiv = node.window.addDiv(root,idTimerDiv);
-		this.stateDiv.innerHTML = new GameState(this.game.gameState);
+		this.stateDiv.innerHTML = 'Uninitialized'; //new GameState(this.game.gameState);
 		
 		return root;
 		
@@ -84,9 +79,12 @@
 
 		
 		node.on('STATECHANGE', function() {
-			console.log('VISUAL STATE');
-			that.stateDiv.innerHTML = new GameState(this.game.gameState);
+			that.writeState(that.game.gameState);
 		}); 
+	};
+	
+	VisualState.prototype.writeState = function (state) {
+		this.stateDiv.innerHTML =  this.gameLoop.getName(state);
 	};
 	
 })(node.window.widgets);
