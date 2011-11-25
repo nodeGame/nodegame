@@ -1,0 +1,9 @@
+table#exhibition {
+	width: 500px;
+	border: 1px solid #CCC;
+}
+
+table#exhibition thead tr td {
+  font-weight: bold;
+  text-align: center;
+  }

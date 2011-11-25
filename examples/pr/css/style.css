@@ -52,6 +52,7 @@ input[type="range"] {
 }
 
 fieldset#VisualTimer_fieldset {
+	float: right;
 	width: 80px;
 	border: 5px solid black;
 }
@@ -59,4 +60,15 @@ fieldset#VisualTimer_fieldset {
 div#VisualTimer_div {
   width: 80px;
 	font-size: 16px;
+}
+
+fieldset#VisualState_fieldset {
+	float: left;
+  width: 200px;
+  border: 5px solid black;
+}
+
+div#VisualState_div {
+  width: 200px;
+  font-size: 16px;
 }

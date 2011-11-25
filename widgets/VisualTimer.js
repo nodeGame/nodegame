@@ -17,11 +17,14 @@
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
 		this.root = null;		// the parent element
+		this.fieldset = { legend: 'Time to go',
+						  id: this.id + '_fieldset'
+		};
 		
 		this.init(options);
 	};
@@ -35,24 +38,25 @@
 		// TODO: update and milliseconds must be multiple now
 	};
 	
-	VisualTimer.prototype.append = function (root, ids) {
+	VisualTimer.prototype.append = function (root) {
 		var that = this;
-		var PREF = this.id + '_';
+//		var PREF = this.id + '_';
+//		
+//		var idFieldset = PREF + 'fieldset';
+//		var idTimerDiv = PREF + 'div';
+//		
+//		if (ids !== null && ids !== undefined) {
+//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+//		}
+//		
+//		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
 		
-		var idFieldset = PREF + 'fieldset';
-		var idTimerDiv = PREF + 'div';
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		}
-		
-		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
 		this.root = root;
-		this.timerDiv = node.window.addDiv(fieldset,idTimerDiv);
+		this.timerDiv = node.window.addDiv(root, this.id + '_div');
 			
 		this.start();
 		
-		return fieldset;
+		return root;
 		
 	};
 	

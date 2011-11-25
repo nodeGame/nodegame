@@ -54,7 +54,8 @@
 	            for (var i=0, len=listeners.length; i < len; i++){
 	                // TODO: Check why fire the event name as well??
 	            	//listeners[i].call(this, event, p1, p2, p3);
-	                listeners[i].call(this, p1, p2, p3);
+	                //listeners[i].call(this, p1, p2, p3);
+	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
 	        
@@ -64,7 +65,9 @@
 	            for (var i=0, len=listeners.length; i < len; i++) {
 	                // TODO: Check why fire the event name as well??
 	            	//listeners[i].call(this, event, p1, p2, p3);
-	                listeners[i].call(this, p1, p2, p3);
+	                //listeners[i].call(this, p1, p2, p3);
+	            	listeners[i].call(this.game, p1, p2, p3);
+	            	
 	            }
 	        }
 	        

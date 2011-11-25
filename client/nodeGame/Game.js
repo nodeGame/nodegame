@@ -27,7 +27,7 @@
 		this.description = settings.description || 'No Description';
 		
 		this.gameLoop = new GameLoop(settings.loops);
-		
+		 
 		// TODO: gameState should be inside player
 		this.player = null;	
 		this.gameState = new GameState();
@@ -265,7 +265,9 @@
 				// Local Listeners from previous state are erased before proceeding
 				// to next one
 				node.node.clearLocalListeners();
-				return func.call(this);
+				node.log('NODE.GAMEeeeeeeeeeeeee');
+				console.log(node.game);
+				return func.call(node.game);
 			}
 		}
 		

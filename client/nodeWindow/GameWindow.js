@@ -32,7 +32,7 @@
 		Document.call(this);
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
-		this.header = this.generateHeader();
+		
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
@@ -163,10 +163,12 @@
 			
 		case 'PLAYER':
 			
-			var maincss		= this.addCSS(this.root, 'style.css');
+			//var maincss		= this.addCSS(this.root, 'style.css');
+			this.header 	= this.generateHeader();
 		    var mainframe 	= this.addIFrame(this.root,'mainframe');
-		    
-			this.addWidget('WaitScreen');
+		   
+
+		    this.addWidget('WaitScreen');
 		    
 			break;
 		}
@@ -207,7 +209,7 @@
 		this.frame = window.frames[frame].document;
 			
 		if (func) {
-    		func.call(); // TODO: Pass the right this reference
+    		func.call(node.game); // TODO: Pass the right this reference
     		//console.log('Frame Loaded correctly!');
     	}
 			
@@ -250,6 +252,7 @@
 		var root = root || this.root;
 		var options = options || {};
 		
+		// TODO: remove the eval
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
@@ -274,7 +277,7 @@
 			g.listeners();
 		}
 		catch(e){
-			throw 'Not compatible gadget: ' + e;
+			throw 'Error while loading widget ' + g.name + ': ' + e;
 		}
 		
 		return g;

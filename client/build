@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME="nodegame-all"
-VERSION="0.5.9.2"
+VERSION="0.5.9.3"
 
 BUILD="./releases/"$VERSION"/"
 EXT=".js"
@@ -80,4 +80,4 @@ echo "Copy done"
 # Producing a minified version as well
 # exec yui $NODEGAME -o $NODEGAMEMIN   --charset=utf-8
 
-
+echo $DATE

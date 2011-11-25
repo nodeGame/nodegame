@@ -29,7 +29,6 @@ function PeerReviewGame () {
 	};
 	
 	var instructions = function(){
-		var that = this;
 		node.window.loadFrame('instructions.html', function() {
 			
 			var b = node.window.getElementById('read');
@@ -46,7 +45,7 @@ function PeerReviewGame () {
 	};
 	
 	var creation = function(){
-		var that = this;
+
 		node.window.loadFrame('creation.html', function(){
 			
 			var root = node.window.getElementById('root');
@@ -55,18 +54,20 @@ function PeerReviewGame () {
 								height: 300
 			};
 			
-			that.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+			this.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
 			
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 1000
+								milliseconds: 10000
 			};
 			
-			that.timer = node.window.addWidget('VisualTimer',root, timerOptions);
+			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
 			
 			node.on('CREATION_DONE', function(){
-				node.set('CF', that.cf.getAllValues());
+				console.log('THISSSSSSSSSSSSSS');
+				console.log(this);
+				node.set('CF', this.cf.getAllValues());
 				node.emit('DONE');
 			});
 			
@@ -76,7 +77,6 @@ function PeerReviewGame () {
 	};
 	
 	var submission = function() {
-		var that = this;
 		var root = node.window.getElementById('root');
 		
 		var ctrl_options = { id: 'exhib',
@@ -125,7 +125,6 @@ function PeerReviewGame () {
 	};	
 	
 	var evaluation = function() {
-		var that = this;
 		var evas = {};
 		var evaAttr = {
 				min: 1,
@@ -144,8 +143,7 @@ function PeerReviewGame () {
 								event: 'EVALUATION_DONE',
 								milliseconds: 10000
 			};			
-			var header = document.getElementById('gn_header');
-			that.timer = node.window.addWidget('VisualTimer', header, timerOptions);
+			this.timer.restart(timerOptions);
 			
 			node.onDATA('CF', function(msg) {
 				console.log(msg);
@@ -185,19 +183,14 @@ function PeerReviewGame () {
 	};
 	
 	var dissemination = function(){
-		var that = this;
-		node.window.loadFrame('dissemination.html');
-		
-//		node.on('in.say.DATA', function(msg) {
-//			console.log('AAAAAAAAAAAAAAAAA');
-//			console.log(msg.data);
-//		});
+		node.window.loadFrame('dissemination.html', function() {
+			
+		});
 		
 		console.log('Dissemination');
 	};
 	
 	var questionnaire = function(){
-		var that = this;
 		node.window.loadFrame('postgame.html');
 		console.log('Postgame');
 	};

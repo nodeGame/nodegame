@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 16:51:53 CET 2011
+ * Built on Fri Nov 25 11:24:23 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 16:51:53 CET 2011
+ * Built on Fri Nov 25 11:24:23 CET 2011
  *
  */
  
@@ -76,7 +76,8 @@
 	            for (var i=0, len=listeners.length; i < len; i++){
 	                // TODO: Check why fire the event name as well??
 	            	//listeners[i].call(this, event, p1, p2, p3);
-	                listeners[i].call(this, p1, p2, p3);
+	                //listeners[i].call(this, p1, p2, p3);
+	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
 	        
@@ -86,7 +87,9 @@
 	            for (var i=0, len=listeners.length; i < len; i++) {
 	                // TODO: Check why fire the event name as well??
 	            	//listeners[i].call(this, event, p1, p2, p3);
-	                listeners[i].call(this, p1, p2, p3);
+	                //listeners[i].call(this, p1, p2, p3);
+	            	listeners[i].call(this.game, p1, p2, p3);
+	            	
 	            }
 	        }
 	        
@@ -2077,7 +2080,7 @@
 		this.description = settings.description || 'No Description';
 		
 		this.gameLoop = new GameLoop(settings.loops);
-		
+		 
 		// TODO: gameState should be inside player
 		this.player = null;	
 		this.gameState = new GameState();
@@ -2315,7 +2318,9 @@
 				// Local Listeners from previous state are erased before proceeding
 				// to next one
 				node.node.clearLocalListeners();
-				return func.call(this);
+				node.log('NODE.GAMEeeeeeeeeeeeee');
+				console.log(node.game);
+				return func.call(node.game);
 			}
 		}
 		
@@ -2721,7 +2726,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 16:51:53 CET 2011
+ * Built on Fri Nov 25 11:24:23 CET 2011
  *
  */
  
@@ -3043,7 +3048,7 @@
 		Document.call(this);
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
-		this.header = this.generateHeader();
+		
 		
 		this.state = GameState.iss.LOADED;
 		this.areLoading = 0; 
@@ -3174,10 +3179,12 @@
 			
 		case 'PLAYER':
 			
-			var maincss		= this.addCSS(this.root, 'style.css');
+			//var maincss		= this.addCSS(this.root, 'style.css');
+			this.header 	= this.generateHeader();
 		    var mainframe 	= this.addIFrame(this.root,'mainframe');
-		    
-			this.addWidget('WaitScreen');
+		   
+
+		    this.addWidget('WaitScreen');
 		    
 			break;
 		}
@@ -3218,7 +3225,7 @@
 		this.frame = window.frames[frame].document;
 			
 		if (func) {
-    		func.call(); // TODO: Pass the right this reference
+    		func.call(node.game); // TODO: Pass the right this reference
     		//console.log('Frame Loaded correctly!');
     	}
 			
@@ -3261,6 +3268,7 @@
 		var root = root || this.root;
 		var options = options || {};
 		
+		// TODO: remove the eval
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
@@ -3285,7 +3293,7 @@
 			g.listeners();
 		}
 		catch(e){
-			throw 'Not compatible gadget: ' + e;
+			throw 'Error while loading widget ' + g.name + ': ' + e;
 		}
 		
 		return g;
@@ -3561,7 +3569,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 24. Nov 16:51:53 CET 2011
+ * Built on Fri Nov 25 11:24:24 CET 2011
  *
  */
  
@@ -5070,11 +5078,14 @@
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
 		this.root = null;		// the parent element
+		this.fieldset = { legend: 'Time to go',
+						  id: this.id + '_fieldset'
+		};
 		
 		this.init(options);
 	};
@@ -5088,24 +5099,25 @@
 		// TODO: update and milliseconds must be multiple now
 	};
 	
-	VisualTimer.prototype.append = function (root, ids) {
+	VisualTimer.prototype.append = function (root) {
 		var that = this;
-		var PREF = this.id + '_';
+//		var PREF = this.id + '_';
+//		
+//		var idFieldset = PREF + 'fieldset';
+//		var idTimerDiv = PREF + 'div';
+//		
+//		if (ids !== null && ids !== undefined) {
+//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+//		}
+//		
+//		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
 		
-		var idFieldset = PREF + 'fieldset';
-		var idTimerDiv = PREF + 'div';
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-		}
-		
-		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
 		this.root = root;
-		this.timerDiv = node.window.addDiv(fieldset,idTimerDiv);
+		this.timerDiv = node.window.addDiv(root, this.id + '_div');
 			
 		this.start();
 		
-		return fieldset;
+		return root;
 		
 	};
 	
