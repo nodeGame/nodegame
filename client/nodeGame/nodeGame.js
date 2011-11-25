@@ -193,7 +193,7 @@
 		return (that.game) ? node.node.game.gameState : false;
 	};
 	
-	node.on = function(event,listener) {
+	node.on = function (event, listener) {
 		var state = this.state();
 		//console.log(state);
 		
@@ -206,14 +206,18 @@
 			that.addLocalListener(event, listener);
 			//console.log('local');
 		}
-		
-		
+	};
+	
+	node.once = function (event, listener) {
+		node.on(event, listener);
+		node.on(event, function(event, listener) {
+			that.removeListener(event, listener);
+		});
 	};
 	
 	node.play = function (conf, game) {	
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
-		// TODO Check why is not working...
 		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
@@ -221,6 +225,27 @@
 		
 		console.log('nodeGame: game loaded...');
 		console.log('nodeGame: ready.');
+	};	
+	
+	node.observe = function (conf) {	
+		node.gsc = that.gsc = new GameSocketClient(conf);
+		
+		// Retrieve the game and set is as observer
+		node.get('GAME', function(game) {
+			
+			alert(game);
+			
+//			var game = game.observer = true;
+//			node.game = that.game = game;
+//			
+//			that.game.init();
+//			
+//			that.gsc.setGame(that.game);
+//			
+//			console.log('nodeGame: game loaded...');
+//			console.log('nodeGame: ready.');
+		});
+		
 	};	
 	
 	node.fire = node.emit = function (event, p1, p2, p3) {	
@@ -242,8 +267,15 @@
 		that.emit('out.set.DATA', value, null, key);
 	}
 	
-	// TODO node.get
-	//node.get = function (key, value) {};
+	
+	node.get = function (key, func) {
+		that.emit('out.get.DATA', key);
+		node.once(key, function(data) {
+			func.call(node.game,data);
+		});
+	};
+	
+
 	
 	// *Aliases*
 	//

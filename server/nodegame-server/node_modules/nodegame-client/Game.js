@@ -26,6 +26,8 @@
 		this.name = settings.name || "A standard game";
 		this.description = settings.description || 'No Description';
 		
+		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer : false;
+		
 		this.gameLoop = new GameLoop(settings.loops);
 		 
 		// TODO: gameState should be inside player
@@ -55,6 +57,13 @@
 		
 		// INCOMING EVENTS
 		var incomingListeners = function() {
+			
+			// Get
+			
+			// TODO: can we avoid the double emit?
+			node.on( IN + get + 'DATA', function(msg){
+				node.emit(msg.text, msg.data);
+			});
 			
 			// Set
 			node.on( IN + set + 'STATE', function(msg){
@@ -131,6 +140,12 @@
 			
 			node.on( OUT + set + 'DATA', function (data, to, key) {
 				that.gsc.sendDATA(GameMsg.actions.SET, data, to, key);
+			});
+			
+			// GET
+			
+			node.on( OUT + get + 'DATA', function (data, to, key) {
+				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
 			});
 			
 		}();
@@ -220,9 +235,12 @@
 		//console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
-		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
-		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
-		node.emit(stateEvent,this.gameState,'ALL');
+		
+		if (!this.observer) {
+			var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
+			node.emit(stateEvent,this.gameState,'ALL');
+		}
+		
 		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};

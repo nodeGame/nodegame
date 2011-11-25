@@ -66,8 +66,17 @@ AdminServer.prototype.attachCustomListeners = function() {
 			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
 			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
+			that.gmm.broadcast(msg, msg.from);
 			//that.gmm.sendSTATE (GameMsg.actions.SAY,msg.data, msg.to);
 		}
+	});
+	
+	this.on(get+'DATA', function(msg) {
+		
+		// Ask a random player to send the game;
+		//var p = this.pl.getRandom();
+		that.gmm.sendDATA('get', 'CULO', msg.from, msg.txt);
+		
 	});
 	
 	// SET

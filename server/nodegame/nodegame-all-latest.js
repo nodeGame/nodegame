@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:38:03 CET 2011
+ * Built on Fr 25. Nov 18:48:08 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:38:03 CET 2011
+ * Built on Fr 25. Nov 18:48:08 CET 2011
  *
  */
  
@@ -29,7 +29,7 @@
 	
 	//var parser = exports.parser = {};
 		 
-	function EventEmitter (){
+	function EventEmitter() {
 	    this._listeners = {};
 	    this._localListeners = {};
 	}
@@ -38,7 +38,7 @@
 	
 	    constructor: EventEmitter,
 		    
-	    addListener: function(type,listener) {
+	    addListener: function (type, listener) {
 	    	 if (typeof this._listeners[type] == "undefined"){
 	             this._listeners[type] = [];
 	         }
@@ -46,7 +46,7 @@
 	         this._listeners[type].push(listener);
 	    },
 	    
-	    addLocalListener: function (type,listener) {
+	    addLocalListener: function (type, listener) {
 	    	if (typeof this._localListeners[type] == "undefined"){
 	            this._localListeners[type] = [];
 	        }
@@ -74,9 +74,6 @@
 	        if (this._listeners[event.type] instanceof Array) {
 	            var listeners = this._listeners[event.type];
 	            for (var i=0, len=listeners.length; i < len; i++){
-	                // TODO: Check why fire the event name as well??
-	            	//listeners[i].call(this, event, p1, p2, p3);
-	                //listeners[i].call(this, p1, p2, p3);
 	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
@@ -85,48 +82,50 @@
 	        if (this._localListeners[event.type] instanceof Array) {
 	            var listeners = this._localListeners[event.type];
 	            for (var i=0, len=listeners.length; i < len; i++) {
-	                // TODO: Check why fire the event name as well??
-	            	//listeners[i].call(this, event, p1, p2, p3);
-	                //listeners[i].call(this, p1, p2, p3);
 	            	listeners[i].call(this.game, p1, p2, p3);
-	            	
 	            }
 	        }
-	        
+	       
 	    },
 	    
 	    // TODO: remove fire when all the code has been updated
-	    fire: function(event, p1, p2, p3) { // Up to 3 parameters
-	    	this.emit(event, p1, p2, p3);
-	    },
+//	    fire: function(event, p1, p2, p3) { // Up to 3 parameters
+//	    	this.emit(event, p1, p2, p3);
+//	    },
 	
 	    removeListener: function(type, listener) {
+	
+	    	function removeFromList(type, listener, list) {
+		    	//console.log('Trying to remove ' + type + ' ' + listener);
+		    	
+		        if (list[type] instanceof Array) {
+		        	
+		        	if (listener === null || listener === undefined) {
+		        		delete list[type];
+		        		//console.log('Removed listener ' + type);
+		        		return true;
+		        	}
+		        	
+		            var listeners = list[type];
+		            for (var i=0, len=listeners.length; i < len; i++) {
+		            	
+		            	//console.log(listeners[i]);
+		            	
+		                if (listeners[i] === listener){
+		                    listeners.splice(i, 1);
+		                    //console.log('Removed listener ' + type + ' ' + listener);
+		                    return true;
+		                }
+		            }
+		        }
+		        
+		        return false; // no listener removed
+	    	}
 	    	
-	    	//console.log('Trying to remove ' + type + ' ' + listener);
-	    	
-	        if (this._listeners[type] instanceof Array) {
-	        	
-	        	if (listener === null || listener === undefined) {
-	        		delete this._listeners[type];
-	        		//console.log('Removed listener ' + type);
-	        		return true;
-	        	}
-	        	
-	        	
-	            var listeners = this._listeners[type];
-	            for (var i=0, len=listeners.length; i < len; i++) {
-	            	
-	            	//console.log(listeners[i]);
-	            	
-	                if (listeners[i] === listener){
-	                    listeners.splice(i, 1);
-	                    //console.log('Removed listener ' + type + ' ' + listener);
-	                    return true;
-	                }
-	            }
-	        }
-	        
-	        return false; // no listener removed
+	    	var r1 = removeFromList(type, listener, this._listeners);
+	    	var r2 = removeFromList(type, listener, this._localListeners);
+
+	    	return r1 || r2;
 	    },
 	    
 	    clearLocalListeners: function() {
@@ -2079,6 +2078,8 @@
 		this.name = settings.name || "A standard game";
 		this.description = settings.description || 'No Description';
 		
+		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer : false;
+		
 		this.gameLoop = new GameLoop(settings.loops);
 		 
 		// TODO: gameState should be inside player
@@ -2108,6 +2109,13 @@
 		
 		// INCOMING EVENTS
 		var incomingListeners = function() {
+			
+			// Get
+			
+			// TODO: can we avoid the double emit?
+			node.on( IN + get + 'DATA', function(msg){
+				node.emit(msg.text, msg.data);
+			});
 			
 			// Set
 			node.on( IN + set + 'STATE', function(msg){
@@ -2184,6 +2192,12 @@
 			
 			node.on( OUT + set + 'DATA', function (data, to, key) {
 				that.gsc.sendDATA(GameMsg.actions.SET, data, to, key);
+			});
+			
+			// GET
+			
+			node.on( OUT + get + 'DATA', function (data, to, key) {
+				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
 			});
 			
 		}();
@@ -2273,9 +2287,12 @@
 		//console.log('Publishing ' + this.gameState);
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
-		//this.STATE(GameMsg.actions.SAY,this.gameState, 'ALL');
-		var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
-		node.emit(stateEvent,this.gameState,'ALL');
+		
+		if (!this.observer) {
+			var stateEvent = GameMsg.OUT + GameMsg.actions.SAY + '.STATE'; 
+			node.emit(stateEvent,this.gameState,'ALL');
+		}
+		
 		node.emit('STATECHANGE');
 		console.log('I: New State = ' + this.gameState);
 	};
@@ -2562,7 +2579,7 @@
 		return (that.game) ? node.node.game.gameState : false;
 	};
 	
-	node.on = function(event,listener) {
+	node.on = function (event, listener) {
 		var state = this.state();
 		//console.log(state);
 		
@@ -2575,14 +2592,18 @@
 			that.addLocalListener(event, listener);
 			//console.log('local');
 		}
-		
-		
+	};
+	
+	node.once = function (event, listener) {
+		node.on(event, listener);
+		node.on(event, function(event, listener) {
+			that.removeListener(event, listener);
+		});
 	};
 	
 	node.play = function (conf, game) {	
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
-		// TODO Check why is not working...
 		node.game = that.game = new Game(game, that.gsc);
 		that.game.init();
 		
@@ -2590,6 +2611,27 @@
 		
 		console.log('nodeGame: game loaded...');
 		console.log('nodeGame: ready.');
+	};	
+	
+	node.observe = function (conf) {	
+		node.gsc = that.gsc = new GameSocketClient(conf);
+		
+		// Retrieve the game and set is as observer
+		node.get('GAME', function(game) {
+			
+			alert(game);
+			
+//			var game = game.observer = true;
+//			node.game = that.game = game;
+//			
+//			that.game.init();
+//			
+//			that.gsc.setGame(that.game);
+//			
+//			console.log('nodeGame: game loaded...');
+//			console.log('nodeGame: ready.');
+		});
+		
 	};	
 	
 	node.fire = node.emit = function (event, p1, p2, p3) {	
@@ -2611,8 +2653,15 @@
 		that.emit('out.set.DATA', value, null, key);
 	}
 	
-	// TODO node.get
-	//node.get = function (key, value) {};
+	
+	node.get = function (key, func) {
+		that.emit('out.get.DATA', key);
+		node.once(key, function(data) {
+			func.call(node.game,data);
+		});
+	};
+	
+
 	
 	// *Aliases*
 	//
@@ -2724,7 +2773,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:38:03 CET 2011
+ * Built on Fr 25. Nov 18:48:08 CET 2011
  *
  */
  
@@ -3254,8 +3303,10 @@
 		return this.addDiv(root,id);
 	};
 	
-	// Gadget
-	
+	/**
+	 * Add a widget to the browser window.
+	 * TODO: If an already existing id is provided, the existing element is deleted.
+	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
 		//console.log(this.widgets);
@@ -3562,6 +3613,103 @@
 })(node.window);
  
  
+(function(exports){
+	
+	/*!
+	 * 
+	 * Table: abstract representation of an HTML table
+	 * 
+	 */
+	
+	exports.Table = Table;
+	
+	function Table (options) {
+		
+		this.id = options.id || 'list';
+		
+		this.TR = 'tr';
+		this.TD = 'td';
+	
+		this.root = this.createRoot(this.id, options);
+		
+		this.list = [];
+	}
+	
+	Table.prototype.append = function(root) {
+		return root.appendChild(this.write());
+	};
+	
+	Table.prototype.add = function(elem) {
+		this.list.push(elem);
+	};
+	
+	Table.prototype.write = function() {
+				
+
+
+        // creates a <table> element and a <tbody> element
+        var tbl     = document.createElement("table");
+        var tblBody = document.createElement("tbody");
+
+        // creating all cells
+        for (var j = 0; j < 2; j++) {
+            // creates a table row
+            var row = document.createElement("tr");
+
+            for (var i = 0; i < 2; i++) {
+                // Create a <td> element and a text node, make the text
+                // node the contents of the <td>, and put the <td> at
+                // the end of the table row
+                var cell = document.createElement("td");
+                var cellText = document.createTextNode("cell is row "+j+", column "+i);
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+            }
+
+            // add the row to the end of the table body
+            tblBody.appendChild(row);
+        }
+
+        // put the <tbody> in the <table>
+        tbl.appendChild(tblBody);
+        // appends <table> into <body>
+        body.appendChild(tbl);
+        // sets the border attribute of tbl to 2;
+        tbl.setAttribute("border", "2");
+	  
+		
+		return root;
+	};
+	
+	Table.prototype.getRoot = function() {
+		return this.root;
+	};
+	
+	Table.prototype.createRoot = function(id, options) {
+		var root = document.createElement(this.FIRST_LEVEL);
+		if (id) {
+			root.id = id;
+		}
+
+		if (options.attributes) {
+			
+			node.window.addAttributes2Elem(root, options.attributes);
+		}
+		
+		return root;
+	};
+	
+	Table.prototype.createItem = function(id) {
+		var item = document.createElement(this.SECOND_LEVEL);
+		if (id) {
+			item.id = id;
+		}
+		return item;
+	};
+	
+})(node.window);
+ 
+ 
  
  
  
@@ -3572,7 +3720,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:38:03 CET 2011
+ * Built on Fr 25. Nov 18:48:08 CET 2011
  *
  */
  
@@ -4942,6 +5090,7 @@
 	};
 	
 	StateDisplay.prototype.updateState =  function(state) {
+		if (!state) return;
 		var that = this;
 		var checkStateDiv = setInterval(function(){
 			if(that.stateDiv){

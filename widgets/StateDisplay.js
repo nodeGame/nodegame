@@ -64,6 +64,7 @@
 	};
 	
 	StateDisplay.prototype.updateState =  function(state) {
+		if (!state) return;
 		var that = this;
 		var checkStateDiv = setInterval(function(){
 			if(that.stateDiv){

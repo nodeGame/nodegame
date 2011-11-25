@@ -27,30 +27,38 @@ GameMsgManager.prototype.sendHI = function(text,to) {
 	this.send(msg); 
 };
 
-GameMsgManager.prototype.sendTXT = function(text,to) {
+GameMsgManager.prototype.sendTXT = function (text,to) {
 	var msg = this.gmg.createTXT(text,to);
 	this.send(msg); 
 };
 
-GameMsgManager.prototype.sendPLIST = function(node,to) {
-	var recipient = to || 'ALL';
+GameMsgManager.prototype.sendPLIST = function (node, to) {
+	var to = to || 'ALL';
 	// TODO: set/get/say choose carefully
-	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, recipient);
+	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, to);
 	this.send(plMsg);
 };
 
-GameMsgManager.prototype.sendSTATE = function(action,state,to) {
-	var recipient = to || 'ALL';
+GameMsgManager.prototype.sendSTATE = function (action, state, to) {
+	var to = to || 'ALL';
 	// TODO: set/get/say choose carefully
-	var stateMsg = this.gmg.createSTATE(action, state, recipient);
+	var stateMsg = this.gmg.createSTATE(action, state, to);
 	this.send(stateMsg);
 };
 
-GameMsgManager.prototype.sendDATA = function (action,data,to,text) {
-	var recipient = to || 'ALL';
-	var dataMsg = this.gmg.createDATA(action, data, recipient,text);
+GameMsgManager.prototype.sendDATA = function (action, data, to, text) {
+	var to = to || 'ALL';
+	var dataMsg = this.gmg.createDATA(action, data, to, text);
 	this.send(dataMsg);
 };
+
+//// New
+//
+//GameMsgManager.prototype.sendGAME = function (action, data, to, text) {
+//	var to = to || 'ALL';
+//	var gameMsg = this.gmg.createGAME(action, data, to, text);
+//	this.send(dataMsg);
+//};
 
 GameMsgManager.prototype.send = function(gameMsg) {
 	
@@ -99,6 +107,28 @@ GameMsgManager.prototype.send = function(gameMsg) {
 			this.log.log('Msg not sent. Unexisting recipient: ' + to, 'ERR');
 		}
 	}
+};
+
+GameMsgManager.prototype.broadcast = function(gameMsg) {
+	
+	var from = gameMsg.from;
+
+	for (var client in this.node.channel.sockets) {
+		if (this.node.channel.sockets.hasOwnProperty(client)) { 
+			console.log(client);
+			if (client !== from) {
+				console.log(client + ' different ' + from);
+				gameMsg.to = client;
+				this.send(gameMsg);
+			}
+			//console.log(this.node.channel.sockets[client]);
+			//this.node.channel.sockets[client].send(msg);
+		}
+	}
+//		
+//		this.log.log('Msg ' + gameMsg.toSMS() + ' broadcasted to ' + to);
+//		this.log.msg('B, ' + gameMsg);
+//	}
 };
 
 // FORWARD
