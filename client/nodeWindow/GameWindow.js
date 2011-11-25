@@ -136,6 +136,11 @@
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
+		if (this.header) {
+			this.header.innerHTML = '';
+			this.header = null;
+		}
+		
 		return headerEl = this.addElement('div', this.root, 'gn_header');
 	};
 	
@@ -235,8 +240,10 @@
 		return this.addDiv(root,id);
 	};
 	
-	// Gadget
-	
+	/**
+	 * Add a widget to the browser window.
+	 * TODO: If an already existing id is provided, the existing element is deleted.
+	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
 		//console.log(this.widgets);

@@ -71,6 +71,7 @@ FILES[0]='Document.js'
 FILES[1]='GameWindow.js'
 FILES[2]='Canvas.js'
 FILES[3]='List.js'
+FILES[4]='Table.js'
 
 for f in ${FILES[*]}
 do

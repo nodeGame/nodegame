@@ -265,8 +265,6 @@
 				// Local Listeners from previous state are erased before proceeding
 				// to next one
 				node.node.clearLocalListeners();
-				node.log('NODE.GAMEeeeeeeeeeeeee');
-				console.log(node.game);
 				return func.call(node.game);
 			}
 		}

@@ -21,8 +21,6 @@ function PeerReviewGame () {
 	
 	
 	var pregame = function() {
-
-		
 		var frame = node.window.loadFrame('pregame.html');
 		node.emit('DONE');
 		console.log('Pregame');
@@ -65,8 +63,6 @@ function PeerReviewGame () {
 			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
 			
 			node.on('CREATION_DONE', function(){
-				console.log('THISSSSSSSSSSSSSS');
-				console.log(this);
 				node.set('CF', this.cf.getAllValues());
 				node.emit('DONE');
 			});
@@ -110,13 +106,12 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 1000
+							milliseconds: 5000
 		};
 		
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
-			//node.emit('HIDE','exhib');
 			node.emit('INPUT_DISABLE');
 			node.DONE();
 		});
@@ -199,42 +194,6 @@ function PeerReviewGame () {
 		node.window.loadFrame('ended.html');
 		console.log('Game ended');
 	};
-	
-	
-//	// Assigning Functions to Loops
-//	
-//	var pregameloop = {
-//		1: pregame
-//	};
-//	
-//	var instructionsloop = {
-//		1: instructions
-//	};
-//	
-//	var gameloop = { // The different, subsequent phases in each round
-//		1: creation,
-//		2: submission,
-//		3: evaluation,
-//		4: dissemination
-//	};
-//	
-//	var postgameloop = {
-//		1: questionnaire
-//	};
-//	
-//	var endgameloop = {
-//		1: endgame
-//	};
-//	
-//	
-//	// LOOPS
-//	this.loops = {
-//			1: {loop:pregameloop},
-//			2: {loop:instructionsloop},
-//			3: {rounds:10, loop:gameloop},
-//			4: {loop:postgameloop},
-//			5: {loop:endgameloop}
-//		};	
 	
 	
 // Assigning Functions to Loops

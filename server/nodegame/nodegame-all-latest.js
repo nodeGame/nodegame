@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.2
+ * nodeGame-all v0.5.9.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:24:23 CET 2011
+ * Built on Fri Nov 25 11:38:03 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.2
+ * nodeGame Client v0.5.9.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:24:23 CET 2011
+ * Built on Fri Nov 25 11:38:03 CET 2011
  *
  */
  
@@ -2318,8 +2318,6 @@
 				// Local Listeners from previous state are erased before proceeding
 				// to next one
 				node.node.clearLocalListeners();
-				node.log('NODE.GAMEeeeeeeeeeeeee');
-				console.log(node.game);
 				return func.call(node.game);
 			}
 		}
@@ -2721,12 +2719,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.2
+ * nodeWindow v0.5.9.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:24:23 CET 2011
+ * Built on Fri Nov 25 11:38:03 CET 2011
  *
  */
  
@@ -3152,6 +3150,11 @@
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
+		if (this.header) {
+			this.header.innerHTML = '';
+			this.header = null;
+		}
+		
 		return headerEl = this.addElement('div', this.root, 'gn_header');
 	};
 	
@@ -3564,12 +3567,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.2
+ * nodeGadgets v0.5.9.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Nov 25 11:24:24 CET 2011
+ * Built on Fri Nov 25 11:38:03 CET 2011
  *
  */
  
