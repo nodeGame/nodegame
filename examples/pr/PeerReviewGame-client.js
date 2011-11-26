@@ -9,7 +9,6 @@ function PeerReviewGame () {
 	this.minPlayers = 2;
 	this.maxPlayers = 8;
 	
-	
 	this.init = function() {			
 		node.window.setup('PLAYER');
 		this.cf = null;
@@ -36,7 +35,7 @@ function PeerReviewGame () {
 				node.fire('WAIT');
 			};
 			
-			node.random.emit('DONE',1000);
+			node.random.emit('DONE',100);
 			
 		});
 		console.log('Instructions');
@@ -57,7 +56,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: 100
 			};
 			
 			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
@@ -106,7 +105,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 5000
+							milliseconds: 2000
 		};
 		
 		this.timer.restart(timerOptions);
@@ -136,7 +135,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 10000
+								milliseconds: 2000
 			};			
 			this.timer.restart(timerOptions);
 			
@@ -179,6 +178,12 @@ function PeerReviewGame () {
 	
 	var dissemination = function(){
 		node.window.loadFrame('dissemination.html', function() {
+			var tbl_options =  { root: node.window.getElementById('exhibition')}
+			var table = new node.window.Table(tbl_options);
+			
+			table.addRow([1,2,3]);
+			table.addRow([4,5,6]);
+			table.addRow([7,8,9]);
 			
 		});
 		

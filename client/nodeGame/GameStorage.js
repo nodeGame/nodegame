@@ -63,6 +63,30 @@
 		return this.storage.sort(GameBit.compareKey);
 	}
 	
+	GameStorage.prototype.sortByValue = function(key) {
+		
+		if (!key) {
+			return this.storage.sort(GameBit.compareValue);
+		}
+		else {
+			
+			
+//			
+//			var func = function (gb1, gb2, key) {
+//				console.log(key);
+//				
+//				if (gb1.value[key] === gb2.value[key]) return 0;
+//				// Sort alphabetically or by numerically ascending
+//				if (gb1.value[key] === gb2.value[key]) return 1;
+//				return -1;
+//			};
+			
+			var func = GameBit.compareValueByKey(key);
+			
+			return this.storage.sort(func);
+		}
+	};
+	
 	GameStorage.prototype.dump = function (reverse) {
 		return this.storage;
 	};	
@@ -250,13 +274,19 @@
 		return -1;
 	};
 	
-	// @TODO: check how this works with objects
 	GameBit.compareValue = function (gb1, gb2) {
 		if (gb1.value === gb2.value) return 0;
 		// Sort alphabetically or by numerically ascending
-		if (gb1.value === gb2.value) return 1;
+		if (gb1.value > gb2.value) return 1;
 		return -1;
-	};
+	};	
+	
+	GameBit.compareValueByKey = function (key) {
+	    return function (a,b) {
+	        return (a.value[key] < b.value[key]) ? -1 : (a.value[key] > b.value[key]) ? 1 : 0;
+	    }
+	}
+
 	
 })(
 	'undefined' != typeof node ? node : module.exports

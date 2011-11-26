@@ -261,6 +261,12 @@
 		return e;
 	};
 	
+	Document.prototype.removeClass = function (element, className) {
+		var regexpr = '/(?:^|\s)' + className + '(?!\S)/';
+		element.className = element.className.replace( regexpr, '' );
+	};
+
+	
 	Document.prototype.removeChildrenFromNode = function (e) {
 		
 	    if(!e) {

@@ -77,10 +77,10 @@ var gs = new GameStorage();
 var clients = ['a','b'];//['a','b','c','d'];
 var states = [1,2]; //[1,2,3,4];
 var ids = ['z','x'];//['z','x','c','v'];
-var objs = [{mario: 'yes', paolo: 'no'}]
 for (var i=0;i<clients.length;i++) {
 	for (var j=0;j<states.length;j++) {
 		for (var x=0;x<ids.length;x++) {
+			var objs = [{mario: 'yes', paolo: 'no', r: Math.random()}]
 			for (var o=0;o<objs.length; o++) {
 				gs.add(clients[i], ids[x], objs[o], new GameState({state:states[j]}));
 			}
@@ -88,7 +88,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-//console.log(gs.toString());
+console.log(gs.toString());
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -141,4 +141,11 @@ for (var i=0;i<clients.length;i++) {
 //var v = gs.getKeyValues();
 //console.log(v);
 
+console.log('Sort by Key-Values');
+gs.sortByValue('r');
 
+for (var gb in gs.storage) {
+	if (gs.storage.hasOwnProperty(gb)) {
+		console.log(gs.storage[gb].value);
+	}
+}

@@ -8,88 +8,85 @@
 	
 	exports.Table = Table;
 	
-	function Table (options) {
-		
-		this.id = options.id || 'list';
-		
-		this.TR = 'tr';
-		this.TD = 'td';
-	
-		this.root = this.createRoot(this.id, options);
-		
-		this.list = [];
+  function Table (options) {
+	    
+	this.id = options.id || 'table';  
+    
+	if (options.root) {
+		this.setRoot(options.root);
 	}
-	
-	Table.prototype.append = function(root) {
-		return root.appendChild(this.write());
-	};
-	
-	Table.prototype.add = function(elem) {
-		this.list.push(elem);
-	};
-	
-	Table.prototype.write = function() {
-				
-
-
-        // creates a <table> element and a <tbody> element
-        var tbl     = document.createElement("table");
-        var tblBody = document.createElement("tbody");
-
-        // creating all cells
-        for (var j = 0; j < 2; j++) {
-            // creates a table row
-            var row = document.createElement("tr");
-
-            for (var i = 0; i < 2; i++) {
-                // Create a <td> element and a text node, make the text
-                // node the contents of the <td>, and put the <td> at
-                // the end of the table row
-                var cell = document.createElement("td");
-                var cellText = document.createTextNode("cell is row "+j+", column "+i);
-                cell.appendChild(cellText);
-                row.appendChild(cell);
-            }
-
-            // add the row to the end of the table body
-            tblBody.appendChild(row);
-        }
-
-        // put the <tbody> in the <table>
-        tbl.appendChild(tblBody);
-        // appends <table> into <body>
-        body.appendChild(tbl);
-        // sets the border attribute of tbl to 2;
-        tbl.setAttribute("border", "2");
-	  
-		
-		return root;
-	};
-	
-	Table.prototype.getRoot = function() {
-		return this.root;
-	};
-	
-	Table.prototype.createRoot = function(id, options) {
-		var root = document.createElement(this.FIRST_LEVEL);
-		if (id) {
-			root.id = id;
-		}
-
-		if (options.attributes) {
-			
-			node.window.addAttributes2Elem(root, options.attributes);
-		}
-		
-		return root;
-	};
-	
-	Table.prototype.createItem = function(id) {
-		var item = document.createElement(this.SECOND_LEVEL);
-		if (id) {
-			item.id = id;
-		}
-		return item;
-	};
+	else {
+		this.root = this.createRoot(this.id, options);
+	}
+    
+    this.pointer = this.root; // Points to the last row added;
+    this.odd = 'odd';
+  };
+  
+  Table.prototype.setRoot = function(root) {
+	  if (!root) return false;
+	  if (this.root && this.root.childNodes) {
+		  root.appendChild(children);
+	  }
+	  this.root = root;
+	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
+  };
+  
+  Table.prototype.append = function(root) {
+    return root.appendChild(this.root);
+  };
+  
+  
+  Table.prototype.createRoot = function (id, options) {
+    var root = document.createElement('table');
+    root.id = id;
+    return root;
+  };
+  
+  Table.prototype.addHeaderRow = function (data, attributes) {
+    var thead = document.createElement('thead');
+    return this.addRow(data, attributes, thead);
+  };
+  
+  Table.prototype.addRow = function (data, attributes, container) {
+    var row = document.createElement('tr');
+    
+    if (attributes) {
+    	node.window.addAttributes2Elem(row, attributes);
+    }
+    
+    for (var i = 0; i < data.length; i++) {
+            var cell = document.createElement('td');
+            var cellContent = document.createTextNode(data[i]);
+            cell.appendChild(cellContent);
+            row.appendChild(cell);
+        } 
+    
+    // If we have other elements, e.g. thead, add them. 
+    // If it is not a normal no even or odd class is added.
+    if (container) {
+      container.appendChild(row);
+      return this.appendRow(container, false);
+    }
+    else {
+      return this.appendRow(row);
+    }
+    
+  };
+  
+  Table.prototype.appendRow = function (row, addClass) {
+    var addClass = ('undefined' !== typeof addClass) ? addClass : true;
+    this.root.appendChild(row);
+    this.pointer = row;
+    if (addClass) {
+      row.className += this.id + '_' + this.odd;
+      this.odd = (this.odd == 'odd') ? 'even' : 'odd'; // toggle pointer to odd or even row
+    }
+    return row;
+  };
+  
+  Table.prototype.getRoot = function() {
+    return this.root;
+  };
 	
 })(node.window);

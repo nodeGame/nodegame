@@ -3,7 +3,23 @@ table#exhibition {
 	border: 1px solid #CCC;
 }
 
-table#exhibition thead tr td {
+table#exhibition thead tr td, {
   font-weight: bold;
   text-align: center;
-  }
+}
+
+table#exhibition tr {
+  border-bottom: 1px solid #CCC;
+}
+
+table#exhibition tr:last-child  {
+  border-bottom: none;
+}
+
+.exhibition_odd   {
+  background: #FFF;
+}
+
+.exhibition_even   {
+  background: #FFC;
+}
