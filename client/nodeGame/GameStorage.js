@@ -1,6 +1,28 @@
 (function (exports, node) {
-		
+	
+	/**
+	 * 
+	 * GameStorage provides a simple, lightweight NO-SQL database for nodeGame.
+	 * 
+	 * Selecting methods returning a new GameStorage obj (can be concatenated):
+	 * 
+	 * 		- filter 			-> execute callback
+	 * 		- select			-> evaluate string
+	 * 		- get				-> evaluate an obj
+	 * 		- sort 				->
+	 * 		- reverse			->
+	 * 		
+	 * Return an array of GameBits or their values:
+	 * 
+	 * 		- fetch
+	 * 
+	 * TODO: update and delete methods
+	 * 
+	 */
+	
+	
 	var GameState = node.GameState;
+	var Utils = node.Utils;
 		
 	/**
 	 * Expose constructors
@@ -38,7 +60,7 @@
 	// Sorting Operation
 	
 	GameStorage.prototype.reverse = function () {
-		return this.storage.reverse();
+		return new GameStorage(this.game, this.options, this.storage.reverse());
 	};
 	
 	/**
@@ -48,7 +70,7 @@
 	 */
 	GameStorage.prototype.sort = function(func) {
 		var func = func || GameBit.comparePlayer;
-		return this.storage.sort(func);
+		return new GameStorage(this.game, this.options, this.storage.sort(func));
 	};
 	
 	GameStorage.prototype.sortByPlayer = function() {
@@ -68,21 +90,8 @@
 		if (!key) {
 			return this.storage.sort(GameBit.compareValue);
 		}
-		else {
-			
-			
-//			
-//			var func = function (gb1, gb2, key) {
-//				console.log(key);
-//				
-//				if (gb1.value[key] === gb2.value[key]) return 0;
-//				// Sort alphabetically or by numerically ascending
-//				if (gb1.value[key] === gb2.value[key]) return 1;
-//				return -1;
-//			};
-			
+		else {			
 			var func = GameBit.compareValueByKey(key);
-			
 			return this.storage.sort(func);
 		}
 	};
@@ -115,7 +124,7 @@
 				out.push(this.storage[i]);
 			}
 		}	
-		return (out.length !== 0) ? out : false;
+		return new GameStorage(this.game, this.options, out);		
 	};
 	
 	GameStorage.prototype.getByPlayer = function (player) {
@@ -130,11 +139,28 @@
 		return this.get(new GameBit({key:key}));
 	};
 	
+	GameStorage.prototype.select = function (conditionString) {
+		
+		var func = function (elem) {
+			try {
+				return Utils.eval('this.' + conditionString, elem);
+			}
+			catch(e) {
+					console.log('Malformed query ' + conditionString);
+					return false;
+				};
+		}
+		
+		return this.filter(func);
+	};
+	
+	GameStorage.prototype.filter = function (func) {
+		return new GameStorage(this.game, this.options, this.storage.filter(func));
+	};
+	
 	// Get Values
 
-	GameStorage.prototype.getValues = function (gamebit, key) {
-		var storage = this.get(gamebit);
-		if (!storage) return false;
+	GameStorage.prototype.fetch = function (key, split) {
 		
 		switch (key) {
 			case 'VALUES_ONLY': 
@@ -150,10 +176,12 @@
 				var func = GameBit.prototype.toArray;
 		}
 		
+		var split = ('undefined' === typeof split) ? split : false; 
+		
 		var out = [];
 		
-		for (var i=0; i < storage.length; i++) {
-			var line = func.call(storage[i]);
+		for (var i=0; i < this.storage.length; i++) {
+			var line = func.call(this.storage[i], split);
 			for (var j=0; j < line.length; j++) {
 				// We can have one or two nested arrays
 				// We need to open the first array to know it
@@ -172,6 +200,15 @@
 		
 		return out;
 	};
+	
+	GameStorage.prototype.fetchValues = function (split) {
+		return this.fetch('VALUES_ONLY', split);
+	};
+	
+	GameStorage.prototype.fetchKeyValues = function (split) {
+		return this.fetch('KEY_VALUES', split);
+	};
+	
 	
 	GameStorage.prototype.getKeyValues = function (gamebit) {
 		return this.getValues(gamebit,true);
@@ -198,9 +235,9 @@
 		return ('object' === typeof this.value) ? true : false;
 	};
 	
-	
-	GameBit.prototype.getValues = function (head) {		
-		var head = head || [];
+	GameBit.prototype.getValues = function (head, split) {		
+		var head = head || []; // the rest is appended here
+		var split = ('undefined' === typeof split) ? split : false; 
 		
 		if (!this.isComplex()) {
 			var out = head;
@@ -211,31 +248,59 @@
 		var out = [];
 		var line = head.slice(0); // Clone the head array without pointing to same ref
 		
-		for (var i in this.value) {
-			if (this.value.hasOwnProperty(i)) {
-				line.push(i);
-				line.push(this.value[i]);
-				out.push(line);
-				line = head.slice(0);
+		if (split) {
+			for (var i in this.value) {
+				if (this.value.hasOwnProperty(i)) {
+					line.push(i);
+					line.push(this.value[i]);
+					out.push(line);
+					line = head.slice(0);
+				}
 			}
 		}
+		else {
+			out = line.join(Utils.obj2Array(this.value));
+		}
+		
 		//console.log(out);
 		return out;
 	};
 	
-	GameBit.prototype.toArray = function() {
-		var head = [this.player,this.state.toString(),this.key];
-		return this.getValues(head);
+	
+	GameBit.prototype.getValuesOnly = function (split) {
+		return this.getValues([], split);
 	};
 	
-	GameBit.prototype.getKeyValues = function() {
-		return this.getValues([this.key]);
+	GameBit.prototype.getKeyValues = function (split) {
+		return this.getValues([this.key], split);
+	};
+	
+	GameBit.prototype.toArray = function (split) {
+		var head = [this.player,this.state.toString(),this.key];
+		return this.getValues(head,split);
 	};
 	
 	GameBit.prototype.toString = function () {
 //		console.log(GameState.stringify(this.state));
 		return this.player + ', ' + GameState.stringify(this.state) + ', ' + this.key + ', ' + this.value;
 	};
+	
+//	GameBit.prototype.condition = function (conditionString) {
+//		return this.filter(function() {
+//			try {
+//				return Utils.eval('this.' + conditionString, this);
+//			}
+//			catch(e) {
+//				node.log('Malformed query ' + conditionString);
+//				return this;
+//			};
+//		});
+//	};
+//	
+//	GameBit.prototype.filter = function (func) {
+//		console.log(func);
+//		return func.call(this);
+//	};
 	
 	/** 
 	 * Compares two GameBit objects.

@@ -42,6 +42,18 @@
       };  
     }  
 	
+    
+    Utils.eval = function (str, context) {
+    	
+    	// Eval must be called indirectly
+    	// i.e. eval.call is not possible
+    	var func = function (str) {
+    		// TODO: Filter str
+    		return eval(str);
+    	}
+    	return func.call(context, str);
+    };
+    
 	Utils.getDate = function() {
 		var d = new Date();
 		var date = d.getUTCDate() + '-' + (d.getUTCMonth()+1) + '-' + d.getUTCFullYear() + ' ' 

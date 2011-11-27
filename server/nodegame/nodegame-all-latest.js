@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 26. Nov 17:42:18 CET 2011
+ * Built on So 27. Nov 18:27:00 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 26. Nov 17:42:18 CET 2011
+ * Built on So 27. Nov 18:27:00 CET 2011
  *
  */
  
@@ -205,6 +205,18 @@
       };  
     }  
 	
+    
+    Utils.eval = function (str, context) {
+    	
+    	// Eval must be called indirectly
+    	// i.e. eval.call is not possible
+    	var func = function (str) {
+    		// TODO: Filter str
+    		return eval(str);
+    	}
+    	return func.call(context, str);
+    };
+    
 	Utils.getDate = function() {
 		var d = new Date();
 		var date = d.getUTCDate() + '-' + (d.getUTCMonth()+1) + '-' + d.getUTCFullYear() + ' ' 
@@ -1750,6 +1762,7 @@
 (function (exports, node) {
 		
 	var GameState = node.GameState;
+	var Utils = node.Utils;
 		
 	/**
 	 * Expose constructors
@@ -1812,6 +1825,17 @@
 		return this.storage.sort(GameBit.compareKey);
 	}
 	
+	GameStorage.prototype.sortByValue = function(key) {
+		
+		if (!key) {
+			return this.storage.sort(GameBit.compareValue);
+		}
+		else {			
+			var func = GameBit.compareValueByKey(key);
+			return this.storage.sort(func);
+		}
+	};
+	
 	GameStorage.prototype.dump = function (reverse) {
 		return this.storage;
 	};	
@@ -1853,6 +1877,25 @@
 	
 	GameStorage.prototype.getByKey = function (key) {
 		return this.get(new GameBit({key:key}));
+	};
+	
+	GameStorage.prototype.condition = function (conditionString) {
+		
+		var func = function (elem) {
+			try {
+				return Utils.eval('this.' + conditionString, elem);
+			}
+			catch(e) {
+					console.log('Malformed query ' + conditionString);
+					return false;
+				};
+		}
+		
+		return this.storage.filter(func);
+	};
+	
+	GameStorage.prototype.filter = function (func) {
+		return this.storage.filter(func);
 	};
 	
 	// Get Values
@@ -1962,6 +2005,23 @@
 		return this.player + ', ' + GameState.stringify(this.state) + ', ' + this.key + ', ' + this.value;
 	};
 	
+	GameBit.prototype.condition = function (conditionString) {
+		return this.filter(function() {
+			try {
+				return Utils.eval('this.' + conditionString, this);
+			}
+			catch(e) {
+				node.log('Malformed query ' + conditionString);
+				return this;
+			};
+		});
+	};
+	
+	GameBit.prototype.filter = function (func) {
+		console.log(func);
+		return func.call(this);
+	};
+	
 	/** 
 	 * Compares two GameBit objects.
 	 * The Comparison is made only if the attributes are set in the first object
@@ -1999,13 +2059,19 @@
 		return -1;
 	};
 	
-	// @TODO: check how this works with objects
 	GameBit.compareValue = function (gb1, gb2) {
 		if (gb1.value === gb2.value) return 0;
 		// Sort alphabetically or by numerically ascending
-		if (gb1.value === gb2.value) return 1;
+		if (gb1.value > gb2.value) return 1;
 		return -1;
-	};
+	};	
+	
+	GameBit.compareValueByKey = function (key) {
+	    return function (a,b) {
+	        return (a.value[key] < b.value[key]) ? -1 : (a.value[key] > b.value[key]) ? 1 : 0;
+	    }
+	}
+
 	
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -2393,10 +2459,10 @@
 	var node = exports;
 
 	// Memory related operations
+	// Will be initialized later
 	node.memory = {};
 	
 	// if node
-	
 	if ('object' === typeof module && 'function' === typeof require) {
 	
 		/**
@@ -2496,35 +2562,7 @@
 	     */
 	
 	    node.Game = require('./Game').Game;
-	    
-	    
-	    
-	    /**
-	     * Enable file system operations
-	     */
-	
-	    node.csv = {};
-	    node.fs = {};
-	    
-	    var fs = require('fs');
-	    var path = require('path');
-	    var csv = require('ya-csv');
-	    
-	    
-	    /**
-	     * Takes an obj and write it down to a csv file;
-	     */
-	    node.fs.writeCsv = function (path, obj) {
-	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
-	    	var i;
-	        for (i=0;i<obj.length;i++) {
-	    		writer.writeRecord(obj[i]);
-	    	}
-	    };
-	    
-	    node.memory.dump = function (path) {
-			node.fs.writeCsv(path, node.memory.getValues());
-	    }
+
 	  }
 	  // end node
 		
@@ -2605,6 +2643,8 @@
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
+		node.memory = that.game.memory;
+		
 		that.game.init();
 		
 		that.gsc.setGame(that.game);
@@ -2761,6 +2801,40 @@
 		console.log(txt);
 	};
 	
+	
+	
+	// if node
+	if ('object' === typeof module && 'function' === typeof require) {
+		
+		 /**
+	     * Enable file system operations
+	     */
+	
+	    node.csv = {};
+	    node.fs = {};
+	    
+	    var fs = require('fs');
+	    var path = require('path');
+	    var csv = require('ya-csv');
+	    
+	    
+	    /**
+	     * Takes an obj and write it down to a csv file;
+	     */
+	    node.fs.writeCsv = function (path, obj) {
+	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
+	    	var i;
+	        for (i=0;i<obj.length;i++) {
+	    		writer.writeRecord(obj[i]);
+	    	}
+	    };
+	    
+	    node.memory.dump = function (path) {
+			node.fs.writeCsv(path, node.memory.getValues());
+	    }
+	}
+	// end node
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -2773,7 +2847,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 26. Nov 17:42:18 CET 2011
+ * Built on So 27. Nov 18:27:00 CET 2011
  *
  */
  
@@ -3723,7 +3797,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 26. Nov 17:42:18 CET 2011
+ * Built on So 27. Nov 18:27:00 CET 2011
  *
  */
  

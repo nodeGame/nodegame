@@ -1,5 +1,8 @@
 var GameState = require('../client/nodeGame/GameState.js');
 module.exports = GameState;
+var Utils = require('../client/nodeGame/Utils.js');
+module.exports = Utils;
+
 var GameState = GameState.GameState;
 
 var GameStorage = require('../client/nodeGame/GameStorage.js').GameStorage;
@@ -88,7 +91,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-console.log(gs.toString());
+console.log(gs);
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -141,11 +144,23 @@ console.log(gs.toString());
 //var v = gs.getKeyValues();
 //console.log(v);
 
-console.log('Sort by Key-Values');
-gs.sortByValue('r');
+//console.log('Sort by Key-Values');
+//gs.sortByValue('r');
+//
+//for (var gb in gs.storage) {
+//	if (gs.storage.hasOwnProperty(gb)) {
+//		console.log(gs.storage[gb].value);
+//	}
+//}
 
-for (var gb in gs.storage) {
-	if (gs.storage.hasOwnProperty(gb)) {
-		console.log(gs.storage[gb].value);
-	}
-}
+
+// Condition Filter
+console.log('Filter Test');
+
+var out = gs.select("value.r > 0.5")
+			.fetch();
+
+console.log(out);
+
+
+
