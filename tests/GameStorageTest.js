@@ -91,7 +91,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-console.log(gs);
+//console.log(gs);
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -157,10 +157,23 @@ console.log(gs);
 // Condition Filter
 console.log('Filter Test');
 
-var out = gs.select("value.r > 0.5")
-			.fetch();
 
+var set = gs.select("value.r > 0.5");
+console.log(set);
+
+
+console.log('Fetch');
+var out = set.fetch();
 console.log(out);
 
+console.log('FetchValues');
+var out = set.fetchValues();
+console.log(out);
 
+console.log('FetchKeyValues');
+var out = set.fetchKeyValues();
+console.log(out);
 
+//console.log('Get');
+//var out = set.get();
+//console.log(out);

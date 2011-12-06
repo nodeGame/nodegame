@@ -106,11 +106,27 @@
 		}
 	};
 	
-	Utils.objToArray = function (obj) {
+	Utils.obj2Array = function (obj) {
+		//console.log(obj);
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
 	           result.push(obj[key]);
+	           //console.log(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	Utils.obj2KeyedArray = function (obj) {
+		//console.log(obj);
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   var o = {};
+	    	   o[key] = obj[key];
+	           result.push(o);
+	           //console.log(o);
 	       }
 	    }
 	    return result;
