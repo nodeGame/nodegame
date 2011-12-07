@@ -162,14 +162,13 @@
 
 	GameStorage.prototype.split = function () {
 
-		var func = GameBit.prototype.split;
-				
 		var out = [];
 		
 		for (var i=0; i < this.storage.length; i++) {
-			out.push(func.call(this.storage[i]));
+			out = out.concat(this.storage[i].split());
 		}	
-		//console.log(out);
+		
+		console.log(out);
 		
 		return new GameStorage(this.game, this.options, out);
 	};
@@ -218,22 +217,29 @@
 		return out;
 	};
 	
-	GameStorage.prototype.fetchValues = function (split) {
+	GameStorage.prototype.fetchArray = function (key) {
+		var out = Utils.obj2Array(this.fetch(key));
+		return out;
+	};
+	
+	
+	
+	GameStorage.prototype.fetchValues = function () {
 		return this.fetch('VALUES_ONLY');
 	};
 	
-	GameStorage.prototype.fetchKeyValues = function (split) {
+	GameStorage.prototype.fetchKeyValues = function () {
 		return this.fetch('KEY_VALUES');
 	};
 	
+	GameStorage.prototype.fetchValuesArray = function () {
+		return this.fetchArray('VALUES_ONLY');
+	};
 	
+	GameStorage.prototype.fetchKeyValuesArray = function () {
+		return this.fetchArray('KEY_VALUES');
+	};
 	
-//	GameStorage.prototype.getKeyValues = function (gamebit) {
-//		return this.getValues(gamebit,true);
-//	};
-		
-	
-
 	
 	/**
 	 * GameBit
@@ -317,17 +323,18 @@
 			}
 		}
 		
-		//console.log(out);
+//		console.log('eeeh');
+//		console.log(out);
 		return out;
 	};
 	
 	
 	GameBit.prototype.getValues = function () {		
-		return new GameBit({value:this.value});
+		return this.value;
 	};
 		
 	GameBit.prototype.getKeyValues = function () {
-		return new GameBit({key: this.key, value: this.value});
+		return {key: this.key, value: this.value};
 	};
 	
 	GameBit.prototype.toArray = function (split) {

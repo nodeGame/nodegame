@@ -161,17 +161,20 @@ console.log('Filter Test');
 var set = gs.select("value.r > 0.5");
 console.log(set);
 
+//set = set.split();
+//console.log(set);
+
 
 console.log('Fetch');
-var out = set.fetch();
+var out = set.fetchArray();
 console.log(out);
 
 console.log('FetchValues');
-var out = set.fetchValues();
+var out = set.fetchValuesArray();
 console.log(out);
 
 console.log('FetchKeyValues');
-var out = set.fetchKeyValues();
+var out = set.fetchKeyValuesArray();
 console.log(out);
 
 //console.log('Get');
