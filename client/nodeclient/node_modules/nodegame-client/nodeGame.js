@@ -191,7 +191,7 @@
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
-		node.memory = that.game.memory;
+		//node.memory = that.game.memory;
 		
 		that.game.init();
 		
@@ -350,7 +350,6 @@
 	};
 	
 	
-	
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 		
@@ -372,14 +371,18 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('fffuck!!!!!!!22222');
+	    	console.log(obj);
 	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
 	    
 	    node.memory.dump = function (path) {
-			node.fs.writeCsv(path, node.memory.getValues());
+	    	console.log('fffuck!!!!!!!!!!!');
+			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
 	    }
+	  
 	}
 	// end node
 	

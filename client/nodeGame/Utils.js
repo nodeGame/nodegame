@@ -42,6 +42,15 @@
       };  
     }  
 	
+    Utils.in_array = function (needle, haystack){
+	  var o = {};
+	  for(var i=0;i<a.length;i++){
+	    o[a[i]]='';
+	  }
+	  
+	  return needle in haystack;
+    }
+    
     
     Utils.eval = function (str, context) {
     	
@@ -118,7 +127,26 @@
 	    return result;
 	}
 	
+	/**
+	 * Creates an array containing all keys and values of the obj.
+	 */
 	Utils.obj2KeyedArray = function (obj) {
+		//console.log(obj);
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   result.push(key);
+	           result.push(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Creates an array of key:value objects.
+	 * 
+	 */
+	Utils.implodeObj = function (obj) {
 		//console.log(obj);
 	    var result = [];
 	    for (var key in obj) {

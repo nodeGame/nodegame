@@ -6,6 +6,7 @@ module.exports = Utils;
 var GameState = GameState.GameState;
 
 var GameStorage = require('../client/nodeGame/GameStorage.js').GameStorage;
+var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
 
 var gs = new GameStorage();
 
@@ -153,30 +154,80 @@ for (var i=0;i<clients.length;i++) {
 //	}
 //}
 
+//Condition Filter
+//console.log('Array Test');
 
-// Condition Filter
-console.log('Filter Test');
+//var obj = {a: 1, b: 2, c: 3, d: {a: 1, b: 2}};
+//
+//console.log(Utils);
+//
+//var ar = Utils.obj2Array(obj);
+//console.log(ar);
+//
+//var ar = Utils.obj2KeyedArray(obj);
+//console.log(ar);
 
 
-var set = gs.select("value.r > 0.5");
-console.log(set);
-
-//set = set.split();
+var set = gs.split();
 //console.log(set);
+//console.log(gs.size());
 
+set = set.select("value.r > 0.7");
+console.log(set);
+console.log(set.size());
 
-console.log('Fetch');
-var out = set.fetchArray();
-console.log(out);
+normalF = set.fetch();
+kaF = set.fetchArray();
 
-console.log('FetchValues');
-var out = set.fetchValuesArray();
-console.log(out);
+console.log('Fetch Normal');
+console.log(normalF);
+console.log('Fetch Array');
+console.log(kaF);
 
-console.log('FetchKeyValues');
-var out = set.fetchKeyValuesArray();
-console.log(out);
+//console.log('FetchArray');
+//var out = set.fetchArray();
+//console.log(out);
+
+//console.log('FetchValues');
+//var out = set.fetchValuesArray();
+//console.log(out);
+//
+//console.log('FetchKeyValues');
+//var out = set.fetchKeyValuesArray();
+//console.log(out);
 
 //console.log('Get');
 //var out = set.get();
 //console.log(out);
+
+
+//console.log('GameBit Test');
+//
+//var gb = new GameBit({state: 'a', player: '1', key: 'mamma', value: {a: 'yes', b: 'no'}});
+//console.log(gb);
+//
+//var out = gb.split();
+//console.log(out)
+//
+//console.log('toArray')
+//var out = gb.toArray();
+//console.log(out);
+
+//console.log('Values')
+//var out = gb.getValues();
+//console.log(out);
+//
+//console.log('Values Array');
+//var out = gb.getValuesArray();
+//console.log(out);
+//
+//console.log('KeyValues');
+//var out = gb.getKeyValues();
+//console.log(out);
+//
+//console.log('KeyValues Array');
+//var out = gb.getKeyValuesArray();
+//console.log(out);
+
+
+

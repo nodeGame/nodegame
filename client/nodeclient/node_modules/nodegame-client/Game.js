@@ -224,6 +224,12 @@
 		return this.gameLoop.previous(this.gameState);
 	};
 	
+	Game.prototype.jumpTo = function (jump) {
+		var gs = this.gameLoop.jumpTo(this.gameState, jump);
+		if (!gs) return false;
+		return this.updateState(gs);
+	};
+	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);
 //		this.gameState.is = is;

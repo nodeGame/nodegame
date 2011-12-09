@@ -13,7 +13,7 @@
 		
 	function Controls (options) {
 		this.name = 'Controls'
-		this.version = '0.1';
+		this.version = '0.2';
 	
 
 		this.options = options;
@@ -39,7 +39,8 @@
 //		else {		
 //			this.list = new node.window.List(this.id);
 //		}
-		
+		this.hasChanged = false; // TODO: should this be inherited?
+		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
@@ -105,9 +106,9 @@
 				var elem = this.add(item, id, attributes);
 				
 				// Fire the onChange event, if one defined
-				if (this.options.change) {
+				if (this.changeEvent) {
 					elem.onchange = function() {
-						node.emit(that.options.change);
+						node.emit(that.changeEvent);
 					};
 				}
 				
@@ -130,9 +131,12 @@
 		}
 	};
 	
-	Controls.prototype.listeners = function() {
+	Controls.prototype.listeners = function() {	
 		var that = this;
-	
+		// TODO: should this be inherited?
+		node.on(this.changeEvent, function(){
+			that.hasChanged = true;
+		});
 				
 	};
 	
@@ -148,7 +152,6 @@
 		
 		return out;
 	};
-	
 	
 	// Sub-classes
 	

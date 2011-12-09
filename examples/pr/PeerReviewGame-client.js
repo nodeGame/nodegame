@@ -15,6 +15,7 @@ function PeerReviewGame () {
 		this.timer = null;
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
+		this.outlet = null;
 	};
 	
 	
@@ -100,19 +101,25 @@ function PeerReviewGame () {
 							}
 		};
 		
-		node.window.addWidget('Controls.Radio',root,ctrl_options);
+		this.outlet = node.window.addWidget('Controls.Radio',root,ctrl_options);
 		
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 2000
+							milliseconds: 10000
 		};
 		
 		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
-			node.emit('INPUT_DISABLE');
-			node.DONE();
+			if (!this.outlet.hasChanged) {
+				alert(this.outlet.hasChanged + ' You must select an outlet for your creation NOW!!');
+				this.timer.restart(timerOptions);
+			}
+			else {
+				node.emit('INPUT_DISABLE');
+				node.DONE();
+			}
 		});
 		
 		console.log('Submission');
@@ -135,7 +142,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 2000
+								milliseconds: 4000
 			};			
 			this.timer.restart(timerOptions);
 			

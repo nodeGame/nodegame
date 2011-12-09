@@ -197,6 +197,23 @@
 		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['state'][gameState.step]['state'];
 	};
+	
+	GameLoop.prototype.jumpTo = function (gameState, jump) {
+		
+		if (this.exist(gameState)) return false;
+		if (!jump || jump === 0) return gameState;
+		
+		var gs = gameState;	
+		var func = (jump > 0) ? this.next : this.previous;
+		
+		for (var i=0; i<jump; i++) {
+			gs = func.call(this,gs);
+			if (!gs) return false;
+		}
+		
+		return gs
+	};
+	
 
 })(
 	'undefined' != typeof node ? node : module.exports

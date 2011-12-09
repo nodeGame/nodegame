@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.3
+ * nodeGame-all v0.5.9.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 27. Nov 18:27:00 CET 2011
+ * Built on Fr 9. Dez 18:42:08 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.3
+ * nodeGame Client v0.5.9.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 27. Nov 18:27:00 CET 2011
+ * Built on Fr 9. Dez 18:42:08 CET 2011
  *
  */
  
@@ -67,7 +67,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -205,6 +205,15 @@
       };  
     }  
 	
+    Utils.in_array = function (needle, haystack){
+	  var o = {};
+	  for(var i=0;i<a.length;i++){
+	    o[a[i]]='';
+	  }
+	  
+	  return needle in haystack;
+    }
+    
     
     Utils.eval = function (str, context) {
     	
@@ -269,11 +278,46 @@
 		}
 	};
 	
-	Utils.objToArray = function (obj) {
+	Utils.obj2Array = function (obj) {
+		//console.log(obj);
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
 	           result.push(obj[key]);
+	           //console.log(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Creates an array containing all keys and values of the obj.
+	 */
+	Utils.obj2KeyedArray = function (obj) {
+		//console.log(obj);
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   result.push(key);
+	           result.push(obj[key]);
+	       }
+	    }
+	    return result;
+	}
+	
+	/**
+	 * Creates an array of key:value objects.
+	 * 
+	 */
+	Utils.implodeObj = function (obj) {
+		//console.log(obj);
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   var o = {};
+	    	   o[key] = obj[key];
+	           result.push(o);
+	           //console.log(o);
 	       }
 	    }
 	    return result;
@@ -1338,6 +1382,23 @@
 		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['state'][gameState.step]['state'];
 	};
+	
+	GameLoop.prototype.jumpTo = function (gameState, jump) {
+		
+		if (this.exist(gameState)) return false;
+		if (!jump || jump === 0) return gameState;
+		
+		var gs = gameState;	
+		var func = (jump > 0) ? this.next : this.previous;
+		
+		for (var i=0; i<jump; i++) {
+			gs = func.call(this,gs);
+			if (!gs) return false;
+		}
+		
+		return gs
+	};
+	
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -1760,10 +1821,31 @@
 ); 
  
 (function (exports, node) {
-		
+	
+	/**
+	 * 
+	 * GameStorage provides a simple, lightweight NO-SQL database for nodeGame.
+	 * 
+	 * Selecting methods returning a new GameStorage obj (can be concatenated):
+	 * 
+	 * 		- filter 			-> execute callback
+	 * 		- select			-> evaluate string
+	 * 		- get				-> evaluate an obj
+	 * 		- sort 				->
+	 * 		- reverse			->
+	 * 		
+	 * Return an array of GameBits or their values:
+	 * 
+	 * 		- fetch
+	 * 
+	 * TODO: update and delete methods
+	 * 
+	 */
+	
+	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
-		
+	
 	/**
 	 * Expose constructors
 	 */
@@ -1780,8 +1862,9 @@
 	function GameStorage (game, options, storage) {
 	  this.game = game;
 	  this.options = options;
-	  //this.clients = {};
 	  this.storage = storage || [];
+	  
+	  this.size = function() { return this.storage.length };
 	};
 	
 	GameStorage.prototype.add = function (player, key, value, state) {
@@ -1800,7 +1883,7 @@
 	// Sorting Operation
 	
 	GameStorage.prototype.reverse = function () {
-		return this.storage.reverse();
+		return new GameStorage(this.game, this.options, this.storage.reverse());
 	};
 	
 	/**
@@ -1810,7 +1893,7 @@
 	 */
 	GameStorage.prototype.sort = function(func) {
 		var func = func || GameBit.comparePlayer;
-		return this.storage.sort(func);
+		return new GameStorage(this.game, this.options, this.storage.sort(func));
 	};
 	
 	GameStorage.prototype.sortByPlayer = function() {
@@ -1864,7 +1947,7 @@
 				out.push(this.storage[i]);
 			}
 		}	
-		return (out.length !== 0) ? out : false;
+		return new GameStorage(this.game, this.options, out);		
 	};
 	
 	GameStorage.prototype.getByPlayer = function (player) {
@@ -1879,74 +1962,95 @@
 		return this.get(new GameBit({key:key}));
 	};
 	
-	GameStorage.prototype.condition = function (conditionString) {
+	GameStorage.prototype.select = function (conditionString) {
 		
 		var func = function (elem) {
+			
+			// TODO: users do not need to enter value. in case they want 
+			// to access a property of the value obj
+			
 			try {
 				return Utils.eval('this.' + conditionString, elem);
 			}
 			catch(e) {
-					console.log('Malformed query ' + conditionString);
-					return false;
-				};
+				console.log('Malformed query ' + conditionString);
+				return false;
+			};
 		}
 		
-		return this.storage.filter(func);
+		return this.filter(func);
 	};
 	
 	GameStorage.prototype.filter = function (func) {
-		return this.storage.filter(func);
+		return new GameStorage(this.game, this.options, this.storage.filter(func));
 	};
 	
 	// Get Values
 
-	GameStorage.prototype.getValues = function (gamebit, key) {
-		var storage = this.get(gamebit);
-		if (!storage) return false;
-		
-		switch (key) {
-			case 'VALUES_ONLY': 
-				var func = GameBit.prototype.getValues;
-				break;
-			case 'KEY_VALUES':
-				var func = GameBit.prototype.getKeyValues; 
-				break;
-			case 'FULL':
-				var func = GameBit.prototype.toArray;
-				break;
-			default:
-				var func = GameBit.prototype.toArray;
-		}
-		
+	GameStorage.prototype.split = function () {
+
 		var out = [];
 		
-		for (var i=0; i < storage.length; i++) {
-			var line = func.call(storage[i]);
-			for (var j=0; j < line.length; j++) {
-				// We can have one or two nested arrays
-				// We need to open the first array to know it
-				if ('object' === typeof line[j]) {
-					out.push(line[j]);
-				}
-				else {
-					out.push(line);
-					break; // do not add line[j] multiple times
-				}
-				
-			}
+		for (var i=0; i < this.storage.length; i++) {
+			out = out.concat(this.storage[i].split());
 		}	
 		
 		//console.log(out);
 		
+		return new GameStorage(this.game, this.options, out);
+	};
+	
+	
+	GameStorage.prototype.fetch = function (key,array) {
+		
+		console.log(key);
+		console.log(array);
+		
+		switch (key) {
+			case 'VALUES':
+				var func = (array) ? GameBit.prototype.getValues :
+									 GameBit.prototype.getValuesArray;
+				break;
+			case 'KEY_VALUES':
+				var func = (array) ? GameBit.prototype.getKeyValues : 
+						   			 GameBit.prototype.getKeyValuesArray; 
+				break;
+			default:
+				if (!array) return this.storage;
+				var func = GameBit.prototype.toArray;
+		}
+		
+		var out = [];	
+		for (var i=0; i < this.storage.length; i++) {
+			out.push(func.call(new GameBit(this.storage[i])));
+		}	
+		
+		//console.log(out);
 		return out;
 	};
 	
-	GameStorage.prototype.getKeyValues = function (gamebit) {
-		return this.getValues(gamebit,true);
+	GameStorage.prototype.fetchArray = function (key) {
+		return this.fetch(key,true);
 	};
-		
 	
-
+	
+	
+	GameStorage.prototype.fetchValues = function () {
+		return this.fetch('VALUES');
+	};
+	
+	GameStorage.prototype.fetchKeyValues = function () {
+		return this.fetch('KEY_VALUES');
+	};
+	
+	GameStorage.prototype.fetchValuesArray = function () {
+		return this.fetchArray('VALUES');
+	};
+	
+	GameStorage.prototype.fetchKeyValuesArray = function () {
+		return this.fetchArray('KEY_VALUES');
+	};
+	
 	
 	/**
 	 * GameBit
@@ -1966,38 +2070,108 @@
 		return ('object' === typeof this.value) ? true : false;
 	};
 	
+//	GameBit.prototype.getValues = function (head, split) {		
+//		
+//		var head = head || []; // the rest is appended here
+//		var split = ('undefined' === typeof split) ? split : false; 
+//		
+//		if (!this.isComplex()) {
+//			var out = head;
+//			out.push(this.value);
+//			return out;
+//		}
+//		
+//		var out = [];
+//		var line = head.slice(0); // Clone the head array without pointing to same ref
+//		
+//		if (split) {
+//			for (var i in this.value) {
+//				if (this.value.hasOwnProperty(i)) {
+//					line.push(i);
+//					line.push(this.value[i]);
+//					out.push(line);
+//					line = head.slice(0);
+//				}
+//			}
+//		}
+//		else {
+//			out = line.concat(Utils.obj2KeyedArray(this.value));
+//			//console.log('eeeh');
+//		}
+//		
+//		//console.log(out);
+//		return out;
+//	};
 	
-	GameBit.prototype.getValues = function (head) {		
-		var head = head || [];
+	GameBit.prototype.split = function () {		
+			
 		
 		if (!this.isComplex()) {
-			var out = head;
-			out.push(this.value);
-			return out;
+			return Utils.clone(this);;
 		}
 		
+		var model = {};
 		var out = [];
-		var line = head.slice(0); // Clone the head array without pointing to same ref
+		
+		if ('undefined' !== typeof this.player) {
+			model.player = this.player;
+		}
+		
+		if ('undefined' !== typeof this.state) {
+			model.state = this.state;
+		}
+			
+		if ('undefined' !== typeof this.key) {
+			model.key = this.key;
+		}
 		
 		for (var i in this.value) {
+			var copy = Utils.clone(model);
+			copy.value = {};
 			if (this.value.hasOwnProperty(i)) {
-				line.push(i);
-				line.push(this.value[i]);
-				out.push(line);
-				line = head.slice(0);
+				copy.value[i] = this.value[i]; 
+				out.push(copy);
 			}
 		}
-		//console.log(out);
+		
 		return out;
 	};
 	
-	GameBit.prototype.toArray = function() {
-		var head = [this.player,this.state.toString(),this.key];
-		return this.getValues(head);
+	
+	GameBit.prototype.getValues = function () {		
+		return this.value;
+	};
+		
+	GameBit.prototype.getKeyValues = function () {
+		return {key: this.key, value: this.value};
 	};
 	
-	GameBit.prototype.getKeyValues = function() {
-		return this.getValues([this.key]);
+	GameBit.prototype.getValuesArray = function () {		
+		return Utils.obj2KeyedArray(this.value);
+	};
+	
+	GameBit.prototype.getKeyValuesArray = function () {
+		return [this.key].concat(Utils.obj2KeyedArray(this.value));
+	};
+	
+	
+	GameBit.prototype.toArray = function () {
+		
+		var out = [];
+		
+		if ('undefined' !== typeof this.state) out.push(this.state);
+		if ('undefined' !== typeof this.player) out.push(this.player);
+		if ('undefined' !== typeof this.key) out.push(this.key);
+		
+		
+		if (!this.isComplex()) {
+			out.push(this.value);
+		}
+		else {
+			out = out.concat(Utils.obj2KeyedArray(this.value));
+		}
+		
+		return out;
 	};
 	
 	GameBit.prototype.toString = function () {
@@ -2005,22 +2179,22 @@
 		return this.player + ', ' + GameState.stringify(this.state) + ', ' + this.key + ', ' + this.value;
 	};
 	
-	GameBit.prototype.condition = function (conditionString) {
-		return this.filter(function() {
-			try {
-				return Utils.eval('this.' + conditionString, this);
-			}
-			catch(e) {
-				node.log('Malformed query ' + conditionString);
-				return this;
-			};
-		});
-	};
-	
-	GameBit.prototype.filter = function (func) {
-		console.log(func);
-		return func.call(this);
-	};
+//	GameBit.prototype.condition = function (conditionString) {
+//		return this.filter(function() {
+//			try {
+//				return Utils.eval('this.' + conditionString, this);
+//			}
+//			catch(e) {
+//				node.log('Malformed query ' + conditionString);
+//				return this;
+//			};
+//		});
+//	};
+//	
+//	GameBit.prototype.filter = function (func) {
+//		console.log(func);
+//		return func.call(this);
+//	};
 	
 	/** 
 	 * Compares two GameBit objects.
@@ -2342,6 +2516,12 @@
 		return this.gameLoop.previous(this.gameState);
 	};
 	
+	Game.prototype.jumpTo = function (jump) {
+		var gs = this.gameLoop.jumpTo(this.gameState, jump);
+		if (!gs) return false;
+		return this.updateState(gs);
+	};
+	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);
 //		this.gameState.is = is;
@@ -2643,7 +2823,7 @@
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
-		node.memory = that.game.memory;
+		//node.memory = that.game.memory;
 		
 		that.game.init();
 		
@@ -2802,7 +2982,6 @@
 	};
 	
 	
-	
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 		
@@ -2824,14 +3003,18 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
+	    	console.log('fffuck!!!!!!!22222');
+	    	console.log(obj);
 	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
 	    
 	    node.memory.dump = function (path) {
-			node.fs.writeCsv(path, node.memory.getValues());
+	    	console.log('fffuck!!!!!!!!!!!');
+			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
 	    }
+	  
 	}
 	// end node
 	
@@ -2842,12 +3025,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.3
+ * nodeWindow v0.5.9.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 27. Nov 18:27:00 CET 2011
+ * Built on Fr 9. Dez 18:42:08 CET 2011
  *
  */
  
@@ -3792,12 +3975,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.3
+ * nodeGadgets v0.5.9.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 27. Nov 18:27:00 CET 2011
+ * Built on Fr 9. Dez 18:42:08 CET 2011
  *
  */
  
@@ -4407,7 +4590,7 @@
 		
 	function Controls (options) {
 		this.name = 'Controls'
-		this.version = '0.1';
+		this.version = '0.2';
 	
 
 		this.options = options;
@@ -4433,7 +4616,8 @@
 //		else {		
 //			this.list = new node.window.List(this.id);
 //		}
-		
+		this.hasChanged = false; // TODO: should this be inherited?
+		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
@@ -4499,9 +4683,9 @@
 				var elem = this.add(item, id, attributes);
 				
 				// Fire the onChange event, if one defined
-				if (this.options.change) {
+				if (this.changeEvent) {
 					elem.onchange = function() {
-						node.emit(that.options.change);
+						node.emit(that.changeEvent);
 					};
 				}
 				
@@ -4524,9 +4708,12 @@
 		}
 	};
 	
-	Controls.prototype.listeners = function() {
+	Controls.prototype.listeners = function() {	
 		var that = this;
-	
+		// TODO: should this be inherited?
+		node.on(this.changeEvent, function(){
+			that.hasChanged = true;
+		});
 				
 	};
 	
@@ -4542,7 +4729,6 @@
 		
 		return out;
 	};
-	
 	
 	// Sub-classes
 	

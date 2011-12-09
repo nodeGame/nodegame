@@ -23,7 +23,7 @@
 	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
-		
+	
 	/**
 	 * Expose constructors
 	 */
@@ -40,8 +40,9 @@
 	function GameStorage (game, options, storage) {
 	  this.game = game;
 	  this.options = options;
-	  //this.clients = {};
 	  this.storage = storage || [];
+	  
+	  this.size = function() { return this.storage.length };
 	};
 	
 	GameStorage.prototype.add = function (player, key, value, state) {
@@ -142,13 +143,17 @@
 	GameStorage.prototype.select = function (conditionString) {
 		
 		var func = function (elem) {
+			
+			// TODO: users do not need to enter value. in case they want 
+			// to access a property of the value obj
+			
 			try {
 				return Utils.eval('this.' + conditionString, elem);
 			}
 			catch(e) {
-					console.log('Malformed query ' + conditionString);
-					return false;
-				};
+				console.log('Malformed query ' + conditionString);
+				return false;
+			};
 		}
 		
 		return this.filter(func);
@@ -168,64 +173,48 @@
 			out = out.concat(this.storage[i].split());
 		}	
 		
-		console.log(out);
+		//console.log(out);
 		
 		return new GameStorage(this.game, this.options, out);
 	};
 	
 	
-	GameStorage.prototype.fetch = function (key) {
+	GameStorage.prototype.fetch = function (key,array) {
 		
+		console.log(key);
+		console.log(array);
 		
 		switch (key) {
-			case 'VALUES_ONLY': 
-				var func = GameBit.prototype.getValues;
+			case 'VALUES':
+				var func = (array) ? GameBit.prototype.getValues :
+									 GameBit.prototype.getValuesArray;
 				break;
 			case 'KEY_VALUES':
-				var func = GameBit.prototype.getKeyValues; 
+				var func = (array) ? GameBit.prototype.getKeyValues : 
+						   			 GameBit.prototype.getKeyValuesArray; 
 				break;
 			default:
-				key = false;
+				if (!array) return this.storage;
+				var func = GameBit.prototype.toArray;
 		}
 		
-		if (!key) return this.storage;
-		
-		
-		var out = [];
-		
+		var out = [];	
 		for (var i=0; i < this.storage.length; i++) {
-			
-			out.push(func.call(this.storage[i]));
-			
-//			var line = func.call(this.storage[i]);
-//			for (var j=0; j < line.length; j++) {
-//				// We can have one or two nested arrays
-//				// We need to open the first array to know it
-//				if ('object' === typeof line[j]) {
-//					out.push(line[j]);
-//				}
-//				else {
-//					out.push(line);
-//					break; // do not add line[j] multiple times
-//				}
-//				
-//			}
+			out.push(func.call(new GameBit(this.storage[i])));
 		}	
 		
 		//console.log(out);
-		
 		return out;
 	};
 	
 	GameStorage.prototype.fetchArray = function (key) {
-		var out = Utils.obj2Array(this.fetch(key));
-		return out;
+		return this.fetch(key,true);
 	};
 	
 	
 	
 	GameStorage.prototype.fetchValues = function () {
-		return this.fetch('VALUES_ONLY');
+		return this.fetch('VALUES');
 	};
 	
 	GameStorage.prototype.fetchKeyValues = function () {
@@ -233,7 +222,7 @@
 	};
 	
 	GameStorage.prototype.fetchValuesArray = function () {
-		return this.fetchArray('VALUES_ONLY');
+		return this.fetchArray('VALUES');
 	};
 	
 	GameStorage.prototype.fetchKeyValuesArray = function () {
@@ -323,8 +312,6 @@
 			}
 		}
 		
-//		console.log('eeeh');
-//		console.log(out);
 		return out;
 	};
 	
@@ -337,14 +324,29 @@
 		return {key: this.key, value: this.value};
 	};
 	
-	GameBit.prototype.toArray = function (split) {
-		var out = [this.player, this.state, this.key];
+	GameBit.prototype.getValuesArray = function () {		
+		return Utils.obj2KeyedArray(this.value);
+	};
+	
+	GameBit.prototype.getKeyValuesArray = function () {
+		return [this.key].concat(Utils.obj2KeyedArray(this.value));
+	};
+	
+	
+	GameBit.prototype.toArray = function () {
+		
+		var out = [];
+		
+		if ('undefined' !== typeof this.state) out.push(this.state);
+		if ('undefined' !== typeof this.player) out.push(this.player);
+		if ('undefined' !== typeof this.key) out.push(this.key);
+		
 		
 		if (!this.isComplex()) {
 			out.push(this.value);
 		}
 		else {
-			out.concat(Utils.obj2KeyedArray(this.value));
+			out = out.concat(Utils.obj2KeyedArray(this.value));
 		}
 		
 		return out;
