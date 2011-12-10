@@ -92,7 +92,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-console.log(gs);
+//console.log(gs);
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -231,7 +231,18 @@ console.log(gs);
 
 console.log('Join Test');
 
+gs = gs.select('value.r > 0.5');
+
 var out = gs.join('x','z','ahah');
 console.log(out);
 
+console.log('1111111111111111111111');
+var out = out.fetchArray();
+console.log(out);
 
+
+
+
+//console.log('2');
+//var out = out.split();
+//console.log(out);

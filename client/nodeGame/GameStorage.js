@@ -184,7 +184,7 @@
 		var out = [];
 		
 		for (var i=0; i < this.storage.length; i++) {
-			out = out.concat(this.storage[i].split());
+			out = out.concat(new GameBit(this.storage[i]).split());
 		}	
 		
 		//console.log(out);
@@ -194,22 +194,28 @@
 	
 	GameStorage.prototype.join = function (key1, key2, newkey) {
 		
-		var func = function(key) {
-			if (this.key === key) return this;
-		};
 		
-		var keys2 = this.filter(func(key2));
-		if (key2.size() === 0) return [];
-		var keys1 = this.filter(func(key1));
-		if (key1.size() === 0) return [];
+//		var keys2 = this.filter(function () {
+//			if (this.key === key2) return this;
+//		});
+//		if (key2.size() === 0) return [];
+//		
+//		var keys1 = this.filter(function () {
+//			if (this.key === key2) return this;
+//		});
+//		if (key1.size() === 0) return [];
 		
 		var out = [];
-		for (var i=0; i<keys1.size(); i++) {
-			for (var j=0; j<keys2.size(); j++) {
-				out.push(Gamebit.join(keys1[i],keys2[j],newkey));
+		for (var i=0; i < this.storage.length; i++) {
+			if (this.storage[i].key === key1) {
+				for (var j=0; j < this.storage.length; j++) {
+					if (this.storage[j].key === key2)
+					out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+				}
 			}
 		};
-		return out;
+		
+		return new GameStorage(this.game, this.options, out);
 	};
 	
 	
@@ -353,16 +359,24 @@
 			model.key = this.key;
 		}
 		
-		for (var i in this.value) {
-			var copy = Utils.clone(model);
-			copy.value = {};
-			if (this.value.hasOwnProperty(i)) {
-				copy.value[i] = this.value[i]; 
-				out.push(copy);
+		var splitValue = function (value, model) {
+			for (var i in value) {
+				var copy = Utils.clone(model);
+				copy.value = {};
+				if (value.hasOwnProperty(i)) {
+					if ('object' === typeof value[i]) {
+						out = out.concat(splitValue(value[i], model));
+					}
+					else {
+						copy.value[i] = value[i]; 
+						out.push(copy);
+					}
+				}
 			}
-		}
+			return out;
+		};
 		
-		return out;
+		return splitValue(this.value, model);
 	};
 	
 	

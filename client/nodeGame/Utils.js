@@ -41,7 +41,7 @@
         return res;  
       };  
     }  
-	
+    
     Utils.in_array = function (needle, haystack){
 	  var o = {};
 	  for(var i=0;i<a.length;i++){
@@ -115,31 +115,32 @@
 		}
 	};
 	
-	Utils.obj2Array = function (obj) {
-		//console.log(obj);
+	Utils._obj2Array = function(obj, keyed) {
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
-	           result.push(obj[key]);
-	           //console.log(obj[key]);
+	    	   if ( 'object' === typeof obj[key] ) {
+					result = result.concat(Utils._obj2Array(obj[key],keyed));
+				}
+				else {
+					if (keyed) result.push(key);
+			        result.push(obj[key]);
+				}
+	    	   
 	       }
 	    }
 	    return result;
+	};
+	
+	Utils.obj2Array = function (obj) {
+	    return Utils._obj2Array(obj);
 	}
 	
 	/**
 	 * Creates an array containing all keys and values of the obj.
 	 */
 	Utils.obj2KeyedArray = function (obj) {
-		//console.log(obj);
-	    var result = [];
-	    for (var key in obj) {
-	       if (obj.hasOwnProperty(key)) {
-	    	   result.push(key);
-	           result.push(obj[key]);
-	       }
-	    }
-	    return result;
+	    return Utils._obj2Array(obj,true);
 	}
 	
 	/**
