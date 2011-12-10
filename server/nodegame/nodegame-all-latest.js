@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 13:29:54 CET 2011
+ * Built on Sat Dec 10 19:23:59 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 13:29:54 CET 2011
+ * Built on Sat Dec 10 19:23:59 CET 2011
  *
  */
  
@@ -204,7 +204,7 @@
         return res;  
       };  
     }  
-	
+    
     Utils.in_array = function (needle, haystack){
 	  var o = {};
 	  for(var i=0;i<a.length;i++){
@@ -278,31 +278,32 @@
 		}
 	};
 	
-	Utils.obj2Array = function (obj) {
-		//console.log(obj);
+	Utils._obj2Array = function(obj, keyed) {
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
-	           result.push(obj[key]);
-	           //console.log(obj[key]);
+	    	   if ( 'object' === typeof obj[key] ) {
+					result = result.concat(Utils._obj2Array(obj[key],keyed));
+				}
+				else {
+					if (keyed) result.push(key);
+			        result.push(obj[key]);
+				}
+	    	   
 	       }
 	    }
 	    return result;
+	};
+	
+	Utils.obj2Array = function (obj) {
+	    return Utils._obj2Array(obj);
 	}
 	
 	/**
 	 * Creates an array containing all keys and values of the obj.
 	 */
 	Utils.obj2KeyedArray = function (obj) {
-		//console.log(obj);
-	    var result = [];
-	    for (var key in obj) {
-	       if (obj.hasOwnProperty(key)) {
-	    	   result.push(key);
-	           result.push(obj[key]);
-	       }
-	    }
-	    return result;
+	    return Utils._obj2Array(obj,true);
 	}
 	
 	/**
@@ -1867,6 +1868,20 @@
 	  this.size = function() { return this.storage.length };
 	};
 	
+	GameStorage.prototype.map = function (func) {
+		var result = [];
+		for (var i=0; i < this.storage.length; i++) {
+			result[i] = func.call(this.storage[i]);
+		}	
+		return result;
+	};
+	
+	GameStorage.prototype.forEach = function (func) {
+		for (var i=0; i < this.storage.length; i++) {
+			func.call(this.storage[i]);
+		}	
+	};
+	
 	GameStorage.prototype.add = function (player, key, value, state) {
 		var state = state || this.game.gameState;
 
@@ -1992,10 +2007,36 @@
 		var out = [];
 		
 		for (var i=0; i < this.storage.length; i++) {
-			out = out.concat(this.storage[i].split());
+			out = out.concat(new GameBit(this.storage[i]).split());
 		}	
 		
 		//console.log(out);
+		
+		return new GameStorage(this.game, this.options, out);
+	};
+	
+	GameStorage.prototype.join = function (key1, key2, newkey) {
+		
+		
+//		var keys2 = this.filter(function () {
+//			if (this.key === key2) return this;
+//		});
+//		if (key2.size() === 0) return [];
+//		
+//		var keys1 = this.filter(function () {
+//			if (this.key === key2) return this;
+//		});
+//		if (key1.size() === 0) return [];
+		
+		var out = [];
+		for (var i=0; i < this.storage.length; i++) {
+			if (this.storage[i].key === key1) {
+				for (var j=0; j < this.storage.length; j++) {
+					if (this.storage[j].key === key2)
+					out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+				}
+			}
+		};
 		
 		return new GameStorage(this.game, this.options, out);
 	};
@@ -2103,6 +2144,22 @@
 //		return out;
 //	};
 	
+	GameBit.prototype.join = function(gb, newkey) {
+		return GameBit.join(this, gb, newkey);
+	};
+		
+	GameBit.join = function(gb1, gb2, newkey) {
+		var value = {};
+		value[gb1.key] = gb1.value;
+		value[gb2.key] = gb2.value;
+		
+		return new GameBit({player: gb1.player,
+							state: gb1.state,
+							key: newkey || gb1.key,
+							value: value
+		});
+	};
+	
 	GameBit.prototype.split = function () {		
 			
 		
@@ -2125,16 +2182,24 @@
 			model.key = this.key;
 		}
 		
-		for (var i in this.value) {
-			var copy = Utils.clone(model);
-			copy.value = {};
-			if (this.value.hasOwnProperty(i)) {
-				copy.value[i] = this.value[i]; 
-				out.push(copy);
+		var splitValue = function (value, model) {
+			for (var i in value) {
+				var copy = Utils.clone(model);
+				copy.value = {};
+				if (value.hasOwnProperty(i)) {
+					if ('object' === typeof value[i]) {
+						out = out.concat(splitValue(value[i], model));
+					}
+					else {
+						copy.value[i] = value[i]; 
+						out.push(copy);
+					}
+				}
 			}
-		}
+			return out;
+		};
 		
-		return out;
+		return splitValue(this.value, model);
 	};
 	
 	
@@ -2173,6 +2238,8 @@
 		
 		return out;
 	};
+	
+	
 	
 	GameBit.prototype.toString = function () {
 //		console.log(GameState.stringify(this.state));
@@ -3030,7 +3097,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 13:29:54 CET 2011
+ * Built on Sat Dec 10 19:23:59 CET 2011
  *
  */
  
@@ -4019,7 +4086,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 13:29:54 CET 2011
+ * Built on Sat Dec 10 19:23:59 CET 2011
  *
  */
  
@@ -4803,34 +4870,28 @@
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
 		console.log('ADDDING radio');
+		console.log(attributes);
 		// add the group name if not specified
 		if ('undefined' === typeof attributes.name) {
 			console.log(this);
 			console.log('MODMOD ' + this.groupName);
-			attributes.name = this.groupName;
+			attributes.name = 'asdasd'; //this.groupName;
 		}
 		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls
-	Controls.prototype.getAllValues = function() {
+	RadioControls.prototype.getAllValues = function() {
 		
 		for (var key in this.features) {
 			if (this.features.hasOwnProperty(key)) {
-				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
-				if (node.window.getElementById(key).checked) {
-					return node.window.getElementById(key).value;
+				var el = node.window.getElementById(key);
+				if (el.checked) {
+					return el.value;
 				}
 			}
 		}
-//		
-//		for (index=0; index < document.frmRadio.choice.length; index++) {
-//			if (document.frmRadio.choice[index].checked) {
-//				var radioValue = document.frmRadio.choice[index].value;
-//				break;
-//			}
-//		}
 		return false;
 	};
 	

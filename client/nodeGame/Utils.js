@@ -44,11 +44,10 @@
     
     Utils.in_array = function (needle, haystack){
 	  var o = {};
-	  for(var i=0;i<a.length;i++){
-	    o[a[i]]='';
+	  for(var i=0;i<haystack.length;i++){
+	    o[haystack[i]]='';
 	  }
-	  
-	  return needle in haystack;
+	  return needle in o;
     }
     
     
@@ -134,14 +133,14 @@
 	
 	Utils.obj2Array = function (obj) {
 	    return Utils._obj2Array(obj);
-	}
+	};
 	
 	/**
 	 * Creates an array containing all keys and values of the obj.
 	 */
 	Utils.obj2KeyedArray = function (obj) {
 	    return Utils._obj2Array(obj,true);
-	}
+	};
 	
 	/**
 	 * Creates an array of key:value objects.
@@ -159,7 +158,7 @@
 	       }
 	    }
 	    return result;
-	}
+	};
 	
 	/**
 	 * Returns an array days, minutes, seconds, mi

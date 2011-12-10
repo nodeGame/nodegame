@@ -149,7 +149,7 @@ function PeerReviewGame () {
 			this.timer.restart(timerOptions);
 			
 			node.onDATA('CF', function(msg) {
-				console.log(msg);
+				//console.log(msg);
 				var cf_options = { id: 'cf',
 								   width: 300,
 								   height: 300,
@@ -173,7 +173,7 @@ function PeerReviewGame () {
 				
 				for (var i in evas) {
 					if (evas.hasOwnProperty(i)) {	
-						node.set('EVA', {from: i,
+						node.set('EVA', {'for': i,
 										 eva: evas[i].value
 						});
 					}

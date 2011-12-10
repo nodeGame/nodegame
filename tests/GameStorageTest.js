@@ -92,7 +92,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-//console.log(gs);
+console.log(gs.fetch());
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -229,19 +229,23 @@ for (var i=0;i<clients.length;i++) {
 //var out = gb.getKeyValuesArray();
 //console.log(out);
 
-console.log('Join Test');
+//console.log('Join Test');
+//
+//gs = gs.select('value.r > 0.5');
+//
+//var out = gs.join('x','z','ahah');
+//console.log(out);
+//
+//console.log('1111111111111111111111');
+//var out = out.fetchArray();
+//console.log(out);
 
-gs = gs.select('value.r > 0.5');
 
-var out = gs.join('x','z','ahah');
+console.log('GroupBy Test');
+
+var out = gs.groupBy('value.r');
 console.log(out);
-
-console.log('1111111111111111111111');
-var out = out.fetchArray();
-console.log(out);
-
-
-
+console.log(out.length);
 
 //console.log('2');
 //var out = out.split();
