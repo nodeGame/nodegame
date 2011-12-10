@@ -172,6 +172,45 @@
 	};
 	
 	
+	Document.prototype.highlight = function (elem, code) {
+		if (!elem) return;
+		
+		// default value is ERR		
+		switch (code) {	
+			case 'OK':
+				var color =  'green';
+				break;
+			case 'WARN':
+				var color = 'yellow';
+				break;
+			default:
+				var color = 'red';
+		}
+		
+		return this.addBorder(elem,color);
+	};
+	
+	Document.prototype.addBorder = function (elem, color, witdh, type) {
+		if (!elem) return;
+		
+		var color = color || 'red';
+		var width = width || '5px';
+		var type = type || 'solid';
+		
+		var properties = { border: width + ' ' + type + ' ' + color }
+		return this.style(elem,properties);
+	};
+	
+	Document.prototype.style = function (elem, properties) {
+		if (!elem || !properties) return;
+		
+		var style = '';
+		for (var i in properties) {
+			style += i + ': ' + properties[i] + '; ';
+		};
+		return elem.setAttribute('style',style);
+	};
+	
 	// TODO: Potentially unsafe
 	// Works only with Chrome
 	Document.prototype.loadFile = function (container,file) {

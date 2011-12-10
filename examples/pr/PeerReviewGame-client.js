@@ -77,10 +77,10 @@ function PeerReviewGame () {
 		
 		var ctrl_options = { id: 'exhib',
 							 name: 'exhib',
-//							 fieldset: {
-//										legend: 'Exhibitions'
-//							 },
-							 fieldset: false,
+							 fieldset: {
+										legend: 'Exhibitions'
+							 },
+							 //fieldset: false,
 							 submit: false,
 //							 submit: {
 //								 		value: 'Submit'
@@ -113,11 +113,13 @@ function PeerReviewGame () {
 		
 		node.on('SUBMISSION_DONE', function(){
 			if (!this.outlet.hasChanged) {
-				alert(this.outlet.hasChanged + ' You must select an outlet for your creation NOW!!');
+				this.outlet.highlight();
+				alert('You must select an outlet for your creation NOW!!');
 				this.timer.restart(timerOptions);
 			}
 			else {
 				node.emit('INPUT_DISABLE');
+				node.set('SUB', this.outlet.getAllValues());
 				node.DONE();
 			}
 		});

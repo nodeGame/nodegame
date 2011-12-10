@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 9. Dez 18:42:08 CET 2011
+ * Built on Sa 10. Dez 13:29:54 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 9. Dez 18:42:08 CET 2011
+ * Built on Sa 10. Dez 13:29:54 CET 2011
  *
  */
  
@@ -37,7 +37,7 @@
 	EventEmitter.prototype = {
 	
 	    constructor: EventEmitter,
-		    
+		
 	    addListener: function (type, listener) {
 	    	 if (typeof this._listeners[type] == "undefined"){
 	             this._listeners[type] = [];
@@ -3030,7 +3030,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 9. Dez 18:42:08 CET 2011
+ * Built on Sa 10. Dez 13:29:54 CET 2011
  *
  */
  
@@ -3208,6 +3208,45 @@
 		return this.addElement('div', root, id, attributes);
 	};
 	
+	
+	Document.prototype.highlight = function (elem, code) {
+		if (!elem) return;
+		
+		// default value is ERR		
+		switch (code) {	
+			case 'OK':
+				var color =  'green';
+				break;
+			case 'WARN':
+				var color = 'yellow';
+				break;
+			default:
+				var color = 'red';
+		}
+		
+		return this.addBorder(elem,color);
+	};
+	
+	Document.prototype.addBorder = function (elem, color, witdh, type) {
+		if (!elem) return;
+		
+		var color = color || 'red';
+		var width = width || '5px';
+		var type = type || 'solid';
+		
+		var properties = { border: width + ' ' + type + ' ' + color }
+		return this.style(elem,properties);
+	};
+	
+	Document.prototype.style = function (elem, properties) {
+		if (!elem || !properties) return;
+		
+		var style = '';
+		for (var i in properties) {
+			style += i + ': ' + properties[i] + '; ';
+		};
+		return elem.setAttribute('style',style);
+	};
 	
 	// TODO: Potentially unsafe
 	// Works only with Chrome
@@ -3980,7 +4019,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 9. Dez 18:42:08 CET 2011
+ * Built on Sa 10. Dez 13:29:54 CET 2011
  *
  */
  
@@ -4730,6 +4769,10 @@
 		return out;
 	};
 	
+	Controls.prototype.highlight = function (code) {
+		return node.window.highlight(this.listRoot, code);
+	};
+	
 	// Sub-classes
 	
 	SliderControls.prototype.__proto__ = Controls.prototype;
@@ -4752,19 +4795,44 @@
 	function RadioControls (options) {
 		Controls.call(this,options);
 		this.name = 'RadioControls'
-		this.version = '0.1';
+		this.version = '0.1.1';
 		this.id = options.id || this.name;
 		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
+		alert(this.groupName);
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
+		console.log('ADDDING radio');
 		// add the group name if not specified
-		if (!attributes.name) {
+		if ('undefined' === typeof attributes.name) {
+			console.log(this);
+			console.log('MODMOD ' + this.groupName);
 			attributes.name = this.groupName;
 		}
+		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
+	// Override getAllValues for Radio Controls
+	Controls.prototype.getAllValues = function() {
+		
+		for (var key in this.features) {
+			if (this.features.hasOwnProperty(key)) {
+				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
+				if (node.window.getElementById(key).checked) {
+					return node.window.getElementById(key).value;
+				}
+			}
+		}
+//		
+//		for (index=0; index < document.frmRadio.choice.length; index++) {
+//			if (document.frmRadio.choice[index].checked) {
+//				var radioValue = document.frmRadio.choice[index].value;
+//				break;
+//			}
+//		}
+		return false;
+	};
 	
 })(node.window.widgets); 
  
