@@ -80,6 +80,7 @@ function PeerReviewGame () {
 							 fieldset: {
 										legend: 'Exhibitions'
 							 },
+							 //change: 'SUBMISSION_DONE',
 							 //fieldset: false,
 							 submit: false,
 //							 submit: {
@@ -106,7 +107,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 10000
+							milliseconds: 6000
 		};
 		
 		this.timer.restart(timerOptions);

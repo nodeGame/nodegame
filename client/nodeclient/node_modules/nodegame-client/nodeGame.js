@@ -192,9 +192,8 @@
 		
 		node.game = that.game = new Game(game, that.gsc);
 		//node.memory = that.game.memory;
-		
-		that.game.init();
-		
+		// INIT the game
+		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
 		console.log('nodeGame: game loaded...');

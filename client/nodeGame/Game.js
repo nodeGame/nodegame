@@ -230,6 +230,10 @@
 		return this.updateState(gs);
 	};
 	
+	Game.prototype.getRelativeState = function (jump) {
+		return this.gameLoop.jumpTo(this.gameState, jump);
+	};
+	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);
 //		this.gameState.is = is;

@@ -182,7 +182,7 @@
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
 		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
-		alert(this.groupName);
+		//alert(this.groupName);
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {

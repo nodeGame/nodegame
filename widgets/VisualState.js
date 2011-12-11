@@ -18,7 +18,7 @@
 		this.id = options.id || 'VisualState';
 		this.name = 'Visual State';
 		this.version = '0.1';
-		this.gameLoop = this.game.gameLoop;
+		this.gameLoop = node.game.gameLoop;
 		
 		this.fieldset = {legend: 'State'};
 		

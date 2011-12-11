@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.5
+ * nodeGame-all v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Dec 11 13:13:53 CET 2011
+ * Built on Sun Dec 11 18:57:44 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.5
+ * nodeGame Client v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Dec 11 13:13:53 CET 2011
+ * Built on Sun Dec 11 18:57:44 CET 2011
  *
  */
  
@@ -1927,6 +1927,82 @@
 	  this.size = function() { return this.storage.length };
 	};
 	
+	GameStorage.prototype.count = function (key) {
+		var count = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if ('undefined' !== typeof tmp) {
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return count;
+	};
+	
+	GameStorage.prototype.sum = function (key) {
+		var sum = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp)) {
+					sum += tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return sum;
+	};
+	
+	GameStorage.prototype.mean = function (key) {
+		var sum = 0;
+		var count = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp)) { 
+					//console.log(tmp);
+					sum += tmp;
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+//		console.log(sum);
+//		console.log(count);
+		return (count === 0) ? 0 : sum / count;
+	};
+	
+	GameStorage.prototype.min = function (key) {
+		var min = false;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp) && tmp < min) {
+					min = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return min;
+	};
+
+	GameStorage.prototype.max = function (key) {
+		var max = false;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp) && tmp < max) {
+					max = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return max;
+	};
+	
+	
 	GameStorage.prototype.map = function (func) {
 		var result = [];
 		for (var i=0; i < this.storage.length; i++) {
@@ -2088,18 +2164,7 @@
 				console.log('Malformed id ' + id);
 				return false;
 			};
-			
-			//console.log(el);
-			
-//			if ('object' !== typeof el) {
-//				var el_id = el;
-//			}
-//			else {
-//				// We need to get an 'hash' of the obj, in order
-//				// to know whether it is already in the groups array
-//				var el_id = Utils.objGetAllKeys(el).join('');
-//			}
-			
+						
 			if (!Utils.in_array(el,groups)) {
 				groups.push(el);
 				
@@ -2120,33 +2185,56 @@
 	};
 	
 	GameStorage.prototype.join = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
+	};
+	
+	GameStorage.prototype.concat = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(){ return true;});
+	};
+
+	GameStorage.prototype._join = function (key1, key2, newkey, condition) {
+		
 		var out = [];
 		for (var i=0; i < this.storage.length; i++) {
-			if (this.storage[i].key === key1) {
-				for (var j=0; j < this.storage.length; j++) {
-					if (this.storage[j].key === key2)
-					out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+			try {
+				var foreign_key = Utils.eval('this.'+key1, this.storage[i]);
+				if ('undefined' !== typeof foreign_key) { 
+					for (var j=0; j < this.storage.length; j++) {
+						if (i === j) continue;
+						try {
+							var key = Utils.eval('this.'+key2, this.storage[j]);
+							if ('undefined' !== typeof key) { 
+								if (condition(foreign_key, key)) {
+									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+								}
+							}
+						}
+						catch(e) {
+							console.log('Malformed key: ' + key2);
+							//return false;
+						}
+					}
 				}
 			}
-		};
+			catch(e) {
+				console.log('Malformed key: ' + key1);
+				//return false;
+			}
+		}
 		
 		return new GameStorage(this.game, this.options, out);
 	};
 	
-	
 	GameStorage.prototype.fetch = function (key,array) {
-		
-		console.log(key);
-		console.log(array);
 		
 		switch (key) {
 			case 'VALUES':
-				var func = (array) ? GameBit.prototype.getValues :
-									 GameBit.prototype.getValuesArray;
+				var func = (array) ? GameBit.prototype.getValuesArray :
+									 GameBit.prototype.getValues ;
 				break;
 			case 'KEY_VALUES':
-				var func = (array) ? GameBit.prototype.getKeyValues : 
-						   			 GameBit.prototype.getKeyValuesArray; 
+				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
+									 GameBit.prototype.getKeyValues; 
 				break;
 			default:
 				if (!array) return this.storage;
@@ -2983,9 +3071,8 @@
 		
 		node.game = that.game = new Game(game, that.gsc);
 		//node.memory = that.game.memory;
-		
-		that.game.init();
-		
+		// INIT the game
+		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
 		console.log('nodeGame: game loaded...');
@@ -3181,12 +3268,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.5
+ * nodeWindow v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Dec 11 13:13:54 CET 2011
+ * Built on Sun Dec 11 18:57:44 CET 2011
  *
  */
  
@@ -4170,12 +4257,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.5
+ * nodeGadgets v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Dec 11 13:13:54 CET 2011
+ * Built on Sun Dec 11 18:57:44 CET 2011
  *
  */
  
@@ -4954,7 +5041,7 @@
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
 		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
-		alert(this.groupName);
+		//alert(this.groupName);
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
@@ -5619,7 +5706,7 @@
 		this.id = options.id || 'VisualState';
 		this.name = 'Visual State';
 		this.version = '0.1';
-		this.gameLoop = this.game.gameLoop;
+		this.gameLoop = node.game.gameLoop;
 		
 		this.fieldset = {legend: 'State'};
 		

@@ -302,21 +302,16 @@
 		return outs;
 	};
 	
-//	GameStorage.prototype.join = function (key1, key2, newkey) {		
-//		var out = [];
-//		for (var i=0; i < this.storage.length; i++) {
-//			if (this.storage[i].key === key1) {
-//				for (var j=0; j < this.storage.length; j++) {
-//					if (this.storage[j].key === key2)
-//					out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
-//				}
-//			}
-//		};
-//		
-//		return new GameStorage(this.game, this.options, out);
-//	};
-
 	GameStorage.prototype.join = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
+	};
+	
+	GameStorage.prototype.concat = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(){ return true;});
+	};
+
+	GameStorage.prototype._join = function (key1, key2, newkey, condition) {
+		
 		var out = [];
 		for (var i=0; i < this.storage.length; i++) {
 			try {
@@ -327,7 +322,7 @@
 						try {
 							var key = Utils.eval('this.'+key2, this.storage[j]);
 							if ('undefined' !== typeof key) { 
-								if (foreign_key === key) {
+								if (condition(foreign_key, key)) {
 									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
 								}
 							}

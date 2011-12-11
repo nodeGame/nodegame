@@ -277,25 +277,21 @@ var out = gs.join('player', 'value.for')
 			.select('value.SUB')
 			.groupBy('value.SUB');
 
-//console.log(out.fetchValues());
+console.log(out[0].fetch());
 
 
-for (var i=0; i<out.length; i++) {
-	var g = out[i];
-	
-	var works = g.groupBy('value.for');
-	
-	for (var j=0; j < works.length; j++) {
-		var work = works[j];
-		var mean = work.mean('value.EVA.eva');
-		console.log(mean);
-	}
-	
-	
-	//var func 
-	
-	console.log(g.fetchValues());
-};
+//for (var i=0; i<out.length; i++) {
+//	var g = out[i];
+//	
+//	var works = g.groupBy('value.EVA.for');
+//	console.log(works.length);
+//	for (var j=0; j < works.length; j++) {
+//		var work = works[j];
+//		console.log(work);
+//		var mean = work.mean('value.EVA.eva');
+//		console.log(mean);
+//	}
+//};
 
 
 //out = Utils.objGetAllKeys(gs.fetch()[0]);
