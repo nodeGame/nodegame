@@ -76,21 +76,21 @@ for (var i=0;i<clients.length;i++) {
 //console.log(v);
 
 
-var gs = new GameStorage();
-
-var clients = ['a','b'];//['a','b','c','d'];
-var states = [1,2]; //[1,2,3,4];
-var ids = ['z','x'];//['z','x','c','v'];
-for (var i=0;i<clients.length;i++) {
-	for (var j=0;j<states.length;j++) {
-		for (var x=0;x<ids.length;x++) {
-			var objs = [{mario: 'yes', paolo: 'no', r: Math.random()}]
-			for (var o=0;o<objs.length; o++) {
-				gs.add(clients[i], ids[x], objs[o], new GameState({state:states[j]}));
-			}
-		}
-	}
-}
+//var gs = new GameStorage();
+//
+//var clients = ['a','b'];//['a','b','c','d'];
+//var states = [1,2]; //[1,2,3,4];
+//var ids = ['z','x'];//['z','x','c','v'];
+//for (var i=0;i<clients.length;i++) {
+//	for (var j=0;j<states.length;j++) {
+//		for (var x=0;x<ids.length;x++) {
+//			var objs = [{mario: 'yes', paolo: 'no', r: Math.random()}]
+//			for (var o=0;o<objs.length; o++) {
+//				gs.add(clients[i], ids[x], objs[o], new GameState({state:states[j]}));
+//			}
+//		}
+//	}
+//}
 
 //console.log(gs.fetch());
 
@@ -241,13 +241,64 @@ for (var i=0;i<clients.length;i++) {
 //console.log(out);
 
 
-console.log('GroupBy Test');
+//console.log('GroupBy Test');
+//
+//
+//
+//var out = gs.groupBy('value');
+//console.log(out[0].fetch());
+//console.log(out);
+//console.log(out.length);
 
-var out = gs.groupBy('value');
-console.log(out[0].fetch());
-console.log(out);
-console.log(out.length);
+
+	
+var storage = [ {state: 1, player: 10, key: 'SUB', value: 'A'},
+                {state: 1, player: 20, key: 'SUB', value: 'B'},
+                {state: 1, player: 30, key: 'SUB', value: 'B'},
+                {state: 1, player: 40, key: 'SUB', value: 'B'},
+                {state: 1, player: 10, key: 'EVA', value: {'for': 20, eva: 6}},
+                {state: 1, player: 10, key: 'EVA', value: {'for': 30, eva: 9}},
+                {state: 1, player: 10, key: 'EVA', value: {'for': 40, eva: 5}},
+                {state: 1, player: 20, key: 'EVA', value: {'for': 10, eva: 5}},
+                {state: 1, player: 20, key: 'EVA', value: {'for': 30, eva: 8}},
+                {state: 1, player: 20, key: 'EVA', value: {'for': 40, eva: 2}},
+                {state: 1, player: 30, key: 'EVA', value: {'for': 10, eva: 8}},
+                {state: 1, player: 30, key: 'EVA', value: {'for': 20, eva: 8}},
+                {state: 1, player: 30, key: 'EVA', value: {'for': 40, eva: 1}},
+                {state: 1, player: 40, key: 'EVA', value: {'for': 10, eva: 7}},
+                {state: 1, player: 40, key: 'EVA', value: {'for': 20, eva: 9}},
+                {state: 1, player: 40, key: 'EVA', value: {'for': 30, eva: 7}},
+                
+              ];
+
+var gs = new GameStorage(null,null,storage);
+
+var out = gs.join('player', 'value.for')
+			.select('value.SUB')
+			.groupBy('value.SUB');
+
+//console.log(out.fetchValues());
+
+
+for (var i=0; i<out.length; i++) {
+	var g = out[i];
+	
+	var works = g.groupBy('value.for');
+	
+	for (var j=0; j < works.length; j++) {
+		var work = works[j];
+		var mean = work.mean('value.EVA.eva');
+		console.log(mean);
+	}
+	
+	
+	//var func 
+	
+	console.log(g.fetchValues());
+};
 
 
 //out = Utils.objGetAllKeys(gs.fetch()[0]);
 //console.log(out.join(''));
+
+

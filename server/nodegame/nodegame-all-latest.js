@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 10 19:23:59 CET 2011
+ * Built on Sun Dec 11 13:13:53 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 10 19:23:59 CET 2011
+ * Built on Sun Dec 11 13:13:53 CET 2011
  *
  */
  
@@ -175,29 +175,23 @@
 	// supported natively. 
 	// See https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter#Compatibility
 	
-    if (!Array.prototype.filter)  
-    {  
-      Array.prototype.filter = function(fun /*, thisp */)  
-      {  
+    if (!Array.prototype.filter) {  
+      Array.prototype.filter = function(fun /*, thisp */) {  
         "use strict";  
-      
-        if (this === void 0 || this === null)  
-          throw new TypeError();  
+        if (this === void 0 || this === null) throw new TypeError();  
       
         var t = Object(this);  
         var len = t.length >>> 0;  
-        if (typeof fun !== "function")  
-          throw new TypeError();  
-      
+        if (typeof fun !== "function") throw new TypeError();  
+        
         var res = [];  
         var thisp = arguments[1];  
-        for (var i = 0; i < len; i++)  
-        {  
-          if (i in t)  
-          {  
+        for (var i = 0; i < len; i++) {  
+          if (i in t) {  
             var val = t[i]; // in case fun mutates this  
-            if (fun.call(thisp, val, i, t))  
+            if (fun.call(thisp, val, i, t)) { 
               res.push(val);  
+            }
           }  
         }  
       
@@ -205,18 +199,68 @@
       };  
     }  
     
+    Utils.equals = function (o1, o2) {
+    	
+      if (!o1 || !o2) return false;
+    	
+      for (var p in o1) {
+          if (o1.hasOwnProperty(p)) {
+        	  
+        	  if ('undefined' === typeof o2[p]) return false;
+
+        	  switch (typeof o1[p]) {
+                  case 'object':
+                      if (!Utils.equals(o1[p],o2[p])) return false;
+                    	
+                  case 'function':
+                      if (o1[p].toString() !== o2[p].toString()) return false;
+                    	
+                  default:
+                      if (o1[p] !== o2[p]) return false; 
+              }
+          } 
+      }
+
+      // Check whether o2 has extra properties
+      for (p in o2) {
+    	  if (o2.hasOwnProperty(p)) {
+    		  if ('undefined' === typeof o1[p]) return false;
+    	  }
+      }
+
+      return true;
+    };
+
+    
     Utils.in_array = function (needle, haystack){
-	  var o = {};
-	  for(var i=0;i<a.length;i++){
-	    o[a[i]]='';
-	  }
 	  
-	  return needle in haystack;
+      if ('object' === typeof needle) {
+    	  var func = Utils.equals;
+      }
+      else {
+    	  var func = function (a,b) {
+    		  return (a === b);
+    	  }
+      }
+      
+      
+	  for(var i=0;i<haystack.length;i++){
+	    if (func.call(this,needle,haystack[i])) return true;
+	  }
+	  return false;
     }
+    
+    Utils.obj_in_array = function (needle, haystack) {
+    	  for(var i=0;i<haystack.length;i++){
+    	    if (Utils.equals(needle, haystack[i])) {
+    	    	return true;
+    	    }
+    	  }
+    	  return false;
+      }
     
     
     Utils.eval = function (str, context) {
-    	
     	// Eval must be called indirectly
     	// i.e. eval.call is not possible
     	var func = function (str) {
@@ -297,14 +341,29 @@
 	
 	Utils.obj2Array = function (obj) {
 	    return Utils._obj2Array(obj);
-	}
+	};
 	
 	/**
 	 * Creates an array containing all keys and values of the obj.
 	 */
 	Utils.obj2KeyedArray = function (obj) {
 	    return Utils._obj2Array(obj,true);
-	}
+	};
+	
+	Utils.objGetAllKeys = function (obj) {
+		var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   result.push(key);
+	    	   if ('object' === typeof obj[key]) {
+	    		   result = result.concat(Utils.objGetAllKeys(obj[key]));
+	    	   }
+	       }
+	    }
+	    return result;
+	};
+	
+
 	
 	/**
 	 * Creates an array of key:value objects.
@@ -322,7 +381,7 @@
 	       }
 	    }
 	    return result;
-	}
+	};
 	
 	/**
 	 * Returns an array days, minutes, seconds, mi
@@ -2015,19 +2074,52 @@
 		return new GameStorage(this.game, this.options, out);
 	};
 	
-	GameStorage.prototype.join = function (key1, key2, newkey) {
+	
+	GameStorage.prototype.groupBy = function (id) {
+		if (!id) return this.storage;
 		
+		var groups = [];
+		var outs = [];
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var el = Utils.eval('this.'+id, this.storage[i]);
+			}
+			catch(e) {
+				console.log('Malformed id ' + id);
+				return false;
+			};
+			
+			//console.log(el);
+			
+//			if ('object' !== typeof el) {
+//				var el_id = el;
+//			}
+//			else {
+//				// We need to get an 'hash' of the obj, in order
+//				// to know whether it is already in the groups array
+//				var el_id = Utils.objGetAllKeys(el).join('');
+//			}
+			
+			if (!Utils.in_array(el,groups)) {
+				groups.push(el);
+				
+				var out = this.filter(function (elem) {
+					if (Utils.eval('this.'+id,elem) === el) {
+						return this;
+					}
+				});
+				
+				outs.push(out);
+			}
+			
+		}
 		
-//		var keys2 = this.filter(function () {
-//			if (this.key === key2) return this;
-//		});
-//		if (key2.size() === 0) return [];
-//		
-//		var keys1 = this.filter(function () {
-//			if (this.key === key2) return this;
-//		});
-//		if (key1.size() === 0) return [];
+		//console.log(groups);
 		
+		return outs;
+	};
+	
+	GameStorage.prototype.join = function (key1, key2, newkey) {		
 		var out = [];
 		for (var i=0; i < this.storage.length; i++) {
 			if (this.storage[i].key === key1) {
@@ -3070,15 +3162,12 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
-	    	console.log('fffuck!!!!!!!22222');
-	    	console.log(obj);
 	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
 	    
 	    node.memory.dump = function (path) {
-	    	console.log('fffuck!!!!!!!!!!!');
 			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
 	    }
 	  
@@ -3097,7 +3186,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 10 19:23:59 CET 2011
+ * Built on Sun Dec 11 13:13:54 CET 2011
  *
  */
  
@@ -4086,7 +4175,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 10 19:23:59 CET 2011
+ * Built on Sun Dec 11 13:13:54 CET 2011
  *
  */
  
