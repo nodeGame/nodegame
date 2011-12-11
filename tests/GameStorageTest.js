@@ -92,7 +92,7 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-console.log(gs.fetch());
+//console.log(gs.fetch());
 
 //console.log('Default sort (by Player)');
 //gs.sort();
@@ -243,10 +243,11 @@ console.log(gs.fetch());
 
 console.log('GroupBy Test');
 
-var out = gs.groupBy('value.r');
+var out = gs.groupBy('value');
+console.log(out[0].fetch());
 console.log(out);
 console.log(out.length);
 
-//console.log('2');
-//var out = out.split();
-//console.log(out);
+
+//out = Utils.objGetAllKeys(gs.fetch()[0]);
+//console.log(out.join(''));

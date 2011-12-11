@@ -8,3 +8,4 @@ client/releases/*
 jquery
 client/nodeclient/exit.csv
 *.csv
+*.swp

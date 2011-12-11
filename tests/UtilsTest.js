@@ -5,6 +5,10 @@ var numbers = [1,2,3,4,5];
 var letters = ['a','b','c','d','e'];
 var biggroup = [1,2,3,4,5,6,7,8,9,0];
 
+var objgroup = [ {a: 1, b: 2}, {a: 1}, {c: 4}];
+
+console.log(utils.in_array({a: 1, b: 2, c: 4}, objgroup));
+
 //var func = function(a) {
 //	console.log(a);
 //}
@@ -35,8 +39,8 @@ var biggroup = [1,2,3,4,5,6,7,8,9,0];
 //var out = utils.arraySelfConcat(o);
 //console.log(out);
 
-var out = utils.matchN(biggroup, 1, true);
-console.log(out);
+//var out = utils.matchN(biggroup, 1, true);
+//console.log(out);
 
 
 //console.log('Testing Cloning, Joining, Merging');

@@ -207,10 +207,21 @@
 				return false;
 			};
 			
+			//console.log(el);
+			
+//			if ('object' !== typeof el) {
+//				var el_id = el;
+//			}
+//			else {
+//				// We need to get an 'hash' of the obj, in order
+//				// to know whether it is already in the groups array
+//				var el_id = Utils.objGetAllKeys(el).join('');
+//			}
+			
 			if (!Utils.in_array(el,groups)) {
 				groups.push(el);
 				
-				var out = this.filter(function(elem){
+				var out = this.filter(function (elem) {
 					if (Utils.eval('this.'+id,elem) === el) {
 						return this;
 					}
