@@ -45,6 +45,20 @@
 	  this.size = function() { return this.storage.length };
 	};
 	
+	GameStorage.prototype.map = function (func) {
+		var result = [];
+		for (var i=0; i < this.storage.length; i++) {
+			result[i] = func.call(this.storage[i]);
+		}	
+		return result;
+	};
+	
+	GameStorage.prototype.forEach = function (func) {
+		for (var i=0; i < this.storage.length; i++) {
+			func.call(this.storage[i]);
+		}	
+	};
+	
 	GameStorage.prototype.add = function (player, key, value, state) {
 		var state = state || this.game.gameState;
 
@@ -178,6 +192,26 @@
 		return new GameStorage(this.game, this.options, out);
 	};
 	
+	GameStorage.prototype.join = function (key1, key2, newkey) {
+		
+		var func = function(key) {
+			if (this.key === key) return this;
+		};
+		
+		var keys2 = this.filter(func(key2));
+		if (key2.size() === 0) return [];
+		var keys1 = this.filter(func(key1));
+		if (key1.size() === 0) return [];
+		
+		var out = [];
+		for (var i=0; i<keys1.size(); i++) {
+			for (var j=0; j<keys2.size(); j++) {
+				out.push(Gamebit.join(keys1[i],keys2[j],newkey));
+			}
+		};
+		return out;
+	};
+	
 	
 	GameStorage.prototype.fetch = function (key,array) {
 		
@@ -281,6 +315,22 @@
 //		return out;
 //	};
 	
+	GameBit.prototype.join = function(gb, newkey) {
+		return GameBit.join(this, gb, newkey);
+	};
+		
+	GameBit.join = function(gb1, gb2, newkey) {
+		var value = {};
+		value[gb1.key] = gb1.value;
+		value[gb2.key] = gb2.value;
+		
+		return new GameBit({player: gb1.player,
+							state: gb1.state,
+							key: newkey || gb1.key,
+							value: value
+		});
+	};
+	
 	GameBit.prototype.split = function () {		
 			
 		
@@ -351,6 +401,8 @@
 		
 		return out;
 	};
+	
+	
 	
 	GameBit.prototype.toString = function () {
 //		console.log(GameState.stringify(this.state));
