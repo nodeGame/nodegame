@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.5
+ * nodeGame-all v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 14:33:51 CET 2011
+ * Built on Mo 12. Dez 10:24:44 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.5
+ * nodeGame Client v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 14:33:52 CET 2011
+ * Built on Mo 12. Dez 10:24:44 CET 2011
  *
  */
  
@@ -175,48 +175,92 @@
 	// supported natively. 
 	// See https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter#Compatibility
 	
-    if (!Array.prototype.filter)  
-    {  
-      Array.prototype.filter = function(fun /*, thisp */)  
-      {  
+    if (!Array.prototype.filter) {  
+      Array.prototype.filter = function(fun /*, thisp */) {  
         "use strict";  
-      
-        if (this === void 0 || this === null)  
-          throw new TypeError();  
+        if (this === void 0 || this === null) throw new TypeError();  
       
         var t = Object(this);  
         var len = t.length >>> 0;  
-        if (typeof fun !== "function")  
-          throw new TypeError();  
-      
+        if (typeof fun !== "function") throw new TypeError();  
+        
         var res = [];  
         var thisp = arguments[1];  
-        for (var i = 0; i < len; i++)  
-        {  
-          if (i in t)  
-          {  
+        for (var i = 0; i < len; i++) {  
+          if (i in t) {  
             var val = t[i]; // in case fun mutates this  
-            if (fun.call(thisp, val, i, t))  
+            if (fun.call(thisp, val, i, t)) { 
               res.push(val);  
+            }
           }  
         }  
       
         return res;  
       };  
     }  
-	
+    
+    Utils.equals = function (o1, o2) {
+    	
+      if (!o1 || !o2) return false;
+    	
+      for (var p in o1) {
+          if (o1.hasOwnProperty(p)) {
+        	  
+        	  if ('undefined' === typeof o2[p]) return false;
+
+        	  switch (typeof o1[p]) {
+                  case 'object':
+                      if (!Utils.equals(o1[p],o2[p])) return false;
+                    	
+                  case 'function':
+                      if (o1[p].toString() !== o2[p].toString()) return false;
+                    	
+                  default:
+                      if (o1[p] !== o2[p]) return false; 
+              }
+          } 
+      }
+
+      // Check whether o2 has extra properties
+      for (p in o2) {
+    	  if (o2.hasOwnProperty(p)) {
+    		  if ('undefined' === typeof o1[p]) return false;
+    	  }
+      }
+
+      return true;
+    };
+
+    
     Utils.in_array = function (needle, haystack){
-	  var o = {};
-	  for(var i=0;i<a.length;i++){
-	    o[a[i]]='';
-	  }
 	  
-	  return needle in haystack;
+      if ('object' === typeof needle) {
+    	  var func = Utils.equals;
+      }
+      else {
+    	  var func = function (a,b) {
+    		  return (a === b);
+    	  }
+      }
+      
+      
+	  for(var i=0;i<haystack.length;i++){
+	    if (func.call(this,needle,haystack[i])) return true;
+	  }
+	  return false;
     }
+    
+    Utils.obj_in_array = function (needle, haystack) {
+    	  for(var i=0;i<haystack.length;i++){
+    	    if (Utils.equals(needle, haystack[i])) {
+    	    	return true;
+    	    }
+    	  }
+    	  return false;
+      }
     
     
     Utils.eval = function (str, context) {
-    	
     	// Eval must be called indirectly
     	// i.e. eval.call is not possible
     	var func = function (str) {
@@ -278,32 +322,48 @@
 		}
 	};
 	
-	Utils.obj2Array = function (obj) {
-		//console.log(obj);
+	Utils._obj2Array = function(obj, keyed) {
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
-	           result.push(obj[key]);
-	           //console.log(obj[key]);
+	    	   if ( 'object' === typeof obj[key] ) {
+					result = result.concat(Utils._obj2Array(obj[key],keyed));
+				}
+				else {
+					if (keyed) result.push(key);
+			        result.push(obj[key]);
+				}
+	    	   
 	       }
 	    }
 	    return result;
-	}
+	};
+	
+	Utils.obj2Array = function (obj) {
+	    return Utils._obj2Array(obj);
+	};
 	
 	/**
 	 * Creates an array containing all keys and values of the obj.
 	 */
 	Utils.obj2KeyedArray = function (obj) {
-		//console.log(obj);
-	    var result = [];
+	    return Utils._obj2Array(obj,true);
+	};
+	
+	Utils.objGetAllKeys = function (obj) {
+		var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
 	    	   result.push(key);
-	           result.push(obj[key]);
+	    	   if ('object' === typeof obj[key]) {
+	    		   result = result.concat(Utils.objGetAllKeys(obj[key]));
+	    	   }
 	       }
 	    }
 	    return result;
-	}
+	};
+	
+
 	
 	/**
 	 * Creates an array of key:value objects.
@@ -321,7 +381,7 @@
 	       }
 	    }
 	    return result;
-	}
+	};
 	
 	/**
 	 * Returns an array days, minutes, seconds, mi
@@ -1867,6 +1927,82 @@
 	  this.size = function() { return this.storage.length };
 	};
 	
+	GameStorage.prototype.count = function (key) {
+		var count = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if ('undefined' !== typeof tmp) {
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return count;
+	};
+	
+	GameStorage.prototype.sum = function (key) {
+		var sum = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp)) {
+					sum += tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return sum;
+	};
+	
+	GameStorage.prototype.mean = function (key) {
+		var sum = 0;
+		var count = 0;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp)) { 
+					//console.log(tmp);
+					sum += tmp;
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+//		console.log(sum);
+//		console.log(count);
+		return (count === 0) ? 0 : sum / count;
+	};
+	
+	GameStorage.prototype.min = function (key) {
+		var min = false;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp) && tmp < min) {
+					min = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return min;
+	};
+
+	GameStorage.prototype.max = function (key) {
+		var max = false;
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.storage[i]);
+				if (!isNaN(tmp) && tmp < max) {
+					max = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return max;
+	};
+	
+	
 	GameStorage.prototype.map = function (func) {
 		var result = [];
 		for (var i=0; i < this.storage.length; i++) {
@@ -2006,7 +2142,7 @@
 		var out = [];
 		
 		for (var i=0; i < this.storage.length; i++) {
-			out = out.concat(this.storage[i].split());
+			out = out.concat(new GameBit(this.storage[i]).split());
 		}	
 		
 		//console.log(out);
@@ -2014,40 +2150,91 @@
 		return new GameStorage(this.game, this.options, out);
 	};
 	
-	GameStorage.prototype.join = function (key1, key2, newkey) {
+	
+	GameStorage.prototype.groupBy = function (id) {
+		if (!id) return this.storage;
 		
-		var func = function(key) {
-			if (this.key === key) return this;
-		};
-		
-		var keys2 = this.filter(func(key2));
-		if (key2.size() === 0) return [];
-		var keys1 = this.filter(func(key1));
-		if (key1.size() === 0) return [];
-		
-		var out = [];
-		for (var i=0; i<keys1.size(); i++) {
-			for (var j=0; j<keys2.size(); j++) {
-				out.push(Gamebit.join(keys1[i],keys2[j],newkey));
+		var groups = [];
+		var outs = [];
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var el = Utils.eval('this.'+id, this.storage[i]);
 			}
-		};
-		return out;
+			catch(e) {
+				console.log('Malformed id ' + id);
+				return false;
+			};
+						
+			if (!Utils.in_array(el,groups)) {
+				groups.push(el);
+				
+				var out = this.filter(function (elem) {
+					if (Utils.eval('this.'+id,elem) === el) {
+						return this;
+					}
+				});
+				
+				outs.push(out);
+			}
+			
+		}
+		
+		//console.log(groups);
+		
+		return outs;
 	};
 	
+	GameStorage.prototype.join = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
+	};
+	
+	GameStorage.prototype.concat = function (key1, key2, newkey) {		
+		return this._join(key1, key2, newkey, function(){ return true;});
+	};
+
+	GameStorage.prototype._join = function (key1, key2, newkey, condition) {
+		
+		var out = [];
+		for (var i=0; i < this.storage.length; i++) {
+			try {
+				var foreign_key = Utils.eval('this.'+key1, this.storage[i]);
+				if ('undefined' !== typeof foreign_key) { 
+					for (var j=0; j < this.storage.length; j++) {
+						if (i === j) continue;
+						try {
+							var key = Utils.eval('this.'+key2, this.storage[j]);
+							if ('undefined' !== typeof key) { 
+								if (condition(foreign_key, key)) {
+									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+								}
+							}
+						}
+						catch(e) {
+							console.log('Malformed key: ' + key2);
+							//return false;
+						}
+					}
+				}
+			}
+			catch(e) {
+				console.log('Malformed key: ' + key1);
+				//return false;
+			}
+		}
+		
+		return new GameStorage(this.game, this.options, out);
+	};
 	
 	GameStorage.prototype.fetch = function (key,array) {
 		
-		console.log(key);
-		console.log(array);
-		
 		switch (key) {
 			case 'VALUES':
-				var func = (array) ? GameBit.prototype.getValues :
-									 GameBit.prototype.getValuesArray;
+				var func = (array) ? GameBit.prototype.getValuesArray :
+									 GameBit.prototype.getValues ;
 				break;
 			case 'KEY_VALUES':
-				var func = (array) ? GameBit.prototype.getKeyValues : 
-						   			 GameBit.prototype.getKeyValuesArray; 
+				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
+									 GameBit.prototype.getKeyValues; 
 				break;
 			default:
 				if (!array) return this.storage;
@@ -2175,16 +2362,24 @@
 			model.key = this.key;
 		}
 		
-		for (var i in this.value) {
-			var copy = Utils.clone(model);
-			copy.value = {};
-			if (this.value.hasOwnProperty(i)) {
-				copy.value[i] = this.value[i]; 
-				out.push(copy);
+		var splitValue = function (value, model) {
+			for (var i in value) {
+				var copy = Utils.clone(model);
+				copy.value = {};
+				if (value.hasOwnProperty(i)) {
+					if ('object' === typeof value[i]) {
+						out = out.concat(splitValue(value[i], model));
+					}
+					else {
+						copy.value[i] = value[i]; 
+						out.push(copy);
+					}
+				}
 			}
-		}
+			return out;
+		};
 		
-		return out;
+		return splitValue(this.value, model);
 	};
 	
 	
@@ -2574,6 +2769,10 @@
 		return this.updateState(gs);
 	};
 	
+	Game.prototype.getRelativeState = function (jump) {
+		return this.gameLoop.jumpTo(this.gameState, jump);
+	};
+	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);
 //		this.gameState.is = is;
@@ -2876,9 +3075,8 @@
 		
 		node.game = that.game = new Game(game, that.gsc);
 		//node.memory = that.game.memory;
-		
-		that.game.init();
-		
+		// INIT the game
+		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
 		console.log('nodeGame: game loaded...');
@@ -3055,15 +3253,12 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
-	    	console.log('fffuck!!!!!!!22222');
-	    	console.log(obj);
 	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
 	    
 	    node.memory.dump = function (path) {
-	    	console.log('fffuck!!!!!!!!!!!');
 			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
 	    }
 	  
@@ -3077,12 +3272,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.5
+ * nodeWindow v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 14:33:52 CET 2011
+ * Built on Mo 12. Dez 10:24:45 CET 2011
  *
  */
  
@@ -4066,12 +4261,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.5
+ * nodeGadgets v0.5.9.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 10. Dez 14:33:52 CET 2011
+ * Built on Mo 12. Dez 10:24:45 CET 2011
  *
  */
  
@@ -4850,23 +5045,24 @@
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
 		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
-		alert(this.groupName);
+		//alert(this.groupName);
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
 		console.log('ADDDING radio');
+		console.log(attributes);
 		// add the group name if not specified
 		if ('undefined' === typeof attributes.name) {
 			console.log(this);
 			console.log('MODMOD ' + this.groupName);
-			attributes.name = this.groupName;
+			attributes.name = 'asdasd'; //this.groupName;
 		}
 		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls
-	Controls.prototype.getAllValues = function() {
+	RadioControls.prototype.getAllValues = function() {
 		
 		for (var key in this.features) {
 			if (this.features.hasOwnProperty(key)) {
@@ -5514,7 +5710,7 @@
 		this.id = options.id || 'VisualState';
 		this.name = 'Visual State';
 		this.version = '0.1';
-		this.gameLoop = this.game.gameLoop;
+		this.gameLoop = node.game.gameLoop;
 		
 		this.fieldset = {legend: 'State'};
 		

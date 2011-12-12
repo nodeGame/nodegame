@@ -182,23 +182,24 @@
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
 		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
-		alert(this.groupName);
+		//alert(this.groupName);
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
 		console.log('ADDDING radio');
+		console.log(attributes);
 		// add the group name if not specified
 		if ('undefined' === typeof attributes.name) {
 			console.log(this);
 			console.log('MODMOD ' + this.groupName);
-			attributes.name = this.groupName;
+			attributes.name = 'asdasd'; //this.groupName;
 		}
 		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls
-	Controls.prototype.getAllValues = function() {
+	RadioControls.prototype.getAllValues = function() {
 		
 		for (var key in this.features) {
 			if (this.features.hasOwnProperty(key)) {

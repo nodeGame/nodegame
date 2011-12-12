@@ -192,9 +192,8 @@
 		
 		node.game = that.game = new Game(game, that.gsc);
 		//node.memory = that.game.memory;
-		
-		that.game.init();
-		
+		// INIT the game
+		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
 		console.log('nodeGame: game loaded...');
@@ -371,15 +370,12 @@
 	    node.fs.writeCsv = function (path, obj) {
 	    	var writer = csv.createCsvStreamWriter(fs.createWriteStream( path, {'flags': 'a'}));
 	    	var i;
-	    	console.log('fffuck!!!!!!!22222');
-	    	console.log(obj);
 	        for (i=0;i<obj.length;i++) {
 	    		writer.writeRecord(obj[i]);
 	    	}
 	    };
 	    
 	    node.memory.dump = function (path) {
-	    	console.log('fffuck!!!!!!!!!!!');
 			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
 	    }
 	  

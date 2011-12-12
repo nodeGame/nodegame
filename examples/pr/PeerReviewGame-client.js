@@ -80,6 +80,7 @@ function PeerReviewGame () {
 							 fieldset: {
 										legend: 'Exhibitions'
 							 },
+							 //change: 'SUBMISSION_DONE',
 							 //fieldset: false,
 							 submit: false,
 //							 submit: {
@@ -106,7 +107,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 10000
+							milliseconds: 6000
 		};
 		
 		this.timer.restart(timerOptions);
@@ -149,7 +150,7 @@ function PeerReviewGame () {
 			this.timer.restart(timerOptions);
 			
 			node.onDATA('CF', function(msg) {
-				console.log(msg);
+				//console.log(msg);
 				var cf_options = { id: 'cf',
 								   width: 300,
 								   height: 300,
@@ -173,7 +174,7 @@ function PeerReviewGame () {
 				
 				for (var i in evas) {
 					if (evas.hasOwnProperty(i)) {	
-						node.set('EVA', {from: i,
+						node.set('EVA', {'for': i,
 										 eva: evas[i].value
 						});
 					}
