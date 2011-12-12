@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.6
+ * nodeGame-all v0.5.9.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 10:24:44 CET 2011
+ * Built on Mo 12. Dez 16:01:20 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.6
+ * nodeGame Client v0.5.9.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 10:24:44 CET 2011
+ * Built on Mo 12. Dez 16:01:20 CET 2011
  *
  */
  
@@ -248,21 +248,13 @@
 	    if (func.call(this,needle,haystack[i])) return true;
 	  }
 	  return false;
-    }
-    
-    Utils.obj_in_array = function (needle, haystack) {
-    	  for(var i=0;i<haystack.length;i++){
-    	    if (Utils.equals(needle, haystack[i])) {
-    	    	return true;
-    	    }
-    	  }
-    	  return false;
-      }
+    };
     
     
     Utils.eval = function (str, context) {
     	// Eval must be called indirectly
     	// i.e. eval.call is not possible
+    	//console.log(str);
     	var func = function (str) {
     		// TODO: Filter str
     		return eval(str);
@@ -1332,7 +1324,7 @@
 	};
 			
 	GameLoop.prototype.next = function (gameState) {
-		
+
 		//console.log('NEXT OF THIS ' + gameState);
 		//console.log(this.limits);
 		
@@ -1444,19 +1436,23 @@
 	};
 	
 	GameLoop.prototype.jumpTo = function (gameState, jump) {
-		
-		if (this.exist(gameState)) return false;
+		if (!this.exist(gameState)) return false;
 		if (!jump || jump === 0) return gameState;
 		
 		var gs = gameState;	
 		var func = (jump > 0) ? this.next : this.previous;
 		
-		for (var i=0; i<jump; i++) {
+		for (var i=0; i < Math.abs(jump); i++) {
 			gs = func.call(this,gs);
 			if (!gs) return false;
 		}
 		
-		return gs
+//		console.log('FROM');
+//		console.log(gameState);		
+//		console.log('TO');
+//		console.log(gs);
+		
+		return gs;
 	};
 	
 
@@ -1902,7 +1898,6 @@
 	 * 
 	 */
 	
-	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
@@ -1969,8 +1964,6 @@
 			}
 			catch (e) {};
 		}	
-//		console.log(sum);
-//		console.log(count);
 		return (count === 0) ? 0 : sum / count;
 	};
 	
@@ -2112,23 +2105,65 @@
 		return this.get(new GameBit({key:key}));
 	};
 	
-	GameStorage.prototype.select = function (conditionString) {
+	
+	// TODO: users do not need to enter value. in case they want 
+	// to access a property of the value obj
+	GameStorage.prototype.select = function (key, op, value) {
+		if (!key) return this;
 		
-		var func = function (elem) {
-			
-			// TODO: users do not need to enter value. in case they want 
-			// to access a property of the value obj
-			
-			try {
-				return Utils.eval('this.' + conditionString, elem);
-			}
-			catch(e) {
-				console.log('Malformed query ' + conditionString);
+		// Verify input 
+		if ('undefined' !== typeof op) {
+			if ('undefined' === typeof value) {
+				node.log('Query error. Missing value for operator: ' + key + ' ' + op + ' (?)', 'WARN');
 				return false;
-			};
+			}
+			
+			if (!Utils.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+				node.log('Query error. Invalid operator detected: ' + op, 'WARN');
+				return false;
+			}
+			
+			if (op === '=') op = '==';
+			
+		}
+		else if ('undefined' !== typeof value) {
+			node.log('Query error. Missing operator: ' + key + ' (?) ' + value , 'WARN');
+			return false;
+		}
+		else {
+			op = '';
+			value = '';
 		}
 		
-		return this.filter(func);
+		// Define comparison function, state is a special case
+		if (key === 'state') {
+			var comparator = function (elem) {
+				try {	
+					if (Utils.eval(GameState.compare(elem.state, value) + op + 0,elem)) {
+						return elem;
+					}
+				}
+				catch(e) {
+					console.log('Malformed select query: ' + key + op + value);
+					return false;
+				};
+			};
+		}
+		else {
+			var comparator = function (elem) {
+				try {	
+					if (Utils.eval('this.' + key + op + value, elem)) {
+						return elem;
+					}
+				}
+				catch(e) {
+					console.log('Malformed select query: ' + key + op + value);
+					return false;
+				};
+			}
+		}
+		
+		return this.filter(comparator);
 	};
 	
 	GameStorage.prototype.filter = function (func) {
@@ -2290,40 +2325,7 @@
 	GameBit.prototype.isComplex = function() {
 		return ('object' === typeof this.value) ? true : false;
 	};
-	
-//	GameBit.prototype.getValues = function (head, split) {		
-//		
-//		var head = head || []; // the rest is appended here
-//		var split = ('undefined' === typeof split) ? split : false; 
-//		
-//		if (!this.isComplex()) {
-//			var out = head;
-//			out.push(this.value);
-//			return out;
-//		}
-//		
-//		var out = [];
-//		var line = head.slice(0); // Clone the head array without pointing to same ref
-//		
-//		if (split) {
-//			for (var i in this.value) {
-//				if (this.value.hasOwnProperty(i)) {
-//					line.push(i);
-//					line.push(this.value[i]);
-//					out.push(line);
-//					line = head.slice(0);
-//				}
-//			}
-//		}
-//		else {
-//			out = line.concat(Utils.obj2KeyedArray(this.value));
-//			//console.log('eeeh');
-//		}
-//		
-//		//console.log(out);
-//		return out;
-//	};
-	
+		
 	GameBit.prototype.join = function(gb, newkey) {
 		return GameBit.join(this, gb, newkey);
 	};
@@ -2422,26 +2424,8 @@
 	
 	
 	GameBit.prototype.toString = function () {
-//		console.log(GameState.stringify(this.state));
 		return this.player + ', ' + GameState.stringify(this.state) + ', ' + this.key + ', ' + this.value;
 	};
-	
-//	GameBit.prototype.condition = function (conditionString) {
-//		return this.filter(function() {
-//			try {
-//				return Utils.eval('this.' + conditionString, this);
-//			}
-//			catch(e) {
-//				node.log('Malformed query ' + conditionString);
-//				return this;
-//			};
-//		});
-//	};
-//	
-//	GameBit.prototype.filter = function (func) {
-//		console.log(func);
-//		return func.call(this);
-//	};
 	
 	/** 
 	 * Compares two GameBit objects.
@@ -2755,12 +2739,14 @@
 		this.gameState.paused = false;
 	};
 	
-	Game.prototype.next = function() {
-		return this.gameLoop.next(this.gameState);
+	Game.prototype.next = function(times) {
+		if (!times) return this.gameLoop.next(this.gameState);
+		return this.gameLoop.jumpTo(this.gameState, Math.abs(times));
 	};
 	
-	Game.prototype.previous = function() {
-		return this.gameLoop.previous(this.gameState);
+	Game.prototype.previous = function (times) {
+		if (!times) return this.gameLoop.previous(this.gameState);
+		return this.gameLoop.jumpTo(this.gameState, -Math.abs(times));
 	};
 	
 	Game.prototype.jumpTo = function (jump) {
@@ -2768,10 +2754,7 @@
 		if (!gs) return false;
 		return this.updateState(gs);
 	};
-	
-	Game.prototype.getRelativeState = function (jump) {
-		return this.gameLoop.jumpTo(this.gameState, jump);
-	};
+
 	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);
@@ -3272,12 +3255,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.6
+ * nodeWindow v0.5.9.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 10:24:45 CET 2011
+ * Built on Mo 12. Dez 16:01:20 CET 2011
  *
  */
  
@@ -4261,12 +4244,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.6
+ * nodeGadgets v0.5.9.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 10:24:45 CET 2011
+ * Built on Mo 12. Dez 16:01:20 CET 2011
  *
  */
  
@@ -4325,6 +4308,9 @@
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {
+		
+		console.log('THIS is THIS');
+		console.log(this);
 		
 		var PREF = this.id + '_';
 		
@@ -4401,6 +4387,9 @@
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
 				
+		console.log('Got face: ');
+		console.log(face);
+		
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
 		

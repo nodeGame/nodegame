@@ -127,7 +127,7 @@
 	
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
-				
+		
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
 		

@@ -57,7 +57,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 100
+								milliseconds: 10000
 			};
 			
 			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
@@ -145,7 +145,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 4000
+								milliseconds: 10000
 			};			
 			this.timer.restart(timerOptions);
 			
@@ -188,6 +188,8 @@ function PeerReviewGame () {
 	
 	var dissemination = function(){
 		node.window.loadFrame('dissemination.html', function() {
+			var root = node.window.getElementById('root');
+			
 			var tbl_options =  { root: node.window.getElementById('exhibition')}
 			var table = new node.window.Table(tbl_options);
 			
@@ -195,7 +197,34 @@ function PeerReviewGame () {
 			table.addRow([4,5,6]);
 			table.addRow([7,8,9]);
 			
+			
+			node.onDATA('WIN_CF', function(msg) {
+				
+				var winners = msg.data;
+				
+				for (var i=0; i < winners.length; i++) {
+					
+					var cf_options = { id: 'cf_' + winners[i].player,
+							   width: 200,
+							   height: 200,
+							   features: winners[i].cf,
+							   controls: false
+					};
+				
+					node.window.addWidget('ChernoffFaces', root, cf_options);
+					
+					node.window.writeln(root);
+					
+					// Add the slider to the container
+					//evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
+				}
+				
+				
+			});
+			
 		});
+		
+		
 		
 		console.log('Dissemination');
 	};

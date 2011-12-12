@@ -236,7 +236,7 @@
 		// Verify input 
 		if ('undefined' !== typeof op) {
 			if ('undefined' === typeof value) {
-				node.log('Query error. Missing value for operator: ' + key + ' ' + op, 'WARN');
+				node.log('Query error. Missing value for operator: ' + key + ' ' + op + ' (?)', 'WARN');
 				return false;
 			}
 			
@@ -246,6 +246,15 @@
 			}
 			
 			if (op === '=') op = '==';
+			
+		}
+		else if ('undefined' !== typeof value) {
+			node.log('Query error. Missing operator: ' + key + ' (?) ' + value , 'WARN');
+			return false;
+		}
+		else {
+			op = '';
+			value = '';
 		}
 		
 		// Define comparison function, state is a special case

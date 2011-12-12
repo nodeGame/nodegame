@@ -216,12 +216,14 @@
 		this.gameState.paused = false;
 	};
 	
-	Game.prototype.next = function() {
-		return this.gameLoop.next(this.gameState);
+	Game.prototype.next = function(times) {
+		if (!times) return this.gameLoop.next(this.gameState);
+		return this.gameLoop.jumpTo(this.gameState, Math.abs(times));
 	};
 	
-	Game.prototype.previous = function() {
-		return this.gameLoop.previous(this.gameState);
+	Game.prototype.previous = function (times) {
+		if (!times) return this.gameLoop.previous(this.gameState);
+		return this.gameLoop.jumpTo(this.gameState, -Math.abs(times));
 	};
 	
 	Game.prototype.jumpTo = function (jump) {
@@ -229,10 +231,7 @@
 		if (!gs) return false;
 		return this.updateState(gs);
 	};
-	
-	Game.prototype.getRelativeState = function (jump) {
-		return this.gameLoop.jumpTo(this.gameState, jump);
-	};
+
 	
 //	Game.prototype.is = function(is) {
 //		//console.log('IS ' + is);

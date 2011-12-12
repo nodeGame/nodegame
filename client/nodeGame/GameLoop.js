@@ -87,7 +87,7 @@
 	};
 			
 	GameLoop.prototype.next = function (gameState) {
-		
+
 		//console.log('NEXT OF THIS ' + gameState);
 		//console.log(this.limits);
 		
@@ -199,19 +199,23 @@
 	};
 	
 	GameLoop.prototype.jumpTo = function (gameState, jump) {
-		
-		if (this.exist(gameState)) return false;
+		if (!this.exist(gameState)) return false;
 		if (!jump || jump === 0) return gameState;
 		
 		var gs = gameState;	
 		var func = (jump > 0) ? this.next : this.previous;
 		
-		for (var i=0; i<jump; i++) {
+		for (var i=0; i < Math.abs(jump); i++) {
 			gs = func.call(this,gs);
 			if (!gs) return false;
 		}
 		
-		return gs
+//		console.log('FROM');
+//		console.log(gameState);		
+//		console.log('TO');
+//		console.log(gs);
+		
+		return gs;
 	};
 	
 

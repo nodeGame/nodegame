@@ -85,21 +85,13 @@
 	    if (func.call(this,needle,haystack[i])) return true;
 	  }
 	  return false;
-    }
-    
-    Utils.obj_in_array = function (needle, haystack) {
-    	  for(var i=0;i<haystack.length;i++){
-    	    if (Utils.equals(needle, haystack[i])) {
-    	    	return true;
-    	    }
-    	  }
-    	  return false;
-      }
+    };
     
     
     Utils.eval = function (str, context) {
     	// Eval must be called indirectly
     	// i.e. eval.call is not possible
+    	//console.log(str);
     	var func = function (str) {
     		// TODO: Filter str
     		return eval(str);
