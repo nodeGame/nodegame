@@ -85,6 +85,10 @@
     return row;
   };
   
+  Table.prototype.addColumn = function (data, attributes, container) {
+  
+  };
+  
   Table.prototype.getRoot = function() {
     return this.root;
   };

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.5.9.7
+ * nodeGame-all v0.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:01:20 CET 2011
+ * Built on Mo 12. Dez 16:37:02 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.5.9.7
+ * nodeGame Client v0.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:01:20 CET 2011
+ * Built on Mo 12. Dez 16:37:02 CET 2011
  *
  */
  
@@ -3255,12 +3255,12 @@
  
  
 /*!
- * nodeWindow v0.5.9.7
+ * nodeWindow v0.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:01:20 CET 2011
+ * Built on Mo 12. Dez 16:37:02 CET 2011
  *
  */
  
@@ -4244,12 +4244,12 @@
  
  
 /*!
- * nodeGadgets v0.5.9.7
+ * nodeGadgets v0.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:01:20 CET 2011
+ * Built on Mo 12. Dez 16:37:02 CET 2011
  *
  */
  
@@ -4308,9 +4308,6 @@
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {
-		
-		console.log('THIS is THIS');
-		console.log(this);
 		
 		var PREF = this.id + '_';
 		
@@ -4386,9 +4383,6 @@
 	
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
-				
-		console.log('Got face: ');
-		console.log(face);
 		
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
