@@ -52,6 +52,17 @@
   		this.size = function() { return this.db.length };
 	};
 	
+	NDDB.prototype.clear = function (confirm) {
+		if (confirm) {
+			this.db = [];
+		}
+		else {
+			this.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
+		}
+		
+		return confirm;
+	};	
+	
 	NDDB.prototype.cloneSettings = function () {
 		var o = Utils.clone(this.options);
 		o.D = Utils.clone(this.D);
@@ -257,35 +268,63 @@
 		return new NDDB(this.cloneSettings(), out);
 	};
 	
+	
+	NDDB._getValues = function (o, key) {		
+		return Utils.eval('this.' + key, o);
+	};
+		
+//	NDDB._getKeyValues = function (o, key) {
+//		var out = {};
+//		out[key] = o[key];
+//		return out;
+//	};
+	
+	NDDB._getValuesArray = function (o, key) {		
+		return Utils.obj2KeyedArray(Utils.eval('this.' + key, o));
+	};
+	
+	NDDB._getKeyValuesArray = function (o, key) {
+		return [key].concat(Utils.obj2KeyedArray(Utils.eval('this.' + key, o)));
+	};
+	
 	NDDB.prototype.fetch = function (key, array) {
 		
-		switch (key) {
+		console.log(key);
+		console.log(array);
+		
+		switch (array) {
 			case 'VALUES':
-				var func = (array) ? GameBit.prototype.getValuesArray :
-									 GameBit.prototype.getValues ;
+				var func = (key) ? NDDB._getValuesArray : 
+								   Utils.obj2Array;
+				
 				break;
 			case 'KEY_VALUES':
-				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
-									 GameBit.prototype.getKeyValues; 
+				var func = (key) ? NDDB._getKeyValuesArray :
+								   Utils.obj2KeyedArray;
 				break;
-			default:
-				if (!array) return this.db;
-				var func = GameBit.prototype.toArray;
+				
+			default: // results are not 
+				if (!key)  return this.db;
+				var func = NDDB._getValues;  	  
 		}
 		
 		var out = [];	
 		for (var i=0; i < this.db.length; i++) {
-			out.push(func.call(this.db[i]));
+			out.push(func.call(this.db[i], this.db[i], key));
 		}	
 		
 		//console.log(out);
 		return out;
 	};
 	
-	NDDB.prototype.fetchArray = function (key) {
-		return this.fetch(key,true);
+	NDDB.prototype.fetchValues = function (key) {
+		return this.fetch(key, 'VALUES');
 	};
 	
+	NDDB.prototype.fetchKeyValues = function (key) {
+		return this.fetch(key, 'KEY_VALUES');
+	};
+		
 	NDDB.prototype.first = function (key) {
 		return this.fetch(key)[0];
 	};
@@ -301,6 +340,116 @@
 							   this.db.slice(limit);
 		
 		return new NDDB(this.cloneSettings(), db);
+	};
+	
+	NDDB.prototype._split = function (o, key) {		
+				
+		if ('object' !== typeof o[key]) {
+			return Utils.clone(o);;
+		}
+		
+		var out = [];
+		var model = Utils.clone(o);
+		model[key] = {};
+		
+		var splitValue = function (value) {
+			for (var i in value) {
+				var copy = Utils.clone(model);
+				if (value.hasOwnProperty(i)) {
+					if ('object' === typeof value[i]) {
+						out = out.concat(splitValue(value[i]));
+					}
+					else {
+						copy[key][i] = value[i]; 
+						out.push(copy);
+					}
+				}
+			}
+			return out;
+		};
+		
+		return splitValue(o[key]);
+	};
+	
+	NDDB.prototype.split = function (key) {	
+		var out = [];
+		for (var i=0; i<this.db.length;i++) {
+			out = out.concat(this._split(this.db[i], key));
+		}
+		return new NDDB(this.cloneSettings(), out);
+	};
+	
+	NDDB.prototype.count = function (key) {
+		var count = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.db[i]);
+				if ('undefined' !== typeof tmp) {
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return count;
+	};
+	
+	NDDB.prototype.sum = function (key) {
+		var sum = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp)) {
+					sum += tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return sum;
+	};
+	
+	NDDB.prototype.mean = function (key) {
+		var sum = 0;
+		var count = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp)) { 
+					//console.log(tmp);
+					sum += tmp;
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return (count === 0) ? 0 : sum / count;
+	};
+	
+	NDDB.prototype.min = function (key) {
+		var min = false;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp) && (tmp < min || min === false)) {
+					min = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return min;
+	};
+
+	NDDB.prototype.max = function (key) {
+		var max = false;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = Utils.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp) && (tmp > max || max === false)) {
+					max = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return max;
 	};
 	
 })(
