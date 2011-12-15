@@ -27,6 +27,11 @@
 	 */
 	exports.NDDB = NDDB;
 	
+	// NDDB version
+	NDDB.version = 0.2;
+	
+	// Stdout redirect
+	NDDB.log = console.log;
 	
 	/**
 	 * NDDB interface
@@ -38,12 +43,12 @@
 		
 		// Default settings
 		this.options = null;
-		this.log = console.log;
+
 		this.D = {};		// The n-dimensional container for comparator functions
 		
 		if (options) {
 			this.options = options;
-			this.log = options.log || this.log;
+			NDDB.log = options.log || NDDB.log;
 			this.D = options.D || this.D;
 		}
 	  		
@@ -57,7 +62,7 @@
 			this.db = [];
 		}
 		else {
-			this.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
+			NDDB.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
 		}
 		
 		return confirm;
@@ -79,7 +84,7 @@
 		
 	NDDB.prototype.set = function (d, comparator) {
 		if (!d || !comparator) {
-			this.log('Cannot set empty property or empty comparator');
+			NDDB.log('Cannot set empty property or empty comparator');
 			return false;
 		}
 		this.D[d] = comparator;
@@ -88,8 +93,8 @@
 
 	NDDB.prototype.comparator = function (d) {
 		return ('undefined' !== typeof this.D[d]) ? this.D[d] : function (o1, o2) {
-//			console.log(o1);
-//			console.log(o2);
+//			NDDB.log(o1);
+//			NDDB.log(o2);
 			if (!o1 && !o2) return 0;
 			if (!o1) return -1;
 			if (!o2) return 1;
@@ -137,7 +142,7 @@
 		var raiseError = function (d,op,value) {
 			var miss = '(?)';
 			var err = 'Malformed query: ' + d || miss + ' ' + op || miss + ' ' + value || miss;
-			this.log(err, 'WARN');
+			NDDB.log(err, 'WARN');
 			return false;
 		};
 	
@@ -150,7 +155,7 @@
 			}
 			
 			if (!Utils.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
-				this.log('Query error. Invalid operator detected: ' + op, 'WARN');
+				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
 			
@@ -185,8 +190,8 @@
 
 		var comparator = this.comparator(d);
 		
-		//this.log(comparator.toString());
-		//this.log(value);
+		//NDDB.log(comparator.toString());
+		//NDDB.log(value);
 		
 		
 		var func = function (elem) {
@@ -196,7 +201,7 @@
 				}
 			}
 			catch(e) {
-				console.log('Malformed select query: ' + d + op + value);
+				NDDB.log('Malformed select query: ' + d + op + value);
 				return false;
 			};
 		};
@@ -253,14 +258,14 @@
 							}
 						}
 						catch(e) {
-							console.log('Malformed key: ' + key2);
+							NDDB.log('Malformed key: ' + key2);
 							//return false;
 						}
 					}
 				}
 			}
 			catch(e) {
-				console.log('Malformed key: ' + key1);
+				NDDB.log('Malformed key: ' + key1);
 				//return false;
 			}
 		}
@@ -289,8 +294,8 @@
 	
 	NDDB.prototype.fetch = function (key, array) {
 		
-		console.log(key);
-		console.log(array);
+//		NDDB.log(key);
+//		NDDB.log(array);
 		
 		switch (array) {
 			case 'VALUES':
@@ -313,7 +318,7 @@
 			out.push(func.call(this.db[i], this.db[i], key));
 		}	
 		
-		//console.log(out);
+		//NDDB.log(out);
 		return out;
 	};
 	
@@ -414,7 +419,7 @@
 			try {
 				var tmp = Utils.eval('this.' + key, this.db[i]);
 				if (!isNaN(tmp)) { 
-					//console.log(tmp);
+					//NDDB.log(tmp);
 					sum += tmp;
 					count++;
 				}
@@ -452,10 +457,40 @@
 		return max;
 	};
 	
+	NDDB.prototype.groupBy = function (key) {
+		if (!key) return this.db;
+		
+		var groups = [];
+		var outs = [];
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var el = Utils.eval('this.' + key, this.db[i]);
+			}
+			catch(e) {
+				NDDB.log('Malformed key ' + key);
+				return false;
+			};
+						
+			if (!Utils.in_array(el,groups)) {
+				groups.push(el);
+				
+				var out = this.filter(function (elem) {
+					if (Utils.equals(Utils.eval('this.' + key, elem),el)) {
+						return this;
+					}
+				});
+				
+				outs.push(out);
+			}
+			
+		}
+		
+		//NDDB.log(groups);
+		
+		return outs;
+	};
+	
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
 );
-
-
-

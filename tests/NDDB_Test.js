@@ -9,7 +9,11 @@ var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
 
 var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js').NDDB;
 
-var nddb = new NDDB();
+var log = function (txt, level) {
+	console.log (level + ': ' + txt);
+};
+
+var nddb = new NDDB({log: log});
 nddb.set('state', GameBit.compareState);
 
 var clients = ['a','b'];//['a','b','c','d'];
@@ -90,7 +94,7 @@ for (var i=0;i<clients.length;i++) {
 //console.log('Limit -1');
 //console.log(out.limit(-1));
 
-nddb.clear(true);
+nddb.clear();
 //console.log(nddb.fetch());
 
 var clients = ['a','b'];//['a','b','c','d'];
@@ -115,10 +119,22 @@ for (var i=0;i<clients.length;i++) {
 //out = nddb.split('value');
 //console.log(out.fetch());
 
-console.log('Fetch Values');
-v = nddb.fetch('value.r');
-console.log(v);
+//console.log('Group By');
+//v = nddb.groupBy('key');
+//console.log(v);
+//
+//for (var i=0; i<v.length; i++) {
+//	console.log(v[i].fetch('value'));
+//}
 
-v = nddb.sum('value.r'); 
-console.log(v);
+//
+//console.log('Fetch');
+//v = nddb.fetch('value.r');
+//console.log(v);
+//
+//v = nddb.sum('value.r'); 
+//console.log(v);
+
+
+
 

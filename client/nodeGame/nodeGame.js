@@ -95,6 +95,16 @@
 	
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
 	    
+	
+	    /**
+	     * Expose NDDB
+	     *
+	     * @api public
+	     */
+	
+	    node.NDDB = require('NDDB').NDDB;
+	
+	    
 	    /**
 	     * Expose GameStorage
 	     *
