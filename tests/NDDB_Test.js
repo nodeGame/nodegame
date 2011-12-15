@@ -70,10 +70,25 @@ for (var i=0;i<clients.length;i++) {
 //out = nddb.select('state','>', new GameState({state: 1}));
 //console.log(out.toString());
 
-console.log('Join State');
-out = nddb.concat('state','state', 'joined');
-console.log(out);
+//console.log('Join State');
+//out = nddb.join('state','state', 'joined');
+//console.log(out.fetch());
 
+console.log('Join State Selective');
+out = nddb.join('state','state', 'joined', ['key']);
+//console.log(out.fetch());
+
+console.log('Get First');
+console.log(out.first());
+
+console.log('Get Last');
+console.log(out.last());
+
+console.log('Limit 1');
+console.log(out.limit(1));
+
+console.log('Limit -1');
+console.log(out.limit(-1));
 
 //var nddb = new NDDB();
 //

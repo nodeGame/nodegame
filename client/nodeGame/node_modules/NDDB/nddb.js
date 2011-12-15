@@ -39,19 +39,24 @@
 		// Default settings
 		this.options = null;
 		this.log = console.log;
+		this.D = {};		// The n-dimensional container for comparator functions
 		
 		if (options) {
 			this.options = options;
 			this.log = options.log || this.log;
+			this.D = options.D || this.D;
 		}
-	  
-		this.D = {};		// The n-dimensional container for comparator functions
+	  		
 		this.db = db || [];	// The actual database
-  		
-	  
 
   		this.size = function() { return this.db.length };
 	};
+	
+	NDDB.prototype.cloneSettings = function () {
+		var o = Utils.clone(this.options);
+		o.D = Utils.clone(this.D);
+		return o;
+	};	
 	
 	NDDB.prototype.toString = function () {
 		var out = '';
@@ -92,7 +97,7 @@
 	// Sorting Operation
 	
 	NDDB.prototype.reverse = function () {
-		return new NDDB(this.options, this.db.reverse());
+		return new NDDB(this.cloneSettings(), this.db.reverse());
 	};
 	
 	/**
@@ -111,7 +116,7 @@
 			var func = this.comparator(d);
 		}
 		
-		return new NDDB(this.options, this.db.sort(func));
+		return new NDDB(this.cloneSettings(), this.db.sort(func));
 	};
 	
 
@@ -190,20 +195,31 @@
 	};
 	
 	NDDB.prototype.filter = function (func) {
-		return new NDDB(this.options, this.db.filter(func));
+		return new NDDB(this.cloneSettings(), this.db.filter(func));
 	};
 	
 	// HERE
 	
-	NDDB.prototype.join = function (key1, key2, flag) {		
-		return this._join(key1, key2, flag, Utils.equals);
+	NDDB.prototype.join = function (key1, key2, pos, select) {
+		// Construct a better comparator function
+		// than the generic Utils.equals
+//		if (key1 === key2 && 'undefined' !== typeof this.D[key1]) {
+//			var comparator = function(o1,o2) {
+//				if (this.D[key1](o1,o2) === 0) return true;
+//				return false;
+//			}
+//		}
+//		else {
+//			var comparator = Utils.equals;
+//		}
+		return this._join(key1, key2, Utils.equals, pos, select);
 	};
 	
-	NDDB.prototype.concat = function (key1, key2, flag) {		
-		return this._join(key1, key2, flag, function(){ return true;});
+	NDDB.prototype.concat = function (key1, key2, pos) {		
+		return this._join(key1, key2, function(){ return true;}, pos);
 	};
 
-	NDDB.prototype._join = function (key1, key2, flag, comparator) {
+	NDDB.prototype._join = function (key1, key2, comparator, pos, select) {
 		
 		var out = [];
 		for (var i=0; i < this.db.length; i++) {
@@ -216,8 +232,11 @@
 							var key = Utils.eval('this.'+key2, this.db[j]);
 							if ('undefined' !== typeof key) { 
 								if (comparator(foreign_key, key)) {
-									var o = Utils.merge(this.db[j], this.db[i]);
-									if (flag) o[flag] = true;
+									// Inject the matched obj into the
+									// reference one
+									var o = Utils.clone(this.db[i]);
+									var o2 = (select) ? Utils.subobj(this.db[j], select) : this.db[j];
+									o[pos] = o2;
 									out.push(o);
 								}
 							}
@@ -235,7 +254,7 @@
 			}
 		}
 		
-		return new NDDB(this.options, out);
+		return new NDDB(this.cloneSettings(), out);
 	};
 	
 	NDDB.prototype.fetch = function (key, array) {
@@ -267,6 +286,22 @@
 		return this.fetch(key,true);
 	};
 	
+	NDDB.prototype.first = function (key) {
+		return this.fetch(key)[0];
+	};
+	
+	NDDB.prototype.last = function (key) {
+		var db = this.fetch(key);
+		return (db.length > 0) ? db[db.length-1] : undefined;
+	};
+	
+	NDDB.prototype.limit = function (limit) {
+		if (limit === 0) return new NDDB(this.cloneSettings());
+		var db = (limit > 0) ? this.db.slice(0, limit) :
+							   this.db.slice(limit);
+		
+		return new NDDB(this.cloneSettings(), db);
+	};
 	
 })(
 	'undefined' != typeof node ? node : module.exports
