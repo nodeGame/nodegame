@@ -1,24 +1,1089 @@
 /*!
- * nodeGame-all v0.6
+ * nodeGame-all v0.6.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:37:02 CET 2011
+ * Built on Do 15. Dez 19:30:12 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6
+ * nodeGame Client v0.6.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:37:02 CET 2011
+ * Built on Do 15. Dez 19:30:12 CET 2011
  *
  */
  
+ 
+(function (exports) {
+	
+	var JSU = exports.JSU = {};
+	
+	  JSU.load = function (additional, target) {
+		var target = target || this; 
+		
+	    for (var prop in additional) {
+	      if (additional.hasOwnProperty(prop)) {
+	        if (typeof target[prop] !== 'object') {
+	        	target[prop] = additional[prop];
+	        } else {
+	          JSU.load(additional[prop], target[prop]);
+	        }
+	      }
+	    }
+
+	    return target;
+	  };
+
+    // if node
+	if ('object' === typeof module && 'function' === typeof require) {
+		
+		JSU.load(require('./lib/obj').obj);
+		JSU.load(require('./lib/array').array);
+	    JSU.load(require('./lib/time').time);
+	    JSU.load(require('./lib/eval').eval);
+	    
+	}
+	// end node
+
+})('undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window); 
+ 
+(function (exports) {
+
+	var OBJ = {};
+	exports.obj = OBJ;
+	
+    OBJ.equals = function (o1, o2) {
+    	
+        if (!o1 || !o2) return false;
+      	
+    	// Check whether arguments are not objects
+    	if ( typeof o1 in {number:'',string:''}) {
+    		if ( typeof o2 in {number:'',string:''}) {
+        		return (o1 === o2);
+        	}
+    		return false;
+    	}
+    	else if ( typeof o2 in {number:'',string:''}) {
+    		return false;
+    	}
+    	
+
+  	  
+      for (var p in o1) {
+          if (o1.hasOwnProperty(p)) {
+        	  
+        	  if ('undefined' === typeof o2[p] && 'undefined' !== typeof o1[p]) return false;
+        	  
+        	  switch (typeof o1[p]) {
+                  case 'object':
+                      if (!OBJ.equals(o1[p],o2[p])) return false;
+                    	
+                  case 'function':
+                      if (o1[p].toString() !== o2[p].toString()) return false;
+                    	
+                  default:
+                      if (o1[p] !== o2[p]) return false; 
+              }
+          } 
+      }
+
+      
+      // Check whether o2 has extra properties
+      // TODO: improve, some properties have already been checked!
+      for (p in o2) {
+    	  if (o2.hasOwnProperty(p)) {
+    		  if ('undefined' === typeof o1[p] && 'undefined' !== typeof o2[p])
+    			  return false;
+    	  }
+      }
+
+      return true;
+    };
+	
+	OBJ.getListSize = function (list) {	
+		var n = 0;
+		for (var key in list) {
+		    if (list.hasOwnProperty(key)) {
+		    	n++;
+		    }
+		}
+		
+		//console.log('Calculated list length ' + n);
+		
+		return n;
+	};
+	
+	
+	
+	OBJ._obj2Array = function(obj, keyed) {
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   if ( 'object' === typeof obj[key] ) {
+					result = result.concat(OBJ._obj2Array(obj[key],keyed));
+				}
+				else {
+					if (keyed) result.push(key);
+			        result.push(obj[key]);
+				}
+	    	   
+	       }
+	    }
+	  
+	    return result;
+	};
+	
+	OBJ.obj2Array = function (obj) {
+	    return OBJ._obj2Array(obj);
+	};
+	
+	/**
+	 * Creates an array containing all keys and values of the obj.
+	 */
+	OBJ.obj2KeyedArray = function (obj) {
+	    return OBJ._obj2Array(obj,true);
+	};
+	
+	OBJ.objGetAllKeys = function (obj) {
+		var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   result.push(key);
+	    	   if ('object' === typeof obj[key]) {
+	    		   result = result.concat(OBJ.objGetAllKeys(obj[key]));
+	    	   }
+	       }
+	    }
+	    return result;
+	};
+	
+
+	
+	/**
+	 * Creates an array of key:value objects.
+	 * 
+	 */
+	OBJ.implodeObj = function (obj) {
+		//console.log(obj);
+	    var result = [];
+	    for (var key in obj) {
+	       if (obj.hasOwnProperty(key)) {
+	    	   var o = {};
+	    	   o[key] = obj[key];
+	           result.push(o);
+	           //console.log(o);
+	       }
+	    }
+	    return result;
+	};
+	
+	
+
+	
+	
+	/**
+	 * Creates a perfect copy of the obj
+	 */
+	OBJ.clone = function (obj) {
+		var clone = {};
+		for (var i in obj) {
+			if ( 'object' === typeof obj[i] ) {
+				clone[i] = OBJ.clone(obj[i]);
+			}
+			else {
+				clone[i] = obj[i];
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Performs a left join on the keys of two objects. In case keys overlaps
+	 *  the values from obj2 are taken.
+	 */
+	OBJ.join = function (obj1, obj2) {
+		var clone = OBJ.clone(obj1);
+		if (!obj2) return clone;
+		for (var i in clone) {
+			if (clone.hasOwnProperty(i)) {
+				if ('undefined' !== typeof obj2[i]) {
+					if ( 'object' === typeof obj2[i] ) {
+						clone[i] = OBJ.join(clone[i], obj2[i]);
+					}
+					else {
+						clone[i] = obj2[i];
+					}
+				}
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Merges two objects in one. In case keys overlaps the values from 
+	 * obj2 are taken.
+	 */
+	OBJ.merge = function (obj1, obj2) {
+		var clone = OBJ.clone(obj1);
+//		console.log('CLONE');
+//		console.log(clone);
+		if (!obj2) return clone;
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				//console.log(i);
+				if ( 'object' === typeof obj2[i] ) {
+					clone[i] = OBJ.merge(obj1[i],obj2[i]);
+				}
+				else {
+					clone[i] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	/**
+	 * Set the.
+	 */
+	OBJ.mergeOnKey = function (obj1, obj2, key) {
+		var clone = OBJ.clone(obj1);
+		if (!obj2 || !key) return clone;		
+		for (var i in obj2) {
+			if (obj2.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj1[i] ) {
+					clone[i][key] = obj2[i];
+				}
+			}
+		}
+		return clone;
+	};
+	
+	OBJ.subobj = function (o, select) {
+		if (!o) return false;
+		var out = {};
+		if (!select) return out;
+		for (var i=0; i<select.length;i++) {
+			var key = select[i];
+			//console.log(key);
+			if ('undefined' !== o[key]) {
+				out[key] = o[key];
+			}
+		}
+		return out;
+	};
+	
+	OBJ.mergeOnValue = function (obj1, obj2) {
+		return OBJ.mergeOnKey(obj1, obj2, 'value');
+	};
+
+})('undefined' !== typeof JSU ? JSU : module.exports); 
+ 
+(function (exports, JSU) {
+	
+	var ARRAY = {};
+	exports.array = ARRAY;
+	
+
+	// ARRAYs
+	/////////
+	
+	// Add the filter method to ARRAY objects in case the method is not
+	// supported natively. 
+	// See https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/ARRAY/filter#Compatibility
+	
+    if (!Array.prototype.filter) {  
+      Array.prototype.filter = function(fun /*, thisp */) {  
+        "use strict";  
+        if (this === void 0 || this === null) throw new TypeError();  
+      
+        var t = Object(this);  
+        var len = t.length >>> 0;  
+        if (typeof fun !== "function") throw new TypeError();  
+        
+        var res = [];  
+        var thisp = arguments[1];  
+        for (var i = 0; i < len; i++) {  
+          if (i in t) {  
+            var val = t[i]; // in case fun mutates this  
+            if (fun.call(thisp, val, i, t)) { 
+              res.push(val);  
+            }
+          }  
+        }  
+      
+        return res;  
+      };  
+    }  
+    
+    ARRAY.in_array = function (needle, haystack){
+  	  
+        if ('object' === typeof needle) {
+      	  var func = JSU.equals;
+        }
+        else {
+      	  var func = function (a,b) {
+      		  return (a === b);
+      	  }
+        }
+        
+        
+  	  for(var i=0;i<haystack.length;i++){
+  	    if (func.call(this,needle,haystack[i])) return true;
+  	  }
+  	  return false;
+    };
+    
+    /**
+	 * Returns an array of N array containing the same number of elements
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	ARRAY.getNGroups = function (array, N) {
+		return ARRAY.getGroupsSizeN(array, Math.floor(array.length / N));
+	};
+	
+	/**
+	 * Returns an array of array containing N elements each
+	 * The last group could have less elements.
+	 * 
+	 */ 
+	ARRAY.getGroupsSizeN = function (array, N) {
+		
+		var copy = array.slice(0);
+		var len = copy.length;
+		var originalLen = copy.length;
+		var result = [];
+		
+		// Init values for the loop algorithm
+		var i;
+		var idx;
+		var group = [];
+		var count = 0;
+		for (i=0; i < originalLen; i++) {
+			
+			// Get a random idx between 0 and array length
+			idx = Math.floor(Math.random()*len);
+			
+			// Prepare the array container for the elements of a new group
+			if (count >= N) {
+				result.push(group);
+				count = 0;
+				group = [];
+			}
+			
+			// Insert element in the group
+			group.push(copy[idx]);
+			
+			// Update
+			copy.splice(idx,1);
+			len = copy.length;
+			count++;
+		}
+		
+		// Add any remaining element
+		if (group.length > 0) {
+			result.push(group);
+		}
+		
+		return result;
+	};
+	
+	/**
+	 * Match each element of the array with N random others.
+	 * If strict is equal to true, elements cannot be matched multiple times.
+	 */
+	ARRAY.matchN = function (array, N, strict) {
+		var result = []
+		var len = array.length;
+		var found = [];
+		for (var i = 0 ; i < len ; i++) {
+			// Recreate the array
+			var copy = array.slice(0);
+			copy.splice(i,1);
+			if (strict) {
+				copy = ARRAY.arrayDiff(copy,found);
+			}
+			var group = ARRAY.getNRandom(copy,N);
+			// Add to the set of used elements
+			found = found.concat(group);
+			// Re-add the current element
+			group.splice(0,0,array[i]);
+			result.push(group);
+			
+			//Update
+			group = [];
+			
+		}
+		return result;
+	};
+	
+	ARRAY.arraySelfConcat = function(array) {
+		var i = 0;
+		var len = array.length;
+		var result = []
+		for (;i<len;i++) {
+			result = result.concat(array[i]);
+		}
+		return result;
+	};
+	
+	
+	/**
+	 * Performs a diff between two arrays. 
+	 * Returns all the values of the first array which are not present 
+	 * in the second one.
+	 */
+	ARRAY.arrayDiff = function(a1, a2) {
+		return a1.filter( function(i) {
+			return !(a2.indexOf(i) > -1);
+		});
+	};
+	
+	/**
+	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+	 * 
+	 */
+	ARRAY.shuffle = function (array, N, callback) {
+		var copy = array.slice(0);
+		var len = array.length-1; // ! -1
+		for (var i = len; i > 0; i--) {
+			var j = Math.floor(Math.random()*(i+1));
+			var tmp = copy[j];
+			copy[j] = copy[i];
+			copy[i] = tmp;
+			//console.log(copy);
+		}
+		return copy;
+	};
+	
+	ARRAY.getNRandom = function (array, N, callback) {
+		return ARRAY.shuffle(array).slice(0,N);
+	};                           
+	                           	
+	ARRAY.generateCombinations = function (array, r, callback) {
+	    function equal(a, b) {
+	        for (var i = 0; i < a.length; i++) {
+	            if (a[i] != b[i]) return false;
+	        }
+	        return true;
+	    }
+	    function values(i, a) {
+	        var ret = [];
+	        for (var j = 0; j < i.length; j++) ret.push(a[i[j]]);
+	        return ret;
+	    }
+	    var n = array.length;
+	    var indices = [];
+	    for (var i = 0; i < r; i++) indices.push(i);
+	    var final = [];
+	    for (var i = n - r; i < n; i++) final.push(i);
+	    while (!equal(indices, final)) {
+	        callback(values(indices, array));
+	        var i = r - 1;
+	        while (indices[i] == n - r + i) i -= 1;
+	        indices[i] += 1;
+	        for (var j = i + 1; j < r; j++) indices[j] = indices[i] + j - i;
+	    }
+	    callback(values(indices, array));
+	};
+    
+	//TODO: Improve
+	ARRAY.print_r = function (array) {
+		for (var i=0,len=array.length;i<len;i++){
+			var el = array[i]; 
+			if (typeof(el) === 'ARRAY'){
+				ARRAY.print_r(el);
+			}
+			else {
+				if (typeof(el) === 'Object'){
+					for (var key in el) {
+						if (el.hasOwnProperty(key)){
+							console.log(key + ' ->\n');
+							ARRAY.print_r(el[key]);
+						}
+					}
+				}
+				else {
+					console.log(el);
+				}
+			}
+		}
+	};
+	
+	
+})(
+   'undefined' !== typeof JSU ? JSU : module.exports
+ , 'undefined' !== typeof JSU ? JSU : module.parent.exports
+); 
+ 
+(function (exports) {
+	
+	var TIME = {};
+	exports.time = TIME;
+
+    TIME.getDate = function() {
+		var d = new Date();
+		var date = d.getUTCDate() + '-' + (d.getUTCMonth()+1) + '-' + d.getUTCFullYear() + ' ' 
+				+ d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ' ' 
+				+ d.getMilliseconds();
+		
+		return date;
+	};
+	
+	TIME.getTime = function() {
+		var d = new Date();
+		var time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+		
+		return time;
+	};
+	
+	/**
+	 * Returns an array days, minutes, seconds, mi
+	 * @param ms time in milliseconds
+	 * @return array 
+	 */
+	TIME.parseMilliseconds = function (ms) {
+	  
+		var result = [];
+		var x = ms / 1000;
+		result[4] = x;
+		var seconds = x % 60;
+		result[3] = Math.floor(seconds);
+		var x = x /60;
+		var minutes = x % 60;
+		result[2] = Math.floor(minutes);
+		var x = x / 60;
+		var hours = x % 24;
+		result[1] = Math.floor(hours);
+		var x = x / 24;
+		var days = x;
+		result[1] = Math.floor(days);
+		
+	    return result;
+	};
+	
+})('undefined' !== typeof JSU ? JSU : module.exports); 
+ 
+(function (exports) {
+	
+
+	var EVAL = {};
+	exports.eval = EVAL;
+	
+	EVAL.eval = function (str, context) {
+    	// Eval must be called indirectly
+    	// i.e. eval.call is not possible
+    	//console.log(str);
+    	var func = function (str) {
+    		// TODO: Filter str
+    		return eval(str);
+    	}
+    	return func.call(context, str);
+    };
+    
+})('undefined' !== typeof JSU ? JSU : module.exports); 
+ 
+(function (exports, JSU) {
+	
+	/**
+	 * 
+	 * NDDB provides a simple, lightweight NO-SQL database for nodeGame.
+	 * 
+	 * Selecting methods returning a new NDDB obj (can be concatenated):
+	 * 
+	 * 		- filter 			-> execute callback
+	 * 		- select			-> evaluate string
+	 * 		- get				-> evaluate an obj
+	 * 		- sort 				->
+	 * 		- reverse			->
+	 * 		
+	 * Return an array of GameBits or their values:
+	 * 
+	 * 		- fetch
+	 * 
+	 * TODO: update and delete methods
+	 * 
+	 */
+	
+	/**
+	 * Expose constructors
+	 */
+	exports.NDDB = NDDB;
+	
+	// NDDB version
+	NDDB.version = 0.2;
+	
+	// Stdout redirect
+	NDDB.log = console.log;
+	
+	/**
+	 * NDDB interface
+	 *
+	 * @api public
+	 */
+	
+	function NDDB (options, db) {
+		
+		// Default settings
+		this.options = null;
+
+		this.D = {};		// The n-dimensional container for comparator functions
+		
+		if (options) {
+			this.options = options;
+			NDDB.log = options.log || NDDB.log;
+			this.D = options.D || this.D;
+		}
+	  		
+		this.db = db || [];	// The actual database
+
+  		this.size = function() { return this.db.length };
+	};
+	
+	NDDB.prototype.clear = function (confirm) {
+		if (confirm) {
+			this.db = [];
+		}
+		else {
+			NDDB.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
+		}
+		
+		return confirm;
+	};	
+	
+	NDDB.prototype.cloneSettings = function () {
+		var o = JSU.clone(this.options);
+		o.D = JSU.clone(this.D);
+		return o;
+	};	
+	
+	NDDB.prototype.toString = function () {
+		var out = '';
+		for (var i=0; i< this.db.length; i++) {
+			out += this.db[i] + '\n'
+		}	
+		return out;
+	};	
+		
+	NDDB.prototype.set = function (d, comparator) {
+		if (!d || !comparator) {
+			NDDB.log('Cannot set empty property or empty comparator');
+			return false;
+		}
+		this.D[d] = comparator;
+		return true;
+	};
+
+	NDDB.prototype.comparator = function (d) {
+		return ('undefined' !== typeof this.D[d]) ? this.D[d] : function (o1, o2) {
+//			NDDB.log(o1);
+//			NDDB.log(o2);
+			if (!o1 && !o2) return 0;
+			if (!o1) return -1;
+			if (!o2) return 1;
+			if (!o1[d]) return -1;
+			if (!o2[d]) return 1;
+			if (o1[d] > o2[d]) return 1;
+			if (o2[d] > o1[d]) return -1;
+			return 0;
+		};	
+	};
+	
+	NDDB.prototype.insert = function (o) {
+		this.db.push(o);
+	};
+	
+	// Sorting Operation
+	
+	NDDB.prototype.reverse = function () {
+		return new NDDB(this.cloneSettings(), this.db.reverse());
+	};
+	
+	/**
+	 * Sort the db according to a certain criteria. Criteria ca be a 
+	 * comparator dimension or a custom function 
+	 * 
+	 * @param d
+	 * 
+	 */
+	NDDB.prototype.sort = function (d) {
+		
+		if ('function' === typeof d) {
+			var func = d;
+		}
+		else {
+			var func = this.comparator(d);
+		}
+		
+		return new NDDB(this.cloneSettings(), this.db.sort(func));
+	};
+	
+
+	
+	NDDB.prototype._analyzeQuery = function (d,op,value) {
+		
+		var raiseError = function (d,op,value) {
+			var miss = '(?)';
+			var err = 'Malformed query: ' + d || miss + ' ' + op || miss + ' ' + value || miss;
+			NDDB.log(err, 'WARN');
+			return false;
+		};
+	
+		if ('undefined' === typeof d) raiseError(d,op,value);
+		
+		// Verify input 
+		if ('undefined' !== typeof op) {
+			if ('undefined' === typeof value) {
+				raiseError(d,op,value);
+			}
+			
+			if (!JSU.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
+				return false;
+			}
+			
+			if (op === '=') {
+				op = '==';
+			}
+			// Encapsulating the value;
+			o = {};
+			o[d] = value;
+			value = o;
+		}
+		else if ('undefined' !== typeof value) {
+			raiseError(d,op,value);
+		}
+		else {
+			op = '';
+			value = '';
+		}
+		
+		return {d:d,op:op,value:value};
+	};
+	
+	// TODO: users do not need to enter value. in case they want 
+	NDDB.prototype.select = function (d, op, value) {
+	
+		var valid = this._analyzeQuery(d, op, value);		
+		if (!valid) return false;
+		
+		var d = valid.d;
+		var op = valid.op;
+		var value = valid.value;
+
+		var comparator = this.comparator(d);
+		
+		//NDDB.log(comparator.toString());
+		//NDDB.log(value);
+		
+		
+		var func = function (elem) {
+			try {	
+				if (JSU.eval(comparator(elem, value) + op + 0, elem)) {
+					return elem;
+				}
+			}
+			catch(e) {
+				NDDB.log('Malformed select query: ' + d + op + value);
+				return false;
+			};
+		};
+	
+		
+		return this.filter(func);
+	};
+	
+	NDDB.prototype.filter = function (func) {
+		return new NDDB(this.cloneSettings(), this.db.filter(func));
+	};
+	
+	// HERE
+	
+	NDDB.prototype.join = function (key1, key2, pos, select) {
+		// Construct a better comparator function
+		// than the generic JSU.equals
+//		if (key1 === key2 && 'undefined' !== typeof this.D[key1]) {
+//			var comparator = function(o1,o2) {
+//				if (this.D[key1](o1,o2) === 0) return true;
+//				return false;
+//			}
+//		}
+//		else {
+//			var comparator = JSU.equals;
+//		}
+		return this._join(key1, key2, JSU.equals, pos, select);
+	};
+	
+	NDDB.prototype.concat = function (key1, key2, pos) {		
+		return this._join(key1, key2, function(){ return true;}, pos);
+	};
+
+	NDDB.prototype._join = function (key1, key2, comparator, pos, select) {
+		
+		var out = [];
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var foreign_key = JSU.eval('this.'+key1, this.db[i]);
+				if ('undefined' !== typeof foreign_key) { 
+					for (var j=0; j < this.db.length; j++) {
+						if (i === j) continue;
+						try {
+							var key = JSU.eval('this.'+key2, this.db[j]);
+							if ('undefined' !== typeof key) { 
+								if (comparator(foreign_key, key)) {
+									// Inject the matched obj into the
+									// reference one
+									var o = JSU.clone(this.db[i]);
+									var o2 = (select) ? JSU.subobj(this.db[j], select) : this.db[j];
+									o[pos] = o2;
+									out.push(o);
+								}
+							}
+						}
+						catch(e) {
+							NDDB.log('Malformed key: ' + key2);
+							//return false;
+						}
+					}
+				}
+			}
+			catch(e) {
+				NDDB.log('Malformed key: ' + key1);
+				//return false;
+			}
+		}
+		
+		return new NDDB(this.cloneSettings(), out);
+	};
+	
+	
+	NDDB._getValues = function (o, key) {		
+		return JSU.eval('this.' + key, o);
+	};
+		
+//	NDDB._getKeyValues = function (o, key) {
+//		var out = {};
+//		out[key] = o[key];
+//		return out;
+//	};
+	
+	NDDB._getValuesArray = function (o, key) {		
+		return JSU.obj2KeyedArray(JSU.eval('this.' + key, o));
+	};
+	
+	NDDB._getKeyValuesArray = function (o, key) {
+		return [key].concat(JSU.obj2KeyedArray(JSU.eval('this.' + key, o)));
+	};
+	
+	NDDB.prototype.fetch = function (key, array) {
+		
+//		NDDB.log(key);
+//		NDDB.log(array);
+		
+		switch (array) {
+			case 'VALUES':
+				var func = (key) ? NDDB._getValuesArray : 
+								   JSU.obj2Array;
+				
+				break;
+			case 'KEY_VALUES':
+				var func = (key) ? NDDB._getKeyValuesArray :
+								   JSU.obj2KeyedArray;
+				break;
+				
+			default: // results are not 
+				if (!key)  return this.db;
+				var func = NDDB._getValues;  	  
+		}
+		
+		var out = [];	
+		for (var i=0; i < this.db.length; i++) {
+			out.push(func.call(this.db[i], this.db[i], key));
+		}	
+		
+		//NDDB.log(out);
+		return out;
+	};
+	
+	NDDB.prototype.fetchValues = function (key) {
+		return this.fetch(key, 'VALUES');
+	};
+	
+	NDDB.prototype.fetchKeyValues = function (key) {
+		return this.fetch(key, 'KEY_VALUES');
+	};
+		
+	NDDB.prototype.first = function (key) {
+		return this.fetch(key)[0];
+	};
+	
+	NDDB.prototype.last = function (key) {
+		var db = this.fetch(key);
+		return (db.length > 0) ? db[db.length-1] : undefined;
+	};
+	
+	NDDB.prototype.limit = function (limit) {
+		if (limit === 0) return new NDDB(this.cloneSettings());
+		var db = (limit > 0) ? this.db.slice(0, limit) :
+							   this.db.slice(limit);
+		
+		return new NDDB(this.cloneSettings(), db);
+	};
+	
+	NDDB.prototype._split = function (o, key) {		
+				
+		if ('object' !== typeof o[key]) {
+			return JSU.clone(o);;
+		}
+		
+		var out = [];
+		var model = JSU.clone(o);
+		model[key] = {};
+		
+		var splitValue = function (value) {
+			for (var i in value) {
+				var copy = JSU.clone(model);
+				if (value.hasOwnProperty(i)) {
+					if ('object' === typeof value[i]) {
+						out = out.concat(splitValue(value[i]));
+					}
+					else {
+						copy[key][i] = value[i]; 
+						out.push(copy);
+					}
+				}
+			}
+			return out;
+		};
+		
+		return splitValue(o[key]);
+	};
+	
+	NDDB.prototype.split = function (key) {	
+		var out = [];
+		for (var i=0; i<this.db.length;i++) {
+			out = out.concat(this._split(this.db[i], key));
+		}
+		return new NDDB(this.cloneSettings(), out);
+	};
+	
+	NDDB.prototype.count = function (key) {
+		var count = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = JSU.eval('this.' + key, this.db[i]);
+				if ('undefined' !== typeof tmp) {
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return count;
+	};
+	
+	NDDB.prototype.sum = function (key) {
+		var sum = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = JSU.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp)) {
+					sum += tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return sum;
+	};
+	
+	NDDB.prototype.mean = function (key) {
+		var sum = 0;
+		var count = 0;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = JSU.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp)) { 
+					//NDDB.log(tmp);
+					sum += tmp;
+					count++;
+				}
+			}
+			catch (e) {};
+		}	
+		return (count === 0) ? 0 : sum / count;
+	};
+	
+	NDDB.prototype.min = function (key) {
+		var min = false;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = JSU.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp) && (tmp < min || min === false)) {
+					min = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return min;
+	};
+
+	NDDB.prototype.max = function (key) {
+		var max = false;
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var tmp = JSU.eval('this.' + key, this.db[i]);
+				if (!isNaN(tmp) && (tmp > max || max === false)) {
+					max = tmp;
+				}
+			}
+			catch (e) {};
+		}	
+		return max;
+	};
+	
+	NDDB.prototype.groupBy = function (key) {
+		if (!key) return this.db;
+		
+		var groups = [];
+		var outs = [];
+		for (var i=0; i < this.db.length; i++) {
+			try {
+				var el = JSU.eval('this.' + key, this.db[i]);
+			}
+			catch(e) {
+				NDDB.log('Malformed key ' + key);
+				return false;
+			};
+						
+			if (!JSU.in_array(el,groups)) {
+				groups.push(el);
+				
+				var out = this.filter(function (elem) {
+					if (JSU.equals(JSU.eval('this.' + key, elem),el)) {
+						return this;
+					}
+				});
+				
+				outs.push(out);
+			}
+			
+		}
+		
+		//NDDB.log(groups);
+		
+		return outs;
+	};
+	
+})(
+		
+	'undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window
+  , 'undefined' != typeof JSU ? JSU : module.parent.exports.JSU
+); 
  
 (function (exports) {
 	
@@ -161,514 +1226,21 @@
 })('object' === typeof module ? module.exports : (window.node = {}));
  
  
-(function (exports) {
+(function (exports, node) {
+	
+	// TODO: check whether we still need a util class for nodegame
 	
 	/**
 	 * Expose constructor
 	 * 
 	 */
-	exports.Utils = Utils;
-	
-	function Utils(){};
-	
-	// Add the filter method to Array objects in case the method is not
-	// supported natively. 
-	// See https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter#Compatibility
-	
-    if (!Array.prototype.filter) {  
-      Array.prototype.filter = function(fun /*, thisp */) {  
-        "use strict";  
-        if (this === void 0 || this === null) throw new TypeError();  
-      
-        var t = Object(this);  
-        var len = t.length >>> 0;  
-        if (typeof fun !== "function") throw new TypeError();  
-        
-        var res = [];  
-        var thisp = arguments[1];  
-        for (var i = 0; i < len; i++) {  
-          if (i in t) {  
-            var val = t[i]; // in case fun mutates this  
-            if (fun.call(thisp, val, i, t)) { 
-              res.push(val);  
-            }
-          }  
-        }  
-      
-        return res;  
-      };  
-    }  
-    
-    Utils.equals = function (o1, o2) {
-    	
-      if (!o1 || !o2) return false;
-    	
-      for (var p in o1) {
-          if (o1.hasOwnProperty(p)) {
-        	  
-        	  if ('undefined' === typeof o2[p]) return false;
+	exports.Utils = ('undefined' !== typeof JSU) ? JSU : node.JSU;
 
-        	  switch (typeof o1[p]) {
-                  case 'object':
-                      if (!Utils.equals(o1[p],o2[p])) return false;
-                    	
-                  case 'function':
-                      if (o1[p].toString() !== o2[p].toString()) return false;
-                    	
-                  default:
-                      if (o1[p] !== o2[p]) return false; 
-              }
-          } 
-      }
-
-      // Check whether o2 has extra properties
-      for (p in o2) {
-    	  if (o2.hasOwnProperty(p)) {
-    		  if ('undefined' === typeof o1[p]) return false;
-    	  }
-      }
-
-      return true;
-    };
-
-    
-    Utils.in_array = function (needle, haystack){
-	  
-      if ('object' === typeof needle) {
-    	  var func = Utils.equals;
-      }
-      else {
-    	  var func = function (a,b) {
-    		  return (a === b);
-    	  }
-      }
-      
-      
-	  for(var i=0;i<haystack.length;i++){
-	    if (func.call(this,needle,haystack[i])) return true;
-	  }
-	  return false;
-    };
-    
-    
-    Utils.eval = function (str, context) {
-    	// Eval must be called indirectly
-    	// i.e. eval.call is not possible
-    	//console.log(str);
-    	var func = function (str) {
-    		// TODO: Filter str
-    		return eval(str);
-    	}
-    	return func.call(context, str);
-    };
-    
-	Utils.getDate = function() {
-		var d = new Date();
-		var date = d.getUTCDate() + '-' + (d.getUTCMonth()+1) + '-' + d.getUTCFullYear() + ' ' 
-				+ d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ' ' 
-				+ d.getMilliseconds();
-		
-		return date;
-	};
-	
-	Utils.getTime = function() {
-		var d = new Date();
-		var time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-		
-		return time;
-	};
-	
-	Utils.getListSize = function (list) {	
-		var n = 0;
-		for (var key in list) {
-		    if (list.hasOwnProperty(key)) {
-		    	n++;
-		    }
-		}
-		
-		//console.log('Calculated list length ' + n);
-		
-		return n;
-	};
-	
-	//TODO: Improve
-	Utils.print_r = function (array) {
-		for (var i=0,len=array.length;i<len;i++){
-			var el = array[i]; 
-			if (typeof(el) === 'Array'){
-				Utils.print_r(el);
-			}
-			else {
-				if (typeof(el) === 'Object'){
-					for (var key in el) {
-						if (el.hasOwnProperty(key)){
-							console.log(key + ' ->\n');
-							Utils.print_r(el[key]);
-						}
-					}
-				}
-				else {
-					console.log(el);
-				}
-			}
-		}
-	};
-	
-	Utils._obj2Array = function(obj, keyed) {
-	    var result = [];
-	    for (var key in obj) {
-	       if (obj.hasOwnProperty(key)) {
-	    	   if ( 'object' === typeof obj[key] ) {
-					result = result.concat(Utils._obj2Array(obj[key],keyed));
-				}
-				else {
-					if (keyed) result.push(key);
-			        result.push(obj[key]);
-				}
-	    	   
-	       }
-	    }
-	    return result;
-	};
-	
-	Utils.obj2Array = function (obj) {
-	    return Utils._obj2Array(obj);
-	};
-	
-	/**
-	 * Creates an array containing all keys and values of the obj.
-	 */
-	Utils.obj2KeyedArray = function (obj) {
-	    return Utils._obj2Array(obj,true);
-	};
-	
-	Utils.objGetAllKeys = function (obj) {
-		var result = [];
-	    for (var key in obj) {
-	       if (obj.hasOwnProperty(key)) {
-	    	   result.push(key);
-	    	   if ('object' === typeof obj[key]) {
-	    		   result = result.concat(Utils.objGetAllKeys(obj[key]));
-	    	   }
-	       }
-	    }
-	    return result;
-	};
-	
-
-	
-	/**
-	 * Creates an array of key:value objects.
-	 * 
-	 */
-	Utils.implodeObj = function (obj) {
-		//console.log(obj);
-	    var result = [];
-	    for (var key in obj) {
-	       if (obj.hasOwnProperty(key)) {
-	    	   var o = {};
-	    	   o[key] = obj[key];
-	           result.push(o);
-	           //console.log(o);
-	       }
-	    }
-	    return result;
-	};
-	
-	/**
-	 * Returns an array days, minutes, seconds, mi
-	 * @param ms time in milliseconds
-	 * @return array 
-	 */
-	Utils.parseMilliseconds = function (ms) {
-	  
-		var result = [];
-		var x = ms / 1000;
-		result[4] = x;
-		var seconds = x % 60;
-		result[3] = Math.floor(seconds);
-		var x = x /60;
-		var minutes = x % 60;
-		result[2] = Math.floor(minutes);
-		var x = x / 60;
-		var hours = x % 24;
-		result[1] = Math.floor(hours);
-		var x = x / 24;
-		var days = x;
-		result[1] = Math.floor(days);
-		
-	    return result;
-	};
-
-	/**
-	 * Returns an array of N array containing the same number of elements
-	 * The last group could have less elements.
-	 * 
-	 */ 
-	Utils.getNGroups = function (array, N) {
-		return Utils.getGroupsSizeN(array, Math.floor(array.length / N));
-	};
-	
-	/**
-	 * Returns an array of array containing N elements each
-	 * The last group could have less elements.
-	 * 
-	 */ 
-	Utils.getGroupsSizeN = function (array, N) {
-		
-		var copy = array.slice(0);
-		var len = copy.length;
-		var originalLen = copy.length;
-		var result = [];
-		
-		// Init values for the loop algorithm
-		var i;
-		var idx;
-		var group = [];
-		var count = 0;
-		for (i=0; i < originalLen; i++) {
-			
-			// Get a random idx between 0 and array length
-			idx = Math.floor(Math.random()*len);
-			
-			// Prepare the array container for the elements of a new group
-			if (count >= N) {
-				result.push(group);
-				count = 0;
-				group = [];
-			}
-			
-			// Insert element in the group
-			group.push(copy[idx]);
-			
-			// Update
-			copy.splice(idx,1);
-			len = copy.length;
-			count++;
-		}
-		
-		// Add any remaining element
-		if (group.length > 0) {
-			result.push(group);
-		}
-		
-		return result;
-	};
-	
-	/**
-	 * Match each element of the array with N random others.
-	 * If strict is equal to true, elements cannot be matched multiple times.
-	 */
-	Utils.matchN = function (array, N, strict) {
-		var result = []
-		var len = array.length;
-		var found = [];
-		for (var i = 0 ; i < len ; i++) {
-			// Recreate the array
-			var copy = array.slice(0);
-			copy.splice(i,1);
-			if (strict) {
-				copy = Utils.arrayDiff(copy,found);
-			}
-			var group = Utils.getNRandom(copy,N);
-			// Add to the set of used elements
-			found = found.concat(group);
-			// Re-add the current element
-			group.splice(0,0,array[i]);
-			result.push(group);
-			
-			//Update
-			group = [];
-			
-		}
-		return result;
-	};
-	
-	Utils.arraySelfConcat = function(array) {
-		var i = 0;
-		var len = array.length;
-		var result = []
-		for (;i<len;i++) {
-			result = result.concat(array[i]);
-		}
-		return result;
-	};
-	
-//	Utils.matchN = function (array, N, strict) {
-//		var result = []
-//		var len = array.length;
-//		var copy = array.slice(0);
-//		for (var i = 0 ; i < len ; i++) {
-//			
-//			// Remove the current element from copy if still present
-//			var idx = copy.indexOf(array[i]);
-//			if (idx > 0) {
-//				copy.splice(idx,1);
-//			}
-//			console.log(idx);
-//			console.log(copy);
-//			
-//			// Find N random elem
-//			var group = Utils.getNRandom(copy,N);
-//			
-//			// Update copy
-//			if (strict) {
-//				copy = Utils.arrayDiff(copy,group);
-//			}
-//			else {
-//				copy = array.slice(0);
-//			}
-//			
-//			// Update results
-//			if (idx > 0) {
-//				group.splice(idx,0,array[i]);
-//			}
-//			// Push
-//			result.push(group);
-//			group = [];
-//			
-//		}
-//		return result;
-//	};
-	
-	/**
-	 * Performs a diff between two arrays. 
-	 * Returns all the values of the first array which are not present 
-	 * in the second one.
-	 */
-	Utils.arrayDiff = function(a1, a2) {
-		return a1.filter( function(i) {
-			return !(a2.indexOf(i) > -1);
-		});
-	};
-	
-	/**
-	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-	 * 
-	 */
-	Utils.shuffle = function (array, N, callback) {
-		var copy = array.slice(0);
-		var len = array.length-1; // ! -1
-		for (var i = len; i > 0; i--) {
-			var j = Math.floor(Math.random()*(i+1));
-			var tmp = copy[j];
-			copy[j] = copy[i];
-			copy[i] = tmp;
-			//console.log(copy);
-		}
-		return copy;
-	};
-	
-	Utils.getNRandom = function (array, N, callback) {
-		return Utils.shuffle(array).slice(0,N);
-	};                           
-	                           	
-	Utils.generateCombinations = function (array, r, callback) {
-	    function equal(a, b) {
-	        for (var i = 0; i < a.length; i++) {
-	            if (a[i] != b[i]) return false;
-	        }
-	        return true;
-	    }
-	    function values(i, a) {
-	        var ret = [];
-	        for (var j = 0; j < i.length; j++) ret.push(a[i[j]]);
-	        return ret;
-	    }
-	    var n = array.length;
-	    var indices = [];
-	    for (var i = 0; i < r; i++) indices.push(i);
-	    var final = [];
-	    for (var i = n - r; i < n; i++) final.push(i);
-	    while (!equal(indices, final)) {
-	        callback(values(indices, array));
-	        var i = r - 1;
-	        while (indices[i] == n - r + i) i -= 1;
-	        indices[i] += 1;
-	        for (var j = i + 1; j < r; j++) indices[j] = indices[i] + j - i;
-	    }
-	    callback(values(indices, array));
-	}
-	
-	/**
-	 * Creates a perfect copy of the obj
-	 */
-	Utils.clone = function (obj) {
-		var clone = {};
-		for (var i in obj) {
-			if ( 'object' === typeof obj[i] ) {
-				clone[i] = Utils.clone(obj[i]);
-			}
-			else {
-				clone[i] = obj[i];
-			}
-		}
-		return clone;
-	};
-	
-	/**
-	 * Performs a left join on the keys of two objects. In case keys overlaps
-	 *  the values from obj2 are taken.
-	 */
-	Utils.join = function (obj1, obj2) {
-		var clone = Utils.clone(obj1);
-		if (!obj2) return clone;
-		for (var i in clone) {
-			if (clone.hasOwnProperty(i)) {
-				if ('undefined' !== typeof obj2[i]) {
-					if ( 'object' === typeof obj2[i] ) {
-						clone[i] = Utils.join(clone[i], obj2[i]);
-					}
-					else {
-						clone[i] = obj2[i];
-					}
-				}
-			}
-		}
-		return clone;
-	};
-	
-	/**
-	 * Merges two objects in one. In case keys overlaps the values from 
-	 * obj2 are taken.
-	 */
-	Utils.merge = function (obj1, obj2) {
-		var clone = Utils.clone(obj1);
-		if (!obj2) return clone;
-		for (var i in obj2) {
-			if (obj2.hasOwnProperty(i)) {
-				if ( 'object' === typeof obj2[i] ) {
-					clone[i] = Utils.merge(obj1[i],obj2[i]);
-				}
-				else {
-					clone[i] = obj2[i];
-				}
-			}
-		}
-		return clone;
-	};
-	
-	/**
-	 * Set the.
-	 */
-	Utils.mergeOnKey = function (obj1, obj2, key) {
-		var clone = Utils.clone(obj1);
-		if (!obj2 || !key) return clone;		
-		for (var i in obj2) {
-			if (obj2.hasOwnProperty(i)) {
-				if ( 'object' === typeof obj1[i] ) {
-					clone[i][key] = obj2[i];
-				}
-			}
-		}
-		return clone;
-	};
-	
-	Utils.mergeOnValue = function (obj1, obj2) {
-		return Utils.mergeOnKey(obj1, obj2, 'value');
-	};
-
-})('undefined' != typeof node ? node : module.exports); 
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+);
+ 
  
 (function (exports) {
 	
@@ -1239,6 +1811,8 @@
 	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
+	
+	console.log(Utils);
 	
 	/*
 	 * GameLoop
@@ -1880,9 +2454,9 @@
 	
 	/**
 	 * 
-	 * GameStorage provides a simple, lightweight NO-SQL database for nodeGame.
+	 * GameDB provides a simple, lightweight NO-SQL database for nodeGame.
 	 * 
-	 * Selecting methods returning a new GameStorage obj (can be concatenated):
+	 * Selecting methods returning a new GameDB obj (can be concatenated):
 	 * 
 	 * 		- filter 			-> execute callback
 	 * 		- select			-> evaluate string
@@ -1898,122 +2472,36 @@
 	 * 
 	 */
 	
+	var NDDB = node.NDDB;
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
 	/**
 	 * Expose constructors
 	 */
-	exports.GameStorage = GameStorage;
+	exports.GameDB = GameDB;
 	exports.GameBit = GameBit;
 	
 	
 	/**
-	 * GameStorage interface
+	 * GameDB interface
 	 *
 	 * @api public
 	 */
 	
-	function GameStorage (game, options, storage) {
+	function GameDB (game, options, storage) {
+	  NDDB.call(this, options, storage);
+	  
 	  this.game = game;
 	  this.options = options;
 	  this.storage = storage || [];
 	  
-	  this.size = function() { return this.storage.length };
 	};
 	
-	GameStorage.prototype.count = function (key) {
-		var count = 0;
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var tmp = Utils.eval('this.' + key, this.storage[i]);
-				if ('undefined' !== typeof tmp) {
-					count++;
-				}
-			}
-			catch (e) {};
-		}	
-		return count;
-	};
-	
-	GameStorage.prototype.sum = function (key) {
-		var sum = 0;
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var tmp = Utils.eval('this.' + key, this.storage[i]);
-				if (!isNaN(tmp)) {
-					sum += tmp;
-				}
-			}
-			catch (e) {};
-		}	
-		return sum;
-	};
-	
-	GameStorage.prototype.mean = function (key) {
-		var sum = 0;
-		var count = 0;
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var tmp = Utils.eval('this.' + key, this.storage[i]);
-				if (!isNaN(tmp)) { 
-					//console.log(tmp);
-					sum += tmp;
-					count++;
-				}
-			}
-			catch (e) {};
-		}	
-		return (count === 0) ? 0 : sum / count;
-	};
-	
-	GameStorage.prototype.min = function (key) {
-		var min = false;
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var tmp = Utils.eval('this.' + key, this.storage[i]);
-				if (!isNaN(tmp) && tmp < min) {
-					min = tmp;
-				}
-			}
-			catch (e) {};
-		}	
-		return min;
-	};
-
-	GameStorage.prototype.max = function (key) {
-		var max = false;
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var tmp = Utils.eval('this.' + key, this.storage[i]);
-				if (!isNaN(tmp) && tmp < max) {
-					max = tmp;
-				}
-			}
-			catch (e) {};
-		}	
-		return max;
-	};
-	
-	
-	GameStorage.prototype.map = function (func) {
-		var result = [];
-		for (var i=0; i < this.storage.length; i++) {
-			result[i] = func.call(this.storage[i]);
-		}	
-		return result;
-	};
-	
-	GameStorage.prototype.forEach = function (func) {
-		for (var i=0; i < this.storage.length; i++) {
-			func.call(this.storage[i]);
-		}	
-	};
-	
-	GameStorage.prototype.add = function (player, key, value, state) {
+	GameDB.prototype.add = function (player, key, value, state) {
 		var state = state || this.game.gameState;
 
-		this.storage.push(new GameBit({
+		this.insert(new GameBit({
 										player: player, 
 										key: key,
 										value: value,
@@ -2023,289 +2511,379 @@
 		return true;
 	};
 	
-	// Sorting Operation
-	
-	GameStorage.prototype.reverse = function () {
-		return new GameStorage(this.game, this.options, this.storage.reverse());
-	};
-	
-	/**
-	 * Sort the game storage according to a certain criteria. 
-	 * If not criteria is passed sort by player name.
-	 * 
-	 */
-	GameStorage.prototype.sort = function(func) {
-		var func = func || GameBit.comparePlayer;
-		return new GameStorage(this.game, this.options, this.storage.sort(func));
-	};
-	
-	GameStorage.prototype.sortByPlayer = function() {
-		return this.storage.sort(GameBit.comparePlayer);
-	}
-	
-	GameStorage.prototype.sortByState = function() {
-		return this.storage.sort(GameBit.compareState);
-	}
-	
-	GameStorage.prototype.sortByKey = function() {
-		return this.storage.sort(GameBit.compareKey);
-	}
-	
-	GameStorage.prototype.sortByValue = function(key) {
-		
-		if (!key) {
-			return this.storage.sort(GameBit.compareValue);
-		}
-		else {			
-			var func = GameBit.compareValueByKey(key);
-			return this.storage.sort(func);
-		}
-	};
-	
-	GameStorage.prototype.dump = function (reverse) {
-		return this.storage;
-	};	
-	
-	GameStorage.prototype.toString = function () {
-		var out = '';
-		for (var i=0; i< this.storage.length; i++) {
-			out += this.storage[i] + '\n'
-		}	
-		return out;
-	};	
-	
-	// Get Objects
-	
-	/**
-	 * Retrieves specific information of combinations of the keys @client,
-	 * @state, and @id
-	 * 
-	 */
-	GameStorage.prototype.get = function (gamebit) {
-		if (!gamebit) return this.storage;
-		var out = [];
-		
-		for (var i=0; i< this.storage.length; i++) {
-			if (GameBit.compare(gamebit,this.storage[i])){
-				out.push(this.storage[i]);
-			}
-		}	
-		return new GameStorage(this.game, this.options, out);		
-	};
-	
-	GameStorage.prototype.getByPlayer = function (player) {
-		return this.get(new GameBit({player:player}));
-	};
-	
-	GameStorage.prototype.getByState = function (state) {
-		return this.get(new GameBit({state:state}));
-	};
-	
-	GameStorage.prototype.getByKey = function (key) {
-		return this.get(new GameBit({key:key}));
-	};
-	
-	
-	// TODO: users do not need to enter value. in case they want 
-	// to access a property of the value obj
-	GameStorage.prototype.select = function (key, op, value) {
-		if (!key) return this;
-		
-		// Verify input 
-		if ('undefined' !== typeof op) {
-			if ('undefined' === typeof value) {
-				node.log('Query error. Missing value for operator: ' + key + ' ' + op + ' (?)', 'WARN');
-				return false;
-			}
-			
-			if (!Utils.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
-				node.log('Query error. Invalid operator detected: ' + op, 'WARN');
-				return false;
-			}
-			
-			if (op === '=') op = '==';
-			
-		}
-		else if ('undefined' !== typeof value) {
-			node.log('Query error. Missing operator: ' + key + ' (?) ' + value , 'WARN');
-			return false;
-		}
-		else {
-			op = '';
-			value = '';
-		}
-		
-		// Define comparison function, state is a special case
-		if (key === 'state') {
-			var comparator = function (elem) {
-				try {	
-					if (Utils.eval(GameState.compare(elem.state, value) + op + 0,elem)) {
-						return elem;
-					}
-				}
-				catch(e) {
-					console.log('Malformed select query: ' + key + op + value);
-					return false;
-				};
-			};
-		}
-		else {
-			var comparator = function (elem) {
-				try {	
-					if (Utils.eval('this.' + key + op + value, elem)) {
-						return elem;
-					}
-				}
-				catch(e) {
-					console.log('Malformed select query: ' + key + op + value);
-					return false;
-				};
-			}
-		}
-		
-		return this.filter(comparator);
-	};
-	
-	GameStorage.prototype.filter = function (func) {
-		return new GameStorage(this.game, this.options, this.storage.filter(func));
-	};
-	
-	// Get Values
+//	GameDB.prototype.count = function (key) {
+//		var count = 0;
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var tmp = Utils.eval('this.' + key, this.storage[i]);
+//				if ('undefined' !== typeof tmp) {
+//					count++;
+//				}
+//			}
+//			catch (e) {};
+//		}	
+//		return count;
+//	};
+//	
+//	GameDB.prototype.sum = function (key) {
+//		var sum = 0;
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var tmp = Utils.eval('this.' + key, this.storage[i]);
+//				if (!isNaN(tmp)) {
+//					sum += tmp;
+//				}
+//			}
+//			catch (e) {};
+//		}	
+//		return sum;
+//	};
+//	
+//	GameDB.prototype.mean = function (key) {
+//		var sum = 0;
+//		var count = 0;
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var tmp = Utils.eval('this.' + key, this.storage[i]);
+//				if (!isNaN(tmp)) { 
+//					//console.log(tmp);
+//					sum += tmp;
+//					count++;
+//				}
+//			}
+//			catch (e) {};
+//		}	
+//		return (count === 0) ? 0 : sum / count;
+//	};
+//	
+//	GameDB.prototype.min = function (key) {
+//		var min = false;
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var tmp = Utils.eval('this.' + key, this.storage[i]);
+//				if (!isNaN(tmp) && tmp < min) {
+//					min = tmp;
+//				}
+//			}
+//			catch (e) {};
+//		}	
+//		return min;
+//	};
+//
+//	GameDB.prototype.max = function (key) {
+//		var max = false;
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var tmp = Utils.eval('this.' + key, this.storage[i]);
+//				if (!isNaN(tmp) && tmp < max) {
+//					max = tmp;
+//				}
+//			}
+//			catch (e) {};
+//		}	
+//		return max;
+//	};
+//	
+//	
+//	GameDB.prototype.map = function (func) {
+//		var result = [];
+//		for (var i=0; i < this.storage.length; i++) {
+//			result[i] = func.call(this.storage[i]);
+//		}	
+//		return result;
+//	};
+//	
+//	GameDB.prototype.forEach = function (func) {
+//		for (var i=0; i < this.storage.length; i++) {
+//			func.call(this.storage[i]);
+//		}	
+//	};
+//	
 
-	GameStorage.prototype.split = function () {
-
-		var out = [];
-		
-		for (var i=0; i < this.storage.length; i++) {
-			out = out.concat(new GameBit(this.storage[i]).split());
-		}	
-		
-		//console.log(out);
-		
-		return new GameStorage(this.game, this.options, out);
-	};
-	
-	
-	GameStorage.prototype.groupBy = function (id) {
-		if (!id) return this.storage;
-		
-		var groups = [];
-		var outs = [];
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var el = Utils.eval('this.'+id, this.storage[i]);
-			}
-			catch(e) {
-				console.log('Malformed id ' + id);
-				return false;
-			};
-						
-			if (!Utils.in_array(el,groups)) {
-				groups.push(el);
-				
-				var out = this.filter(function (elem) {
-					if (Utils.eval('this.'+id,elem) === el) {
-						return this;
-					}
-				});
-				
-				outs.push(out);
-			}
-			
-		}
-		
-		//console.log(groups);
-		
-		return outs;
-	};
-	
-	GameStorage.prototype.join = function (key1, key2, newkey) {		
-		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
-	};
-	
-	GameStorage.prototype.concat = function (key1, key2, newkey) {		
-		return this._join(key1, key2, newkey, function(){ return true;});
-	};
-
-	GameStorage.prototype._join = function (key1, key2, newkey, condition) {
-		
-		var out = [];
-		for (var i=0; i < this.storage.length; i++) {
-			try {
-				var foreign_key = Utils.eval('this.'+key1, this.storage[i]);
-				if ('undefined' !== typeof foreign_key) { 
-					for (var j=0; j < this.storage.length; j++) {
-						if (i === j) continue;
-						try {
-							var key = Utils.eval('this.'+key2, this.storage[j]);
-							if ('undefined' !== typeof key) { 
-								if (condition(foreign_key, key)) {
-									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
-								}
-							}
-						}
-						catch(e) {
-							console.log('Malformed key: ' + key2);
-							//return false;
-						}
-					}
-				}
-			}
-			catch(e) {
-				console.log('Malformed key: ' + key1);
-				//return false;
-			}
-		}
-		
-		return new GameStorage(this.game, this.options, out);
-	};
-	
-	GameStorage.prototype.fetch = function (key,array) {
-		
-		switch (key) {
-			case 'VALUES':
-				var func = (array) ? GameBit.prototype.getValuesArray :
-									 GameBit.prototype.getValues ;
-				break;
-			case 'KEY_VALUES':
-				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
-									 GameBit.prototype.getKeyValues; 
-				break;
-			default:
-				if (!array) return this.storage;
-				var func = GameBit.prototype.toArray;
-		}
-		
-		var out = [];	
-		for (var i=0; i < this.storage.length; i++) {
-			out.push(func.call(new GameBit(this.storage[i])));
-		}	
-		
-		//console.log(out);
-		return out;
-	};
-	
-	GameStorage.prototype.fetchArray = function (key) {
-		return this.fetch(key,true);
-	};
-	
-	
-	
-	GameStorage.prototype.fetchValues = function () {
-		return this.fetch('VALUES');
-	};
-	
-	GameStorage.prototype.fetchKeyValues = function () {
-		return this.fetch('KEY_VALUES');
-	};
-	
-	GameStorage.prototype.fetchValuesArray = function () {
-		return this.fetchArray('VALUES');
-	};
-	
-	GameStorage.prototype.fetchKeyValuesArray = function () {
-		return this.fetchArray('KEY_VALUES');
-	};
+//	
+//	// Sorting Operation
+//	
+//	GameDB.prototype.reverse = function () {
+//		return new GameDB(this.game, this.options, this.storage.reverse());
+//	};
+//	
+//	/**
+//	 * Sort the game storage according to a certain criteria. 
+//	 * If not criteria is passed sort by player name.
+//	 * 
+//	 */
+//	GameDB.prototype.sort = function(func) {
+//		var func = func || GameBit.comparePlayer;
+//		return new GameDB(this.game, this.options, this.storage.sort(func));
+//	};
+//	
+//	GameDB.prototype.sortByPlayer = function() {
+//		return this.storage.sort(GameBit.comparePlayer);
+//	}
+//	
+//	GameDB.prototype.sortByState = function() {
+//		return this.storage.sort(GameBit.compareState);
+//	}
+//	
+//	GameDB.prototype.sortByKey = function() {
+//		return this.storage.sort(GameBit.compareKey);
+//	}
+//	
+//	GameDB.prototype.sortByValue = function(key) {
+//		
+//		if (!key) {
+//			return this.storage.sort(GameBit.compareValue);
+//		}
+//		else {			
+//			var func = GameBit.compareValueByKey(key);
+//			return this.storage.sort(func);
+//		}
+//	};
+//	
+//	GameDB.prototype.dump = function (reverse) {
+//		return this.storage;
+//	};	
+//	
+//	GameDB.prototype.toString = function () {
+//		var out = '';
+//		for (var i=0; i< this.storage.length; i++) {
+//			out += this.storage[i] + '\n'
+//		}	
+//		return out;
+//	};	
+//	
+//	// Get Objects
+//	
+//	/**
+//	 * Retrieves specific information of combinations of the keys @client,
+//	 * @state, and @id
+//	 * 
+//	 */
+//	GameDB.prototype.get = function (gamebit) {
+//		if (!gamebit) return this.storage;
+//		var out = [];
+//		
+//		for (var i=0; i< this.storage.length; i++) {
+//			if (GameBit.compare(gamebit,this.storage[i])){
+//				out.push(this.storage[i]);
+//			}
+//		}	
+//		return new GameDB(this.game, this.options, out);		
+//	};
+//	
+//	GameDB.prototype.getByPlayer = function (player) {
+//		return this.get(new GameBit({player:player}));
+//	};
+//	
+//	GameDB.prototype.getByState = function (state) {
+//		return this.get(new GameBit({state:state}));
+//	};
+//	
+//	GameDB.prototype.getByKey = function (key) {
+//		return this.get(new GameBit({key:key}));
+//	};
+//	
+//	
+//	// TODO: users do not need to enter value. in case they want 
+//	// to access a property of the value obj
+//	GameDB.prototype.select = function (key, op, value) {
+//		if (!key) return this;
+//		
+//		// Verify input 
+//		if ('undefined' !== typeof op) {
+//			if ('undefined' === typeof value) {
+//				node.log('Query error. Missing value for operator: ' + key + ' ' + op + ' (?)', 'WARN');
+//				return false;
+//			}
+//			
+//			if (!Utils.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+//				node.log('Query error. Invalid operator detected: ' + op, 'WARN');
+//				return false;
+//			}
+//			
+//			if (op === '=') op = '==';
+//			
+//		}
+//		else if ('undefined' !== typeof value) {
+//			node.log('Query error. Missing operator: ' + key + ' (?) ' + value , 'WARN');
+//			return false;
+//		}
+//		else {
+//			op = '';
+//			value = '';
+//		}
+//		
+//		// Define comparison function, state is a special case
+//		if (key === 'state') {
+//			var comparator = function (elem) {
+//				try {	
+//					if (Utils.eval(GameState.compare(elem.state, value) + op + 0,elem)) {
+//						return elem;
+//					}
+//				}
+//				catch(e) {
+//					console.log('Malformed select query: ' + key + op + value);
+//					return false;
+//				};
+//			};
+//		}
+//		else {
+//			var comparator = function (elem) {
+//				try {	
+//					if (Utils.eval('this.' + key + op + value, elem)) {
+//						return elem;
+//					}
+//				}
+//				catch(e) {
+//					console.log('Malformed select query: ' + key + op + value);
+//					return false;
+//				};
+//			}
+//		}
+//		
+//		return this.filter(comparator);
+//	};
+//	
+//	GameDB.prototype.filter = function (func) {
+//		return new GameDB(this.game, this.options, this.storage.filter(func));
+//	};
+//	
+//	// Get Values
+//
+//	GameDB.prototype.split = function () {
+//
+//		var out = [];
+//		
+//		for (var i=0; i < this.storage.length; i++) {
+//			out = out.concat(new GameBit(this.storage[i]).split());
+//		}	
+//		
+//		//console.log(out);
+//		
+//		return new GameDB(this.game, this.options, out);
+//	};
+//	
+//	
+//	GameDB.prototype.groupBy = function (id) {
+//		if (!id) return this.storage;
+//		
+//		var groups = [];
+//		var outs = [];
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var el = Utils.eval('this.'+id, this.storage[i]);
+//			}
+//			catch(e) {
+//				console.log('Malformed id ' + id);
+//				return false;
+//			};
+//						
+//			if (!Utils.in_array(el,groups)) {
+//				groups.push(el);
+//				
+//				var out = this.filter(function (elem) {
+//					if (Utils.eval('this.'+id,elem) === el) {
+//						return this;
+//					}
+//				});
+//				
+//				outs.push(out);
+//			}
+//			
+//		}
+//		
+//		//console.log(groups);
+//		
+//		return outs;
+//	};
+//	
+//	GameDB.prototype.join = function (key1, key2, newkey) {		
+//		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
+//	};
+//	
+//	GameDB.prototype.concat = function (key1, key2, newkey) {		
+//		return this._join(key1, key2, newkey, function(){ return true;});
+//	};
+//
+//	GameDB.prototype._join = function (key1, key2, newkey, condition) {
+//		
+//		var out = [];
+//		for (var i=0; i < this.storage.length; i++) {
+//			try {
+//				var foreign_key = Utils.eval('this.'+key1, this.storage[i]);
+//				if ('undefined' !== typeof foreign_key) { 
+//					for (var j=0; j < this.storage.length; j++) {
+//						if (i === j) continue;
+//						try {
+//							var key = Utils.eval('this.'+key2, this.storage[j]);
+//							if ('undefined' !== typeof key) { 
+//								if (condition(foreign_key, key)) {
+//									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
+//								}
+//							}
+//						}
+//						catch(e) {
+//							console.log('Malformed key: ' + key2);
+//							//return false;
+//						}
+//					}
+//				}
+//			}
+//			catch(e) {
+//				console.log('Malformed key: ' + key1);
+//				//return false;
+//			}
+//		}
+//		
+//		return new GameDB(this.game, this.options, out);
+//	};
+//	
+//	GameDB.prototype.fetch = function (key,array) {
+//		
+//		switch (key) {
+//			case 'VALUES':
+//				var func = (array) ? GameBit.prototype.getValuesArray :
+//									 GameBit.prototype.getValues ;
+//				break;
+//			case 'KEY_VALUES':
+//				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
+//									 GameBit.prototype.getKeyValues; 
+//				break;
+//			default:
+//				if (!array) return this.storage;
+//				var func = GameBit.prototype.toArray;
+//		}
+//		
+//		var out = [];	
+//		for (var i=0; i < this.storage.length; i++) {
+//			out.push(func.call(new GameBit(this.storage[i])));
+//		}	
+//		
+//		//console.log(out);
+//		return out;
+//	};
+//	
+//	GameDB.prototype.fetchArray = function (key) {
+//		return this.fetch(key,true);
+//	};
+//	
+//	
+//	
+//	GameDB.prototype.fetchValues = function () {
+//		return this.fetch('VALUES');
+//	};
+//	
+//	GameDB.prototype.fetchKeyValues = function () {
+//		return this.fetch('KEY_VALUES');
+//	};
+//	
+//	GameDB.prototype.fetchValuesArray = function () {
+//		return this.fetchArray('VALUES');
+//	};
+//	
+//	GameDB.prototype.fetchKeyValuesArray = function () {
+//		return this.fetchArray('KEY_VALUES');
+//	};
 	
 	
 	/**
@@ -2322,104 +2900,104 @@
 		this.value = options.value;
 	};
 	
-	GameBit.prototype.isComplex = function() {
-		return ('object' === typeof this.value) ? true : false;
-	};
+//	GameBit.prototype.isComplex = function() {
+//		return ('object' === typeof this.value) ? true : false;
+//	};
 		
-	GameBit.prototype.join = function(gb, newkey) {
-		return GameBit.join(this, gb, newkey);
-	};
-		
-	GameBit.join = function(gb1, gb2, newkey) {
-		var value = {};
-		value[gb1.key] = gb1.value;
-		value[gb2.key] = gb2.value;
-		
-		return new GameBit({player: gb1.player,
-							state: gb1.state,
-							key: newkey || gb1.key,
-							value: value
-		});
-	};
+//	GameBit.prototype.join = function(gb, newkey) {
+//		return GameBit.join(this, gb, newkey);
+//	};
+//		
+//	GameBit.join = function(gb1, gb2, newkey) {
+//		var value = {};
+//		value[gb1.key] = gb1.value;
+//		value[gb2.key] = gb2.value;
+//		
+//		return new GameBit({player: gb1.player,
+//							state: gb1.state,
+//							key: newkey || gb1.key,
+//							value: value
+//		});
+//	};
 	
-	GameBit.prototype.split = function () {		
-			
-		
-		if (!this.isComplex()) {
-			return Utils.clone(this);;
-		}
-		
-		var model = {};
-		var out = [];
-		
-		if ('undefined' !== typeof this.player) {
-			model.player = this.player;
-		}
-		
-		if ('undefined' !== typeof this.state) {
-			model.state = this.state;
-		}
-			
-		if ('undefined' !== typeof this.key) {
-			model.key = this.key;
-		}
-		
-		var splitValue = function (value, model) {
-			for (var i in value) {
-				var copy = Utils.clone(model);
-				copy.value = {};
-				if (value.hasOwnProperty(i)) {
-					if ('object' === typeof value[i]) {
-						out = out.concat(splitValue(value[i], model));
-					}
-					else {
-						copy.value[i] = value[i]; 
-						out.push(copy);
-					}
-				}
-			}
-			return out;
-		};
-		
-		return splitValue(this.value, model);
-	};
-	
-	
-	GameBit.prototype.getValues = function () {		
-		return this.value;
-	};
-		
-	GameBit.prototype.getKeyValues = function () {
-		return {key: this.key, value: this.value};
-	};
-	
-	GameBit.prototype.getValuesArray = function () {		
-		return Utils.obj2KeyedArray(this.value);
-	};
-	
-	GameBit.prototype.getKeyValuesArray = function () {
-		return [this.key].concat(Utils.obj2KeyedArray(this.value));
-	};
-	
-	
-	GameBit.prototype.toArray = function () {
-		
-		var out = [];
-		
-		if ('undefined' !== typeof this.state) out.push(this.state);
-		if ('undefined' !== typeof this.player) out.push(this.player);
-		if ('undefined' !== typeof this.key) out.push(this.key);
-		
-		
-		if (!this.isComplex()) {
-			out.push(this.value);
-		}
-		else {
-			out = out.concat(Utils.obj2KeyedArray(this.value));
-		}
-		
-		return out;
-	};
+//	GameBit.prototype.split = function () {		
+//			
+//		
+//		if (!this.isComplex()) {
+//			return Utils.clone(this);;
+//		}
+//		
+//		var model = {};
+//		var out = [];
+//		
+//		if ('undefined' !== typeof this.player) {
+//			model.player = this.player;
+//		}
+//		
+//		if ('undefined' !== typeof this.state) {
+//			model.state = this.state;
+//		}
+//			
+//		if ('undefined' !== typeof this.key) {
+//			model.key = this.key;
+//		}
+//		
+//		var splitValue = function (value, model) {
+//			for (var i in value) {
+//				var copy = Utils.clone(model);
+//				copy.value = {};
+//				if (value.hasOwnProperty(i)) {
+//					if ('object' === typeof value[i]) {
+//						out = out.concat(splitValue(value[i], model));
+//					}
+//					else {
+//						copy.value[i] = value[i]; 
+//						out.push(copy);
+//					}
+//				}
+//			}
+//			return out;
+//		};
+//		
+//		return splitValue(this.value, model);
+//	};
+//	
+//	
+//	GameBit.prototype.getValues = function () {		
+//		return this.value;
+//	};
+//		
+//	GameBit.prototype.getKeyValues = function () {
+//		return {key: this.key, value: this.value};
+//	};
+//	
+//	GameBit.prototype.getValuesArray = function () {		
+//		return Utils.obj2KeyedArray(this.value);
+//	};
+//	
+//	GameBit.prototype.getKeyValuesArray = function () {
+//		return [this.key].concat(Utils.obj2KeyedArray(this.value));
+//	};
+//	
+//	
+//	GameBit.prototype.toArray = function () {
+//		
+//		var out = [];
+//		
+//		if ('undefined' !== typeof this.state) out.push(this.state);
+//		if ('undefined' !== typeof this.player) out.push(this.player);
+//		if ('undefined' !== typeof this.key) out.push(this.key);
+//		
+//		
+//		if (!this.isComplex()) {
+//			out.push(this.value);
+//		}
+//		else {
+//			out = out.concat(Utils.obj2KeyedArray(this.value));
+//		}
+//		
+//		return out;
+//	};
 	
 	
 	
@@ -2471,11 +3049,11 @@
 		return -1;
 	};	
 	
-	GameBit.compareValueByKey = function (key) {
-	    return function (a,b) {
-	        return (a.value[key] < b.value[key]) ? -1 : (a.value[key] > b.value[key]) ? 1 : 0;
-	    }
-	}
+//	GameBit.compareValueByKey = function (key) {
+//	    return function (a,b) {
+//	        return (a.value[key] < b.value[key]) ? -1 : (a.value[key] > b.value[key]) ? 1 : 0;
+//	    }
+//	}
 
 	
 })(
@@ -2894,6 +3472,14 @@
 	     */
 	
 	    node.EventEmitter = require('./EventEmitter').EventEmitter;
+	    
+	    /**
+	     * Expose JSU
+	     *
+	     * @api public
+	     */
+	
+	    node.JSU = require('JSU').JSU;
 		
 	    /**
 	     * Expose Utils
@@ -2902,7 +3488,9 @@
 	     */
 	
 	    node.utils = node.Utils = require('./Utils').Utils;
-	
+	    
+	    console.log(node.utils);
+	    
 	    /**
 	     * Expose GameState.
 	     *
@@ -2960,6 +3548,16 @@
 	     */
 	
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
+	    
+	
+	    /**
+	     * Expose NDDB
+	     *
+	     * @api public
+	     */
+	
+	    node.NDDB = require('NDDB').NDDB;
+	
 	    
 	    /**
 	     * Expose GameStorage
@@ -3248,6 +3846,9 @@
 	}
 	// end node
 	
+	
+	
+	
 })('undefined' != typeof node ? node : module.exports); 
  
  
@@ -3255,12 +3856,12 @@
  
  
 /*!
- * nodeWindow v0.6
+ * nodeWindow v0.6.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:37:02 CET 2011
+ * Built on Do 15. Dez 19:30:12 CET 2011
  *
  */
  
@@ -4232,6 +4833,10 @@
     return row;
   };
   
+  Table.prototype.addColumn = function (data, attributes, container) {
+  
+  };
+  
   Table.prototype.getRoot = function() {
     return this.root;
   };
@@ -4244,12 +4849,12 @@
  
  
 /*!
- * nodeGadgets v0.6
+ * nodeGadgets v0.6.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 12. Dez 16:37:02 CET 2011
+ * Built on Do 15. Dez 19:30:12 CET 2011
  *
  */
  

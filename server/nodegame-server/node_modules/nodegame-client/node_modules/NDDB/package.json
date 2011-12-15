@@ -1,0 +1,13 @@
+{
+  "name": "NDDB",
+  "description": "Javascript lightweight N-dimensional database",
+  "version": "0.1",
+  "keywords": [ "db" ],
+  "author": "Stefano Balietti <futur.dorko@gmail.com>",
+  "licenses": [
+    { "type": "GPL" }
+  ],
+	"dependencies": {},
+  "engines": { "node":  ">=0.2.3" },
+  "main": "nddb"
+}

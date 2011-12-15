@@ -28,8 +28,10 @@ DATE=`eval date` #+%Y%m%d`
 AUTHOR="Copyright 2011, Stefano Balietti"
 
 DIR="nodeGame/"
-HEADER=$DIR"ng.header.js.tpl"
-BOTTOM=$DIR"ng.bottom.js.tpl"
+
+# not used for now
+#HEADER=$DIR"ng.header.js.tpl"
+#BOTTOM=$DIR"ng.bottom.js.tpl"
 
 
 # Custom Funcs
@@ -65,19 +67,27 @@ addBlanks 2 $NODEGAME
 # echo "Writing header:" $HEADER  
 # `cat $HEADER >> $NODEGAME`
 
-# Add all the classes
 
-FILES[0]='EventEmitter.js'
-FILES[1]='Utils.js'
-FILES[2]='GameState.js'
-FILES[3]='PlayerList.js'
-FILES[4]='GameMsg.js'
-FILES[5]='GameLoop.js'
-FILES[6]='GameMsgGenerator.js'
-FILES[7]='GameSocketClient.js'
-FILES[8]='GameStorage.js'
-FILES[9]='Game.js'
-FILES[10]='nodeGame.js'
+# Node Modules
+
+FILES[0]='node_modules/JSU/jsu.js'
+FILES[1]='node_modules/JSU/lib/obj.js'
+FILES[2]='node_modules/JSU/lib/array.js'
+FILES[3]='node_modules/JSU/lib/time.js'
+FILES[4]='node_modules/JSU/lib/eval.js'
+FILES[5]='node_modules/NDDB/nddb.js'
+# Add all the classes
+FILES[6]='EventEmitter.js'
+FILES[7]='Utils.js'
+FILES[8]='GameState.js'
+FILES[9]='PlayerList.js'
+FILES[10]='GameMsg.js'
+FILES[11]='GameLoop.js'
+FILES[12]='GameMsgGenerator.js'
+FILES[13]='GameSocketClient.js'
+FILES[14]='GameDB.js'
+FILES[15]='Game.js'
+FILES[16]='nodeGame.js'
 
 for f in ${FILES[*]}
 do

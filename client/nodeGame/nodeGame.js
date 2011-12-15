@@ -28,6 +28,14 @@
 	     */
 	
 	    node.EventEmitter = require('./EventEmitter').EventEmitter;
+	    
+	    /**
+	     * Expose JSU
+	     *
+	     * @api public
+	     */
+	
+	    node.JSU = require('JSU').JSU;
 		
 	    /**
 	     * Expose Utils
@@ -36,7 +44,7 @@
 	     */
 	
 	    node.utils = node.Utils = require('./Utils').Utils;
-	
+	    
 	    /**
 	     * Expose GameState.
 	     *

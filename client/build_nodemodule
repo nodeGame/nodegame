@@ -10,12 +10,13 @@ FILES[4]='GameMsg.js'
 FILES[5]='GameLoop.js'
 FILES[6]='GameMsgGenerator.js'
 FILES[7]='GameSocketClient.js'
-FILES[8]='GameStorage.js'
+FILES[8]='GameDB.js'
 FILES[9]='Game.js'
 FILES[10]='nodeGame.js'
 FILES[11]='package.json'
 
 DIR="nodeGame/"
+DIR_MODULES="nodeGame/node_modules/"
 MODULEDIR="nodeclient/node_modules/nodegame-client/"
 MODULEDIRSERVER="../server/nodegame-server/node_modules/nodegame-client/"
 for f in ${FILES[*]}
@@ -25,6 +26,11 @@ do
   `cp $F $MODULEDIR$f`
 	 `cp $F $MODULEDIRSERVER$f`
 done
+
+echo "Copying node_modules directory"
+`cp $DIR_MODULES $MODULEDIR -r`
+`cp $DIR_MODULES $MODULEDIRSERVER -r`
+
 
 echo "Done."
 
