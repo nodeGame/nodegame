@@ -1,0 +1,14 @@
+{
+  "name": "JSUS",
+  "description": "JavaScript UtilS. Collection of general purpose functions. JSUS helps!",
+  "version": "0.2",
+  "keywords": [ "util", "general", "array", "eval", "time", "date", "object"],
+  "author": "Stefano Balietti <futur.dorko@gmail.com>",
+  "licenses": [
+    { "type": "GPL" }
+  ],
+  "directories": { "lib": "./lib"},
+  "dependencies": {},
+  "engines": { "node":  ">=0.2.3" },
+  "main": "jsus"
+}

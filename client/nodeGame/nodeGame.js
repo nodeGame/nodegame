@@ -35,7 +35,7 @@
 	     * @api public
 	     */
 	
-	    node.JSU = require('JSU').JSU;
+	    node.JSUS = require('JSUS').JSUS;
 		
 	    /**
 	     * Expose Utils
@@ -119,7 +119,7 @@
 	     * @api public
 	     */
 	
-	    node.GameStorage = require('./GameStorage').GameStorage;
+	    node.GameDB = require('./GameDB').GameDB;
 	    
 	    /**
 	     * Expose Game

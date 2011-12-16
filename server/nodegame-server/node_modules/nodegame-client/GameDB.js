@@ -38,11 +38,18 @@
 	 */
 	
 	function GameDB (game, options, storage) {
-	  NDDB.call(this, options, storage);
+	  
+	  console.log(this);	
+		
+	  NDDB.extend(this, options, storage);
+	  
+	  console.log(this);
 	  
 	  this.game = game;
 	  this.options = options;
 	  this.storage = storage || [];
+	  
+	  this.set('state', GameBit.compareState);
 	  
 	};
 	

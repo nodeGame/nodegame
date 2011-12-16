@@ -2,7 +2,7 @@
 	
 	var GameState = node.GameState;
 	var GameMsg = node.GameMsg;
-	var GameStorage = node.GameStorage;
+	var GameDB = node.GameDB;
 	var PlayerList = node.PlayerList;
 	var GameLoop = node.GameLoop;
 	var Utils = node.Utils;
@@ -46,7 +46,7 @@
 		
 		this.pl = new PlayerList();
 		
-		this.memory = new GameStorage(this);
+		this.memory = new GameDB(this);
 		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';

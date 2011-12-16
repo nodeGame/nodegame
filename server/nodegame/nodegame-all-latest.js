@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 15. Dez 19:30:12 CET 2011
+ * Built on Fr 16. Dez 18:36:08 CET 2011
  *
  */
  
@@ -15,16 +15,18 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 15. Dez 19:30:12 CET 2011
+ * Built on Fr 16. Dez 18:36:08 CET 2011
  *
  */
  
  
 (function (exports) {
 	
-	var JSU = exports.JSU = {};
+	var JSUS = exports.JSUS = {};
 	
-	  JSU.load = function (additional, target) {
+	JSUS.extend = function (additional, target) {		
+		if (!additional) return target;
+			
 		var target = target || this; 
 		
 	    for (var prop in additional) {
@@ -32,31 +34,37 @@
 	        if (typeof target[prop] !== 'object') {
 	        	target[prop] = additional[prop];
 	        } else {
-	          JSU.load(additional[prop], target[prop]);
+	          JSUS.extend(additional[prop], target[prop]);
 	        }
 	      }
 	    }
 
+	    // TODO: this is true also for {}
+	    if (additional.prototype) {
+	    	if (!target.prototype) target.prototype = {};
+	    	JSUS.extend(additional.prototype, target.prototype);
+	    };
+	    
 	    return target;
 	  };
 
     // if node
 	if ('object' === typeof module && 'function' === typeof require) {
-		
-		JSU.load(require('./lib/obj').obj);
-		JSU.load(require('./lib/array').array);
-	    JSU.load(require('./lib/time').time);
-	    JSU.load(require('./lib/eval').eval);
-	    
+	    require('./lib/obj');
+		require('./lib/array');
+	    require('./lib/time');
+	    require('./lib/eval');
 	}
 	// end node
 
 })('undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window); 
  
-(function (exports) {
+(function (JSUS) {
 
-	var OBJ = {};
-	exports.obj = OBJ;
+	
+	
+	function OBJ(){};
+
 	
     OBJ.equals = function (o1, o2) {
     	
@@ -282,14 +290,15 @@
 		return OBJ.mergeOnKey(obj1, obj2, 'value');
 	};
 
-})('undefined' !== typeof JSU ? JSU : module.exports); 
+	JSUS.extend(OBJ);
+	
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
-(function (exports, JSU) {
+(function (JSUS) {
 	
-	var ARRAY = {};
-	exports.array = ARRAY;
+	function ARRAY(){};
 	
-
+	
 	// ARRAYs
 	/////////
 	
@@ -324,7 +333,7 @@
     ARRAY.in_array = function (needle, haystack){
   	  
         if ('object' === typeof needle) {
-      	  var func = JSU.equals;
+      	  var func = JSUS.equals;
         }
         else {
       	  var func = function (a,b) {
@@ -516,16 +525,13 @@
 		}
 	};
 	
+	JSUS.extend(ARRAY);
 	
-})(
-   'undefined' !== typeof JSU ? JSU : module.exports
- , 'undefined' !== typeof JSU ? JSU : module.parent.exports
-); 
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
-(function (exports) {
+(function (JSUS) {
 	
-	var TIME = {};
-	exports.time = TIME;
+	function TIME() {};
 
     TIME.getDate = function() {
 		var d = new Date();
@@ -568,14 +574,14 @@
 	    return result;
 	};
 	
-})('undefined' !== typeof JSU ? JSU : module.exports); 
+	JSUS.extend(TIME);
+	
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
-(function (exports) {
+(function (JSUS) {
 	
+	function EVAL(){};
 
-	var EVAL = {};
-	exports.eval = EVAL;
-	
 	EVAL.eval = function (str, context) {
     	// Eval must be called indirectly
     	// i.e. eval.call is not possible
@@ -587,9 +593,11 @@
     	return func.call(context, str);
     };
     
-})('undefined' !== typeof JSU ? JSU : module.exports); 
+    JSUS.extend(EVAL);
+    
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
-(function (exports, JSU) {
+(function (exports, JSUS) {
 	
 	/**
 	 * 
@@ -621,6 +629,11 @@
 	
 	// Stdout redirect
 	NDDB.log = console.log;
+	
+	NDDB.extend = function (obj, options, db) {
+		var nddb = new NDDB(options, db);
+		return JSUS.extend(nddb,obj);
+	};
 	
 	/**
 	 * NDDB interface
@@ -658,8 +671,8 @@
 	};	
 	
 	NDDB.prototype.cloneSettings = function () {
-		var o = JSU.clone(this.options);
-		o.D = JSU.clone(this.D);
+		var o = JSUS.clone(this.options);
+		o.D = JSUS.clone(this.D);
 		return o;
 	};	
 	
@@ -743,7 +756,7 @@
 				raiseError(d,op,value);
 			}
 			
-			if (!JSU.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
 				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
@@ -785,7 +798,7 @@
 		
 		var func = function (elem) {
 			try {	
-				if (JSU.eval(comparator(elem, value) + op + 0, elem)) {
+				if (JSUS.eval(comparator(elem, value) + op + 0, elem)) {
 					return elem;
 				}
 			}
@@ -807,7 +820,7 @@
 	
 	NDDB.prototype.join = function (key1, key2, pos, select) {
 		// Construct a better comparator function
-		// than the generic JSU.equals
+		// than the generic JSUS.equals
 //		if (key1 === key2 && 'undefined' !== typeof this.D[key1]) {
 //			var comparator = function(o1,o2) {
 //				if (this.D[key1](o1,o2) === 0) return true;
@@ -815,9 +828,9 @@
 //			}
 //		}
 //		else {
-//			var comparator = JSU.equals;
+//			var comparator = JSUS.equals;
 //		}
-		return this._join(key1, key2, JSU.equals, pos, select);
+		return this._join(key1, key2, JSUS.equals, pos, select);
 	};
 	
 	NDDB.prototype.concat = function (key1, key2, pos) {		
@@ -829,18 +842,18 @@
 		var out = [];
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var foreign_key = JSU.eval('this.'+key1, this.db[i]);
+				var foreign_key = JSUS.eval('this.'+key1, this.db[i]);
 				if ('undefined' !== typeof foreign_key) { 
 					for (var j=0; j < this.db.length; j++) {
 						if (i === j) continue;
 						try {
-							var key = JSU.eval('this.'+key2, this.db[j]);
+							var key = JSUS.eval('this.'+key2, this.db[j]);
 							if ('undefined' !== typeof key) { 
 								if (comparator(foreign_key, key)) {
 									// Inject the matched obj into the
 									// reference one
-									var o = JSU.clone(this.db[i]);
-									var o2 = (select) ? JSU.subobj(this.db[j], select) : this.db[j];
+									var o = JSUS.clone(this.db[i]);
+									var o2 = (select) ? JSUS.subobj(this.db[j], select) : this.db[j];
 									o[pos] = o2;
 									out.push(o);
 								}
@@ -864,7 +877,7 @@
 	
 	
 	NDDB._getValues = function (o, key) {		
-		return JSU.eval('this.' + key, o);
+		return JSUS.eval('this.' + key, o);
 	};
 		
 //	NDDB._getKeyValues = function (o, key) {
@@ -874,11 +887,11 @@
 //	};
 	
 	NDDB._getValuesArray = function (o, key) {		
-		return JSU.obj2KeyedArray(JSU.eval('this.' + key, o));
+		return JSUS.obj2KeyedArray(JSUS.eval('this.' + key, o));
 	};
 	
 	NDDB._getKeyValuesArray = function (o, key) {
-		return [key].concat(JSU.obj2KeyedArray(JSU.eval('this.' + key, o)));
+		return [key].concat(JSUS.obj2KeyedArray(JSUS.eval('this.' + key, o)));
 	};
 	
 	NDDB.prototype.fetch = function (key, array) {
@@ -889,12 +902,12 @@
 		switch (array) {
 			case 'VALUES':
 				var func = (key) ? NDDB._getValuesArray : 
-								   JSU.obj2Array;
+								   JSUS.obj2Array;
 				
 				break;
 			case 'KEY_VALUES':
 				var func = (key) ? NDDB._getKeyValuesArray :
-								   JSU.obj2KeyedArray;
+								   JSUS.obj2KeyedArray;
 				break;
 				
 			default: // results are not 
@@ -939,16 +952,16 @@
 	NDDB.prototype._split = function (o, key) {		
 				
 		if ('object' !== typeof o[key]) {
-			return JSU.clone(o);;
+			return JSUS.clone(o);;
 		}
 		
 		var out = [];
-		var model = JSU.clone(o);
+		var model = JSUS.clone(o);
 		model[key] = {};
 		
 		var splitValue = function (value) {
 			for (var i in value) {
-				var copy = JSU.clone(model);
+				var copy = JSUS.clone(model);
 				if (value.hasOwnProperty(i)) {
 					if ('object' === typeof value[i]) {
 						out = out.concat(splitValue(value[i]));
@@ -977,7 +990,7 @@
 		var count = 0;
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var tmp = JSU.eval('this.' + key, this.db[i]);
+				var tmp = JSUS.eval('this.' + key, this.db[i]);
 				if ('undefined' !== typeof tmp) {
 					count++;
 				}
@@ -991,7 +1004,7 @@
 		var sum = 0;
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var tmp = JSU.eval('this.' + key, this.db[i]);
+				var tmp = JSUS.eval('this.' + key, this.db[i]);
 				if (!isNaN(tmp)) {
 					sum += tmp;
 				}
@@ -1006,7 +1019,7 @@
 		var count = 0;
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var tmp = JSU.eval('this.' + key, this.db[i]);
+				var tmp = JSUS.eval('this.' + key, this.db[i]);
 				if (!isNaN(tmp)) { 
 					//NDDB.log(tmp);
 					sum += tmp;
@@ -1022,7 +1035,7 @@
 		var min = false;
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var tmp = JSU.eval('this.' + key, this.db[i]);
+				var tmp = JSUS.eval('this.' + key, this.db[i]);
 				if (!isNaN(tmp) && (tmp < min || min === false)) {
 					min = tmp;
 				}
@@ -1036,7 +1049,7 @@
 		var max = false;
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var tmp = JSU.eval('this.' + key, this.db[i]);
+				var tmp = JSUS.eval('this.' + key, this.db[i]);
 				if (!isNaN(tmp) && (tmp > max || max === false)) {
 					max = tmp;
 				}
@@ -1053,18 +1066,18 @@
 		var outs = [];
 		for (var i=0; i < this.db.length; i++) {
 			try {
-				var el = JSU.eval('this.' + key, this.db[i]);
+				var el = JSUS.eval('this.' + key, this.db[i]);
 			}
 			catch(e) {
 				NDDB.log('Malformed key ' + key);
 				return false;
 			};
 						
-			if (!JSU.in_array(el,groups)) {
+			if (!JSUS.in_array(el,groups)) {
 				groups.push(el);
 				
 				var out = this.filter(function (elem) {
-					if (JSU.equals(JSU.eval('this.' + key, elem),el)) {
+					if (JSUS.equals(JSUS.eval('this.' + key, elem),el)) {
 						return this;
 					}
 				});
@@ -1082,7 +1095,7 @@
 })(
 		
 	'undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window
-  , 'undefined' != typeof JSU ? JSU : module.parent.exports.JSU
+  , 'undefined' != typeof JSUS ? JSUS : module.parent.exports.JSUS
 ); 
  
 (function (exports) {
@@ -1234,7 +1247,7 @@
 	 * Expose constructor
 	 * 
 	 */
-	exports.Utils = ('undefined' !== typeof JSU) ? JSU : node.JSU;
+	exports.Utils = ('undefined' !== typeof JSUS) ? JSUS : node.JSUS;
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -1811,8 +1824,6 @@
 	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
-	
-	console.log(Utils);
 	
 	/*
 	 * GameLoop
@@ -2490,11 +2501,18 @@
 	 */
 	
 	function GameDB (game, options, storage) {
-	  NDDB.call(this, options, storage);
+	  
+	  console.log(this);	
+		
+	  NDDB.extend(this, options, storage);
+	  
+	  console.log(this);
 	  
 	  this.game = game;
 	  this.options = options;
 	  this.storage = storage || [];
+	  
+	  this.set('state', GameBit.compareState);
 	  
 	};
 	
@@ -3103,7 +3121,7 @@
 	
 	var GameState = node.GameState;
 	var GameMsg = node.GameMsg;
-	var GameStorage = node.GameStorage;
+	var GameDB = node.GameDB;
 	var PlayerList = node.PlayerList;
 	var GameLoop = node.GameLoop;
 	var Utils = node.Utils;
@@ -3147,7 +3165,7 @@
 		
 		this.pl = new PlayerList();
 		
-		this.memory = new GameStorage(this);
+		this.memory = new GameDB(this);
 		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';
@@ -3479,7 +3497,7 @@
 	     * @api public
 	     */
 	
-	    node.JSU = require('JSU').JSU;
+	    node.JSUS = require('JSUS').JSUS;
 		
 	    /**
 	     * Expose Utils
@@ -3488,8 +3506,6 @@
 	     */
 	
 	    node.utils = node.Utils = require('./Utils').Utils;
-	    
-	    console.log(node.utils);
 	    
 	    /**
 	     * Expose GameState.
@@ -3565,7 +3581,7 @@
 	     * @api public
 	     */
 	
-	    node.GameStorage = require('./GameStorage').GameStorage;
+	    node.GameDB = require('./GameDB').GameDB;
 	    
 	    /**
 	     * Expose Game
@@ -3861,7 +3877,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 15. Dez 19:30:12 CET 2011
+ * Built on Fr 16. Dez 18:36:08 CET 2011
  *
  */
  
@@ -4854,7 +4870,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 15. Dez 19:30:12 CET 2011
+ * Built on Fr 16. Dez 18:36:08 CET 2011
  *
  */
  

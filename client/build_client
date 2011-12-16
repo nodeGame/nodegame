@@ -70,11 +70,11 @@ addBlanks 2 $NODEGAME
 
 # Node Modules
 
-FILES[0]='node_modules/JSU/jsu.js'
-FILES[1]='node_modules/JSU/lib/obj.js'
-FILES[2]='node_modules/JSU/lib/array.js'
-FILES[3]='node_modules/JSU/lib/time.js'
-FILES[4]='node_modules/JSU/lib/eval.js'
+FILES[0]='node_modules/JSUS/jsus.js'
+FILES[1]='node_modules/JSUS/lib/obj.js'
+FILES[2]='node_modules/JSUS/lib/array.js'
+FILES[3]='node_modules/JSUS/lib/time.js'
+FILES[4]='node_modules/JSUS/lib/eval.js'
 FILES[5]='node_modules/NDDB/nddb.js'
 # Add all the classes
 FILES[6]='EventEmitter.js'

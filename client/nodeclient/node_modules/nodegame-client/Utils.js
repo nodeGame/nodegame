@@ -6,7 +6,7 @@
 	 * Expose constructor
 	 * 
 	 */
-	exports.Utils = ('undefined' !== typeof JSU) ? JSU : node.JSU;
+	exports.Utils = ('undefined' !== typeof JSUS) ? JSUS : node.JSUS;
 
 })(
 	'undefined' != typeof node ? node : module.exports
