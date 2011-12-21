@@ -57,7 +57,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 100
+								milliseconds: 10000
 			};
 			
 			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
@@ -145,7 +145,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 10000
+								milliseconds: 6000
 			};			
 			this.timer.restart(timerOptions);
 			

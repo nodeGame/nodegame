@@ -59,5 +59,5 @@ B.prototype.c1 = function(){};
 var o = JSUS.setNestedValue('a.b.c', 'cacca', {});
 console.log(o);
 
-var v = JSUS.getNestedValue('a.b.c', o);
+var v = JSUS.getNestedValue('a.r.t', o);
 console.log(v);

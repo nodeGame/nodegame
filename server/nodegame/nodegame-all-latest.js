@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 17:33:19 CET 2011
+ * Built on Mi 21. Dez 18:35:32 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 17:33:19 CET 2011
+ * Built on Mi 21. Dez 18:35:32 CET 2011
  *
  */
  
@@ -721,15 +721,16 @@
 
 	NDDB.prototype.comparator = function (d) {
 		return ('undefined' !== typeof this.D[d]) ? this.D[d] : function (o1, o2) {
-//			NDDB.log(o1);
-//			NDDB.log(o2);
+			NDDB.log('1' + o1);
+			NDDB.log('2' + o2);
 			if (!o1 && !o2) return 0;
 			if (!o1) return -1;
 			if (!o2) return 1;		
 			var v1 = JSUS.getNestedValue(d,o1);
 			var v2 = JSUS.getNestedValue(d,o2);
-//			NDDB.log(v1);
-//			NDDB.log(v2);
+			NDDB.log(v1);
+			NDDB.log(v2);
+			if (!v1 && !v2) return 0;
 			if (!v1) return -1;
 			if (!v2) return 1;
 			if (v1 > v2) return 1;
@@ -825,8 +826,11 @@
 		//NDDB.log(comparator.toString());
 		//NDDB.log(value);
 		
+		var exist = function (elem) {
+			if ('undefined' !== typeof JSUS.getNestedValue(d,elem)) return elem;
+		};
 		
-		var func = function (elem) {
+		var compare = function (elem) {
 			try {	
 //				console.log(elem);
 //				console.log(value);
@@ -840,7 +844,7 @@
 			};
 		};
 		
-		return this.filter(func);
+		return this.filter((op === '') ? exist : compare);
 	};
 	
 	NDDB.prototype.filter = function (func) {
@@ -3910,7 +3914,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 17:33:19 CET 2011
+ * Built on Mi 21. Dez 18:35:32 CET 2011
  *
  */
  
@@ -4903,7 +4907,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 17:33:19 CET 2011
+ * Built on Mi 21. Dez 18:35:32 CET 2011
  *
  */
  
