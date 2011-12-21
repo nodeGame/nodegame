@@ -4,7 +4,14 @@
 	
 	JSUS.extend = function (additional, target) {		
 		if (!additional) return target;
-			
+		
+//		console.log('A');
+//		console.log(additional);
+//		
+//		console.log('T');
+//		console.log(target);
+//		
+		
 		var target = target || this; 
 		
 	    for (var prop in additional) {
@@ -17,11 +24,12 @@
 	      }
 	    }
 
+	    // additional is a class (Function)
 	    // TODO: this is true also for {}
 	    if (additional.prototype) {
-	    	if (!target.prototype) target.prototype = {};
-	    	JSUS.extend(additional.prototype, target.prototype);
+	    	JSUS.extend(additional.prototype, target.prototype || target);
 	    };
+		
 	    
 	    return target;
 	  };

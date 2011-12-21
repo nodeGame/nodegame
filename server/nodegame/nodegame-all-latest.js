@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 16. Dez 18:36:08 CET 2011
+ * Built on Mi 21. Dez 17:33:19 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 16. Dez 18:36:08 CET 2011
+ * Built on Mi 21. Dez 17:33:19 CET 2011
  *
  */
  
@@ -26,7 +26,14 @@
 	
 	JSUS.extend = function (additional, target) {		
 		if (!additional) return target;
-			
+		
+//		console.log('A');
+//		console.log(additional);
+//		
+//		console.log('T');
+//		console.log(target);
+//		
+		
 		var target = target || this; 
 		
 	    for (var prop in additional) {
@@ -39,11 +46,12 @@
 	      }
 	    }
 
+	    // additional is a class (Function)
 	    // TODO: this is true also for {}
 	    if (additional.prototype) {
-	    	if (!target.prototype) target.prototype = {};
-	    	JSUS.extend(additional.prototype, target.prototype);
+	    	JSUS.extend(additional.prototype, target.prototype || target);
 	    };
+		
 	    
 	    return target;
 	  };
@@ -288,6 +296,28 @@
 	
 	OBJ.mergeOnValue = function (obj1, obj2) {
 		return OBJ.mergeOnKey(obj1, obj2, 'value');
+	};
+	
+	OBJ.setNestedValue = function (str, value, obj) {
+		var obj = obj || {};
+		var keys = str.split('.');
+		if (keys.length === 1) {
+			obj[str] = value;
+			return obj;
+		}
+		var k = keys.shift();
+		obj[k] = OBJ.setNestedValue(keys.join('.'), value, obj[k]); 
+		return obj;
+	};
+	
+	OBJ.getNestedValue = function (str, obj) {
+		if (!obj) return;
+		var keys = str.split('.');
+		if (keys.length === 1) {
+			return obj[str];
+		}
+		var k = keys.shift();
+		return OBJ.getNestedValue(keys.join('.'), obj[k]); 
 	};
 
 	JSUS.extend(OBJ);
@@ -630,10 +660,6 @@
 	// Stdout redirect
 	NDDB.log = console.log;
 	
-	NDDB.extend = function (obj, options, db) {
-		var nddb = new NDDB(options, db);
-		return JSUS.extend(nddb,obj);
-	};
 	
 	/**
 	 * NDDB interface
@@ -686,7 +712,7 @@
 		
 	NDDB.prototype.set = function (d, comparator) {
 		if (!d || !comparator) {
-			NDDB.log('Cannot set empty property or empty comparator');
+			NDDB.log('Cannot set empty property or empty comparator', 'ERR');
 			return false;
 		}
 		this.D[d] = comparator;
@@ -699,11 +725,15 @@
 //			NDDB.log(o2);
 			if (!o1 && !o2) return 0;
 			if (!o1) return -1;
-			if (!o2) return 1;
-			if (!o1[d]) return -1;
-			if (!o2[d]) return 1;
-			if (o1[d] > o2[d]) return 1;
-			if (o2[d] > o1[d]) return -1;
+			if (!o2) return 1;		
+			var v1 = JSUS.getNestedValue(d,o1);
+			var v2 = JSUS.getNestedValue(d,o2);
+//			NDDB.log(v1);
+//			NDDB.log(v2);
+			if (!v1) return -1;
+			if (!v2) return 1;
+			if (v1 > v2) return 1;
+			if (v2 > v1) return -1;
 			return 0;
 		};	
 	};
@@ -747,6 +777,7 @@
 			NDDB.log(err, 'WARN');
 			return false;
 		};
+		
 	
 		if ('undefined' === typeof d) raiseError(d,op,value);
 		
@@ -764,10 +795,9 @@
 			if (op === '=') {
 				op = '==';
 			}
+			
 			// Encapsulating the value;
-			o = {};
-			o[d] = value;
-			value = o;
+			value = JSUS.setNestedValue(d,value);
 		}
 		else if ('undefined' !== typeof value) {
 			raiseError(d,op,value);
@@ -798,6 +828,8 @@
 		
 		var func = function (elem) {
 			try {	
+//				console.log(elem);
+//				console.log(value);
 				if (JSUS.eval(comparator(elem, value) + op + 0, elem)) {
 					return elem;
 				}
@@ -807,7 +839,6 @@
 				return false;
 			};
 		};
-	
 		
 		return this.filter(func);
 	};
@@ -1069,7 +1100,7 @@
 				var el = JSUS.eval('this.' + key, this.db[i]);
 			}
 			catch(e) {
-				NDDB.log('Malformed key ' + key);
+				NDDB.log('groupBy malformed key: ' + key, 'ERR');
 				return false;
 			};
 						
@@ -2483,7 +2514,9 @@
 	 * 
 	 */
 	
+	var JSUS = node.Utils;
 	var NDDB = node.NDDB;
+	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
@@ -2492,8 +2525,7 @@
 	 */
 	exports.GameDB = GameDB;
 	exports.GameBit = GameBit;
-	
-	
+
 	/**
 	 * GameDB interface
 	 *
@@ -2501,12 +2533,9 @@
 	 */
 	
 	function GameDB (game, options, storage) {
-	  
-	  console.log(this);	
-		
-	  NDDB.extend(this, options, storage);
-	  
-	  console.log(this);
+	  // Inheriting from NDDB	
+	  JSUS.extend(node.NDDB,this);
+	  node.NDDB.call(this,options,storage);
 	  
 	  this.game = game;
 	  this.options = options;
@@ -3472,6 +3501,11 @@
 	// Will be initialized later
 	node.memory = {};
 	
+
+	// Load the auxiliary library if available in the browser
+	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
+    if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
+    
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 	
@@ -3571,9 +3605,8 @@
 	     *
 	     * @api public
 	     */
-	
+	  	
 	    node.NDDB = require('NDDB').NDDB;
-	
 	    
 	    /**
 	     * Expose GameStorage
@@ -3856,7 +3889,7 @@
 	    };
 	    
 	    node.memory.dump = function (path) {
-			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
+			node.fs.writeCsv(path, node.game.memory.split().fetchValues());
 	    }
 	  
 	}
@@ -3877,7 +3910,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 16. Dez 18:36:08 CET 2011
+ * Built on Mi 21. Dez 17:33:19 CET 2011
  *
  */
  
@@ -4870,7 +4903,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 16. Dez 18:36:08 CET 2011
+ * Built on Mi 21. Dez 17:33:19 CET 2011
  *
  */
  

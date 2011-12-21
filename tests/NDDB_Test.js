@@ -1,16 +1,19 @@
 var Utils = require('../client/nodeGame/Utils.js');
 module.exports.Utils = Utils.Utils;
+var JSUS = require('../client/nodeGame/node_modules/JSUS/jsus.js');
+module.exports.JSUS = JSUS.JSUS;
 
 var GameState = require('../client/nodeGame/GameState.js');
 module.exports.GameState = GameState.GameState;
 var GameState = GameState.GameState;
 
-var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
+var GameBit = require('../client/nodeGame/GameDB.js').GameBit;
 
 var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js').NDDB;
 
 var log = function (txt, level) {
-	console.log (level + ': ' + txt);
+	var level = level || 'INFO';
+	console.log(txt);
 };
 
 var nddb = new NDDB({log: log});
@@ -94,7 +97,7 @@ for (var i=0;i<clients.length;i++) {
 //console.log('Limit -1');
 //console.log(out.limit(-1));
 
-nddb.clear();
+nddb.clear(true);
 //console.log(nddb.fetch());
 
 var clients = ['a','b'];//['a','b','c','d'];
@@ -103,7 +106,14 @@ var ids = ['z','x'];//['z','x','c','v'];
 for (var i=0;i<clients.length;i++) {
 	for (var j=0;j<states.length;j++) {
 		for (var x=0;x<ids.length;x++) {
-			var objs = [{mario: 'yes', paolo: 'no', r: Math.random()}]
+			var p = Math.random();
+			if (p>0.5) {
+				var objs = [{mario: (p>0.5) ? 'yes' : 'no', paolo: (p>0.5) ? 'no' : 'yes', k: '10', r: Math.random()}];
+			}
+			else {
+				var objs = [{mario: (p>0.5) ? 'yes' : 'no', paolo: (p>0.5) ? 'no' : 'yes', r: Math.random()}];
+			}
+			            
 			for (var o=0;o<objs.length; o++) {
 				var gb = new GameBit({player: clients[i],
 									  key: ids[x],
@@ -116,11 +126,17 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
+//var v = nddb.select('key','=','x');
+//console.log(v);
+
+var v = nddb.select('value.k');
+console.log(v.fetch());
+
 //out = nddb.split('value');
 //console.log(out.fetch());
 
 //console.log('Group By');
-//v = nddb.groupBy('key');
+//v = nddb.groupBy('value.k');
 //console.log(v);
 //
 //for (var i=0; i<v.length; i++) {

@@ -10,6 +10,11 @@
 	// Will be initialized later
 	node.memory = {};
 	
+
+	// Load the auxiliary library if available in the browser
+	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
+    if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
+    
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 	
@@ -109,9 +114,8 @@
 	     *
 	     * @api public
 	     */
-	
+	  	
 	    node.NDDB = require('NDDB').NDDB;
-	
 	    
 	    /**
 	     * Expose GameStorage
@@ -394,7 +398,7 @@
 	    };
 	    
 	    node.memory.dump = function (path) {
-			node.fs.writeCsv(path, node.game.memory.split().fetchArray());
+			node.fs.writeCsv(path, node.game.memory.split().fetchValues());
 	    }
 	  
 	}

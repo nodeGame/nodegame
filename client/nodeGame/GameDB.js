@@ -20,7 +20,9 @@
 	 * 
 	 */
 	
+	var JSUS = node.Utils;
 	var NDDB = node.NDDB;
+	
 	var GameState = node.GameState;
 	var Utils = node.Utils;
 	
@@ -29,8 +31,7 @@
 	 */
 	exports.GameDB = GameDB;
 	exports.GameBit = GameBit;
-	
-	
+
 	/**
 	 * GameDB interface
 	 *
@@ -38,12 +39,9 @@
 	 */
 	
 	function GameDB (game, options, storage) {
-	  
-	  console.log(this);	
-		
-	  NDDB.extend(this, options, storage);
-	  
-	  console.log(this);
+	  // Inheriting from NDDB	
+	  JSUS.extend(node.NDDB,this);
+	  node.NDDB.call(this,options,storage);
 	  
 	  this.game = game;
 	  this.options = options;

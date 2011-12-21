@@ -228,6 +228,28 @@
 	OBJ.mergeOnValue = function (obj1, obj2) {
 		return OBJ.mergeOnKey(obj1, obj2, 'value');
 	};
+	
+	OBJ.setNestedValue = function (str, value, obj) {
+		var obj = obj || {};
+		var keys = str.split('.');
+		if (keys.length === 1) {
+			obj[str] = value;
+			return obj;
+		}
+		var k = keys.shift();
+		obj[k] = OBJ.setNestedValue(keys.join('.'), value, obj[k]); 
+		return obj;
+	};
+	
+	OBJ.getNestedValue = function (str, obj) {
+		if (!obj) return;
+		var keys = str.split('.');
+		if (keys.length === 1) {
+			return obj[str];
+		}
+		var k = keys.shift();
+		return OBJ.getNestedValue(keys.join('.'), obj[k]); 
+	};
 
 	JSUS.extend(OBJ);
 	

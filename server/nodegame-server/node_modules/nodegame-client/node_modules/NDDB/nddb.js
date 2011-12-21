@@ -31,10 +31,6 @@
 	// Stdout redirect
 	NDDB.log = console.log;
 	
-	NDDB.extend = function (obj, options, db) {
-		var nddb = new NDDB(options, db);
-		return JSUS.extend(nddb,obj);
-	};
 	
 	/**
 	 * NDDB interface
@@ -87,7 +83,7 @@
 		
 	NDDB.prototype.set = function (d, comparator) {
 		if (!d || !comparator) {
-			NDDB.log('Cannot set empty property or empty comparator');
+			NDDB.log('Cannot set empty property or empty comparator', 'ERR');
 			return false;
 		}
 		this.D[d] = comparator;
@@ -100,11 +96,15 @@
 //			NDDB.log(o2);
 			if (!o1 && !o2) return 0;
 			if (!o1) return -1;
-			if (!o2) return 1;
-			if (!o1[d]) return -1;
-			if (!o2[d]) return 1;
-			if (o1[d] > o2[d]) return 1;
-			if (o2[d] > o1[d]) return -1;
+			if (!o2) return 1;		
+			var v1 = JSUS.getNestedValue(d,o1);
+			var v2 = JSUS.getNestedValue(d,o2);
+//			NDDB.log(v1);
+//			NDDB.log(v2);
+			if (!v1) return -1;
+			if (!v2) return 1;
+			if (v1 > v2) return 1;
+			if (v2 > v1) return -1;
 			return 0;
 		};	
 	};
@@ -148,6 +148,7 @@
 			NDDB.log(err, 'WARN');
 			return false;
 		};
+		
 	
 		if ('undefined' === typeof d) raiseError(d,op,value);
 		
@@ -165,10 +166,9 @@
 			if (op === '=') {
 				op = '==';
 			}
+			
 			// Encapsulating the value;
-			o = {};
-			o[d] = value;
-			value = o;
+			value = JSUS.setNestedValue(d,value);
 		}
 		else if ('undefined' !== typeof value) {
 			raiseError(d,op,value);
@@ -199,6 +199,8 @@
 		
 		var func = function (elem) {
 			try {	
+//				console.log(elem);
+//				console.log(value);
 				if (JSUS.eval(comparator(elem, value) + op + 0, elem)) {
 					return elem;
 				}
@@ -208,7 +210,6 @@
 				return false;
 			};
 		};
-	
 		
 		return this.filter(func);
 	};
@@ -470,7 +471,7 @@
 				var el = JSUS.eval('this.' + key, this.db[i]);
 			}
 			catch(e) {
-				NDDB.log('Malformed key ' + key);
+				NDDB.log('groupBy malformed key: ' + key, 'ERR');
 				return false;
 			};
 						
