@@ -202,6 +202,8 @@ function PeerReviewGame () {
 				
 				var winners = msg.data;
 				
+				console.log(msg.data);
+				
 				for (var i=0; i < winners.length; i++) {
 					
 					var cf_options = { id: 'cf_' + winners[i].player,

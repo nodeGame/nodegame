@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.1
+ * nodeGame-all v0.6.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 18:35:32 CET 2011
+ * Built on Do 22. Dez 14:26:12 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.1
+ * nodeGame Client v0.6.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 18:35:32 CET 2011
+ * Built on Do 22. Dez 14:26:12 CET 2011
  *
  */
  
@@ -721,15 +721,15 @@
 
 	NDDB.prototype.comparator = function (d) {
 		return ('undefined' !== typeof this.D[d]) ? this.D[d] : function (o1, o2) {
-			NDDB.log('1' + o1);
-			NDDB.log('2' + o2);
+//			NDDB.log('1' + o1);
+//			NDDB.log('2' + o2);
 			if (!o1 && !o2) return 0;
 			if (!o1) return -1;
 			if (!o2) return 1;		
 			var v1 = JSUS.getNestedValue(d,o1);
 			var v2 = JSUS.getNestedValue(d,o2);
-			NDDB.log(v1);
-			NDDB.log(v2);
+//			NDDB.log(v1);
+//			NDDB.log(v2);
 			if (!v1 && !v2) return 0;
 			if (!v1) return -1;
 			if (!v2) return 1;
@@ -873,14 +873,16 @@
 	};
 
 	NDDB.prototype._join = function (key1, key2, comparator, pos, select) {
-		
+		var pos = ('undefined' !== typeof pos) ? pos : 'joined';
 		var out = [];
+		var idxs = [];
 		for (var i=0; i < this.db.length; i++) {
 			try {
 				var foreign_key = JSUS.eval('this.'+key1, this.db[i]);
 				if ('undefined' !== typeof foreign_key) { 
-					for (var j=0; j < this.db.length; j++) {
-						if (i === j) continue;
+					// TODO: check if this is correct for left join
+					for (var j=i+1; j < this.db.length; j++) {
+						//if (i === j) continue;
 						try {
 							var key = JSUS.eval('this.'+key2, this.db[j]);
 							if ('undefined' !== typeof key) { 
@@ -914,12 +916,6 @@
 	NDDB._getValues = function (o, key) {		
 		return JSUS.eval('this.' + key, o);
 	};
-		
-//	NDDB._getKeyValues = function (o, key) {
-//		var out = {};
-//		out[key] = o[key];
-//		return out;
-//	};
 	
 	NDDB._getValuesArray = function (o, key) {		
 		return JSUS.obj2KeyedArray(JSUS.eval('this.' + key, o));
@@ -3909,12 +3905,12 @@
  
  
 /*!
- * nodeWindow v0.6.1
+ * nodeWindow v0.6.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 18:35:32 CET 2011
+ * Built on Do 22. Dez 14:26:12 CET 2011
  *
  */
  
@@ -4902,12 +4898,12 @@
  
  
 /*!
- * nodeGadgets v0.6.1
+ * nodeGadgets v0.6.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 21. Dez 18:35:32 CET 2011
+ * Built on Do 22. Dez 14:26:12 CET 2011
  *
  */
  
