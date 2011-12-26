@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:19:34 CET 2011
+ * Built on Mon Dec 26 19:51:48 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:19:34 CET 2011
+ * Built on Mon Dec 26 19:51:48 CET 2011
  *
  */
  
@@ -3965,7 +3965,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:19:34 CET 2011
+ * Built on Mon Dec 26 19:51:48 CET 2011
  *
  */
  
@@ -5125,7 +5125,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:19:34 CET 2011
+ * Built on Mon Dec 26 19:51:48 CET 2011
  *
  */
  
@@ -5286,6 +5286,12 @@
 	
 	ChernoffFaces.prototype.getAllValues = function() {
 		return this.sc.getAllValues();
+	};
+	
+	ChernoffFaces.prototype.randomize = function() {
+		var fv = new FaceVector();
+		fv.shuffle();
+		this.fp.redraw(fv);
 	};
 	
 	/*!
@@ -5726,7 +5732,7 @@
 			if (this.hasOwnProperty(key)) {
 				
 				if (key !== 'color') {
-					this[key] = Math.random();
+					this[key] = this[key].min + Math.random() * this[key].max;
 				}
 			}
 		}

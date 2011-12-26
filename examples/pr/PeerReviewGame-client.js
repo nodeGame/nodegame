@@ -53,6 +53,8 @@ function PeerReviewGame () {
 			};
 			
 			this.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+			// AUTOPLAY
+			this.cf.randomize();
 			
 			// Add timer
 			var timerOptions = {
@@ -107,7 +109,6 @@ function PeerReviewGame () {
 		// AUTOPLAY
 		node.random.exec(function(){
 			var choice = Math.random();
-			
 			if (choice < 0.33) {
 				node.window.getElementById('ex_A').click();
 			}
@@ -117,9 +118,6 @@ function PeerReviewGame () {
 			else {
 				node.window.getElementById('ex_C').click();
 			}
-			
-			//alert(choice);
-			
 		}, 10);
 		
 		
@@ -187,6 +185,16 @@ function PeerReviewGame () {
 				
 				// Add the slider to the container
 				evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
+				
+				// AUTOPLAY
+				node.random.exec(function(){
+					var choice = Math.random();
+					
+					node.window.getElementById(evaId).value = Math.random()*10;
+					
+					//alert(choice);
+					
+				}, 10);
 			});
 			
 			
@@ -214,11 +222,6 @@ function PeerReviewGame () {
 //			var table = new node.Table(tbl_options);
 			var table = new node.Table();
 			
-//			table.addRow([1,2,3]);
-//			table.addRow([4,5,6]);
-//			table.addRow([7,8,9]);
-			
-			
 			node.onDATA('WIN_CF', function(msg) {
 				
 				var winners = msg.data;
@@ -243,8 +246,8 @@ function PeerReviewGame () {
 					
 					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
 					table.addColumn([[container, details_tbl.parse()]]);
-					console.log('Winneer');
-					console.log(winners[i]);
+//					console.log('Winneer');
+//					console.log(winners[i]);
 				}
 				
 				

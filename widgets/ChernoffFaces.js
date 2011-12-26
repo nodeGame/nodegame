@@ -156,6 +156,12 @@
 		return this.sc.getAllValues();
 	};
 	
+	ChernoffFaces.prototype.randomize = function() {
+		var fv = new FaceVector();
+		fv.shuffle();
+		this.fp.redraw(fv);
+	};
+	
 	/*!
 	* ChernoffFaces
 	* 
@@ -594,7 +600,7 @@
 			if (this.hasOwnProperty(key)) {
 				
 				if (key !== 'color') {
-					this[key] = Math.random();
+					this[key] = this[key].min + Math.random() * this[key].max;
 				}
 			}
 		}
