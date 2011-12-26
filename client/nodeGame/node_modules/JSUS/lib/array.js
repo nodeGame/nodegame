@@ -34,6 +34,36 @@
       };  
     }  
     
+    ARRAY.removeElement = function (needle, haystack) {
+    	
+//    	console.log('needle');
+//    	console.log(needle);
+//    	console.log('haystack');
+//    	console.log(haystack);
+    	
+    	if ('object' === typeof needle) {
+        	  var func = JSUS.equals;
+	      }
+	      else {
+	    	  var func = function (a,b) {
+	    		  return (a === b);
+	    	  }
+	      }
+    	
+    	
+    	for (var i=0; i < haystack.length; i++) {
+      	    if (func(needle, haystack[i])){
+//      	    	console.log('hays');
+//      	    	console.log(haystack);
+      	    	return haystack.splice(i,1);
+      	    }
+      	}
+    	
+      	return false;
+    	
+    };
+    
+    
     ARRAY.in_array = function (needle, haystack){
   	  
         if ('object' === typeof needle) {

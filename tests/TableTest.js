@@ -1,69 +1,30 @@
-	function Table (options) {
-		
-		this.id = options.id || 'table';
-	
-		this.root = this.createRoot(this.id, options);
-		this.pointer = this.root; // Points to the last row added;
-	};
-	
-	Table.prototype.append = function(root) {
-		return root.appendChild(this.write());
-	};
-	
-	
-	Table.prototype.createRoot = function (id, options) {
-        var root = document.createElement('table');
-        root.id = id;
-        return root;
-	};
-	
-	Table.prototype.addHeaderRow = function (data, attributes) {
-		var thead = document.createElement('thead');
-		return this.addRow(data, attributes, thead);
-	};
-	
-	Table.prototype.write = function() {
-		//
-	};
-	
-	Table.prototype.addRow = function (data, attributes, container) {
-		var row = document.createElement('tr');
-		
-		for (var i = 0; i < data.length; i++) {
-            var cell = document.createElement('td');
-            var cellContent = document.createTextNode(data[i]);
-            cell.appendChild(cellContent);
-            row.appendChild(cell);
-        } 
-		
-		// If we have other elements, e.g. thead
-		if (container) {
-			container.appendChild(row);
-			row = container;
-		}
-		
-		return this.appendRow(row);
-	};
-	
-	Table.prototype.appendRow = function(row) {
-		this.pointer.appendChild(row);
-		this.pointer = row;
-		return row;
-	};
-	
-	Table.prototype.getRoot = function() {
-		return this.root;
-	};
+var GameState = require('../client/nodeGame/GameState.js');
+module.exports.GameState = GameState.GameState;
+var Utils = require('../client/nodeGame/Utils.js');
+module.exports.Utils = Utils.Utils;
+var JSUS = require('../client/nodeGame/node_modules/JSUS/jsus.js');
+module.exports.JSUS = JSUS.JSUS;
+var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js');
+module.exports.NDDB = NDDB.NDDB;
+var Table = require('../client/nodeWindow/Table.js');
+
+module.exports.Table = Table;
 
 
-var t = new Table();
+//var GameState = GameState.GameState;
+//var GameStorage = require('../client/nodeGame/GameStorage.js').GameStorage;
+//var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
 
-var rows = 5;
-var cols = [a,b,c,d];
+var data = ['a','b','c']; 
+var dims = ['x','y','z'];
 
-for (var i=0; i < rows; i++) {
-	t.addRow(cols);
-}
+var t = new Table({});
+
+t._add(data, dims);
+t._add(data, dims);
+t._add(data, dims);
+console.log(t.pointers);
+console.log(t.fetch());
 
 
 

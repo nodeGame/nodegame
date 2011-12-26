@@ -1,94 +1,33 @@
 <!doctype html>
 <div id="ah"></div>
+<script src="http://localhost:8080/socket.io/socket.io.js"></script> 
+<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+
+<!--  
+<script type="text/javascript" charset="utf-8" source="../client/nodeGame/node_modules/JSUS/jsus.js"></script>
+<script type="text/javascript" charset="utf-8" source="../client/nodeWindow/node_modules/NDDB/nddb.js"></script>
+<script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
+ -->
 <script>
-  function Table (options) {
-    
-    this.id = options.id || 'table';
   
-    this.root = this.createRoot(this.id, options);
-    this.pointer = this.root; // Points to the last row added;
-    this.odd = 'odd';
-  };
-  
-  Table.prototype.append = function(root) {
-    return root.appendChild(this.write());
-  };
-  
-  
-  Table.prototype.createRoot = function (id, options) {
-        var root = document.createElement('table');
-        root.id = id;
-        return root;
-  };
-  
-  Table.prototype.addHeaderRow = function (data, attributes) {
-    var thead = document.createElement('thead');
-    return this.addRow(data, attributes, thead);
-  };
-  
-  Table.prototype.write = function() {
-    //
-  };
-  
-  Table.prototype.addRow = function (data, attributes, container) {
-    var row = document.createElement('tr');
-    
-    if (attributes) {
-			
-    }
-    
-    for (var i = 0; i < data.length; i++) {
-            var cell = document.createElement('td');
-            var cellContent = document.createTextNode(data[i]);
-            cell.appendChild(cellContent);
-            row.appendChild(cell);
-        } 
-    
-    // If we have other elements, e.g. thead, add them. 
-    // If it is not a normal no even or odd class is added.
-    if (container) {
-      container.appendChild(row);
-      return this.appendRow(container, false);
-    }
-    else {
-      return this.appendRow(row);
-    }
-    
-  };
-  
-  Table.prototype.appendRow = function (row, addClass) {
-    var addClass = ('undefined' !== typeof addClass) ? addClass : true;
-    this.root.appendChild(row);
-    this.pointer = row;
-    if (addClass) {
-      row.className += this.id + '_' + this.odd;
-      this.odd = (this.odd == 'odd') ? 'even' : 'odd'; // toggle pointer to odd or even row
-    }
-    return row;
-  };
-  
-  Table.prototype.getRoot = function() {
-    return this.root;
-  };
   
 
+var data = [['a',1], ['b',2], ['c',3]]; 
+var dims = ['x','y','z'];
 
-var t = new Table({});
+var t = new node.Table({});
 
-var rows = 5;
-var ids = [1,2,3,4];
-var cols = [ 
-            ['1a','b','c','d'],
-            ['2a','b','c','d'],
-            ['3a','b','c','d'],
-            ['4a','b','c','d']
-					];
+// t._add(data, dims);
+// t._add(data, dims);
+// t._add(data, dims);
+t.addColumn(data);
+t.addColumn(data);
+t.addColumn(data);
 
-t.addHeaderRow(ids);
+console.log(t.pointers);
+console.log(t.fetch());
 
-for (var i=0; i < cols.length; i++) {
-  t.addRow(cols[i]);
-}
+document.getElementById('ah').appendChild(t.parse());
 
-document.getElementById('ah').appendChild(t.getRoot());
+
 </script>
