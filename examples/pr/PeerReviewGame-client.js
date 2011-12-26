@@ -57,7 +57,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: 100
 			};
 			
 			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
@@ -104,10 +104,30 @@ function PeerReviewGame () {
 		
 		this.outlet = node.window.addWidget('Controls.Radio',root,ctrl_options);
 		
+		// AUTOPLAY
+		node.random.exec(function(){
+			var choice = Math.random();
+			
+			if (choice < 0.33) {
+				node.window.getElementById('ex_A').click();
+			}
+			else if (choice < 0.66) {
+				node.window.getElementById('ex_B').click();
+			}
+			else {
+				node.window.getElementById('ex_C').click();
+			}
+			
+			//alert(choice);
+			
+		}, 10);
+		
+		
+		
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 6000
+							milliseconds: 3000
 		};
 		
 		this.timer.restart(timerOptions);
@@ -145,7 +165,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 6000
+								milliseconds: 100
 			};			
 			this.timer.restart(timerOptions);
 			
@@ -190,21 +210,26 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var tbl_options =  { root: node.window.getElementById('exhibition')}
-			var table = new node.window.Table(tbl_options);
+//			var tbl_options =  { root: node.window.getElementById('exhibition')}
+//			var table = new node.Table(tbl_options);
+			var table = new node.Table();
 			
-			table.addRow([1,2,3]);
-			table.addRow([4,5,6]);
-			table.addRow([7,8,9]);
+//			table.addRow([1,2,3]);
+//			table.addRow([4,5,6]);
+//			table.addRow([7,8,9]);
 			
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
 				var winners = msg.data;
-				
-				console.log(msg.data);
+				//console.log(msg.data);
 				
 				for (var i=0; i < winners.length; i++) {
+					
+					var details_tbl = new node.Table();
+					details_tbl.addColumn(['Exhibition: ' + winners[i].ex,
+					                       'Mean Evaluation: ' + winners[i].mean, 
+					                       'Author: ' + winners[i].author ]);
 					
 					var cf_options = { id: 'cf_' + winners[i].player,
 							   width: 200,
@@ -212,15 +237,23 @@ function PeerReviewGame () {
 							   features: winners[i].cf,
 							   controls: false
 					};
-				
-					node.window.addWidget('ChernoffFaces', root, cf_options);
 					
-					node.window.writeln(root);
 					
-					// Add the slider to the container
-					//evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
+					var container = document.createElement('div');
+					
+					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+					table.addColumn([[container, details_tbl.parse()]]);
+					console.log('Winneer');
+					console.log(winners[i]);
 				}
 				
+				
+				
+				console.log('Before Parsing');
+				console.log(table);
+				root.appendChild(table.parse());
+				//alert('After Parsing');
+				//console.log(table.parse());
 				
 			});
 			

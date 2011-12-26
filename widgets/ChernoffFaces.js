@@ -47,8 +47,54 @@
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
+		var PREF = this.id + '_';
+		var ids = options.ids || {};
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idCanvas = PREF + 'canvas';
+		var idButton = PREF + 'button';
+	
+		
+		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
+		}
 		
 		
+		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
+		this.fp = new FacePainter(canvas);		
+		this.fp.draw(new FaceVector(this.features));
+		
+		if (this.controls) {
+			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+			
+			var sc_options = {
+								id: 'cf_controls',
+								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+								change: this.change,
+								fieldset: {id: idFieldset, 
+										   legend: 'Chernoff Box',
+										   attributes: {style: 'float:left'}
+								},
+								//attributes: {style: 'float:left'},
+								submit: 'Send'
+			};
+			
+			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+		}
+
+		this.root = root;
+		return root;
+		
+	};
+	
+	ChernoffFaces.prototype.getHTML = function() {
+		var d = document.createElement('div');
+		this.append(d);
+		return d.innerHTML;
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {

@@ -20,10 +20,10 @@
 	Table.log = console.log;
 	
   function Table (options, data) {
-	    
+	var options = options || {};
+	        
 	JSUS.extend(node.NDDB,this);
     node.NDDB.call(this, options, data);  
-    
     
     Table.log = options.log || Table.log;
     this.defaultDim1 = options.defaultDim1 || 'x';
@@ -157,7 +157,9 @@
 	
 	if ('object' !== typeof data) data = [data]; 
 	
-	var insertCell = function (content){		
+	var insertCell = function (content){	
+		console.log('content');
+		console.log(content);
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? j : y;
@@ -172,30 +174,38 @@
 	
 	var cell = null;
 	// Loop Dim1
-	for (var i = 0; i < data.length; i++){
-		if ('object' === typeof data[i]) {
+	for (var i = 0; i < data.length; i++) {
+		console.log('data_i');
+		console.log(data[i]);
+		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
-				if ('object' === typeof data[i][j]) {
+//				console.log(data[i]);
+				if (data[i][j] instanceof Array) {
+					Table.log(data[i][j]);
+					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
+						console.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
-					//this.updatePointer(dims[2],h+z);
 					h=0; // reset h
 				}
 				else {
+					console.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
-			//this.updatePointer(dims[1],j+y);
 			j=0; // reset j
 		}
 		else {
+			console.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
-	//this.updatePointer(dims[0],i+x);
+	
+	console.log('After insert');
+	console.log(this.db);
 	
   };
     
@@ -224,9 +234,11 @@
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
+			  console.log(trid);
 		  }
 		  var TD = document.createElement('td');
-		  var content = document.createTextNode(this.db[i].content);
+		  var c = this.db[i].content;
+		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  TR.appendChild(TD);
 	  }

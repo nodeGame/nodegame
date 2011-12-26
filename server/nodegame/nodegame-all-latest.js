@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.2
+ * nodeGame-all v0.6.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 16:42:31 CET 2011
+ * Built on Mon Dec 26 19:19:34 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.2
+ * nodeGame Client v0.6.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 16:42:31 CET 2011
+ * Built on Mon Dec 26 19:19:34 CET 2011
  *
  */
  
@@ -62,6 +62,7 @@
 		require('./lib/array');
 	    require('./lib/time');
 	    require('./lib/eval');
+	    require('./lib/dom');
 	}
 	// end node
 
@@ -655,6 +656,30 @@
     
     JSUS.extend(EVAL);
     
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
+ 
+(function (JSUS) {
+	
+	function DOM(){};
+
+	//Returns true if it is a DOM node
+	DOM.isNode = function(o){
+	  return (
+	    typeof Node === "object" ? o instanceof Node : 
+	    typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+	  );
+	}
+	
+	//Returns true if it is a DOM element    
+	DOM.isElement = function(o){
+	  return (
+	    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+	    typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
+	  );
+	}
+
+	JSUS.extend(DOM);
+	
 })('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
 (function (exports, JSUS) {
@@ -3869,14 +3894,14 @@
 		var timing = timing || 6000;
 		setTimeout(function(event) {
 			node.emit(event);
-		}, 1000+Math.random()*timing, event);
+		}, Math.random()*timing, event);
 	};
 	
 	node.random.exec = function (func, timing) {
 		var timing = timing || 6000;
 		setTimeout(function(func) {
 			func.call();
-		}, 1000+Math.random()*timing, func);
+		}, Math.random()*timing, func);
 	}
 	
 	node.replay = function() {
@@ -3935,12 +3960,12 @@
  
  
 /*!
- * nodeWindow v0.6.2
+ * nodeWindow v0.6.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 16:42:31 CET 2011
+ * Built on Mon Dec 26 19:19:34 CET 2011
  *
  */
  
@@ -4675,8 +4700,8 @@
 		this.width = canvas.width;
 		this.height = canvas.height;
 		
-		console.log(canvas.width);
-		console.log(canvas.height);		
+//		console.log(canvas.width);
+//		console.log(canvas.height);		
 	};
 	
 	Canvas.prototype = {
@@ -4847,10 +4872,10 @@
 	Table.log = console.log;
 	
   function Table (options, data) {
-	    
+	var options = options || {};
+	        
 	JSUS.extend(node.NDDB,this);
     node.NDDB.call(this, options, data);  
-    
     
     Table.log = options.log || Table.log;
     this.defaultDim1 = options.defaultDim1 || 'x';
@@ -4984,7 +5009,9 @@
 	
 	if ('object' !== typeof data) data = [data]; 
 	
-	var insertCell = function (content){		
+	var insertCell = function (content){	
+		console.log('content');
+		console.log(content);
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? j : y;
@@ -4999,30 +5026,38 @@
 	
 	var cell = null;
 	// Loop Dim1
-	for (var i = 0; i < data.length; i++){
-		if ('object' === typeof data[i]) {
+	for (var i = 0; i < data.length; i++) {
+		console.log('data_i');
+		console.log(data[i]);
+		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
-				if ('object' === typeof data[i][j]) {
+//				console.log(data[i]);
+				if (data[i][j] instanceof Array) {
+					Table.log(data[i][j]);
+					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
+						console.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
-					//this.updatePointer(dims[2],h+z);
 					h=0; // reset h
 				}
 				else {
+					console.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
-			//this.updatePointer(dims[1],j+y);
 			j=0; // reset j
 		}
 		else {
+			console.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
-	//this.updatePointer(dims[0],i+x);
+	
+	console.log('After insert');
+	console.log(this.db);
 	
   };
     
@@ -5051,9 +5086,11 @@
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
+			  console.log(trid);
 		  }
 		  var TD = document.createElement('td');
-		  var content = document.createTextNode(this.db[i].content);
+		  var c = this.db[i].content;
+		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  TR.appendChild(TD);
 	  }
@@ -5083,12 +5120,12 @@
  
  
 /*!
- * nodeGadgets v0.6.2
+ * nodeGadgets v0.6.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 16:42:31 CET 2011
+ * Built on Mon Dec 26 19:19:34 CET 2011
  *
  */
  
@@ -5142,8 +5179,54 @@
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
+		var PREF = this.id + '_';
+		var ids = options.ids || {};
+		
+		var idFieldset = PREF + 'fieldset'; 
+		var idCanvas = PREF + 'canvas';
+		var idButton = PREF + 'button';
+	
+		
+		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+		
+		if (ids !== null && ids !== undefined) {
+			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+			if (ids.hasOwnProperty('button')) idButton = ids.button;
+		}
 		
 		
+		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
+		this.fp = new FacePainter(canvas);		
+		this.fp.draw(new FaceVector(this.features));
+		
+		if (this.controls) {
+			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+			
+			var sc_options = {
+								id: 'cf_controls',
+								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+								change: this.change,
+								fieldset: {id: idFieldset, 
+										   legend: 'Chernoff Box',
+										   attributes: {style: 'float:left'}
+								},
+								//attributes: {style: 'float:left'},
+								submit: 'Send'
+			};
+			
+			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+		}
+
+		this.root = root;
+		return root;
+		
+	};
+	
+	ChernoffFaces.prototype.getHTML = function() {
+		var d = document.createElement('div');
+		this.append(d);
+		return d.innerHTML;
 	};
 	
 	ChernoffFaces.prototype.append = function (root, ids) {

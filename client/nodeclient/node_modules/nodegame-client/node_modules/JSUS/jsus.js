@@ -40,6 +40,7 @@
 		require('./lib/array');
 	    require('./lib/time');
 	    require('./lib/eval');
+	    require('./lib/dom');
 	}
 	// end node
 

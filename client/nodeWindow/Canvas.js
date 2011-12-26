@@ -18,8 +18,8 @@
 		this.width = canvas.width;
 		this.height = canvas.height;
 		
-		console.log(canvas.width);
-		console.log(canvas.height);		
+//		console.log(canvas.width);
+//		console.log(canvas.height);		
 	};
 	
 	Canvas.prototype = {

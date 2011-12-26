@@ -348,14 +348,14 @@
 		var timing = timing || 6000;
 		setTimeout(function(event) {
 			node.emit(event);
-		}, 1000+Math.random()*timing, event);
+		}, Math.random()*timing, event);
 	};
 	
 	node.random.exec = function (func, timing) {
 		var timing = timing || 6000;
 		setTimeout(function(func) {
 			func.call();
-		}, 1000+Math.random()*timing, func);
+		}, Math.random()*timing, func);
 	}
 	
 	node.replay = function() {
