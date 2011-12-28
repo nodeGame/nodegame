@@ -170,13 +170,13 @@
 	};
 	
 	
-	node.memory.get = function (reverse) {
-		return node.game.dump(reverse);
-	}
-
-	node.memory.getValues = function(reverse) {
-		return node.game.memory.getValues(reverse);
-	}
+//	node.memory.get = function (reverse) {
+//		return node.game.dump(reverse);
+//	}
+//
+//	node.memory.getValues = function(reverse) {
+//		return node.game.memory.getValues(reverse);
+//	}
 	
 	/**
 	 * Creating an object

@@ -1,4 +1,4 @@
-(function (exports) {
+(function (exports, JSUS) {
 	/*!
 	 * ChernoffFaces
 	 * 
@@ -21,7 +21,7 @@
 		this.game = node.game;
 		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
-		this.version = '0.1';
+		this.version = '0.2';
 		
 		//this.fieldset = { id: this.id, legend: this.name};
 		
@@ -47,47 +47,47 @@
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
-		var PREF = this.id + '_';
-		var ids = options.ids || {};
-		
-		var idFieldset = PREF + 'fieldset'; 
-		var idCanvas = PREF + 'canvas';
-		var idButton = PREF + 'button';
-	
-		
-		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-			if (ids.hasOwnProperty('button')) idButton = ids.button;
-		}
-		
-		
-		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-		this.fp = new FacePainter(canvas);		
-		this.fp.draw(new FaceVector(this.features));
-		
-		if (this.controls) {
-			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-			
-			var sc_options = {
-								id: 'cf_controls',
-								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
-								change: this.change,
-								fieldset: {id: idFieldset, 
-										   legend: 'Chernoff Box',
-										   attributes: {style: 'float:left'}
-								},
-								//attributes: {style: 'float:left'},
-								submit: 'Send'
-			};
-			
-			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-		}
-
-		this.root = root;
-		return root;
+//		var PREF = this.id + '_';
+//		var ids = options.ids || {};
+//		
+//		var idFieldset = PREF + 'fieldset'; 
+//		var idCanvas = PREF + 'canvas';
+//		var idButton = PREF + 'button';
+//	
+//		
+//		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+//		
+//		if (ids !== null && ids !== undefined) {
+//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+//			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+//			if (ids.hasOwnProperty('button')) idButton = ids.button;
+//		}
+//		
+//		
+//		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
+//		this.fp = new FacePainter(canvas);		
+//		this.fp.draw(new FaceVector(this.features));
+//		
+//		if (this.controls) {
+//			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+//			
+//			var sc_options = {
+//								id: 'cf_controls',
+//								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+//								change: this.change,
+//								fieldset: {id: idFieldset, 
+//										   legend: 'Chernoff Box',
+//										   attributes: {style: 'float:left'}
+//								},
+//								//attributes: {style: 'float:left'},
+//								submit: 'Send'
+//			};
+//			
+//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//		}
+//
+//		this.root = root;
+//		return root;
 		
 	};
 	
@@ -157,9 +157,11 @@
 	};
 	
 	ChernoffFaces.prototype.randomize = function() {
-		var fv = new FaceVector();
-		fv.shuffle();
+		var fv = new FaceVector.random();
+		console.log(fv);
 		this.fp.redraw(fv);
+		this.sc.init({features: fv});
+		return true;
 	};
 	
 	/*!
@@ -179,6 +181,9 @@
 	
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
+		node.log('FACE 2 DRAW', 'DEBUG');
+		node.log(face, 'DEBUG');
+		if (!face) return;
 		
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
@@ -564,10 +569,33 @@
 			}					
 	};
 	
-	function FaceVector (faceVector) {
+	//Constructs a random face vector.
+	FaceVector.random = function () {
+		var out = JSUS.clone(FaceVector.defaults);
+		for (var key in out) {
+			if (out.hasOwnProperty(key)) {
+				if (!JSUS.in_array(key,['color','lineWidth','scaleX','scaleY'])) {
+					console.log('key');
+					console.log(key);
+					out[key].value = out[key].min + Math.random() * out[key].max;
+					console.log(out[key]);
+				}
+			}
+		}
 		
-		//if (typeof(faceVector) !== 'undefined') {
+		out.scaleX = 1;
+		out.scaleY = 1;
 		
+		out.color = 'green';
+		out.lineWidth = 1;
+		
+		console.log('OUT');
+		console.log(out);
+		
+		return out;
+	};
+	
+	function FaceVector (faceVector) {		
 		var faceVector = faceVector || {};
 		
 		this.scaleX = faceVector.scaleX || 1;
@@ -586,11 +614,7 @@
 					this[key] = FaceVector.defaults[key].value;
 				}
 			}
-		}
-			
-		delete this.faceVector;
-		
-			
+		}	
 	};
 
 	
@@ -598,9 +622,11 @@
 	FaceVector.prototype.shuffle = function () {
 		for (var key in this) {
 			if (this.hasOwnProperty(key)) {
-				
-				if (key !== 'color') {
-					this[key] = this[key].min + Math.random() * this[key].max;
+				if (FaceVector.defaults.hasOwnProperty(key)) {
+					if (key !== 'color') {
+						this[key] = FaceVector.defaults[key].min + Math.random() * FaceVector.defaults[key].max;
+						
+					}
 				}
 			}
 		}
@@ -636,4 +662,4 @@
 		return out;
 	};
 
-})('object' === typeof module ? module.exports : node.window.widgets);
+})(node.window.widgets, node.JSUS);

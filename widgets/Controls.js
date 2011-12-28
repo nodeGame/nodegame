@@ -142,11 +142,15 @@
 	
 	Controls.prototype.getAllValues = function() {
 		var out = {};
-		for (var key in this.features) {
-			
+		for (var key in this.features) {	
 			if (this.features.hasOwnProperty(key)) {
-				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
-				out[key] = Number(node.window.getElementById(key).value);
+				var el = node.window.getElementById(key);
+				if (el) {
+//					node.log('KEY: ' + key, 'DEBUG');
+//					node.log('VALUE: ' + el.value, 'DEBUG');
+					out[key] = Number(el.value);
+				}
+				
 			}
 		}
 		

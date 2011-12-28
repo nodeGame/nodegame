@@ -158,8 +158,8 @@
 	if ('object' !== typeof data) data = [data]; 
 	
 	var insertCell = function (content){	
-		console.log('content');
-		console.log(content);
+		//console.log('content');
+		//console.log(content);
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? j : y;
@@ -175,8 +175,8 @@
 	var cell = null;
 	// Loop Dim1
 	for (var i = 0; i < data.length; i++) {
-		console.log('data_i');
-		console.log(data[i]);
+		//console.log('data_i');
+		//console.log(data[i]);
 		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
@@ -186,26 +186,26 @@
 					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
-						console.log('Here h');
+						//console.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
 					h=0; // reset h
 				}
 				else {
-					console.log('Here j');
+					//console.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
 			j=0; // reset j
 		}
 		else {
-			console.log('Here i');
+			//console.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
-	
-	console.log('After insert');
-	console.log(this.db);
+//	
+//	console.log('After insert');
+//	console.log(this.db);
 	
   };
     
@@ -234,7 +234,7 @@
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
-			  console.log(trid);
+			  //console.log(trid);
 		  }
 		  var TD = document.createElement('td');
 		  var c = this.db[i].content;

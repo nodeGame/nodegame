@@ -82,7 +82,7 @@
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
-					//console.log('updatePlayer');
+					//node.log('updatePlayer', 'DEBUG);
 					that.pl.updatePlayerState(msg.from, msg.data);
 					node.emit('UPDATED_PLIST');
 					that.pl.checkState();
@@ -90,7 +90,7 @@
 				// Assume this is the server for now
 				// TODO: assign a string-id to the server
 				else {
-					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
+					//node.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data), 'DEBUG');
 					that.updateState(msg.data);
 				}
 			});
@@ -120,7 +120,7 @@
 			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
-				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
+				//node.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2], 'DEBUG');
 				that.gsc.sendSTATE(GameMsg.actions.SAY, state, to);
 			});	
 			
@@ -155,22 +155,22 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
+					//node.log('WE PLAY AUTO', 'DEBUG');
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					
 					if (morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
-						console.log( morePlayers + ' player/s still needed to play the game');
+						node.log( morePlayers + ' player/s still needed to play the game');
 					}
 					// TODO: differentiate between before the game starts and during the game
 					else {
 						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
-						console.log( that.pl.size() + ' players ready. Game can proceed');
+						node.log( that.pl.size() + ' players ready. Game can proceed');
 						that.updateState(that.next());
 					}
 				}
 //				else {
-//					console.log('WAITING FOR MONITOR TO STEP');
+//					node.log('WAITING FOR MONITOR TO STEP', 'DEBUG');
 //				}
 			});
 			
@@ -198,7 +198,7 @@
 			
 			node.on('LOADED', function(){
 				that.gameState.is =  GameState.iss.PLAYING;
-				//console.log('STTTEEEP ' + that.gameState.state);		
+				//node.log('STTTEEEP ' + that.gameState.state, 'DEBUG');		
 				that.gsc.clearBuffer();
 			});
 			
@@ -241,7 +241,7 @@
 //	};
 	
 	Game.prototype.publishState = function() {
-		//console.log('Publishing ' + this.gameState);
+		//node.log('Publishing ' + this.gameState, 'DEBUG');
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		
@@ -251,12 +251,12 @@
 		}
 		
 		node.emit('STATECHANGE');
-		console.log('I: New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState);
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//console.log('New state is going to be ' + new GameState(state));
+		//node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -266,7 +266,7 @@
 			}
 		}		
 		else {
-			console.log('error in stepping');
+			node.log('Error in stepping', 'ERR');
 			// TODO: implement sendERR
 			node.emit('TXT','State was not updated');
 			// Removed
@@ -320,14 +320,14 @@
 	
 	Game.prototype.isGameReady = function() {
 		
-		//console.log('GameState is : ' + this.gameState.is);
+		//node.log('GameState is : ' + this.gameState.is, 'DEBUG');
 		
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
 		if (node.window) {
 			
-			//console.log('WindowState is ' + node.window.state);
+			// node.log('WindowState is ' + node.window.state, 'DEBUG');
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
 		

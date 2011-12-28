@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:51:48 CET 2011
+ * Built on Wed Dec 28 15:07:37 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:51:48 CET 2011
+ * Built on Wed Dec 28 15:07:37 CET 2011
  *
  */
  
@@ -3285,7 +3285,7 @@
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
-					//console.log('updatePlayer');
+					//node.log('updatePlayer', 'DEBUG);
 					that.pl.updatePlayerState(msg.from, msg.data);
 					node.emit('UPDATED_PLIST');
 					that.pl.checkState();
@@ -3293,7 +3293,7 @@
 				// Assume this is the server for now
 				// TODO: assign a string-id to the server
 				else {
-					//console.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data));
+					//node.log('updateState: ' + msg.from + ' -- ' + new GameState(msg.data), 'DEBUG');
 					that.updateState(msg.data);
 				}
 			});
@@ -3323,7 +3323,7 @@
 			});
 			
 			node.on( OUT + say + 'STATE', function (state, to) {
-				//console.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2]);
+				//node.log('BBBB' + p + ' ' + args[0] + ' ' + args[1] + ' ' + args[2], 'DEBUG');
 				that.gsc.sendSTATE(GameMsg.actions.SAY, state, to);
 			});	
 			
@@ -3358,22 +3358,22 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					//console.log('WE PLAY AUTO');
+					//node.log('WE PLAY AUTO', 'DEBUG');
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					
 					if (morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
-						console.log( morePlayers + ' player/s still needed to play the game');
+						node.log( morePlayers + ' player/s still needed to play the game');
 					}
 					// TODO: differentiate between before the game starts and during the game
 					else {
 						node.emit('OUT.say.TXT', this.minPlayers + ' players ready. Game can proceed');
-						console.log( that.pl.size() + ' players ready. Game can proceed');
+						node.log( that.pl.size() + ' players ready. Game can proceed');
 						that.updateState(that.next());
 					}
 				}
 //				else {
-//					console.log('WAITING FOR MONITOR TO STEP');
+//					node.log('WAITING FOR MONITOR TO STEP', 'DEBUG');
 //				}
 			});
 			
@@ -3401,7 +3401,7 @@
 			
 			node.on('LOADED', function(){
 				that.gameState.is =  GameState.iss.PLAYING;
-				//console.log('STTTEEEP ' + that.gameState.state);		
+				//node.log('STTTEEEP ' + that.gameState.state, 'DEBUG');		
 				that.gsc.clearBuffer();
 			});
 			
@@ -3444,7 +3444,7 @@
 //	};
 	
 	Game.prototype.publishState = function() {
-		//console.log('Publishing ' + this.gameState);
+		//node.log('Publishing ' + this.gameState, 'DEBUG');
 		this.gsc.gmg.state = this.gameState;
 		// Important: SAY
 		
@@ -3454,12 +3454,12 @@
 		}
 		
 		node.emit('STATECHANGE');
-		console.log('I: New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState);
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//console.log('New state is going to be ' + new GameState(state));
+		//node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -3469,7 +3469,7 @@
 			}
 		}		
 		else {
-			console.log('error in stepping');
+			node.log('Error in stepping', 'ERR');
 			// TODO: implement sendERR
 			node.emit('TXT','State was not updated');
 			// Removed
@@ -3523,14 +3523,14 @@
 	
 	Game.prototype.isGameReady = function() {
 		
-		//console.log('GameState is : ' + this.gameState.is);
+		//node.log('GameState is : ' + this.gameState.is, 'DEBUG');
 		
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
 		if (node.window) {
 			
-			//console.log('WindowState is ' + node.window.state);
+			// node.log('WindowState is ' + node.window.state, 'DEBUG');
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
 		
@@ -3716,13 +3716,13 @@
 	};
 	
 	
-	node.memory.get = function (reverse) {
-		return node.game.dump(reverse);
-	}
-
-	node.memory.getValues = function(reverse) {
-		return node.game.memory.getValues(reverse);
-	}
+//	node.memory.get = function (reverse) {
+//		return node.game.dump(reverse);
+//	}
+//
+//	node.memory.getValues = function(reverse) {
+//		return node.game.memory.getValues(reverse);
+//	}
 	
 	/**
 	 * Creating an object
@@ -3965,7 +3965,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:51:48 CET 2011
+ * Built on Wed Dec 28 15:07:37 CET 2011
  *
  */
  
@@ -5010,8 +5010,8 @@
 	if ('object' !== typeof data) data = [data]; 
 	
 	var insertCell = function (content){	
-		console.log('content');
-		console.log(content);
+		//console.log('content');
+		//console.log(content);
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? j : y;
@@ -5027,8 +5027,8 @@
 	var cell = null;
 	// Loop Dim1
 	for (var i = 0; i < data.length; i++) {
-		console.log('data_i');
-		console.log(data[i]);
+		//console.log('data_i');
+		//console.log(data[i]);
 		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
@@ -5038,26 +5038,26 @@
 					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
-						console.log('Here h');
+						//console.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
 					h=0; // reset h
 				}
 				else {
-					console.log('Here j');
+					//console.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
 			j=0; // reset j
 		}
 		else {
-			console.log('Here i');
+			//console.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
-	
-	console.log('After insert');
-	console.log(this.db);
+//	
+//	console.log('After insert');
+//	console.log(this.db);
 	
   };
     
@@ -5086,7 +5086,7 @@
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
-			  console.log(trid);
+			  //console.log(trid);
 		  }
 		  var TD = document.createElement('td');
 		  var c = this.db[i].content;
@@ -5125,12 +5125,12 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mon Dec 26 19:51:48 CET 2011
+ * Built on Wed Dec 28 15:07:37 CET 2011
  *
  */
  
  
-(function (exports) {
+(function (exports, JSUS) {
 	/*!
 	 * ChernoffFaces
 	 * 
@@ -5153,7 +5153,7 @@
 		this.game = node.game;
 		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
-		this.version = '0.1';
+		this.version = '0.2';
 		
 		//this.fieldset = { id: this.id, legend: this.name};
 		
@@ -5179,47 +5179,47 @@
 	};
 	
 	ChernoffFaces.prototype.init = function(options) {
-		var PREF = this.id + '_';
-		var ids = options.ids || {};
-		
-		var idFieldset = PREF + 'fieldset'; 
-		var idCanvas = PREF + 'canvas';
-		var idButton = PREF + 'button';
-	
-		
-		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-			if (ids.hasOwnProperty('button')) idButton = ids.button;
-		}
-		
-		
-		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-		this.fp = new FacePainter(canvas);		
-		this.fp.draw(new FaceVector(this.features));
-		
-		if (this.controls) {
-			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-			
-			var sc_options = {
-								id: 'cf_controls',
-								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
-								change: this.change,
-								fieldset: {id: idFieldset, 
-										   legend: 'Chernoff Box',
-										   attributes: {style: 'float:left'}
-								},
-								//attributes: {style: 'float:left'},
-								submit: 'Send'
-			};
-			
-			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-		}
-
-		this.root = root;
-		return root;
+//		var PREF = this.id + '_';
+//		var ids = options.ids || {};
+//		
+//		var idFieldset = PREF + 'fieldset'; 
+//		var idCanvas = PREF + 'canvas';
+//		var idButton = PREF + 'button';
+//	
+//		
+//		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+//		
+//		if (ids !== null && ids !== undefined) {
+//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
+//			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
+//			if (ids.hasOwnProperty('button')) idButton = ids.button;
+//		}
+//		
+//		
+//		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
+//		this.fp = new FacePainter(canvas);		
+//		this.fp.draw(new FaceVector(this.features));
+//		
+//		if (this.controls) {
+//			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
+//			
+//			var sc_options = {
+//								id: 'cf_controls',
+//								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+//								change: this.change,
+//								fieldset: {id: idFieldset, 
+//										   legend: 'Chernoff Box',
+//										   attributes: {style: 'float:left'}
+//								},
+//								//attributes: {style: 'float:left'},
+//								submit: 'Send'
+//			};
+//			
+//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//		}
+//
+//		this.root = root;
+//		return root;
 		
 	};
 	
@@ -5289,9 +5289,11 @@
 	};
 	
 	ChernoffFaces.prototype.randomize = function() {
-		var fv = new FaceVector();
-		fv.shuffle();
+		var fv = new FaceVector.random();
+		console.log(fv);
 		this.fp.redraw(fv);
+		this.sc.init({features: fv});
+		return true;
 	};
 	
 	/*!
@@ -5311,6 +5313,9 @@
 	
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
+		node.log('FACE 2 DRAW', 'DEBUG');
+		node.log(face, 'DEBUG');
+		if (!face) return;
 		
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
@@ -5696,10 +5701,33 @@
 			}					
 	};
 	
-	function FaceVector (faceVector) {
+	//Constructs a random face vector.
+	FaceVector.random = function () {
+		var out = JSUS.clone(FaceVector.defaults);
+		for (var key in out) {
+			if (out.hasOwnProperty(key)) {
+				if (!JSUS.in_array(key,['color','lineWidth','scaleX','scaleY'])) {
+					console.log('key');
+					console.log(key);
+					out[key].value = out[key].min + Math.random() * out[key].max;
+					console.log(out[key]);
+				}
+			}
+		}
 		
-		//if (typeof(faceVector) !== 'undefined') {
+		out.scaleX = 1;
+		out.scaleY = 1;
 		
+		out.color = 'green';
+		out.lineWidth = 1;
+		
+		console.log('OUT');
+		console.log(out);
+		
+		return out;
+	};
+	
+	function FaceVector (faceVector) {		
 		var faceVector = faceVector || {};
 		
 		this.scaleX = faceVector.scaleX || 1;
@@ -5718,11 +5746,7 @@
 					this[key] = FaceVector.defaults[key].value;
 				}
 			}
-		}
-			
-		delete this.faceVector;
-		
-			
+		}	
 	};
 
 	
@@ -5730,9 +5754,11 @@
 	FaceVector.prototype.shuffle = function () {
 		for (var key in this) {
 			if (this.hasOwnProperty(key)) {
-				
-				if (key !== 'color') {
-					this[key] = this[key].min + Math.random() * this[key].max;
+				if (FaceVector.defaults.hasOwnProperty(key)) {
+					if (key !== 'color') {
+						this[key] = FaceVector.defaults[key].min + Math.random() * FaceVector.defaults[key].max;
+						
+					}
 				}
 			}
 		}
@@ -5768,7 +5794,7 @@
 		return out;
 	};
 
-})('object' === typeof module ? module.exports : node.window.widgets); 
+})(node.window.widgets, node.JSUS); 
  
  
  
@@ -5916,11 +5942,15 @@
 	
 	Controls.prototype.getAllValues = function() {
 		var out = {};
-		for (var key in this.features) {
-			
+		for (var key in this.features) {	
 			if (this.features.hasOwnProperty(key)) {
-				//console.log('STE ' + key + ' ' + node.window.getElementById(key).value);
-				out[key] = Number(node.window.getElementById(key).value);
+				var el = node.window.getElementById(key);
+				if (el) {
+//					node.log('KEY: ' + key, 'DEBUG');
+//					node.log('VALUE: ' + el.value, 'DEBUG');
+					out[key] = Number(el.value);
+				}
+				
 			}
 		}
 		
@@ -6709,11 +6739,12 @@
 	Utils = node.Utils;
 	
 	function VisualTimer (options) {
+		var options = options || {};
 		
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.3';
+		this.version = '0.3.1';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
@@ -6726,6 +6757,7 @@
 	};
 	
 	VisualTimer.prototype.init = function (options) {
+		if (this.timer) clearInterval(this.timer);
 		this.milliseconds = options.milliseconds || 10000;
 		this.timePassed = 0;
 		this.update = options.update || 1000;

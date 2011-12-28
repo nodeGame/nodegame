@@ -13,11 +13,12 @@
 	Utils = node.Utils;
 	
 	function VisualTimer (options) {
+		var options = options || {};
 		
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.3';
+		this.version = '0.3.1';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
@@ -30,6 +31,7 @@
 	};
 	
 	VisualTimer.prototype.init = function (options) {
+		if (this.timer) clearInterval(this.timer);
 		this.milliseconds = options.milliseconds || 10000;
 		this.timePassed = 0;
 		this.update = options.update || 1000;

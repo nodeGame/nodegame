@@ -12,9 +12,9 @@ function PeerReviewGame () {
 	this.init = function() {			
 		node.window.setup('PLAYER');
 		this.cf = null;
-		this.timer = null;
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
+		this.timer = node.window.addWidget('VisualTimer', this.header);
 		this.outlet = null;
 	};
 	
@@ -59,10 +59,10 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 100
+								milliseconds: 10000
 			};
 			
-			this.timer = node.window.addWidget('VisualTimer',this.header, timerOptions);
+			this.timer.restart(timerOptions);
 			
 			node.on('CREATION_DONE', function(){
 				node.set('CF', this.cf.getAllValues());
@@ -258,6 +258,11 @@ function PeerReviewGame () {
 				//alert('After Parsing');
 				//console.log(table.parse());
 				
+				this.timer.restart({
+									event: 'DONE',
+									milliseconds: 5000
+				});	
+				
 			});
 			
 		});
@@ -268,7 +273,12 @@ function PeerReviewGame () {
 	};
 	
 	var questionnaire = function(){
-		node.window.loadFrame('postgame.html');
+		node.window.loadFrame('postgame.html', function(){
+			this.timer.restart({
+								event: 'DONE',
+								milliseconds: 10000
+			});
+		});
 		console.log('Postgame');
 	};
 	
