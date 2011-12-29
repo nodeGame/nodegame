@@ -33,6 +33,7 @@
 	};
 	
 	Controls.prototype.init = function (options) {
+		
 //		if (options.fieldset) {
 //			this.list = new node.window.List();
 //		}
@@ -138,6 +139,24 @@
 			that.hasChanged = true;
 		});
 				
+	};
+
+	Controls.prototype.refresh = function() {
+		for (var key in this.features) {	
+			if (this.features.hasOwnProperty(key)) {
+				var el = node.window.getElementById(key);
+				if (el) {
+//					node.log('KEY: ' + key, 'DEBUG');
+//					node.log('VALUE: ' + el.value, 'DEBUG');
+					el.value = this.features[key].value;
+					// TODO: set all the other attributes
+					// TODO: remove/add elements
+				}
+				
+			}
+		}
+		
+		return true;
 	};
 	
 	Controls.prototype.getAllValues = function() {

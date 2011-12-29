@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Dec 28 15:07:37 CET 2011
+ * Built on Thu Dec 29 13:01:43 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Dec 28 15:07:37 CET 2011
+ * Built on Thu Dec 29 13:01:43 CET 2011
  *
  */
  
@@ -210,11 +210,13 @@
 	OBJ.clone = function (obj) {
 		var clone = {};
 		for (var i in obj) {
-			if ( 'object' === typeof obj[i] ) {
-				clone[i] = OBJ.clone(obj[i]);
-			}
-			else {
-				clone[i] = obj[i];
+			if (obj.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj[i] ) {
+					clone[i] = OBJ.clone(obj[i]);
+				}
+				else {
+					clone[i] = obj[i];
+				}
 			}
 		}
 		return clone;
@@ -3965,7 +3967,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Dec 28 15:07:37 CET 2011
+ * Built on Thu Dec 29 13:01:43 CET 2011
  *
  */
  
@@ -4690,6 +4692,7 @@
 	exports.Canvas = Canvas;
 	
 	function Canvas(canvas) {
+
 		this.canvas = canvas;
 		// 2D Canvas Context 
 		this.ctx = canvas.getContext('2d');
@@ -5125,7 +5128,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Dec 28 15:07:37 CET 2011
+ * Built on Thu Dec 29 13:01:43 CET 2011
  *
  */
  
@@ -5149,6 +5152,7 @@
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
 	function ChernoffFaces(options) {
+		var options = options || {};
 		
 		this.game = node.game;
 		this.id = options.id || 'ChernoffFaces';
@@ -5277,10 +5281,10 @@
 	ChernoffFaces.prototype.listeners = function () {
 		var that = this;
 		
-		node.on( that.change, function(msg) {
-				var fv = new FaceVector(that.sc.getAllValues());
-				that.fp.redraw(fv);
-			}); 
+		node.on(that.change, function(msg) {
+			var fv = new FaceVector(that.sc.getAllValues());
+			that.fp.redraw(fv);
+		}); 
 	};
 	
 	
@@ -5289,10 +5293,10 @@
 	};
 	
 	ChernoffFaces.prototype.randomize = function() {
-		var fv = new FaceVector.random();
-		console.log(fv);
+		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		this.sc.init({features: fv});
+		this.sc.init({features: Utils.mergeOnValue(FaceVector.defaults, fv)});
+		this.sc.refresh();
 		return true;
 	};
 	
@@ -5313,8 +5317,6 @@
 	
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
-		node.log('FACE 2 DRAW', 'DEBUG');
-		node.log(face, 'DEBUG');
 		if (!face) return;
 		
 		this.fit2Canvas(face);
@@ -5351,7 +5353,7 @@
 	// TODO: Improve. It eats a bit of the margins
 	FacePainter.prototype.fit2Canvas = function(face) {
 		if (!this.canvas) {
-			console.log('No canvas found');
+		console.log('No canvas found');
 			return;
 		}
 		
@@ -5703,53 +5705,48 @@
 	
 	//Constructs a random face vector.
 	FaceVector.random = function () {
-		var out = JSUS.clone(FaceVector.defaults);
-		for (var key in out) {
-			if (out.hasOwnProperty(key)) {
-				if (!JSUS.in_array(key,['color','lineWidth','scaleX','scaleY'])) {
-					console.log('key');
-					console.log(key);
-					out[key].value = out[key].min + Math.random() * out[key].max;
-					console.log(out[key]);
-				}
-			}
-		}
-		
-		out.scaleX = 1;
-		out.scaleY = 1;
-		
-		out.color = 'green';
-		out.lineWidth = 1;
-		
-		console.log('OUT');
-		console.log(out);
-		
-		return out;
+	  var out = {};
+	  for (var key in FaceVector.defaults) {
+	    if (FaceVector.defaults.hasOwnProperty(key)) {
+	      if (!JSUS.in_array(key,['color','lineWidth','scaleX','scaleY'])) {
+	        out[key] = FaceVector.defaults[key].min + Math.random() * FaceVector.defaults[key].max;
+	      }
+	    }
+	  }
+	  
+	  out.scaleX = 1;
+	  out.scaleY = 1;
+	  
+	  out.color = 'green';
+	  out.lineWidth = 1; 
+	  
+	  return new FaceVector(out);
 	};
 	
-	function FaceVector (faceVector) {		
-		var faceVector = faceVector || {};
-		
+	function FaceVector (faceVector) {
+		  var faceVector = faceVector || {};
+
 		this.scaleX = faceVector.scaleX || 1;
 		this.scaleY = faceVector.scaleY || 1;
-		
+
+
 		this.color = faceVector.color || 'green';
 		this.lineWidth = faceVector.lineWidth || 1;
-		
-		// Merge on key
-		for (var key in FaceVector.defaults) {
-			if (FaceVector.defaults.hasOwnProperty(key)){
-				if (faceVector.hasOwnProperty(key)){
-					this[key] = faceVector[key];
-				}
-				else {
-					this[key] = FaceVector.defaults[key].value;
-				}
-			}
-		}	
-	};
+		  
+		  // Merge on key
+		 for (var key in FaceVector.defaults) {
+		   if (FaceVector.defaults.hasOwnProperty(key)){
+		     if (faceVector.hasOwnProperty(key)){
+		       this[key] = faceVector[key];
+		     }
+		     else {
+		       this[key] = FaceVector.defaults[key].value;
+		     }
+		   }
+		 }
+		  
+		};
 
-	
 	//Constructs a random face vector.
 	FaceVector.prototype.shuffle = function () {
 		for (var key in this) {
@@ -5833,6 +5830,7 @@
 	};
 	
 	Controls.prototype.init = function (options) {
+		
 //		if (options.fieldset) {
 //			this.list = new node.window.List();
 //		}
@@ -5938,6 +5936,24 @@
 			that.hasChanged = true;
 		});
 				
+	};
+
+	Controls.prototype.refresh = function() {
+		for (var key in this.features) {	
+			if (this.features.hasOwnProperty(key)) {
+				var el = node.window.getElementById(key);
+				if (el) {
+					node.log('KEY: ' + key, 'DEBUG');
+					node.log('VALUE: ' + el.value, 'DEBUG');
+					el.value = this.features[key].value;
+					// TODO: set all the other attributes
+					// TODO: remove/add elements
+				}
+				
+			}
+		}
+		
+		return true;
 	};
 	
 	Controls.prototype.getAllValues = function() {

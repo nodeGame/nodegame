@@ -140,11 +140,13 @@
 	OBJ.clone = function (obj) {
 		var clone = {};
 		for (var i in obj) {
-			if ( 'object' === typeof obj[i] ) {
-				clone[i] = OBJ.clone(obj[i]);
-			}
-			else {
-				clone[i] = obj[i];
+			if (obj.hasOwnProperty(i)) {
+				if ( 'object' === typeof obj[i] ) {
+					clone[i] = OBJ.clone(obj[i]);
+				}
+				else {
+					clone[i] = obj[i];
+				}
 			}
 		}
 		return clone;

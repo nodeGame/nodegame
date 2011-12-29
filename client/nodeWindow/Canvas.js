@@ -8,6 +8,7 @@
 	exports.Canvas = Canvas;
 	
 	function Canvas(canvas) {
+
 		this.canvas = canvas;
 		// 2D Canvas Context 
 		this.ctx = canvas.getContext('2d');
