@@ -22,7 +22,7 @@
 		this.game = node.game;
 		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
-		this.version = '0.2';
+		this.version = '0.3';
 		
 		//this.fieldset = { id: this.id, legend: this.name};
 		

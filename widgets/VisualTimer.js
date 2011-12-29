@@ -18,7 +18,7 @@
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.3.1';
+		this.version = '0.3.2';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
@@ -32,7 +32,7 @@
 	
 	VisualTimer.prototype.init = function (options) {
 		if (this.timer) clearInterval(this.timer);
-		this.milliseconds = options.milliseconds || 10000;
+		this.milliseconds = options.milliseconds || 0;
 		this.timePassed = 0;
 		this.update = options.update || 1000;
 		this.text = options.text || 'Time to go';
@@ -63,6 +63,10 @@
 	};
 	
 	VisualTimer.prototype.start = function() {
+		if (!this.milliseconds || this.milliseconds === 0){
+			this.timerDiv.innerHTML = '0:0';
+			return;
+		}
 		var that = this;
 		// Init Timer
 		var time = Utils.parseMilliseconds(this.milliseconds);

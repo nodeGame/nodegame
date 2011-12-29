@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.3
+ * nodeGame-all v0.6.3.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 13:01:43 CET 2011
+ * Built on Thu Dec 29 14:11:34 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.3
+ * nodeGame Client v0.6.3.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 13:01:43 CET 2011
+ * Built on Thu Dec 29 14:11:34 CET 2011
  *
  */
  
@@ -3962,12 +3962,12 @@
  
  
 /*!
- * nodeWindow v0.6.3
+ * nodeWindow v0.6.3.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 13:01:43 CET 2011
+ * Built on Thu Dec 29 14:11:34 CET 2011
  *
  */
  
@@ -5123,12 +5123,12 @@
  
  
 /*!
- * nodeGadgets v0.6.3
+ * nodeGadgets v0.6.3.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 13:01:43 CET 2011
+ * Built on Thu Dec 29 14:11:34 CET 2011
  *
  */
  
@@ -5157,7 +5157,7 @@
 		this.game = node.game;
 		this.id = options.id || 'ChernoffFaces';
 		this.name = 'Chernoff Faces';
-		this.version = '0.2';
+		this.version = '0.3';
 		
 		//this.fieldset = { id: this.id, legend: this.name};
 		
@@ -5943,8 +5943,8 @@
 			if (this.features.hasOwnProperty(key)) {
 				var el = node.window.getElementById(key);
 				if (el) {
-					node.log('KEY: ' + key, 'DEBUG');
-					node.log('VALUE: ' + el.value, 'DEBUG');
+//					node.log('KEY: ' + key, 'DEBUG');
+//					node.log('VALUE: ' + el.value, 'DEBUG');
 					el.value = this.features[key].value;
 					// TODO: set all the other attributes
 					// TODO: remove/add elements
@@ -6760,7 +6760,7 @@
 		this.game = node.game;
 		this.id = options.id || 'VisualTimer';
 		this.name = 'Visual Timer';
-		this.version = '0.3.1';
+		this.version = '0.3.2';
 		
 		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
@@ -6774,7 +6774,7 @@
 	
 	VisualTimer.prototype.init = function (options) {
 		if (this.timer) clearInterval(this.timer);
-		this.milliseconds = options.milliseconds || 10000;
+		this.milliseconds = options.milliseconds || 0;
 		this.timePassed = 0;
 		this.update = options.update || 1000;
 		this.text = options.text || 'Time to go';
@@ -6805,6 +6805,11 @@
 	};
 	
 	VisualTimer.prototype.start = function() {
+		if (!this.milliseconds || this.milliseconds === 0){
+			this.timerDiv.innerHTML = '0:0';
+			return;
+		}
+		
 		var that = this;
 		// Init Timer
 		var time = Utils.parseMilliseconds(this.milliseconds);
