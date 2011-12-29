@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 19:11:48 CET 2011
+ * Built on Thu Dec 29 19:43:26 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 19:11:48 CET 2011
+ * Built on Thu Dec 29 19:43:26 CET 2011
  *
  */
  
@@ -471,6 +471,9 @@
 	 * If strict is equal to true, elements cannot be matched multiple times.
 	 */
 	ARRAY.matchN = function (array, N, strict) {
+		console.log('TO MATCH');
+		console.log(array.length);
+		
 		var result = []
 		var len = array.length;
 		var found = [];
@@ -3967,7 +3970,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 19:11:48 CET 2011
+ * Built on Thu Dec 29 19:43:26 CET 2011
  *
  */
  
@@ -5134,7 +5137,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Dec 29 19:11:48 CET 2011
+ * Built on Thu Dec 29 19:43:27 CET 2011
  *
  */
  

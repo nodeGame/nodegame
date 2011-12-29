@@ -142,6 +142,9 @@
 	 * If strict is equal to true, elements cannot be matched multiple times.
 	 */
 	ARRAY.matchN = function (array, N, strict) {
+		console.log('TO MATCH');
+		console.log(array.length);
+		
 		var result = []
 		var len = array.length;
 		var found = [];
