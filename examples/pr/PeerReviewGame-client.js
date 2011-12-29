@@ -59,7 +59,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: 100
 			};
 			
 			this.timer.restart(timerOptions);
@@ -125,7 +125,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 3000
+							milliseconds: 100
 		};
 		
 		this.timer.restart(timerOptions);
@@ -245,7 +245,7 @@ function PeerReviewGame () {
 					var container = document.createElement('div');
 					
 					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-					table.addColumn([[container, details_tbl.parse()]]);
+					table.addColumn([container, details_tbl.parse()]);
 //					console.log('Winneer');
 //					console.log(winners[i]);
 				}

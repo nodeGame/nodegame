@@ -150,6 +150,9 @@
 		dims = Table.H;
 	}
 	
+	console.log('DATA TBL');
+	console.log(data);
+	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
 	var y = y || this.pointers[dims[1]] + 1;
@@ -159,12 +162,15 @@
 	
 	var insertCell = function (content){	
 		//console.log('content');
-		//console.log(content);
+		console.log(x + ' ' + y + ' ' + z);
+		console.log(i + ' ' + j + ' ' + h);
+		
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
-		cell[dims[1]] = (j) ? j : y;
-		cell[dims[2]] = (h) ? h : z;
+		cell[dims[1]] = (j) ? y+j : y;
+		cell[dims[2]] = (h) ? z+h : z;
 		cell['content'] = content;	
+		console.log(cell);
 		this.insert(new Cell(cell));
 		this.updatePointer(dims[0],cell[dims[0]]);
 		this.updatePointer(dims[1],cell[dims[1]]);
@@ -182,8 +188,8 @@
 			for (var j = 0; j < data[i].length; j++) {
 //				console.log(data[i]);
 				if (data[i][j] instanceof Array) {
-					Table.log(data[i][j]);
-					Table.log(typeof data[i][j]);
+//					Table.log(data[i][j]);
+//					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
 						//console.log('Here h');

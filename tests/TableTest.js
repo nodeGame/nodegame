@@ -15,14 +15,22 @@ module.exports.Table = Table;
 //var GameStorage = require('../client/nodeGame/GameStorage.js').GameStorage;
 //var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
 
-var data = ['a','b','c']; 
+var data = [1,2,3]; 
 var dims = ['x','y','z'];
 
 var t = new Table({});
 
-t._add(data, dims);
-t._add(data, dims);
-t._add(data, dims);
+//t._add(data, dims);
+//t._add(data, dims);
+//t._add(data, dims);
+
+for (var i=0; i<5; i++) {
+	var a = [[i,'a',2],[i,'a',2],[i,'a',2]];
+	t.addColumn(a);
+}
+
+t.sort('y');
+t.reverse();
 console.log(t.pointers);
 console.log(t.fetch());
 
