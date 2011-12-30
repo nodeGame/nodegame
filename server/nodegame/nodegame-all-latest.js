@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:15:30 CET 2011
+ * Built on Fri Dec 30 16:51:40 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:15:30 CET 2011
+ * Built on Fri Dec 30 16:51:40 CET 2011
  *
  */
  
@@ -3970,7 +3970,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:15:30 CET 2011
+ * Built on Fri Dec 30 16:51:40 CET 2011
  *
  */
  
@@ -5091,8 +5091,10 @@
   Table.prototype.parse = function() {
 	  this.sort('y');
 	  var trid = -1;
+	  
 	  var root = document.createElement('table');
 	  for (var i=0; i < this.db.length; i++) {
+		  if (this.db[i].x !==
 		  if (trid !== this.db[i].y) {
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
@@ -5136,7 +5138,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:15:30 CET 2011
+ * Built on Fri Dec 30 16:51:40 CET 2011
  *
  */
  

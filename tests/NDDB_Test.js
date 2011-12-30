@@ -129,8 +129,8 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.select('key','=','x');
 //console.log(v);
 
-var v = nddb.select('value.k');
-console.log(v.fetch());
+//var v = nddb.select('value.k');
+//console.log(v.fetch());
 
 //out = nddb.split('value');
 //console.log(out.fetch());
@@ -152,5 +152,10 @@ console.log(v.fetch());
 //console.log(v);
 
 
+//var v = nddb.sort('x');
+//console.log(v);
+
+var v = nddb.sort(['state','value.r']);
+console.log(v.fetch());
 
 

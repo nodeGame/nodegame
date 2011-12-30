@@ -1,1 +1,33 @@
 STILL TO DO
+
+
+/**
+   * Sort the db according to a certain criteria. Criteria ca be a 
+   * comparator dimension or a custom function 
+   * 
+   * @param d
+   * 
+   */
+  NDDB.prototype.sort = function (d) {
+    
+    console.log('MULTI');
+    
+    if ('function' === typeof d) {
+      var func = d;
+    }
+    else if (d instanceof Array) {
+      
+      var func = function(a,b) {
+        for (var i=0; i < d.length; i++) {
+          var result = this.comparator(d).call(this,a,b);
+          if (result !== 0) return result;
+        }
+        return result;
+      }
+    }
+    else
+      var func = this.comparator(d);
+    }
+    
+    return new NDDB(this.cloneSettings(), this.db.sort(func));
+  };
