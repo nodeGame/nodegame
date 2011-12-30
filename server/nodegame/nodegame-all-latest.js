@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.3.1
+ * nodeGame-all v0.6.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:51:40 CET 2011
+ * Built on Fri Dec 30 17:25:56 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.3.1
+ * nodeGame Client v0.6.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:51:40 CET 2011
+ * Built on Fri Dec 30 17:25:56 CET 2011
  *
  */
  
@@ -809,25 +809,58 @@
 		return new NDDB(this.cloneSettings(), this.db.reverse());
 	};
 	
-	/**
-	 * Sort the db according to a certain criteria. Criteria ca be a 
-	 * comparator dimension or a custom function 
-	 * 
-	 * @param d
-	 * 
-	 */
-	NDDB.prototype.sort = function (d) {
-		
-		if ('function' === typeof d) {
-			var func = d;
-		}
-		else {
-			var func = this.comparator(d);
-		}
-		
-		return new NDDB(this.cloneSettings(), this.db.sort(func));
-	};
+//	/**
+//	 * Sort the db according to a certain criteria. Criteria ca be a 
+//	 * comparator dimension or a custom function 
+//	 * 
+//	 * @param d
+//	 * 
+//	 */
+//	NDDB.prototype.sort = function (d) {
+//		
+//		if ('function' === typeof d) {
+//			var func = d;
+//		}
+//		else {
+//			var func = this.comparator(d);
+//		}
+//		
+//		return new NDDB(this.cloneSettings(), this.db.sort(func));
+//	};
 	
+	/**
+	   * Sort the db according to a certain criteria. Criteria ca be a 
+	   * comparator dimension or a custom function 
+	   * 
+	   * @param d
+	   * 
+	   */
+	  NDDB.prototype.sort = function (d) {
+	    
+		// FUNCTION  
+	    if ('function' === typeof d) {
+	      var func = d;
+	    }
+	    
+	    // ARRAY of dimensions
+	    else if (d instanceof Array) {
+	      var that = this;
+	      var func = function (a,b) {
+	        for (var i=0; i < d.length; i++) {
+	          var result = that.comparator(d[i]).call(that,a,b);
+	          if (result !== 0) return result;
+	        }
+	        return result;
+	      }
+	    }
+	    
+	    // SINGLE dimension
+	    else {
+	      var func = this.comparator(d);
+	    }
+	    
+	    return new NDDB(this.cloneSettings(), this.db.sort(func));
+	  };
 
 	
 	NDDB.prototype._analyzeQuery = function (d,op,value) {
@@ -3965,12 +3998,12 @@
  
  
 /*!
- * nodeWindow v0.6.3.1
+ * nodeWindow v0.6.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:51:40 CET 2011
+ * Built on Fri Dec 30 17:25:56 CET 2011
  *
  */
  
@@ -4568,16 +4601,20 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			var tokens = g.split('.');
-			var i = 0;
-			var strg = 'g = new this.widgets';
-			for (;i<tokens.length;i++) {
-				strg += '[\''+tokens[i]+'\']';
-			}
-			strg+='(options);';
-			//console.log(strg);
-			eval(strg);
-			//g = new this.widgets[tokens](options);
+			
+			g = JSUS.getNestedValue(g,this.widgets);
+			g = new g(options);
+			
+//			var tokens = g.split('.');
+//			var i = 0;
+//			var strg = 'g = new this.widgets';
+//			for (;i<tokens.length;i++) {
+//				strg += '[\''+tokens[i]+'\']';
+//			}
+//			strg+='(options);';
+//			//console.log(strg);
+//			eval(strg);
+//			//g = new this.widgets[tokens](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
@@ -5094,7 +5131,7 @@
 	  
 	  var root = document.createElement('table');
 	  for (var i=0; i < this.db.length; i++) {
-		  if (this.db[i].x !==
+		  //if (this.db[i].x !==
 		  if (trid !== this.db[i].y) {
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);
@@ -5133,12 +5170,12 @@
  
  
 /*!
- * nodeGadgets v0.6.3.1
+ * nodeGadgets v0.6.4
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 16:51:40 CET 2011
+ * Built on Fri Dec 30 17:25:56 CET 2011
  *
  */
  

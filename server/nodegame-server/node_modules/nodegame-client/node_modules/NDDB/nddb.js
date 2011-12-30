@@ -120,25 +120,58 @@
 		return new NDDB(this.cloneSettings(), this.db.reverse());
 	};
 	
-	/**
-	 * Sort the db according to a certain criteria. Criteria ca be a 
-	 * comparator dimension or a custom function 
-	 * 
-	 * @param d
-	 * 
-	 */
-	NDDB.prototype.sort = function (d) {
-		
-		if ('function' === typeof d) {
-			var func = d;
-		}
-		else {
-			var func = this.comparator(d);
-		}
-		
-		return new NDDB(this.cloneSettings(), this.db.sort(func));
-	};
+//	/**
+//	 * Sort the db according to a certain criteria. Criteria ca be a 
+//	 * comparator dimension or a custom function 
+//	 * 
+//	 * @param d
+//	 * 
+//	 */
+//	NDDB.prototype.sort = function (d) {
+//		
+//		if ('function' === typeof d) {
+//			var func = d;
+//		}
+//		else {
+//			var func = this.comparator(d);
+//		}
+//		
+//		return new NDDB(this.cloneSettings(), this.db.sort(func));
+//	};
 	
+	/**
+	   * Sort the db according to a certain criteria. Criteria ca be a 
+	   * comparator dimension or a custom function 
+	   * 
+	   * @param d
+	   * 
+	   */
+	  NDDB.prototype.sort = function (d) {
+	    
+		// FUNCTION  
+	    if ('function' === typeof d) {
+	      var func = d;
+	    }
+	    
+	    // ARRAY of dimensions
+	    else if (d instanceof Array) {
+	      var that = this;
+	      var func = function (a,b) {
+	        for (var i=0; i < d.length; i++) {
+	          var result = that.comparator(d[i]).call(that,a,b);
+	          if (result !== 0) return result;
+	        }
+	        return result;
+	      }
+	    }
+	    
+	    // SINGLE dimension
+	    else {
+	      var func = this.comparator(d);
+	    }
+	    
+	    return new NDDB(this.cloneSettings(), this.db.sort(func));
+	  };
 
 	
 	NDDB.prototype._analyzeQuery = function (d,op,value) {

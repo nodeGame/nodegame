@@ -1,0 +1,3 @@
+6.3.4
+
+- GameWindow uses JSUS.getNestedValue to load nested widgets

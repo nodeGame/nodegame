@@ -236,7 +236,7 @@
 	  
 	  var root = document.createElement('table');
 	  for (var i=0; i < this.db.length; i++) {
-		  if (this.db[i].x !==
+		  //if (this.db[i].x !==
 		  if (trid !== this.db[i].y) {
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);

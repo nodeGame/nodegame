@@ -263,16 +263,20 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			var tokens = g.split('.');
-			var i = 0;
-			var strg = 'g = new this.widgets';
-			for (;i<tokens.length;i++) {
-				strg += '[\''+tokens[i]+'\']';
-			}
-			strg+='(options);';
-			//console.log(strg);
-			eval(strg);
-			//g = new this.widgets[tokens](options);
+			
+			g = JSUS.getNestedValue(g,this.widgets);
+			g = new g(options);
+			
+//			var tokens = g.split('.');
+//			var i = 0;
+//			var strg = 'g = new this.widgets';
+//			for (;i<tokens.length;i++) {
+//				strg += '[\''+tokens[i]+'\']';
+//			}
+//			strg+='(options);';
+//			//console.log(strg);
+//			eval(strg);
+//			//g = new this.widgets[tokens](options);
 		}
 		
 		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
