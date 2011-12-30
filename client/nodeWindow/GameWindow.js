@@ -263,7 +263,6 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			
 			g = JSUS.getNestedValue(g,this.widgets);
 			g = new g(options);
 			

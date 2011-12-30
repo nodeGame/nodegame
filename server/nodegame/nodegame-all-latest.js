@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 17:25:56 CET 2011
+ * Built on Fri Dec 30 18:05:09 CET 2011
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 17:25:56 CET 2011
+ * Built on Fri Dec 30 18:05:09 CET 2011
  *
  */
  
@@ -4003,7 +4003,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 17:25:56 CET 2011
+ * Built on Fri Dec 30 18:05:09 CET 2011
  *
  */
  
@@ -4601,7 +4601,6 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
-			
 			g = JSUS.getNestedValue(g,this.widgets);
 			g = new g(options);
 			
@@ -4925,6 +4924,8 @@
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
+    // Class for missing cells
+    this.missing = options.missing || 'missing';
     this.pointers = {
     				x: options.pointerX || 0,
     				y: options.pointerY || 0,
@@ -5124,12 +5125,20 @@
     return this.root;
   };
   
-  // 2D for now
+  // TODO: Only 2D for now
   Table.prototype.parse = function() {
-	  this.sort('y');
-	  var trid = -1;
-	  
 	  var root = document.createElement('table');
+	  if (this.size() ===  0) return root;
+	  
+	  this.sort(['y','x']); // z to add first
+	  var trid = -1;
+	  // TODO: What happens if the are missing at the beginning ??
+	  var f = this.first();
+	  var old_x = f.x;
+	  // TODO: Do we need old_y and old_z ?
+	  var old_y = f.y;
+	  var old_z = f.z;
+	  console.log(this);
 	  for (var i=0; i < this.db.length; i++) {
 		  //if (this.db[i].x !==
 		  if (trid !== this.db[i].y) {
@@ -5137,12 +5146,31 @@
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
 			  //console.log(trid);
+			  old_x = f.x;
+			  old_y = f.y;
+			  old_z = f.z;
 		  }
+		  
+		  // Insert missing cells
+		  if (this.db[i].x > old_x + 1) {
+			  var diff = this.db[i].x - (old_x + 1);
+			  for (var j=0; j < diff; j++ ) {
+				  var TD = document.createElement('td');
+				  TD.setAttribute('class', this.missing);
+				  TR.appendChild(TD);
+			  }
+		  }
+		  // Normal Insert
 		  var TD = document.createElement('td');
 		  var c = this.db[i].content;
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  TR.appendChild(TD);
+		  
+		  // Update old refs
+		  old_x = this.db[i].x;
+		  old_y = this.db[i].y;
+		  old_z = this.db[i].z;
 	  }
 	  
 	  return root;
@@ -5175,7 +5203,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Dec 30 17:25:56 CET 2011
+ * Built on Fri Dec 30 18:05:09 CET 2011
  *
  */
  

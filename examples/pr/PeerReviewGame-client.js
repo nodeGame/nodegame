@@ -261,7 +261,7 @@ function PeerReviewGame () {
 							table.addColumn(column);
 						}
 						else {
-							table.addColumn(['No creation was selected for exhibition ' + this.exs[j]]);
+							table.addColumn(['No creation was selected for exhibition ' + this.exs[j],'']);
 						}
 					}
 				}
