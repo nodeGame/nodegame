@@ -150,8 +150,8 @@
 		dims = Table.H;
 	}
 	
-	console.log('DATA TBL');
-	console.log(data);
+//	console.log('DATA TBL');
+//	console.log(data);
 	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
@@ -162,15 +162,15 @@
 	
 	var insertCell = function (content){	
 		//console.log('content');
-		console.log(x + ' ' + y + ' ' + z);
-		console.log(i + ' ' + j + ' ' + h);
+//		console.log(x + ' ' + y + ' ' + z);
+//		console.log(i + ' ' + j + ' ' + h);
 		
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? y+j : y;
 		cell[dims[2]] = (h) ? z+h : z;
 		cell['content'] = content;	
-		console.log(cell);
+		//console.log(cell);
 		this.insert(new Cell(cell));
 		this.updatePointer(dims[0],cell[dims[0]]);
 		this.updatePointer(dims[1],cell[dims[1]]);
@@ -232,10 +232,11 @@
   // 2D for now
   Table.prototype.parse = function() {
 	  this.sort('y');
-	  this.reverse();
 	  var trid = -1;
+	  
 	  var root = document.createElement('table');
 	  for (var i=0; i < this.db.length; i++) {
+		  if (this.db[i].x !==
 		  if (trid !== this.db[i].y) {
 			  var TR = document.createElement('tr');
 			  root.appendChild(TR);

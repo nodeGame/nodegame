@@ -16,6 +16,7 @@ function PeerReviewGame () {
 		this.vs = node.window.addWidget('VisualState', this.header);
 		this.timer = node.window.addWidget('VisualTimer', this.header);
 		this.outlet = null;
+		this.exs = ['A','B','C'];
 	};
 	
 	
@@ -224,30 +225,48 @@ function PeerReviewGame () {
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
-				var winners = msg.data;
-				//console.log(msg.data);
-				
-				for (var i=0; i < winners.length; i++) {
+				if (msg.data.length > 0) {
+					var db = new node.NDDB(null,msg.data);
 					
-					var details_tbl = new node.Table();
-					details_tbl.addColumn(['Exhibition: ' + winners[i].ex,
-					                       'Mean Evaluation: ' + winners[i].mean, 
-					                       'Author: ' + winners[i].author ]);
+					for (var j=0; j < this.exs.length; j++) {
+						var winners = db.select('ex','=',this.exs[j])
+										.sort('mean')
+										.fetch();
 					
-					var cf_options = { id: 'cf_' + winners[i].player,
-							   width: 200,
-							   height: 200,
-							   features: winners[i].cf,
-							   controls: false
-					};
-					
-					
-					var container = document.createElement('div');
-					
-					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-					table.addColumn([container, details_tbl.parse()]);
-//					console.log('Winneer');
-//					console.log(winners[i]);
+						if (winners.length > 0) {
+							var column = [];
+							for (var i=0; i < winners.length; i++) {
+							
+							
+								var details_tbl = new node.Table();
+								details_tbl.addColumn(['Exhibition: ' + winners[i].ex,
+								                       'Author: ' + winners[i].author,
+								                       'Mean Evaluation: ' + winners[i].mean
+								]);
+								
+								var cf_options = { id: 'cf_' + winners[i].player,
+										   width: 200,
+										   height: 200,
+										   features: winners[i].cf,
+										   controls: false
+								};
+								
+								
+								var container = document.createElement('div');
+								
+								var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+								column.push(details_tbl.parse());
+								column.push(container);	
+							}
+							table.addColumn(column);
+						}
+						else {
+							table.addColumn(['No creation was selected for exhibition ' + this.exs[j]]);
+						}
+					}
+				}
+				else {
+					node.window.write('No work was selected to be published in any exhibition');
 				}
 				
 				

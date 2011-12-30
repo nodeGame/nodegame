@@ -24,8 +24,8 @@ var t = new Table({});
 //t._add(data, dims);
 //t._add(data, dims);
 
-for (var i=0; i<5; i++) {
-	var a = [[i,'a',2],[i,'a',2],[i,'a',2]];
+for (var i=0.1; i<5; i++) {
+	var a = [i,'a'];
 	t.addColumn(a);
 }
 
@@ -33,6 +33,7 @@ t.sort('y');
 t.reverse();
 console.log(t.pointers);
 console.log(t.fetch());
+console.log(t.parse());
 
 
 
