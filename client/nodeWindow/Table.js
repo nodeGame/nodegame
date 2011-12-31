@@ -253,8 +253,8 @@
 			  trid = this.db[i].y;
 			  //console.log(trid);
 			  old_x = f.x - 1; // must start exactly from the first
-			  old_y = f.y - 1;
-			  old_z = f.z - 1;
+//			  old_y = f.y - 1;
+//			  old_z = f.z - 1;
 		  }
 		  
 		  // Insert missing cells
@@ -275,8 +275,8 @@
 		  
 		  // Update old refs
 		  old_x = this.db[i].x;
-		  old_y = this.db[i].y;
-		  old_z = this.db[i].z;
+//		  old_y = this.db[i].y;
+//		  old_z = this.db[i].z;
 	  }
 	  
 	  return root;
@@ -286,8 +286,6 @@
   
   function Cell (cell){
 	  
-	  console.log(cell);
-	  
 	  this.x = ('undefined' !== typeof cell.x) ? cell.x : null;
 	  this.y = ('undefined' !== typeof cell.y) ? cell.y : null;
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
@@ -295,7 +293,6 @@
 	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
 	  this.style = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
-  
   
 	
 })(('undefined' !== typeof node) ? node : module.parent.exports);
