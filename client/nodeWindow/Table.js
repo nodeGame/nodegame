@@ -252,9 +252,9 @@
 			  root.appendChild(TR);
 			  trid = this.db[i].y;
 			  //console.log(trid);
-			  old_x = f.x;
-			  old_y = f.y;
-			  old_z = f.z;
+			  old_x = f.x - 1; // must start exactly from the first
+			  old_y = f.y - 1;
+			  old_z = f.z - 1;
 		  }
 		  
 		  // Insert missing cells
@@ -286,12 +286,14 @@
   
   function Cell (cell){
 	  
+	  console.log(cell);
+	  
 	  this.x = ('undefined' !== typeof cell.x) ? cell.x : null;
 	  this.y = ('undefined' !== typeof cell.y) ? cell.y : null;
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
 	  
-	  this.content = cell.content || '';
-	  this.style = cell.style || null;
+	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
+	  this.style = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
   

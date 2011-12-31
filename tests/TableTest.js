@@ -24,10 +24,17 @@ var t = new Table({});
 //t._add(data, dims);
 //t._add(data, dims);
 
-for (var i=0.1; i<5; i++) {
-	var a = [i,'a'];
-	t.addColumn(a);
-}
+//for (var i=0.1; i<5; i++) {
+//	var a = [i,'a'];
+//	t.addColumn(a);
+//}
+
+t.addColumn([1,'a']);
+t.addColumn([2]);
+t.addColumn([3,'c']);
+t.addColumn([3]);
+
+
 
 t.sort('y');
 t.reverse();

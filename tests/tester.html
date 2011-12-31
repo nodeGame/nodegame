@@ -19,9 +19,11 @@ var t = new node.Table({});
 // t._add(data, dims);
 // t._add(data, dims);
 // t._add(data, dims);
-t.addColumn(['a',1]);
-t.addColumn(['b']);
-t.addColumn(['c',3]);
+t.addColumn([0]);
+t.addColumn([1,'a']);
+t.addColumn([2]);
+t.addColumn([3,'c','s']);
+t.addColumn([3]);
 
 //console.log(t.pointers);
 //console.log(t.fetch());
