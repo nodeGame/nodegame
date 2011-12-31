@@ -4,7 +4,7 @@
 	 * 
 	 * NDDB provides a simple, lightweight NO-SQL database for nodeGame.
 	 * 
-	 * Selecting methods returning a new NDDB obj (can be concatenated):
+	 * Selecting methods returning a this.create obj (can be concatenated):
 	 * 
 	 * 		- filter 			-> execute callback
 	 * 		- select			-> evaluate string
@@ -54,6 +54,11 @@
 		this.db = db || [];	// The actual database
 
   		this.size = function() { return this.db.length };
+	};
+	
+	NDDB.prototype.create = function (options, db) {
+		//In case the class was inherited
+		return new this.constructor(options, db);
 	};
 	
 	NDDB.prototype.clear = function (confirm) {
@@ -117,7 +122,7 @@
 	// Sorting Operation
 	
 	NDDB.prototype.reverse = function () {
-		return new NDDB(this.cloneSettings(), this.db.reverse());
+		return this.create(this.cloneSettings(), this.db.reverse());
 	};
 	
 //	/**
@@ -136,7 +141,7 @@
 //			var func = this.comparator(d);
 //		}
 //		
-//		return new NDDB(this.cloneSettings(), this.db.sort(func));
+//		return this.create(this.cloneSettings(), this.db.sort(func));
 //	};
 	
 	/**
@@ -170,7 +175,7 @@
 	      var func = this.comparator(d);
 	    }
 	    
-	    return new NDDB(this.cloneSettings(), this.db.sort(func));
+	    return this.create(this.cloneSettings(), this.db.sort(func));
 	  };
 
 	
@@ -252,7 +257,7 @@
 	};
 	
 	NDDB.prototype.filter = function (func) {
-		return new NDDB(this.cloneSettings(), this.db.filter(func));
+		return this.create(this.cloneSettings(), this.db.filter(func));
 	};
 	
 	// HERE
@@ -313,7 +318,7 @@
 			}
 		}
 		
-		return new NDDB(this.cloneSettings(), out);
+		return this.create(this.cloneSettings(), out);
 	};
 	
 	
@@ -377,11 +382,11 @@
 	};
 	
 	NDDB.prototype.limit = function (limit) {
-		if (limit === 0) return new NDDB(this.cloneSettings());
+		if (limit === 0) return this.create(this.cloneSettings());
 		var db = (limit > 0) ? this.db.slice(0, limit) :
 							   this.db.slice(limit);
 		
-		return new NDDB(this.cloneSettings(), db);
+		return this.create(this.cloneSettings(), db);
 	};
 	
 	NDDB.prototype._split = function (o, key) {		
@@ -418,7 +423,7 @@
 		for (var i=0; i<this.db.length;i++) {
 			out = out.concat(this._split(this.db[i], key));
 		}
-		return new NDDB(this.cloneSettings(), out);
+		return this.create(this.cloneSettings(), out);
 	};
 	
 	NDDB.prototype.count = function (key) {
