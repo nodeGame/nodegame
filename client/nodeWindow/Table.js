@@ -1,5 +1,6 @@
 (function(exports){
 	
+	console.log(exports);
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
@@ -63,9 +64,32 @@
 			el.className += ', ' + c;
 		}
 	});
-	  
+	
+	return this;
   };
-  
+
+  // Depends on node.window
+  Table.prototype.removeClass = function (c) {
+	if (!c) return;
+	
+	if (c instanceof Array) {
+		var func = function(el, c) {
+			for (var i=0; i< c.length; i++) {
+				node.window.removeClass(el, c[i]);
+			}
+		}
+	}
+	else {
+		var func = node.window.removeClass;
+	}
+	
+	this.forEach(function (el) {
+		func.call(this,el,c);
+	});
+	
+	return this;
+  };
+	
   Table.prototype.setRoot = function (root) {
 	  if (!root) return false;
 	  if (this.root && this.root.childNodes) {
