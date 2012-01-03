@@ -21,35 +21,38 @@ var dims = ['x','y','z'];
 var t = new Table({});
 
 
-//t._add(data, dims);
-//t._add(data, dims);
-//t._add(data, dims);
+t._add(data, dims);
+t._add(data, dims);
+t._add(data, dims);
 
 //for (var i=0.1; i<5; i++) {
 //	var a = [i,'a'];
 //	t.addColumn(a);
 //}
 //
-t.addColumn([1,'a']);
-t.addColumn([2]);
-t.addColumn([3,'c']);
-t.addColumn([3]);
 
+t.addClass(['culo','c2']);
+t.addClass('culo2');
 
-
-t.sort('x');
-t.reverse();
-console.log(t.pointers);
 console.log(t.fetch());
-//console.log(t.parse());
-
-t.addColumn([2,2,2]);
-
-
-aa = t.select('x','>',2);
-
-console.log(aa.pointers);
-console.log(aa.fetch());
-
-aa.addColumn([1,2]);
+//t.addColumn([1,'a']);
+//t.addColumn([2]);
+//t.addColumn([3,'c']);
+//t.addColumn([3]);
+//
+//
+//
+//t.sort('x');
+//t.reverse();
+//console.log(t.pointers);
+//console.log(t.fetch());
+////console.log(t.parse());
+//
+//t.addColumn([2,2,2]);
+//
+//
+//aa = t.select('x','>',2);
+//
+//aa.addColumn([1,2]);
+//console.log(aa.fetch());
 

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.4
+ * nodeGame-all v0.6.4.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 09:56:27 CET 2011
+ * Built on Sat Dec 31 17:30:55 CET 2011
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.4
+ * nodeGame Client v0.6.4.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 09:56:27 CET 2011
+ * Built on Sat Dec 31 17:30:55 CET 2011
  *
  */
  
@@ -693,7 +693,7 @@
 	 * 
 	 * NDDB provides a simple, lightweight NO-SQL database for nodeGame.
 	 * 
-	 * Selecting methods returning a new NDDB obj (can be concatenated):
+	 * Selecting methods returning a this.create obj (can be concatenated):
 	 * 
 	 * 		- filter 			-> execute callback
 	 * 		- select			-> evaluate string
@@ -743,6 +743,11 @@
 		this.db = db || [];	// The actual database
 
   		this.size = function() { return this.db.length };
+	};
+	
+	NDDB.prototype.create = function (options, db) {
+		//In case the class was inherited
+		return new this.constructor(options, db);
 	};
 	
 	NDDB.prototype.clear = function (confirm) {
@@ -806,7 +811,7 @@
 	// Sorting Operation
 	
 	NDDB.prototype.reverse = function () {
-		return new NDDB(this.cloneSettings(), this.db.reverse());
+		return this.create(this.cloneSettings(), this.db.reverse());
 	};
 	
 //	/**
@@ -825,7 +830,7 @@
 //			var func = this.comparator(d);
 //		}
 //		
-//		return new NDDB(this.cloneSettings(), this.db.sort(func));
+//		return this.create(this.cloneSettings(), this.db.sort(func));
 //	};
 	
 	/**
@@ -859,7 +864,7 @@
 	      var func = this.comparator(d);
 	    }
 	    
-	    return new NDDB(this.cloneSettings(), this.db.sort(func));
+	    return this.create(this.cloneSettings(), this.db.sort(func));
 	  };
 
 	
@@ -941,7 +946,7 @@
 	};
 	
 	NDDB.prototype.filter = function (func) {
-		return new NDDB(this.cloneSettings(), this.db.filter(func));
+		return this.create(this.cloneSettings(), this.db.filter(func));
 	};
 	
 	// HERE
@@ -1002,7 +1007,7 @@
 			}
 		}
 		
-		return new NDDB(this.cloneSettings(), out);
+		return this.create(this.cloneSettings(), out);
 	};
 	
 	
@@ -1066,11 +1071,11 @@
 	};
 	
 	NDDB.prototype.limit = function (limit) {
-		if (limit === 0) return new NDDB(this.cloneSettings());
+		if (limit === 0) return this.create(this.cloneSettings());
 		var db = (limit > 0) ? this.db.slice(0, limit) :
 							   this.db.slice(limit);
 		
-		return new NDDB(this.cloneSettings(), db);
+		return this.create(this.cloneSettings(), db);
 	};
 	
 	NDDB.prototype._split = function (o, key) {		
@@ -1107,7 +1112,7 @@
 		for (var i=0; i<this.db.length;i++) {
 			out = out.concat(this._split(this.db[i], key));
 		}
-		return new NDDB(this.cloneSettings(), out);
+		return this.create(this.cloneSettings(), out);
 	};
 	
 	NDDB.prototype.count = function (key) {
@@ -3998,12 +4003,12 @@
  
  
 /*!
- * nodeWindow v0.6.4
+ * nodeWindow v0.6.4.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 09:56:27 CET 2011
+ * Built on Sat Dec 31 17:30:55 CET 2011
  *
  */
  
@@ -5147,8 +5152,8 @@
 			  trid = this.db[i].y;
 			  //console.log(trid);
 			  old_x = f.x - 1; // must start exactly from the first
-			  old_y = f.y - 1;
-			  old_z = f.z - 1;
+//			  old_y = f.y - 1;
+//			  old_z = f.z - 1;
 		  }
 		  
 		  // Insert missing cells
@@ -5169,8 +5174,8 @@
 		  
 		  // Update old refs
 		  old_x = this.db[i].x;
-		  old_y = this.db[i].y;
-		  old_z = this.db[i].z;
+//		  old_y = this.db[i].y;
+//		  old_z = this.db[i].z;
 	  }
 	  
 	  return root;
@@ -5180,8 +5185,6 @@
   
   function Cell (cell){
 	  
-	  console.log(cell);
-	  
 	  this.x = ('undefined' !== typeof cell.x) ? cell.x : null;
 	  this.y = ('undefined' !== typeof cell.y) ? cell.y : null;
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
@@ -5189,7 +5192,6 @@
 	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
 	  this.style = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
-  
   
 	
 })(('undefined' !== typeof node) ? node : module.parent.exports);
@@ -5200,12 +5202,12 @@
  
  
 /*!
- * nodeGadgets v0.6.4
+ * nodeGadgets v0.6.4.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 09:56:27 CET 2011
+ * Built on Sat Dec 31 17:30:55 CET 2011
  *
  */
  

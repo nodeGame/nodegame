@@ -51,7 +51,22 @@
 //	this.odd = 'odd';
   };
   
-  Table.prototype.setRoot = function(root) {
+  Table.prototype.addClass = function (c) {
+	if (!c) return;
+	if (c instanceof Array) c = c.join(', ');
+	
+	this.forEach(function (el) {
+		if (!el.className) {
+			el.className = c;
+		} 
+		else {
+			el.className += ', ' + c;
+		}
+	});
+	  
+  };
+  
+  Table.prototype.setRoot = function (root) {
 	  if (!root) return false;
 	  if (this.root && this.root.childNodes) {
 		  root.appendChild(children);
@@ -291,7 +306,7 @@
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
 	  
 	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
-	  this.style = ('undefined' !== typeof cell.style) ? cell.style : null;
+	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
 	
