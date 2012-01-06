@@ -92,6 +92,26 @@
 		}();
 	};
 	
+	// Overriding Document.write and Document.writeln
+	GameWindow.prototype._write = Document.prototype.write;
+	GameWindow.prototype._writeln = Document.prototype.writeln;
+	
+	// Write should after the last element in mainframe. 
+	// TODO: get the last child. 
+	
+	GameWindow.prototype.write = function (text, root) {
+		if (!root) var root = this.root;
+		if (!text) var text = '';
+		return this._write(root, text);
+	};
+	
+	GameWindow.prototype.writeln = function (text, root, br) {
+		if (!root) var root = this.root;
+		if (!text) var text = '';
+		return this._writeln(root, text, br);
+	};
+	
+	
 	/**
 	 * Enable / Disable all input in a container with id @id.
 	 * If no container with id @id is found, then the whole document is used.
@@ -132,7 +152,7 @@
 		// We assume that the BODY element always exists
 		// TODO: Check if body element does not exist and add it
 		var root = Math.floor(Math.random()*10000);
-		return rootEl = this.addElement('div', document.body, root);
+		return this.addElement('div', document.body, root);
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
@@ -141,7 +161,7 @@
 			this.header = null;
 		}
 		
-		return headerEl = this.addElement('div', this.root, 'gn_header');
+		return this.addElement('div', this.root, 'gn_header');
 	};
 	
 	GameWindow.prototype.setup = function (type){

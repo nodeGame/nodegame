@@ -1,6 +1,5 @@
 (function(exports){
 	
-	console.log(exports);
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
@@ -10,7 +9,7 @@
 	exports.Table = Table;
 	
 	// For simple testing
-	module.exports = Table;
+	//module.exports = Table;
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;

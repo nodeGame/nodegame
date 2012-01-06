@@ -1,5 +1,7 @@
 <!doctype html>
-<div id="ah"></div>
+<div id="ah">
+<div id="ih"></div>
+</div>
 <script src="http://localhost:8080/socket.io/socket.io.js"></script> 
 <script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
 
@@ -10,6 +12,10 @@
  -->
 <script>
 
+document.getElementById('ah').appendChild(document.createTextNode('ih'));
+node.window.write('culo', document.getElementById('ah'));
+
+console.log(document.getElementById('ah').lastChild());
 
 var data = ['a',1]; 
 var dims = ['x','y','z'];

@@ -124,6 +124,7 @@
 	};
 	
 	Document.prototype.write = function (root, text) {
+		if (!root) return;
 		var text = (text) ? text : '';
 		var tn = document.createTextNode(text);
 		root.appendChild(tn);
@@ -131,6 +132,7 @@
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {
+		if (!root) return;
 		var br = this.addBreak(root,rc);
 		return (text) ? this.write(root, text) : br;
 	};

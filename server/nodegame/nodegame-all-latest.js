@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.4.1
+ * nodeGame-all v0.6.4.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 17:30:55 CET 2011
+ * Built on Fri Jan 6 21:38:40 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.4.1
+ * nodeGame Client v0.6.4.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 17:30:55 CET 2011
+ * Built on Fri Jan 6 21:38:40 CET 2012
  *
  */
  
@@ -802,6 +802,12 @@
 			if (v2 > v1) return -1;
 			return 0;
 		};	
+	};
+	
+	NDDB.prototype.forEach = function(func, params) {
+		for (var i=0; i< this.db.length; i++) {
+			func.call(this, this.db[i], params);
+		}
 	};
 	
 	NDDB.prototype.insert = function (o) {
@@ -4003,12 +4009,12 @@
  
  
 /*!
- * nodeWindow v0.6.4.1
+ * nodeWindow v0.6.4.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 17:30:55 CET 2011
+ * Built on Fri Jan 6 21:38:40 CET 2012
  *
  */
  
@@ -4139,6 +4145,7 @@
 	};
 	
 	Document.prototype.write = function (root, text) {
+		if (!root) return;
 		var text = (text) ? text : '';
 		var tn = document.createTextNode(text);
 		root.appendChild(tn);
@@ -4146,6 +4153,7 @@
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {
+		if (!root) return;
 		var br = this.addBreak(root,rc);
 		return (text) ? this.write(root, text) : br;
 	};
@@ -4435,6 +4443,26 @@
 		}();
 	};
 	
+	// Overriding Document.write and Document.writeln
+	GameWindow.prototype._write = Document.prototype.write;
+	GameWindow.prototype._writeln = Document.prototype.writeln;
+	
+	// Write should after the last element in mainframe. 
+	// TODO: get the last child. 
+	
+	GameWindow.prototype.write = function (text, root) {
+		if (!root) var root = this.root;
+		if (!text) var text = '';
+		return this._write(root, text);
+	};
+	
+	GameWindow.prototype.writeln = function (text, root, br) {
+		if (!root) var root = this.root;
+		if (!text) var text = '';
+		return this._writeln(root, text, br);
+	};
+	
+	
 	/**
 	 * Enable / Disable all input in a container with id @id.
 	 * If no container with id @id is found, then the whole document is used.
@@ -4475,7 +4503,7 @@
 		// We assume that the BODY element always exists
 		// TODO: Check if body element does not exist and add it
 		var root = Math.floor(Math.random()*10000);
-		return rootEl = this.addElement('div', document.body, root);
+		return this.addElement('div', document.body, root);
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
@@ -4484,7 +4512,7 @@
 			this.header = null;
 		}
 		
-		return headerEl = this.addElement('div', this.root, 'gn_header');
+		return this.addElement('div', this.root, 'gn_header');
 	};
 	
 	GameWindow.prototype.setup = function (type){
@@ -4950,7 +4978,45 @@
 //	this.odd = 'odd';
   };
   
-  Table.prototype.setRoot = function(root) {
+  Table.prototype.addClass = function (c) {
+	if (!c) return;
+	if (c instanceof Array) c = c.join(', ');
+	
+	this.forEach(function (el) {
+		if (!el.className) {
+			el.className = c;
+		} 
+		else {
+			el.className += ', ' + c;
+		}
+	});
+	
+	return this;
+  };
+
+  // Depends on node.window
+  Table.prototype.removeClass = function (c) {
+	if (!c) return;
+	
+	if (c instanceof Array) {
+		var func = function(el, c) {
+			for (var i=0; i< c.length; i++) {
+				node.window.removeClass(el, c[i]);
+			}
+		}
+	}
+	else {
+		var func = node.window.removeClass;
+	}
+	
+	this.forEach(function (el) {
+		func.call(this,el,c);
+	});
+	
+	return this;
+  };
+	
+  Table.prototype.setRoot = function (root) {
 	  if (!root) return false;
 	  if (this.root && this.root.childNodes) {
 		  root.appendChild(children);
@@ -5190,7 +5256,7 @@
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
 	  
 	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
-	  this.style = ('undefined' !== typeof cell.style) ? cell.style : null;
+	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
 	
@@ -5202,12 +5268,12 @@
  
  
 /*!
- * nodeGadgets v0.6.4.1
+ * nodeGadgets v0.6.4.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Dec 31 17:30:55 CET 2011
+ * Built on Fri Jan 6 21:38:40 CET 2012
  *
  */
  

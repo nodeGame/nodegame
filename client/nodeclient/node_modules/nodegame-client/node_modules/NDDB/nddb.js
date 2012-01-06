@@ -115,6 +115,12 @@
 		};	
 	};
 	
+	NDDB.prototype.forEach = function(func, params) {
+		for (var i=0; i< this.db.length; i++) {
+			func.call(this, this.db[i], params);
+		}
+	};
+	
 	NDDB.prototype.insert = function (o) {
 		this.db.push(o);
 	};
