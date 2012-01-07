@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 7. Jan 16:54:19 CET 2012
+ * Built on Sa 7. Jan 17:04:00 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 7. Jan 16:54:19 CET 2012
+ * Built on Sa 7. Jan 17:04:00 CET 2012
  *
  */
  
@@ -3537,7 +3537,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 7. Jan 16:54:19 CET 2012
+ * Built on Sa 7. Jan 17:04:01 CET 2012
  *
  */
  
@@ -3677,7 +3677,7 @@
 	
 	Document.prototype.writeln = function (root, text, rc) {
 		if (!root) return;
-		var br = this.addBreak(root,rc);
+		var br = this.addBreak(root, rc);
 		return (text) ? this.write(root, text) : br;
 	};
 	
@@ -3691,7 +3691,7 @@
 	
 	// BR
 	
-	Document.prototype.addBreak = function (root,rc) {
+	Document.prototype.addBreak = function (root, rc) {
 		var RC = rc || 'br';
 		var br = document.createElement(RC);
 		return root.appendChild(br);
@@ -4541,52 +4541,6 @@
 	
 	return this;
   };
-	
-//  Table.prototype.setRoot = function (root) {
-//	  if (!root) return false;
-//	  if (this.root && this.root.childNodes) {
-//		  root.appendChild(children);
-//	  }
-//	  this.root = root;
-//	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
-//  };
-//  
-//  Table.prototype.append = function(root) {
-//    return root.appendChild(this.root);
-//  };
-  
-  
-//  Table.prototype.createRoot = function (id, options) {
-//    var root = document.createElement('table');
-//    root.id = id;
-//    return root;
-//  };
-//    
-//  Table.prototype.addRow = function (data, attributes, container) {
-//    var row = document.createElement('tr');
-//    
-//    if (attributes) {
-//    	node.window.addAttributes2Elem(row, attributes);
-//    }
-//    
-//    for (var i = 0; i < data.length; i++) {
-//            var cell = document.createElement('td');
-//            var cellContent = document.createTextNode(data[i]);
-//            cell.appendChild(cellContent);
-//            row.appendChild(cell);
-//        } 
-//    
-//    // If we have other elements, e.g. thead, add them. 
-//    // If it is not a normal no even or odd class is added.
-//    if (container) {
-//      container.appendChild(row);
-//      return this.appendRow(container, false);
-//    }
-//    else {
-//      return this.appendRow(row);
-//    }
-//    
-//  };
   
   Table.prototype.addHeader = function (header) {
 	  this.header = header;
@@ -4726,6 +4680,7 @@
 	  };
 	  
 	  var TABLE = document.createElement('table');
+	  TABLE.id = this.id;
 	  
 	  // HEADER
 	  if (this.header && this.header.length > 0) {
@@ -4824,7 +4779,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 7. Jan 16:54:19 CET 2012
+ * Built on Sa 7. Jan 17:04:01 CET 2012
  *
  */
  

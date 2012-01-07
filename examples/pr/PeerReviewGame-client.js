@@ -219,9 +219,8 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var table = new node.Table();
+			var table = new node.Table({id: 'exhibition'});
 			table.addHeader(['A', 'B', 'C']);
-			table.addFooter(['end A', 'end B', 'end C']);
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
