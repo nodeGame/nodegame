@@ -38,8 +38,7 @@
 	 * @api public
 	 */
 	
-	function NDDB (options, db) {
-		
+	function NDDB (options, db) {				
 		// Default settings
 		this.options = null;
 
@@ -57,6 +56,7 @@
 	};
 	
 	NDDB.prototype.create = function (options, db) {
+		console.log('create func');
 		//In case the class was inherited
 		return new this.constructor(options, db);
 	};
@@ -73,6 +73,7 @@
 	};	
 	
 	NDDB.prototype.cloneSettings = function () {
+		if (!this.options) return {};
 		var o = JSUS.clone(this.options);
 		o.D = JSUS.clone(this.D);
 		return o;
@@ -238,8 +239,8 @@
 
 		var comparator = this.comparator(d);
 		
-		//NDDB.log(comparator.toString());
-		//NDDB.log(value);
+//		NDDB.log(comparator.toString());
+//		NDDB.log(value);
 		
 		var exist = function (elem) {
 			if ('undefined' !== typeof JSUS.getNestedValue(d,elem)) return elem;

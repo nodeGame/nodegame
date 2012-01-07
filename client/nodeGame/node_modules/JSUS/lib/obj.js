@@ -138,6 +138,7 @@
 	 * Creates a perfect copy of the obj
 	 */
 	OBJ.clone = function (obj) {
+		if (!obj) return;
 		var clone = {};
 		for (var i in obj) {
 			if (obj.hasOwnProperty(i)) {

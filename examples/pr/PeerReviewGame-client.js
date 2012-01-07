@@ -219,9 +219,9 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-//			var tbl_options =  { root: node.window.getElementById('exhibition')}
-//			var table = new node.Table(tbl_options);
 			var table = new node.Table();
+			table.addHeader(['A', 'B', 'C']);
+			table.addFooter(['end A', 'end B', 'end C']);
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
@@ -266,7 +266,7 @@ function PeerReviewGame () {
 					}
 				}
 				else {
-					node.window.write('No work was selected to be published in any exhibition');
+					node.window.write('No work was selected to be published in any exhibition', root);
 				}
 				
 				
