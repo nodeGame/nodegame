@@ -46,7 +46,7 @@
 		
 		this.pl = new PlayerList();
 		
-		this.memory = new GameDB(this);
+		this.memory = new GameDB();
 		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';

@@ -12,8 +12,8 @@
 	
 
 	// Load the auxiliary library if available in the browser
+	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
 	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
-    if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
     
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {

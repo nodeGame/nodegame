@@ -39,16 +39,9 @@
     };
     
     this.id = options.id || 'table';  
-
-//	if (options.root) {
-//		this.setRoot(options.root);
-//	}
-//	else {
-//		this.root = this.createRoot(this.id, options);
-//	}
-//	
-//	this.pointer = this.root; // Points to the last row added;
-//	this.odd = 'odd';
+    
+    this.header = null;
+    this.footer = null;
   };
   
   Table.prototype.addClass = function (c) {
@@ -89,31 +82,26 @@
 	return this;
   };
 	
-  Table.prototype.setRoot = function (root) {
-	  if (!root) return false;
-	  if (this.root && this.root.childNodes) {
-		  root.appendChild(children);
-	  }
-	  this.root = root;
-	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
-  };
+//  Table.prototype.setRoot = function (root) {
+//	  if (!root) return false;
+//	  if (this.root && this.root.childNodes) {
+//		  root.appendChild(children);
+//	  }
+//	  this.root = root;
+//	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
+//  };
+//  
+//  Table.prototype.append = function(root) {
+//    return root.appendChild(this.root);
+//  };
   
-  Table.prototype.append = function(root) {
-    return root.appendChild(this.root);
-  };
   
-  
-  Table.prototype.createRoot = function (id, options) {
-    var root = document.createElement('table');
-    root.id = id;
-    return root;
-  };
-  
-  Table.prototype.addHeaderRow = function (data, attributes) {
-    var thead = document.createElement('thead');
-    return this.addRow(data, attributes, thead);
-  };
-  
+//  Table.prototype.createRoot = function (id, options) {
+//    var root = document.createElement('table');
+//    root.id = id;
+//    return root;
+//  };
+//    
 //  Table.prototype.addRow = function (data, attributes, container) {
 //    var row = document.createElement('tr');
 //    
@@ -139,17 +127,14 @@
 //    }
 //    
 //  };
-//  
-  Table.prototype.appendRow = function (row, addClass) {
-    var addClass = ('undefined' !== typeof addClass) ? addClass : true;
-    this.root.appendChild(row);
-    this.pointer = row;
-    if (addClass) {
-      row.className += this.id + '_' + this.odd;
-      this.odd = (this.odd == 'odd') ? 'even' : 'odd'; // toggle pointer to odd or even row
-    }
-    return row;
-  };
+  
+  Table.prototype.addHeader = function (header) {
+	  this.header = header;
+  }
+
+  Table.prototype.addFooter = function (footer) {
+	  this.footer = footer;
+  }
   
   Table._checkDim123 = function (dims) {
 	  var t = Table.H.slice(0);
@@ -270,54 +255,87 @@
   };
   
   // TODO: Only 2D for now
+  // TODO: improve algorithm, rewrite
   Table.prototype.parse = function() {
-	  var root = document.createElement('table');
-	  if (this.size() ===  0) return root;
 	  
-	  this.sort(['y','x']); // z to add first
-	  var trid = -1;
-	  // TODO: What happens if the are missing at the beginning ??
-	  var f = this.first();
-	  var old_x = f.x;
-	  // TODO: Do we need old_y and old_z ?
-	  var old_y = f.y;
-	  var old_z = f.z;
-	  console.log(this);
-	  for (var i=0; i < this.db.length; i++) {
-		  //if (this.db[i].x !==
-		  if (trid !== this.db[i].y) {
-			  var TR = document.createElement('tr');
-			  root.appendChild(TR);
-			  trid = this.db[i].y;
-			  //console.log(trid);
-			  old_x = f.x - 1; // must start exactly from the first
-//			  old_y = f.y - 1;
-//			  old_z = f.z - 1;
-		  }
-		  
-		  // Insert missing cells
-		  if (this.db[i].x > old_x + 1) {
-			  var diff = this.db[i].x - (old_x + 1);
-			  for (var j=0; j < diff; j++ ) {
-				  var TD = document.createElement('td');
-				  TD.setAttribute('class', this.missing);
-				  TR.appendChild(TD);
-			  }
-		  }
-		  // Normal Insert
-		  var TD = document.createElement('td');
-		  var c = this.db[i].content;
+	  var appendContent = function (td, c) {
+		  if (!td) return;
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-		  TD.appendChild(content);
-		  TR.appendChild(TD);
-		  
-		  // Update old refs
-		  old_x = this.db[i].x;
-//		  old_y = this.db[i].y;
-//		  old_z = this.db[i].z;
+		  td.appendChild(content);
+		  return td;
+	  };
+	  
+	  var TABLE = document.createElement('table');
+	  
+	  // HEADER
+	  if (this.header && this.header.length > 0) {
+		  var THEAD = document.createElement('thead');
+		  var TR = document.createElement('tr');
+		  for (var i=0; i < this.header.length; i++) {
+			  var TH = document.createElement('th');
+			  TH = appendContent(TH, this.header[i]);
+			  TR.appendChild(TH);
+		  }
+		  THEAD.appendChild(TR);
+		  i=0;
+		  TABLE.appendChild(THEAD);
 	  }
 	  
-	  return root;
+	  // BODY
+	  if (this.size() !==  0) {
+		  var TBODY = document.createElement('tbody');
+	  
+		  this.sort(['y','x']); // z to add first
+		  var trid = -1;
+		  // TODO: What happens if the are missing at the beginning ??
+		  var f = this.first();
+		  var old_x = f.x;
+
+		  for (var i=0; i < this.db.length; i++) {
+			  //if (this.db[i].x !==
+			  if (trid !== this.db[i].y) {
+				  var TR = document.createElement('tr');
+				  TBODY.appendChild(TR);
+				  trid = this.db[i].y;
+				  //console.log(trid);
+				  old_x = f.x - 1; // must start exactly from the first
+			  }
+			  
+			  // Insert missing cells
+			  if (this.db[i].x > old_x + 1) {
+				  var diff = this.db[i].x - (old_x + 1);
+				  for (var j=0; j < diff; j++ ) {
+					  var TD = document.createElement('td');
+					  TD.setAttribute('class', this.missing);
+					  TR.appendChild(TD);
+				  }
+			  }
+			  // Normal Insert
+			  var TD = document.createElement('td');
+			  TD = appendContent(TD, this.db[i].content);
+			  TR.appendChild(TD);
+			  
+			  // Update old refs
+			  old_x = this.db[i].x;
+		  }
+		  TABLE.appendChild(TBODY);
+	  }
+	 
+	  
+	  //FOOTER
+	  if (this.footer && this.footer.length > 0) {
+		  var TFOOT = document.createElement('tfoot');
+		  var TR = document.createElement('tr');
+		  for (var i=0; i < this.header.length; i++) {
+			  var TD = document.createElement('td');
+			  TD = appendContent(TD, this.footer[i]);
+			  TR.appendChild(TD);
+		  }
+		  TFOOT.appendChild(TR);
+		  TABLE.appendChild(TFOOT);
+	  }
+	  
+	  return TABLE;
   }
   
   // Cell Class

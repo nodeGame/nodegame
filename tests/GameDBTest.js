@@ -2,13 +2,18 @@ var GameState = require('../client/nodeGame/GameState.js');
 module.exports.GameState = GameState.GameState;
 var Utils = require('../client/nodeGame/Utils.js');
 module.exports.Utils = Utils.Utils;
+var JSUS = require('../client/nodeGame/node_modules/JSUS/jsus.js');
+module.exports.JSUS = JSUS.JSUS;
+
+var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js').NDDB;
+module.exports.NDDB = NDDB;
 
 var GameState = GameState.GameState;
 
-var GameStorage = require('../client/nodeGame/GameStorage.js').GameStorage;
-var GameBit = require('../client/nodeGame/GameStorage.js').GameBit;
+var GameDB = require('../client/nodeGame/GameDB.js').GameDB;
+var GameBit = require('../client/nodeGame/GameDB.js').GameBit;
 
-var gs = new GameStorage();
+var gs = new GameDB();
 
 var clients = ['a','b'];//['a','b','c','d'];
 var states = [1,2]; //[1,2,3,4];
@@ -271,16 +276,17 @@ var storage = [ {state: new GameState({state:1}), player: 10, key: 'SUB', value:
                 
               ];
 
-var gs = new GameStorage(null,null,storage);
+var gdb = new GameDB(null,storage);
+//
+//var out = gs.filter(function(elem){
+//		if (elem.player == 40) {
+//			//console.log(elem.player);
+//			return elem;
+//		}
+//});
 
-var out = gs.filter(function(elem){
-		if (elem.player == 40) {
-			console.log(elem.player);
-			return elem;
-		}
-});
 
-
+var out = gdb.select('state', '=', new GameState({state:3}));
 
 console.log(out.fetch());
 //

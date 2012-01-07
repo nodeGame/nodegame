@@ -231,6 +231,7 @@ function PeerReviewGame () {
 					for (var j=0; j < this.exs.length; j++) {
 						var winners = db.select('ex','=',this.exs[j])
 										.sort('mean')
+										.reverse()
 										.fetch();
 					
 						if (winners.length > 0) {

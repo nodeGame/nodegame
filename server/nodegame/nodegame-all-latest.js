@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.4.2
+ * nodeGame-all v0.6.4.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 6 21:38:40 CET 2012
+ * Built on Sa 7. Jan 16:54:19 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.4.2
+ * nodeGame Client v0.6.4.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 6 21:38:40 CET 2012
+ * Built on Sa 7. Jan 16:54:19 CET 2012
  *
  */
  
@@ -208,6 +208,7 @@
 	 * Creates a perfect copy of the obj
 	 */
 	OBJ.clone = function (obj) {
+		if (!obj) return;
 		var clone = {};
 		for (var i in obj) {
 			if (obj.hasOwnProperty(i)) {
@@ -727,8 +728,7 @@
 	 * @api public
 	 */
 	
-	function NDDB (options, db) {
-		
+	function NDDB (options, db) {				
 		// Default settings
 		this.options = null;
 
@@ -762,6 +762,7 @@
 	};	
 	
 	NDDB.prototype.cloneSettings = function () {
+		if (!this.options) return {};
 		var o = JSUS.clone(this.options);
 		o.D = JSUS.clone(this.D);
 		return o;
@@ -927,8 +928,8 @@
 
 		var comparator = this.comparator(d);
 		
-		//NDDB.log(comparator.toString());
-		//NDDB.log(value);
+//		NDDB.log(comparator.toString());
+//		NDDB.log(value);
 		
 		var exist = function (elem) {
 			if ('undefined' !== typeof JSUS.getNestedValue(d,elem)) return elem;
@@ -1447,8 +1448,9 @@
 	// If strict is set, also the is property is compared
 	GameState.compare = function (gs1, gs2, strict) {
 		var strict = strict || false;
-//		console.log(gs1);
-//		console.log(gs2);
+//		console.log('COMPARAING GSs','DEBUG')
+//		console.log(gs1,'DEBUG');
+//		console.log(gs2,'DEBUG');
 		var result = gs1.state - gs2.state;
 		
 		if (result === 0 && 'undefined' !== typeof gs1.round) {
@@ -1462,7 +1464,7 @@
 				}
 			}
 		}
-		//console.log('EQUAL? ' + result);
+//		console.log('EQUAL? ' + result);
 		
 		return result;
 	};
@@ -2598,6 +2600,7 @@
  
 (function (exports, node) {
 	
+	
 	/**
 	 * 
 	 * GameDB provides a simple, lightweight NO-SQL database for nodeGame.
@@ -2620,9 +2623,8 @@
 	
 	var JSUS = node.Utils;
 	var NDDB = node.NDDB;
-	
+		
 	var GameState = node.GameState;
-	var Utils = node.Utils;
 	
 	/**
 	 * Expose constructors
@@ -2636,21 +2638,16 @@
 	 * @api public
 	 */
 	
-	function GameDB (game, options, storage) {
+	function GameDB (options, db) {
+	  var options = options || {};
 	  // Inheriting from NDDB	
-	  JSUS.extend(node.NDDB,this);
-	  node.NDDB.call(this,options,storage);
-	  
-	  this.game = game;
-	  this.options = options;
-	  this.storage = storage || [];
-	  
+	  JSUS.extend(node.NDDB, this);
+	  node.NDDB.call(this, options, db);
 	  this.set('state', GameBit.compareState);
-	  
 	};
 	
 	GameDB.prototype.add = function (player, key, value, state) {
-		var state = state || this.game.gameState;
+		var state = state || node.game.gameState;
 
 		this.insert(new GameBit({
 										player: player, 
@@ -2661,381 +2658,6 @@
 
 		return true;
 	};
-	
-//	GameDB.prototype.count = function (key) {
-//		var count = 0;
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var tmp = Utils.eval('this.' + key, this.storage[i]);
-//				if ('undefined' !== typeof tmp) {
-//					count++;
-//				}
-//			}
-//			catch (e) {};
-//		}	
-//		return count;
-//	};
-//	
-//	GameDB.prototype.sum = function (key) {
-//		var sum = 0;
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var tmp = Utils.eval('this.' + key, this.storage[i]);
-//				if (!isNaN(tmp)) {
-//					sum += tmp;
-//				}
-//			}
-//			catch (e) {};
-//		}	
-//		return sum;
-//	};
-//	
-//	GameDB.prototype.mean = function (key) {
-//		var sum = 0;
-//		var count = 0;
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var tmp = Utils.eval('this.' + key, this.storage[i]);
-//				if (!isNaN(tmp)) { 
-//					//console.log(tmp);
-//					sum += tmp;
-//					count++;
-//				}
-//			}
-//			catch (e) {};
-//		}	
-//		return (count === 0) ? 0 : sum / count;
-//	};
-//	
-//	GameDB.prototype.min = function (key) {
-//		var min = false;
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var tmp = Utils.eval('this.' + key, this.storage[i]);
-//				if (!isNaN(tmp) && tmp < min) {
-//					min = tmp;
-//				}
-//			}
-//			catch (e) {};
-//		}	
-//		return min;
-//	};
-//
-//	GameDB.prototype.max = function (key) {
-//		var max = false;
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var tmp = Utils.eval('this.' + key, this.storage[i]);
-//				if (!isNaN(tmp) && tmp < max) {
-//					max = tmp;
-//				}
-//			}
-//			catch (e) {};
-//		}	
-//		return max;
-//	};
-//	
-//	
-//	GameDB.prototype.map = function (func) {
-//		var result = [];
-//		for (var i=0; i < this.storage.length; i++) {
-//			result[i] = func.call(this.storage[i]);
-//		}	
-//		return result;
-//	};
-//	
-//	GameDB.prototype.forEach = function (func) {
-//		for (var i=0; i < this.storage.length; i++) {
-//			func.call(this.storage[i]);
-//		}	
-//	};
-//	
-
-//	
-//	// Sorting Operation
-//	
-//	GameDB.prototype.reverse = function () {
-//		return new GameDB(this.game, this.options, this.storage.reverse());
-//	};
-//	
-//	/**
-//	 * Sort the game storage according to a certain criteria. 
-//	 * If not criteria is passed sort by player name.
-//	 * 
-//	 */
-//	GameDB.prototype.sort = function(func) {
-//		var func = func || GameBit.comparePlayer;
-//		return new GameDB(this.game, this.options, this.storage.sort(func));
-//	};
-//	
-//	GameDB.prototype.sortByPlayer = function() {
-//		return this.storage.sort(GameBit.comparePlayer);
-//	}
-//	
-//	GameDB.prototype.sortByState = function() {
-//		return this.storage.sort(GameBit.compareState);
-//	}
-//	
-//	GameDB.prototype.sortByKey = function() {
-//		return this.storage.sort(GameBit.compareKey);
-//	}
-//	
-//	GameDB.prototype.sortByValue = function(key) {
-//		
-//		if (!key) {
-//			return this.storage.sort(GameBit.compareValue);
-//		}
-//		else {			
-//			var func = GameBit.compareValueByKey(key);
-//			return this.storage.sort(func);
-//		}
-//	};
-//	
-//	GameDB.prototype.dump = function (reverse) {
-//		return this.storage;
-//	};	
-//	
-//	GameDB.prototype.toString = function () {
-//		var out = '';
-//		for (var i=0; i< this.storage.length; i++) {
-//			out += this.storage[i] + '\n'
-//		}	
-//		return out;
-//	};	
-//	
-//	// Get Objects
-//	
-//	/**
-//	 * Retrieves specific information of combinations of the keys @client,
-//	 * @state, and @id
-//	 * 
-//	 */
-//	GameDB.prototype.get = function (gamebit) {
-//		if (!gamebit) return this.storage;
-//		var out = [];
-//		
-//		for (var i=0; i< this.storage.length; i++) {
-//			if (GameBit.compare(gamebit,this.storage[i])){
-//				out.push(this.storage[i]);
-//			}
-//		}	
-//		return new GameDB(this.game, this.options, out);		
-//	};
-//	
-//	GameDB.prototype.getByPlayer = function (player) {
-//		return this.get(new GameBit({player:player}));
-//	};
-//	
-//	GameDB.prototype.getByState = function (state) {
-//		return this.get(new GameBit({state:state}));
-//	};
-//	
-//	GameDB.prototype.getByKey = function (key) {
-//		return this.get(new GameBit({key:key}));
-//	};
-//	
-//	
-//	// TODO: users do not need to enter value. in case they want 
-//	// to access a property of the value obj
-//	GameDB.prototype.select = function (key, op, value) {
-//		if (!key) return this;
-//		
-//		// Verify input 
-//		if ('undefined' !== typeof op) {
-//			if ('undefined' === typeof value) {
-//				node.log('Query error. Missing value for operator: ' + key + ' ' + op + ' (?)', 'WARN');
-//				return false;
-//			}
-//			
-//			if (!Utils.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
-//				node.log('Query error. Invalid operator detected: ' + op, 'WARN');
-//				return false;
-//			}
-//			
-//			if (op === '=') op = '==';
-//			
-//		}
-//		else if ('undefined' !== typeof value) {
-//			node.log('Query error. Missing operator: ' + key + ' (?) ' + value , 'WARN');
-//			return false;
-//		}
-//		else {
-//			op = '';
-//			value = '';
-//		}
-//		
-//		// Define comparison function, state is a special case
-//		if (key === 'state') {
-//			var comparator = function (elem) {
-//				try {	
-//					if (Utils.eval(GameState.compare(elem.state, value) + op + 0,elem)) {
-//						return elem;
-//					}
-//				}
-//				catch(e) {
-//					console.log('Malformed select query: ' + key + op + value);
-//					return false;
-//				};
-//			};
-//		}
-//		else {
-//			var comparator = function (elem) {
-//				try {	
-//					if (Utils.eval('this.' + key + op + value, elem)) {
-//						return elem;
-//					}
-//				}
-//				catch(e) {
-//					console.log('Malformed select query: ' + key + op + value);
-//					return false;
-//				};
-//			}
-//		}
-//		
-//		return this.filter(comparator);
-//	};
-//	
-//	GameDB.prototype.filter = function (func) {
-//		return new GameDB(this.game, this.options, this.storage.filter(func));
-//	};
-//	
-//	// Get Values
-//
-//	GameDB.prototype.split = function () {
-//
-//		var out = [];
-//		
-//		for (var i=0; i < this.storage.length; i++) {
-//			out = out.concat(new GameBit(this.storage[i]).split());
-//		}	
-//		
-//		//console.log(out);
-//		
-//		return new GameDB(this.game, this.options, out);
-//	};
-//	
-//	
-//	GameDB.prototype.groupBy = function (id) {
-//		if (!id) return this.storage;
-//		
-//		var groups = [];
-//		var outs = [];
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var el = Utils.eval('this.'+id, this.storage[i]);
-//			}
-//			catch(e) {
-//				console.log('Malformed id ' + id);
-//				return false;
-//			};
-//						
-//			if (!Utils.in_array(el,groups)) {
-//				groups.push(el);
-//				
-//				var out = this.filter(function (elem) {
-//					if (Utils.eval('this.'+id,elem) === el) {
-//						return this;
-//					}
-//				});
-//				
-//				outs.push(out);
-//			}
-//			
-//		}
-//		
-//		//console.log(groups);
-//		
-//		return outs;
-//	};
-//	
-//	GameDB.prototype.join = function (key1, key2, newkey) {		
-//		return this._join(key1, key2, newkey, function(a,b) {return (a === b);});
-//	};
-//	
-//	GameDB.prototype.concat = function (key1, key2, newkey) {		
-//		return this._join(key1, key2, newkey, function(){ return true;});
-//	};
-//
-//	GameDB.prototype._join = function (key1, key2, newkey, condition) {
-//		
-//		var out = [];
-//		for (var i=0; i < this.storage.length; i++) {
-//			try {
-//				var foreign_key = Utils.eval('this.'+key1, this.storage[i]);
-//				if ('undefined' !== typeof foreign_key) { 
-//					for (var j=0; j < this.storage.length; j++) {
-//						if (i === j) continue;
-//						try {
-//							var key = Utils.eval('this.'+key2, this.storage[j]);
-//							if ('undefined' !== typeof key) { 
-//								if (condition(foreign_key, key)) {
-//									out.push(GameBit.join(this.storage[i], this.storage[j], newkey));
-//								}
-//							}
-//						}
-//						catch(e) {
-//							console.log('Malformed key: ' + key2);
-//							//return false;
-//						}
-//					}
-//				}
-//			}
-//			catch(e) {
-//				console.log('Malformed key: ' + key1);
-//				//return false;
-//			}
-//		}
-//		
-//		return new GameDB(this.game, this.options, out);
-//	};
-//	
-//	GameDB.prototype.fetch = function (key,array) {
-//		
-//		switch (key) {
-//			case 'VALUES':
-//				var func = (array) ? GameBit.prototype.getValuesArray :
-//									 GameBit.prototype.getValues ;
-//				break;
-//			case 'KEY_VALUES':
-//				var func = (array) ? GameBit.prototype.getKeyValuesArray : 
-//									 GameBit.prototype.getKeyValues; 
-//				break;
-//			default:
-//				if (!array) return this.storage;
-//				var func = GameBit.prototype.toArray;
-//		}
-//		
-//		var out = [];	
-//		for (var i=0; i < this.storage.length; i++) {
-//			out.push(func.call(new GameBit(this.storage[i])));
-//		}	
-//		
-//		//console.log(out);
-//		return out;
-//	};
-//	
-//	GameDB.prototype.fetchArray = function (key) {
-//		return this.fetch(key,true);
-//	};
-//	
-//	
-//	
-//	GameDB.prototype.fetchValues = function () {
-//		return this.fetch('VALUES');
-//	};
-//	
-//	GameDB.prototype.fetchKeyValues = function () {
-//		return this.fetch('KEY_VALUES');
-//	};
-//	
-//	GameDB.prototype.fetchValuesArray = function () {
-//		return this.fetchArray('VALUES');
-//	};
-//	
-//	GameDB.prototype.fetchKeyValuesArray = function () {
-//		return this.fetchArray('KEY_VALUES');
-//	};
-	
 	
 	/**
 	 * GameBit
@@ -3050,105 +2672,6 @@
 		this.key = options.key;
 		this.value = options.value;
 	};
-	
-//	GameBit.prototype.isComplex = function() {
-//		return ('object' === typeof this.value) ? true : false;
-//	};
-		
-//	GameBit.prototype.join = function(gb, newkey) {
-//		return GameBit.join(this, gb, newkey);
-//	};
-//		
-//	GameBit.join = function(gb1, gb2, newkey) {
-//		var value = {};
-//		value[gb1.key] = gb1.value;
-//		value[gb2.key] = gb2.value;
-//		
-//		return new GameBit({player: gb1.player,
-//							state: gb1.state,
-//							key: newkey || gb1.key,
-//							value: value
-//		});
-//	};
-	
-//	GameBit.prototype.split = function () {		
-//			
-//		
-//		if (!this.isComplex()) {
-//			return Utils.clone(this);;
-//		}
-//		
-//		var model = {};
-//		var out = [];
-//		
-//		if ('undefined' !== typeof this.player) {
-//			model.player = this.player;
-//		}
-//		
-//		if ('undefined' !== typeof this.state) {
-//			model.state = this.state;
-//		}
-//			
-//		if ('undefined' !== typeof this.key) {
-//			model.key = this.key;
-//		}
-//		
-//		var splitValue = function (value, model) {
-//			for (var i in value) {
-//				var copy = Utils.clone(model);
-//				copy.value = {};
-//				if (value.hasOwnProperty(i)) {
-//					if ('object' === typeof value[i]) {
-//						out = out.concat(splitValue(value[i], model));
-//					}
-//					else {
-//						copy.value[i] = value[i]; 
-//						out.push(copy);
-//					}
-//				}
-//			}
-//			return out;
-//		};
-//		
-//		return splitValue(this.value, model);
-//	};
-//	
-//	
-//	GameBit.prototype.getValues = function () {		
-//		return this.value;
-//	};
-//		
-//	GameBit.prototype.getKeyValues = function () {
-//		return {key: this.key, value: this.value};
-//	};
-//	
-//	GameBit.prototype.getValuesArray = function () {		
-//		return Utils.obj2KeyedArray(this.value);
-//	};
-//	
-//	GameBit.prototype.getKeyValuesArray = function () {
-//		return [this.key].concat(Utils.obj2KeyedArray(this.value));
-//	};
-//	
-//	
-//	GameBit.prototype.toArray = function () {
-//		
-//		var out = [];
-//		
-//		if ('undefined' !== typeof this.state) out.push(this.state);
-//		if ('undefined' !== typeof this.player) out.push(this.player);
-//		if ('undefined' !== typeof this.key) out.push(this.key);
-//		
-//		
-//		if (!this.isComplex()) {
-//			out.push(this.value);
-//		}
-//		else {
-//			out = out.concat(Utils.obj2KeyedArray(this.value));
-//		}
-//		
-//		return out;
-//	};
 	
 	
 	
@@ -3298,7 +2821,7 @@
 		
 		this.pl = new PlayerList();
 		
-		this.memory = new GameDB(this);
+		this.memory = new GameDB();
 		
 		var that = this;
 		var say = GameMsg.actions.SAY + '.';
@@ -3607,8 +3130,8 @@
 	
 
 	// Load the auxiliary library if available in the browser
+	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
 	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
-    if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
     
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
@@ -4009,12 +3532,12 @@
  
  
 /*!
- * nodeWindow v0.6.4.2
+ * nodeWindow v0.6.4.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 6 21:38:40 CET 2012
+ * Built on Sa 7. Jan 16:54:19 CET 2012
  *
  */
  
@@ -4451,13 +3974,23 @@
 	// TODO: get the last child. 
 	
 	GameWindow.prototype.write = function (text, root) {
-		if (!root) var root = this.root;
+		if (!root){
+			var root = document.getElementById(this.mainframe);
+			console.log('RRRRooot');
+			console.log(root);
+			console.log('RRRRooot LC');
+			console.log(root.lastChild);
+			root = root.lastChild || root;
+		}
 		if (!text) var text = '';
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		if (!root) var root = this.root;
+		if (!root){
+			var root = document.getElementById(this.mainframe);
+			root = root.lastChild || root;
+		}
 		if (!text) var text = '';
 		return this._writeln(root, text, br);
 	};
@@ -4966,16 +4499,9 @@
     };
     
     this.id = options.id || 'table';  
-
-//	if (options.root) {
-//		this.setRoot(options.root);
-//	}
-//	else {
-//		this.root = this.createRoot(this.id, options);
-//	}
-//	
-//	this.pointer = this.root; // Points to the last row added;
-//	this.odd = 'odd';
+    
+    this.header = null;
+    this.footer = null;
   };
   
   Table.prototype.addClass = function (c) {
@@ -5016,31 +4542,26 @@
 	return this;
   };
 	
-  Table.prototype.setRoot = function (root) {
-	  if (!root) return false;
-	  if (this.root && this.root.childNodes) {
-		  root.appendChild(children);
-	  }
-	  this.root = root;
-	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
-  };
+//  Table.prototype.setRoot = function (root) {
+//	  if (!root) return false;
+//	  if (this.root && this.root.childNodes) {
+//		  root.appendChild(children);
+//	  }
+//	  this.root = root;
+//	  this.id = ('undefined' !== typeof root.id) ? root.id : this.id;
+//  };
+//  
+//  Table.prototype.append = function(root) {
+//    return root.appendChild(this.root);
+//  };
   
-  Table.prototype.append = function(root) {
-    return root.appendChild(this.root);
-  };
   
-  
-  Table.prototype.createRoot = function (id, options) {
-    var root = document.createElement('table');
-    root.id = id;
-    return root;
-  };
-  
-  Table.prototype.addHeaderRow = function (data, attributes) {
-    var thead = document.createElement('thead');
-    return this.addRow(data, attributes, thead);
-  };
-  
+//  Table.prototype.createRoot = function (id, options) {
+//    var root = document.createElement('table');
+//    root.id = id;
+//    return root;
+//  };
+//    
 //  Table.prototype.addRow = function (data, attributes, container) {
 //    var row = document.createElement('tr');
 //    
@@ -5066,17 +4587,14 @@
 //    }
 //    
 //  };
-//  
-  Table.prototype.appendRow = function (row, addClass) {
-    var addClass = ('undefined' !== typeof addClass) ? addClass : true;
-    this.root.appendChild(row);
-    this.pointer = row;
-    if (addClass) {
-      row.className += this.id + '_' + this.odd;
-      this.odd = (this.odd == 'odd') ? 'even' : 'odd'; // toggle pointer to odd or even row
-    }
-    return row;
-  };
+  
+  Table.prototype.addHeader = function (header) {
+	  this.header = header;
+  }
+
+  Table.prototype.addFooter = function (footer) {
+	  this.footer = footer;
+  }
   
   Table._checkDim123 = function (dims) {
 	  var t = Table.H.slice(0);
@@ -5197,54 +4715,87 @@
   };
   
   // TODO: Only 2D for now
+  // TODO: improve algorithm, rewrite
   Table.prototype.parse = function() {
-	  var root = document.createElement('table');
-	  if (this.size() ===  0) return root;
 	  
-	  this.sort(['y','x']); // z to add first
-	  var trid = -1;
-	  // TODO: What happens if the are missing at the beginning ??
-	  var f = this.first();
-	  var old_x = f.x;
-	  // TODO: Do we need old_y and old_z ?
-	  var old_y = f.y;
-	  var old_z = f.z;
-	  console.log(this);
-	  for (var i=0; i < this.db.length; i++) {
-		  //if (this.db[i].x !==
-		  if (trid !== this.db[i].y) {
-			  var TR = document.createElement('tr');
-			  root.appendChild(TR);
-			  trid = this.db[i].y;
-			  //console.log(trid);
-			  old_x = f.x - 1; // must start exactly from the first
-//			  old_y = f.y - 1;
-//			  old_z = f.z - 1;
-		  }
-		  
-		  // Insert missing cells
-		  if (this.db[i].x > old_x + 1) {
-			  var diff = this.db[i].x - (old_x + 1);
-			  for (var j=0; j < diff; j++ ) {
-				  var TD = document.createElement('td');
-				  TD.setAttribute('class', this.missing);
-				  TR.appendChild(TD);
-			  }
-		  }
-		  // Normal Insert
-		  var TD = document.createElement('td');
-		  var c = this.db[i].content;
+	  var appendContent = function (td, c) {
+		  if (!td) return;
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-		  TD.appendChild(content);
-		  TR.appendChild(TD);
-		  
-		  // Update old refs
-		  old_x = this.db[i].x;
-//		  old_y = this.db[i].y;
-//		  old_z = this.db[i].z;
+		  td.appendChild(content);
+		  return td;
+	  };
+	  
+	  var TABLE = document.createElement('table');
+	  
+	  // HEADER
+	  if (this.header && this.header.length > 0) {
+		  var THEAD = document.createElement('thead');
+		  var TR = document.createElement('tr');
+		  for (var i=0; i < this.header.length; i++) {
+			  var TH = document.createElement('th');
+			  TH = appendContent(TH, this.header[i]);
+			  TR.appendChild(TH);
+		  }
+		  THEAD.appendChild(TR);
+		  i=0;
+		  TABLE.appendChild(THEAD);
 	  }
 	  
-	  return root;
+	  // BODY
+	  if (this.size() !==  0) {
+		  var TBODY = document.createElement('tbody');
+	  
+		  this.sort(['y','x']); // z to add first
+		  var trid = -1;
+		  // TODO: What happens if the are missing at the beginning ??
+		  var f = this.first();
+		  var old_x = f.x;
+
+		  for (var i=0; i < this.db.length; i++) {
+			  //if (this.db[i].x !==
+			  if (trid !== this.db[i].y) {
+				  var TR = document.createElement('tr');
+				  TBODY.appendChild(TR);
+				  trid = this.db[i].y;
+				  //console.log(trid);
+				  old_x = f.x - 1; // must start exactly from the first
+			  }
+			  
+			  // Insert missing cells
+			  if (this.db[i].x > old_x + 1) {
+				  var diff = this.db[i].x - (old_x + 1);
+				  for (var j=0; j < diff; j++ ) {
+					  var TD = document.createElement('td');
+					  TD.setAttribute('class', this.missing);
+					  TR.appendChild(TD);
+				  }
+			  }
+			  // Normal Insert
+			  var TD = document.createElement('td');
+			  TD = appendContent(TD, this.db[i].content);
+			  TR.appendChild(TD);
+			  
+			  // Update old refs
+			  old_x = this.db[i].x;
+		  }
+		  TABLE.appendChild(TBODY);
+	  }
+	 
+	  
+	  //FOOTER
+	  if (this.footer && this.footer.length > 0) {
+		  var TFOOT = document.createElement('tfoot');
+		  var TR = document.createElement('tr');
+		  for (var i=0; i < this.header.length; i++) {
+			  var TD = document.createElement('td');
+			  TD = appendContent(TD, this.footer[i]);
+			  TR.appendChild(TD);
+		  }
+		  TFOOT.appendChild(TR);
+		  TABLE.appendChild(TFOOT);
+	  }
+	  
+	  return TABLE;
   }
   
   // Cell Class
@@ -5268,12 +4819,12 @@
  
  
 /*!
- * nodeGadgets v0.6.4.2
+ * nodeGadgets v0.6.4.3
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 6 21:38:40 CET 2012
+ * Built on Sa 7. Jan 16:54:19 CET 2012
  *
  */
  

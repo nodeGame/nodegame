@@ -100,13 +100,23 @@
 	// TODO: get the last child. 
 	
 	GameWindow.prototype.write = function (text, root) {
-		if (!root) var root = this.root;
+		if (!root){
+			var root = document.getElementById(this.mainframe);
+			console.log('RRRRooot');
+			console.log(root);
+			console.log('RRRRooot LC');
+			console.log(root.lastChild);
+			root = root.lastChild || root;
+		}
 		if (!text) var text = '';
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		if (!root) var root = this.root;
+		if (!root){
+			var root = document.getElementById(this.mainframe);
+			root = root.lastChild || root;
+		}
 		if (!text) var text = '';
 		return this._writeln(root, text, br);
 	};

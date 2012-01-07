@@ -56,7 +56,6 @@
 	};
 	
 	NDDB.prototype.create = function (options, db) {
-		console.log('create func');
 		//In case the class was inherited
 		return new this.constructor(options, db);
 	};
