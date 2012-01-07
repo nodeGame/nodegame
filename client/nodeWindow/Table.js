@@ -82,13 +82,23 @@
 	return this;
   };
   
-  Table.prototype.addHeader = function (header) {
-	  this.header = header;
-  }
+  Table.prototype._addSpecial = function (data, type) {
+	if (!data) return;
+	var type = type || 'header';
+	var out = [];
+	for (var i=0; i < data.length; i++) {
+		out.push({content: data[i], type: type});
+	} 
+	return out;
+  };
+  
+  Table.prototype.setHeader = function (header) {
+	  this.header = this._addSpecial(header);
+  };
 
-  Table.prototype.addFooter = function (footer) {
-	  this.footer = footer;
-  }
+  Table.prototype.setFooter = function (footer) {
+	  this.footer = this._addSpecial(footer, 'footer');
+  };
   
   Table._checkDim123 = function (dims) {
 	  var t = Table.H.slice(0);
@@ -212,12 +222,23 @@
   // TODO: improve algorithm, rewrite
   Table.prototype.parse = function() {
 	  
-	  var appendContent = function (td, c) {
-		  if (!td) return;
+	  var fromCell2TD = function (cell, el) {
+		  if (!cell) return;
+		  var el = el || 'td';
+		  var TD = document.createElement(el);
+		  var c = cell.content;
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-		  td.appendChild(content);
-		  return td;
+		  TD.appendChild(content);
+		  if (cell.className) TD.className = cell.className;
+		  return TD;
 	  };
+	  
+//	  var appendContent = function (td, c) {
+//		  if (!td) return;
+//		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
+//		  td.appendChild(content);
+//		  return td;
+//	  };
 	  
 	  var TABLE = document.createElement('table');
 	  TABLE.id = this.id;
@@ -227,9 +248,7 @@
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  var TH = document.createElement('th');
-			  TH = appendContent(TH, this.header[i]);
-			  TR.appendChild(TH);
+			  TR.appendChild(fromCell2TD(this.header[i]),'th');
 		  }
 		  THEAD.appendChild(TR);
 		  i=0;
@@ -247,7 +266,6 @@
 		  var old_x = f.x;
 
 		  for (var i=0; i < this.db.length; i++) {
-			  //if (this.db[i].x !==
 			  if (trid !== this.db[i].y) {
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
@@ -261,14 +279,12 @@
 				  var diff = this.db[i].x - (old_x + 1);
 				  for (var j=0; j < diff; j++ ) {
 					  var TD = document.createElement('td');
-					  TD.setAttribute('class', this.missing);
+					  TD.className = this.missing;
 					  TR.appendChild(TD);
 				  }
 			  }
 			  // Normal Insert
-			  var TD = document.createElement('td');
-			  TD = appendContent(TD, this.db[i].content);
-			  TR.appendChild(TD);
+			  TR.appendChild(fromCell2TD(this.db[i]));
 			  
 			  // Update old refs
 			  old_x = this.db[i].x;
@@ -282,9 +298,7 @@
 		  var TFOOT = document.createElement('tfoot');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  var TD = document.createElement('td');
-			  TD = appendContent(TD, this.footer[i]);
-			  TR.appendChild(TD);
+			  TR.appendChild(fromCell2TD(this.footer[i]));
 		  }
 		  TFOOT.appendChild(TR);
 		  TABLE.appendChild(TFOOT);

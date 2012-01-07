@@ -3,13 +3,13 @@ table#exhibition {
 	border: 1px solid #CCC;
 }
 
-table#exhibition thead tr td, {
+table#exhibition thead tr th, {
   font-weight: bold;
   text-align: center;
 }
 
 table#exhibition tr {
-  border-bottom: 1px solid #CCC;
+  border: 1px solid #CCC;
 }
 
 table#exhibition tr:last-child  {
@@ -22,4 +22,28 @@ table#exhibition tr:last-child  {
 
 .exhibition_even   {
   background: #FFC;
+}
+
+table#exhibition .first {
+  background: yellow;	
+}
+
+table#exhibition .second {
+  background: grey; 
+}
+
+table#exhibition .third {
+  background: #CF4; 
+}
+
+table#exhibition .other {
+  background: white; 
+}
+
+table#exhibition .missing {
+  background: white; 
+}
+
+canvas {
+	background: white;
 }

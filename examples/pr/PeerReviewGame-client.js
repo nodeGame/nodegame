@@ -220,7 +220,7 @@ function PeerReviewGame () {
 			var root = node.window.getElementById('root');
 			
 			var table = new node.Table({id: 'exhibition'});
-			table.addHeader(['A', 'B', 'C']);
+			table.setHeader(this.exs);
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
@@ -269,13 +269,15 @@ function PeerReviewGame () {
 					node.window.write('No work was selected to be published in any exhibition', root);
 				}
 				
+				// Styling the table
+				table.select('y', '<', 1).addClass('first');
+				table.select('y', '<', 3).addClass('second');
+				table.select('y', '<', 5).addClass('third');
+				table.select('y', '>', 5).addClass('other');
 				
 				
-				console.log('Before Parsing');
-				console.log(table);
+				node.log(table.fetch());
 				root.appendChild(table.parse());
-				//alert('After Parsing');
-				//console.log(table.parse());
 				
 				this.timer.restart({
 									event: 'DONE',
