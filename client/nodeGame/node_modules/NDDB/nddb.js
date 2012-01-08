@@ -203,7 +203,7 @@
 				raiseError(d,op,value);
 			}
 			
-			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>'])) {
+			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>', 'in', '!in'])) {
 				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
@@ -213,13 +213,16 @@
 			}
 			
 			// Range-queries need an array as third parameter
-			if (op === '<>' || op === '><') {
+			if (JSUS.in_array(op,['><', '<>', 'in', '!in'])) {
 				if (!(value instanceof Array)) {
 					NDDB.log('Range-queries need an array as third parameter', 'WARN');
 					raiseError(d,op,value);
 				}
-				value[0] = JSUS.setNestedValue(d,value[0]);
-				value[1] = JSUS.setNestedValue(d,value[1]);
+				if (op === '<>' || op === '><') {
+					
+					value[0] = JSUS.setNestedValue(d,value[0]);
+					value[1] = JSUS.setNestedValue(d,value[1]);
+				}
 			}
 			else {
 				// Encapsulating the value;
@@ -276,16 +279,30 @@
 			}
 		};
 		
-		var notin = function (elem) {
+		var notbetween = function (elem) {
 			if (comparator(elem, value[0]) < 0 && comparator(elem, value[1] > 0)) {
+				return elem;
+			}
+		};
+		
+		var inarray = function (elem) {
+			if (JSUS.in_array(JSUS.getNestedValue(d,elem), value)) {
+				return elem;
+			}
+		};
+		
+		var notinarray = function (elem) {
+			if (!JSUS.in_array(JSUS.getNestedValue(d,elem), value)) {
 				return elem;
 			}
 		};
 		
 		switch (op) {
 			case (''): var func = exist; break;
-			case ('<>'): var func = notin; break;
+			case ('<>'): var func = notbetween; break;
 			case ('><'): var func = between; break;
+			case ('in'): var func = inarray; break;
+			case ('!in'): var func = notinarray; break;
 			default: var func = compare;
 		}
 		
