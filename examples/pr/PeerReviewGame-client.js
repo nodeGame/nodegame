@@ -182,7 +182,7 @@ function PeerReviewGame () {
 				 
 				
 				var evaId = 'eva_' + msg.data.from;
-				node.window.writeln(root);
+				node.window.writeln();
 				
 				// Add the slider to the container
 				evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);

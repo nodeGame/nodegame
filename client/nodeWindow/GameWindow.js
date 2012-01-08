@@ -19,9 +19,8 @@
 	
 	function GameWindow() {
 		
-		console.log('nodeWindow: loading...');
-		
 		if ('undefined' !== typeof node) {
+			node.log('nodeWindow: loading...');
 			var gsc = node.gsc || null;
 			var game = node.game || null;
 		}
@@ -96,28 +95,15 @@
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
 	
-	// Write should after the last element in mainframe. 
-	// TODO: get the last child. 
-	
-	GameWindow.prototype.write = function (text, root) {
-		if (!root){
-			var root = document.getElementById(this.mainframe);
-			console.log('RRRRooot');
-			console.log(root);
-			console.log('RRRRooot LC');
-			console.log(root.lastChild);
-			root = root.lastChild || root;
-		}
-		if (!text) var text = '';
+	GameWindow.prototype.write = function (text, root) {		
+		var root = root || this.frame.body;
+		root = root.lastElementChild || root;
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		if (!root){
-			var root = document.getElementById(this.mainframe);
-			root = root.lastChild || root;
-		}
-		if (!text) var text = '';
+		var root = root || this.frame.body;
+		root = root.lastElementChild || root;
 		return this._writeln(root, text, br);
 	};
 	

@@ -1,40 +1,64 @@
 <!doctype html>
+<body>
 <div id="ah">
 <div id="ih"></div>
 </div>
+<iframe id="mainframe" name="mainframe">
+	<html>
+		<body>
+			<h2>AHAH</h2>
+			<div>cacca</div>
+			mamama
+			dewdewdw
+		</body>
+	</html>
+</iframe>
+
 <script src="http://localhost:8080/socket.io/socket.io.js"></script> 
 <script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
-
 <!--  
 <script type="text/javascript" charset="utf-8" source="../client/nodeGame/node_modules/JSUS/jsus.js"></script>
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/node_modules/NDDB/nddb.js"></script>
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
  -->
 <script>
+window.onload = function() {
+	 
+// 	 node.window.writeln('ee1');
+// 	 node.window.write('ee2');
+// 	 node.window.write('ee3');
+// 	 node.window.write('ee4');
+  b = window.frames['mainframe'].document;
+  console.log(b.body);
+  while (b) {
+	  console.log(b);
+	  b = b.lastChild;
+  }
+  
+  
+	 a = document.getElementById('mainframe').document;
+	 console.log(a);
+	 //a.appendChild(document.createTextNode('uu'));
+	 
+};
+// var tn = document.createTextNode('uh');
 
-document.getElementById('ah').appendChild(document.createTextNode('ih'));
-node.window.write('culo', document.getElementById('ah'));
+// console.log(document.getElementById('ah').lastElement);
 
-console.log(document.getElementById('ah').lastChild());
+// console.log(document.getElementById('ah').lastChild.parentNode.parentNode.parentNode.parentNode.parentNode);
 
-var data = ['a',1]; 
-var dims = ['x','y','z'];
+// u.appendChild(tn);
 
-var t = new node.Table({});
+// console.log(JSUS.isElement(document.getElementById('ah').lastChild));
+// console.log(JSUS.isElement(document.getElementById('ah')));
 
-// t._add(data, dims);
-// t._add(data, dims);
-// t._add(data, dims);
-t.addColumn([0]);
-t.addColumn([1,'a']);
-t.addColumn([2]);
-t.addColumn([3,'c','s']);
-t.addColumn([3]);
+// document.getElementById('ah').lastChild.appendChild(tn);
 
-//console.log(t.pointers);
-//console.log(t.fetch());
+// console.log(document.getElementById('ah').lastChild);
 
-document.getElementById('ah').appendChild(t.parse());
+// node.window.write('culo');
 
 
 </script>
+</body>
+</html>

@@ -11,13 +11,26 @@
 	}
 	
 	//Returns true if it is a DOM element    
-	DOM.isElement = function(o){
+	DOM.isElement = function(o) {
 	  return (
 	    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
 	    typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
 	  );
 	}
 
+//	DOM.findLastElement = function(o) {
+//		if (!o) return;
+//		
+//		if (o.lastChild) {
+//			var e 
+//			JSUS.isElement(e)) return DOM.findLastElement(e);
+//		
+//			var e = e.previousSibling;
+//			if (e && JSUS.isElement(e)) return DOM.findLastElement(e);
+//		
+//		return o;
+//	};
+	
 	JSUS.extend(DOM);
 	
 })('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS);

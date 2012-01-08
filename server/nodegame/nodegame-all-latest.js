@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Jan 7 20:03:09 CET 2012
+ * Built on Sun Jan 8 13:46:07 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Jan 7 20:03:09 CET 2012
+ * Built on Sun Jan 8 13:46:07 CET 2012
  *
  */
  
@@ -677,13 +677,26 @@
 	}
 	
 	//Returns true if it is a DOM element    
-	DOM.isElement = function(o){
+	DOM.isElement = function(o) {
 	  return (
 	    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
 	    typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
 	  );
 	}
 
+//	DOM.findLastElement = function(o) {
+//		if (!o) return;
+//		
+//		if (o.lastChild) {
+//			var e 
+//			JSUS.isElement(e)) return DOM.findLastElement(e);
+//		
+//			var e = e.previousSibling;
+//			if (e && JSUS.isElement(e)) return DOM.findLastElement(e);
+//		
+//		return o;
+//	};
+	
 	JSUS.extend(DOM);
 	
 })('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
@@ -3537,7 +3550,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Jan 7 20:03:09 CET 2012
+ * Built on Sun Jan 8 13:46:07 CET 2012
  *
  */
  
@@ -3669,8 +3682,12 @@
 	
 	Document.prototype.write = function (root, text) {
 		if (!root) return;
-		var text = (text) ? text : '';
+		if (!text) return;
 		var tn = document.createTextNode(text);
+		console.log('ROOT');
+		console.log(root);
+		console.log('TEXT');
+		console.log(text);
 		root.appendChild(tn);
 		return tn;
 	};
@@ -3678,7 +3695,7 @@
 	Document.prototype.writeln = function (root, text, rc) {
 		if (!root) return;
 		var br = this.addBreak(root, rc);
-		return (text) ? this.write(root, text) : br;
+		return (text) ? Document.prototype.write(root, text) : br;
 	};
 	
 	// IFRAME
@@ -3893,9 +3910,8 @@
 	
 	function GameWindow() {
 		
-		console.log('nodeWindow: loading...');
-		
 		if ('undefined' !== typeof node) {
+			node.log('nodeWindow: loading...');
 			var gsc = node.gsc || null;
 			var game = node.game || null;
 		}
@@ -3970,28 +3986,15 @@
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
 	
-	// Write should after the last element in mainframe. 
-	// TODO: get the last child. 
-	
-	GameWindow.prototype.write = function (text, root) {
-		if (!root){
-			var root = document.getElementById(this.mainframe);
-			console.log('RRRRooot');
-			console.log(root);
-			console.log('RRRRooot LC');
-			console.log(root.lastChild);
-			root = root.lastChild || root;
-		}
-		if (!text) var text = '';
+	GameWindow.prototype.write = function (text, root) {		
+		var root = root || this.frame.body;
+		root = root.lastElementChild || root;
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		if (!root){
-			var root = document.getElementById(this.mainframe);
-			root = root.lastChild || root;
-		}
-		if (!text) var text = '';
+		var root = root || this.frame.body;
+		root = root.lastElementChild || root;
 		return this._writeln(root, text, br);
 	};
 	
@@ -4793,7 +4796,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sat Jan 7 20:03:09 CET 2012
+ * Built on Sun Jan 8 13:46:07 CET 2012
  *
  */
  
