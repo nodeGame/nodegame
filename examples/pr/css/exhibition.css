@@ -1,5 +1,5 @@
 table#exhibition {
-	width: 700px;
+	width: 800px;
 	border: 1px solid #CCC;
 }
 
@@ -9,7 +9,7 @@ table#exhibition thead tr th, {
 }
 
 table#exhibition tr {
-  border: 1px solid #CCC;
+  border: 1px solid black;
 }
 
 table#exhibition tr:last-child  {
@@ -25,23 +25,19 @@ table#exhibition tr:last-child  {
 }
 
 table#exhibition .first {
-  background: yellow;	
+  background: #ffffaa;	
 }
 
 table#exhibition .second {
-  background: grey; 
+  background: #eeeeee; 
 }
 
 table#exhibition .third {
-  background: #CF4; 
+ background: #ffdd66; 
 }
 
 table#exhibition .other {
-  background: white; 
-}
-
-table#exhibition .missing {
-  background: white; 
+  background: #CCC; 
 }
 
 canvas {

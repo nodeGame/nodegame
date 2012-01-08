@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 14:10:54 CET 2012
+ * Built on Sun Jan 8 15:30:54 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 14:10:54 CET 2012
+ * Built on Sun Jan 8 15:30:54 CET 2012
  *
  */
  
@@ -906,7 +906,7 @@
 				raiseError(d,op,value);
 			}
 			
-			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>'])) {
+			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>', 'in', '!in'])) {
 				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
@@ -914,16 +914,23 @@
 			if (op === '=') {
 				op = '==';
 			}
+			
 			// Range-queries need an array as third parameter
-			else if (op === '<>' || op === '><') {
-				if (!value instanceof Array) {
-					console.log('cas');
+			if (JSUS.in_array(op,['><', '<>', 'in', '!in'])) {
+				if (!(value instanceof Array)) {
+					NDDB.log('Range-queries need an array as third parameter', 'WARN');
 					raiseError(d,op,value);
 				}
+				if (op === '<>' || op === '><') {
+					
+					value[0] = JSUS.setNestedValue(d,value[0]);
+					value[1] = JSUS.setNestedValue(d,value[1]);
+				}
 			}
-			
-			// Encapsulating the value;
-			value = JSUS.setNestedValue(d,value);
+			else {
+				// Encapsulating the value;
+				value = JSUS.setNestedValue(d,value);
+			}
 		}
 		else if ('undefined' !== typeof value) {
 			raiseError(d,op,value);
@@ -970,24 +977,35 @@
 		};
 		
 		var between = function (elem) {
-			try {	
-//				console.log(elem);
-//				console.log(value);
-				if (JSUS.eval(comparator(elem, value[0]) + op[0] + 0, elem)) {
-					if (JSUS.eval(comparator(elem, value[1]) + op[1] + 0, elem)) {
-					return elem;
-					}
-				}
+			if (comparator(elem, value[0]) > 0 && comparator(elem, value[1]) < 0) {
+				return elem;
 			}
-			catch(e) {
-				NDDB.log('Malformed select-range query: ' + d + op + value);
-				return false;
-			};
+		};
+		
+		var notbetween = function (elem) {
+			if (comparator(elem, value[0]) < 0 && comparator(elem, value[1] > 0)) {
+				return elem;
+			}
+		};
+		
+		var inarray = function (elem) {
+			if (JSUS.in_array(JSUS.getNestedValue(d,elem), value)) {
+				return elem;
+			}
+		};
+		
+		var notinarray = function (elem) {
+			if (!JSUS.in_array(JSUS.getNestedValue(d,elem), value)) {
+				return elem;
+			}
 		};
 		
 		switch (op) {
 			case (''): var func = exist; break;
-			case ('<>' || '><'): var func = between; break;
+			case ('<>'): var func = notbetween; break;
+			case ('><'): var func = between; break;
+			case ('in'): var func = inarray; break;
+			case ('!in'): var func = notinarray; break;
 			default: var func = compare;
 		}
 		
@@ -3518,7 +3536,8 @@
 		}, Math.random()*timing, func);
 	}
 	
-	node.replay = function() {
+	node.replay = function (reset) {
+		if (reset) node.game.memory.clear(true);
 		node.goto(new GameState({state: 1, step: 1, round: 1}));
 	}
 	
@@ -3579,7 +3598,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 14:10:54 CET 2012
+ * Built on Sun Jan 8 15:30:54 CET 2012
  *
  */
  
@@ -4825,7 +4844,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 14:10:54 CET 2012
+ * Built on Sun Jan 8 15:30:55 CET 2012
  *
  */
  

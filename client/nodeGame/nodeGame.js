@@ -358,7 +358,8 @@
 		}, Math.random()*timing, func);
 	}
 	
-	node.replay = function() {
+	node.replay = function (reset) {
+		if (reset) node.game.memory.clear(true);
 		node.goto(new GameState({state: 1, step: 1, round: 1}));
 	}
 	

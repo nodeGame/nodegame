@@ -1,3 +1,10 @@
+6.5
+
+- NDDB in, !in, <> and >< select queries added
+- GameWindow write and writeln methods bugs fixed 
+- Table addClass method
+- NDDB objects are returned based on the constructor
+
 6.3.4
 
 - GameWindow uses JSUS.getNestedValue to load nested widgets

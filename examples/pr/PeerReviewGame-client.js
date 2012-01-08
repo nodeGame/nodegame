@@ -220,7 +220,8 @@ function PeerReviewGame () {
 			var root = node.window.getElementById('root');
 			
 			var table = new node.Table({id: 'exhibition'});
-			table.setHeader(this.exs);
+			table.setHeader(['','A','B','C']);
+			table.addColumn([1,2,3]);
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
@@ -239,9 +240,8 @@ function PeerReviewGame () {
 							
 							
 								var details_tbl = new node.Table();
-								details_tbl.addColumn(['Exhibition: ' + winners[i].ex,
-								                       'Author: ' + winners[i].author,
-								                       'Mean Evaluation: ' + winners[i].mean
+								details_tbl.addColumn(['Author: ' + winners[i].author,
+								                       'Score: ' + winners[i].mean
 								]);
 								
 								var cf_options = { id: 'cf_' + winners[i].player,
@@ -255,13 +255,13 @@ function PeerReviewGame () {
 								var container = document.createElement('div');
 								
 								var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-								column.push(details_tbl.parse());
-								column.push(container);	
+								container.appendChild(details_tbl.parse());
+								column.push(container);
 							}
 							table.addColumn(column);
 						}
 						else {
-							table.addColumn(['No creation was selected for exhibition ' + this.exs[j],'']);
+							table.addColumn(['No creation was selected for exhibition ' + this.exs[j]]);
 						}
 					}
 				}
@@ -270,10 +270,10 @@ function PeerReviewGame () {
 				}
 				
 				// Styling the table
-				table.select('y', '<', 1).addClass('first');
-				table.select('y', '<', 3).addClass('second');
-				table.select('y', '<', 5).addClass('third');
-				table.select('y', '>', 5).addClass('other');
+				table.select('y', '=', 0).addClass('first');
+				table.select('y', '=', 1).addClass('second');
+				table.select('y', '=', 2).addClass('third');
+				table.select('y', '>', 2).addClass('other');
 				
 				
 				node.log(table.fetch());
