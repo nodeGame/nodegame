@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.4.4
+ * nodeGame-all v0.6.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 13:46:07 CET 2012
+ * Built on Sun Jan 8 14:10:54 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.4.4
+ * nodeGame Client v0.6.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 13:46:07 CET 2012
+ * Built on Sun Jan 8 14:10:54 CET 2012
  *
  */
  
@@ -906,13 +906,20 @@
 				raiseError(d,op,value);
 			}
 			
-			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>'])) {
 				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
 			
 			if (op === '=') {
 				op = '==';
+			}
+			// Range-queries need an array as third parameter
+			else if (op === '<>' || op === '><') {
+				if (!value instanceof Array) {
+					console.log('cas');
+					raiseError(d,op,value);
+				}
 			}
 			
 			// Encapsulating the value;
@@ -962,7 +969,29 @@
 			};
 		};
 		
-		return this.filter((op === '') ? exist : compare);
+		var between = function (elem) {
+			try {	
+//				console.log(elem);
+//				console.log(value);
+				if (JSUS.eval(comparator(elem, value[0]) + op[0] + 0, elem)) {
+					if (JSUS.eval(comparator(elem, value[1]) + op[1] + 0, elem)) {
+					return elem;
+					}
+				}
+			}
+			catch(e) {
+				NDDB.log('Malformed select-range query: ' + d + op + value);
+				return false;
+			};
+		};
+		
+		switch (op) {
+			case (''): var func = exist; break;
+			case ('<>' || '><'): var func = between; break;
+			default: var func = compare;
+		}
+		
+		return this.filter(func);
 	};
 	
 	NDDB.prototype.filter = function (func) {
@@ -3545,12 +3574,12 @@
  
  
 /*!
- * nodeWindow v0.6.4.4
+ * nodeWindow v0.6.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 13:46:07 CET 2012
+ * Built on Sun Jan 8 14:10:54 CET 2012
  *
  */
  
@@ -4791,12 +4820,12 @@
  
  
 /*!
- * nodeGadgets v0.6.4.4
+ * nodeGadgets v0.6.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 13:46:07 CET 2012
+ * Built on Sun Jan 8 14:10:54 CET 2012
  *
  */
  

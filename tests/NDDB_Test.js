@@ -126,6 +126,8 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
+//console.log(nddb.fetch());
+
 //var v = nddb.select('key','=','x');
 //console.log(v);
 
@@ -158,6 +160,9 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.sort(['state','value.r']);
 //console.log(v.fetch());
 
-var v = nddb.select('state', '=', new GameState({state:1}));
-console.log(v.fetch());
+//var v = nddb.select('value.r', '<>', [0.2,0.9]);
+//console.log(v.fetch());
 
+
+var v = nddb.select('value.r', '><', [0.4,0.5]);
+console.log(v.fetchValues());

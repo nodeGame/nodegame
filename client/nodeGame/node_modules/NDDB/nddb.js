@@ -203,7 +203,7 @@
 				raiseError(d,op,value);
 			}
 			
-			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '==='])) {
+			if (!JSUS.in_array(op, ['>','>=','>==','<', '<=', '<==', '!=', '!==', '=', '==', '===', '><', '<>'])) {
 				NDDB.log('Query error. Invalid operator detected: ' + op, 'WARN');
 				return false;
 			}
@@ -212,8 +212,19 @@
 				op = '==';
 			}
 			
-			// Encapsulating the value;
-			value = JSUS.setNestedValue(d,value);
+			// Range-queries need an array as third parameter
+			if (op === '<>' || op === '><') {
+				if (!(value instanceof Array)) {
+					NDDB.log('Range-queries need an array as third parameter', 'WARN');
+					raiseError(d,op,value);
+				}
+				value[0] = JSUS.setNestedValue(d,value[0]);
+				value[1] = JSUS.setNestedValue(d,value[1]);
+			}
+			else {
+				// Encapsulating the value;
+				value = JSUS.setNestedValue(d,value);
+			}
 		}
 		else if ('undefined' !== typeof value) {
 			raiseError(d,op,value);
@@ -259,7 +270,26 @@
 			};
 		};
 		
-		return this.filter((op === '') ? exist : compare);
+		var between = function (elem) {
+			if (comparator(elem, value[0]) > 0 && comparator(elem, value[1]) < 0) {
+				return elem;
+			}
+		};
+		
+		var notin = function (elem) {
+			if (comparator(elem, value[0]) < 0 && comparator(elem, value[1] > 0)) {
+				return elem;
+			}
+		};
+		
+		switch (op) {
+			case (''): var func = exist; break;
+			case ('<>'): var func = notin; break;
+			case ('><'): var func = between; break;
+			default: var func = compare;
+		}
+		
+		return this.filter(func);
 	};
 	
 	NDDB.prototype.filter = function (func) {
