@@ -29,6 +29,8 @@
 		}
 		
 		Document.call(this);
+		
+		this.frame = null;
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
 		
@@ -198,11 +200,11 @@
 	
 	
 	GameWindow.prototype.getElementById = function (id) {
-		return this.frame.getElementById(id);
+		return (this.frame) ? this.frame.getElementById(id) : document.getElementById(id);
 	};
 	
 	GameWindow.prototype.getElementsByTagName = function (tag) {
-		return this.frame.getElementsByTagName(tag);
+		return (this.frame) ? this.frame.getElementsByTagName(tag) : document.getElementsByTagName(tag);
 	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {

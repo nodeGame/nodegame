@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 15:30:54 CET 2012
+ * Built on Mo 9. Jan 14:27:42 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 15:30:54 CET 2012
+ * Built on Mo 9. Jan 14:27:42 CET 2012
  *
  */
  
@@ -1341,7 +1341,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -3598,7 +3598,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 15:30:54 CET 2012
+ * Built on Mo 9. Jan 14:27:42 CET 2012
  *
  */
  
@@ -3968,6 +3968,8 @@
 		}
 		
 		Document.call(this);
+		
+		this.frame = null;
 		this.mainframe = 'mainframe';
 		this.root = this.generateRandomRoot();
 		
@@ -4137,11 +4139,11 @@
 	
 	
 	GameWindow.prototype.getElementById = function (id) {
-		return this.frame.getElementById(id);
+		return (this.frame) ? this.frame.getElementById(id) : document.getElementById(id);
 	};
 	
 	GameWindow.prototype.getElementsByTagName = function (tag) {
-		return this.frame.getElementsByTagName(tag);
+		return (this.frame) ? this.frame.getElementsByTagName(tag) : document.getElementsByTagName(tag);
 	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
@@ -4844,7 +4846,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 8 15:30:55 CET 2012
+ * Built on Mo 9. Jan 14:27:42 CET 2012
  *
  */
  
@@ -5011,7 +5013,11 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		this.sc.init({features: Utils.mergeOnValue(FaceVector.defaults, fv)});
+		var sc_options = {
+				features: Utils.mergeOnValue(FaceVector.defaults, fv),
+				change: this.change
+		};
+		this.sc.init(sc_options);
 		this.sc.refresh();
 		return true;
 	};
@@ -5553,10 +5559,17 @@
 //		else {		
 //			this.list = new node.window.List(this.id);
 //		}
+		
+		console.log('OP SC');
+		console.log(options);
+		
 		this.hasChanged = false; // TODO: should this be inherited?
 		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
+		
+		console.log('CHANGEEVENT');
+		console.log(this.changeEvent);
 		
 		if (!options.features) return;
 		

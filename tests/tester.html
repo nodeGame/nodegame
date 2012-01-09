@@ -1,19 +1,7 @@
 <!doctype html>
 <body>
-<div id="ah">
-<div id="ih"></div>
-</div>
-<iframe id="mainframe" name="mainframe">
-	<html>
-		<body>
-			<h2>AHAH</h2>
-			<div>cacca</div>
-			mamama
-			dewdewdw
-		</body>
-	</html>
-</iframe>
-
+<h2>Chernoff Faces Test</h2>
+<div id="root"></div>
 <script src="http://localhost:8080/socket.io/socket.io.js"></script> 
 <script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
 <!--  
@@ -22,43 +10,28 @@
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
  -->
 <script>
-window.onload = function() {
-	 
-// 	 node.window.writeln('ee1');
-// 	 node.window.write('ee2');
-// 	 node.window.write('ee3');
-// 	 node.window.write('ee4');
-  b = window.frames['mainframe'].document;
-  console.log(b.body);
-  while (b) {
-	  console.log(b);
-	  b = b.lastChild;
-  }
-  
-  
-	 a = document.getElementById('mainframe').document;
-	 console.log(a);
-	 //a.appendChild(document.createTextNode('uu'));
-	 
-};
-// var tn = document.createTextNode('uh');
+window.onload = function(){
+	
+	// Create the Client
+      
+    var conf = {
+      name: "P_" + Math.floor(Math.random()*100),
+      url: "http://localhost:8080/pr"
+    };
 
-// console.log(document.getElementById('ah').lastElement);
+    node.play(conf, {});
+	
+	var root = node.window.getElementById('root');
+	var cf_options = { 
+	                   id: 'cf',
+						         width: 500,
+						         height: 500
+	};
+	
+	
+	this.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
 
-// console.log(document.getElementById('ah').lastChild.parentNode.parentNode.parentNode.parentNode.parentNode);
-
-// u.appendChild(tn);
-
-// console.log(JSUS.isElement(document.getElementById('ah').lastChild));
-// console.log(JSUS.isElement(document.getElementById('ah')));
-
-// document.getElementById('ah').lastChild.appendChild(tn);
-
-// console.log(document.getElementById('ah').lastChild);
-
-// node.window.write('culo');
-
-
+}
 </script>
 </body>
 </html>
