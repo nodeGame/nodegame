@@ -41,16 +41,10 @@
 //			this.list = new node.window.List(this.id);
 //		}
 		
-		console.log('OP SC');
-		console.log(options);
-		
 		this.hasChanged = false; // TODO: should this be inherited?
 		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
-		
-		console.log('CHANGEEVENT');
-		console.log(this.changeEvent);
 		
 		if (!options.features) return;
 		

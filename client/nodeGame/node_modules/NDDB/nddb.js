@@ -65,11 +65,32 @@
 			this.db = [];
 		}
 		else {
-			NDDB.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
+			NDDB.log('Do you really want to clear the current dataset? Please use clear(true)', 'WARN');
 		}
 		
 		return confirm;
 	};	
+	
+	NDDB.prototype.delete = function (confirm) {
+		if (confirm) {
+			//this.db.slice(0,this.size());
+//			for (var i=0; i < this.db.length; i++) {
+//				this.db[i] = ['a'];
+//			}
+			// TODO: Why is this working only if I change the property of an object
+			// not if I delete, or change the object???
+			this.forEach(function (el) {
+				el = 1;
+			});
+			this.db = [];
+		}
+		else {
+			NDDB.log('Do you really want to delete all the records? Please use delete(true)', 'WARN');
+		}
+		
+		return confirm;
+	};	
+	
 	
 	NDDB.prototype.cloneSettings = function () {
 		if (!this.options) return {};
@@ -311,6 +332,12 @@
 	
 	NDDB.prototype.filter = function (func) {
 		return this.create(this.cloneSettings(), this.db.filter(func));
+	};
+	
+	
+	NDDB.prototype.shuffle = function () {
+		this.db = JSUS.shuffle(this.db);
+		return true;
 	};
 	
 	// HERE

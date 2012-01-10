@@ -1,114 +1,83 @@
 (function (exports, node) {
 	
+	var GameState = node.GameState;
+	var Utils = node.Utils;
+	
 	/*
 	 * Holds information about the list of players.
 	 *
 	 */
 	
-	var JSUS = node.Utils;
-	var NDDB = node.NDDB;
-		
-	var GameState = node.GameState;
-	
 	/**
-	 * Expose constructors
+	 * Expose constructor
 	 */
 	exports.PlayerList = PlayerList;
-
-	/**
-	 * PlayerList interface
-	 *
-	 * @api public
-	 */
 	
-	function PlayerList (options, list) {
-	  var options = options || {};
-	  // Inheriting from NDDB	
-	  JSUS.extend(node.NDDB, this);
-	  node.NDDB.call(this, options, db);
-	  //this.set('state', GameBit.compareState);
-	  this.count = 0;
-	};
+	function PlayerList(list) {
+		
+		this.pl = list || {};
+		
+		this.size = function() {
+			return Utils.getListSize(this.pl);
+		};
+				
+	//	console.log('This is the size ' + this.size());
 	
-	GameDB.prototype.add = function (player, key, value, state) {
-		var state = state || node.game.gameState;
-
-		this.insert(new GameBit({
-										player: player, 
-										key: key,
-										value: value,
-										state: state
-		}));
-
-		return true;
-	};
+	}
 	
-
-	// TODO: Deprecated, remove once transition is completed
-	PlayerList.prototype.addPlayer = function (player) {
-		return this.add(player);
-	};
+	exports.PlayerList.prototype.importIDS = function(arrayIDS) {
 	
-	PlayerList.prototype.add = function (player) {
-		if (!player || !player.id) return;
-
-		// Check if the id is unique
-		if (this.exist(player)) {
-			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
-			return false;
+		var PREFIX = 'P_';
+		var i = this.size();
+		var j = 0;
+		for (;j<arrayIDS.length;j++){
+			this.add(arrayIDS[j],'P_' + ++i);
 		}
+	};
 		
-		this.insert(new Player({
-								id: player.id,
-								name: player.name,
-								count: this.count
-		}));
-		this.count++;
-		return true;
-		
-			
-		
+	PlayerList.prototype.addPlayer = function (player) {
+		if (!player) return false;
+		return this.add(player.id, player.name);
 	};
 	
-
-//	exports.PlayerList.prototype.importIDS = function(arrayIDS) {
-//	
-//		var PREFIX = 'P_';
-//		var i = this.size();
-//		var j = 0;
-//		for (;j<arrayIDS.length;j++){
-//			this.add(arrayIDS[j],'P_' + ++i);
-//		}
-//	};
-		
+	PlayerList.prototype.add = function (pid,name) {	
+		// Check if the id is unique
+		if (!this.exist(pid)) {
+			this.pl[pid] = new Player({id: pid, name: name});
+			//console.log('Added Player ' + this.pl[pid]);
+			return true;
+		}
+			
+		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
+		return false;
+	};
 	
-	
-	PlayerList.prototype.remove = function (player) {	
+	PlayerList.prototype.remove = function (pid) {	
 		// Check if the id exists
-		if (this.exist(player)) {
-			delete this.pl[id];
+		if (this.exist(pid)) {
+			delete this.pl[pid];
 		
 			return true;
 		}
 		
-		node.log('Attempt to remove a non-existing player from the the player list', 'ERR');
+		console.log('E: Attempt to remove a non-existing player from the the player list');
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (id) {	
+	PlayerList.prototype.get = function (pid) {	
 		// Check if the id exists
-		if (this.exist(id)) {
-			return this.pl[id];
+		if (this.exist(pid)) {
+			return this.pl[pid];
 		}
 		
-		node.log('Attempt to access a non-existing player from the the player list ' + id, 'ERR');
+		console.log('W: Attempt to access a non-existing player from the the player list ' + pid);
 		return false;
 	};
 	
-	PlayerList.prototype.pop = function (id) {	
-		var p = this.get(id);
+	PlayerList.prototype.pop = function (pid) {	
+		var p = this.get(pid);
 		if (p) {
-			this.remove(id);
+			this.remove(pid);
 		}
 		return p;
 	};
@@ -128,8 +97,8 @@
 	
 	PlayerList.prototype.updatePlayer = function (player) {
 		
-		if (this.exist(id)) {
-			this.pl[id] = player;
+		if (this.exist(pid)) {
+			this.pl[pid] = player;
 		
 			return true;
 		}
@@ -138,9 +107,9 @@
 		return false;
 	};
 	
-	PlayerList.prototype.updatePlayerState = function (id, state) {
+	PlayerList.prototype.updatePlayerState = function (pid, state) {
 				
-		if (!this.exist(id)) {
+		if (!this.exist(pid)) {
 			console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
 			return false;	
 		}
@@ -152,16 +121,16 @@
 		
 		//console.log(this.pl);
 		
-		this.pl[id].state = state;	
+		this.pl[pid].state = state;	
 	
 		return true;
 	};
 	
-	PlayerList.prototype.exist = function (id) {
-		return (this.select('id', '=', id).count() > 0) ? true : false;
+	PlayerList.prototype.exist = function (pid) {
+		return (typeof(this.pl[pid]) !== 'undefined') ? true : false;
 	};
 	
-	// Returns an array of array of n groups of players {id: name}
+	// Returns an array of array of n groups of players {pid: name}
 	//The last group could have less elements.
 	PlayerList.prototype.getNGroups = function (n) {
 		
@@ -198,7 +167,7 @@
 		return result;
 	};
 	
-	// Returns an array of array of groups of n players {id: name};
+	// Returns an array of array of groups of n players {pid: name};
 	// The last group could have less elements.
 	PlayerList.prototype.getGroupsSizeN = function (n) {
 		// TODO: getGroupsSizeN
@@ -349,26 +318,24 @@
 	exports.Player = Player;
 	
 	function Player (pl) {
-		var pl = pl || {};
 		
+		// PRIVATE variables
 		this.id = pl.id;
-		this.count = pl.count;
 		this.name = pl.name;
 		this.state = pl.state || new GameState();
-		this.ip = pl.ip;
 	}
 	
-//	Player.prototype.getId = function() {
-//		return this.id;
-//	};
-//	
-//	Player.prototype.getName = function() {
-//		return this.name;
-//	};
-//	
-//	Player.prototype.updateState = function (state) {
-//		this.state = state;
-//	};
+	Player.prototype.getId = function() {
+		return this.id;
+	};
+	
+	Player.prototype.getName = function() {
+		return this.name;
+	};
+	
+	Player.prototype.updateState = function (state) {
+		this.state = state;
+	};
 	
 	Player.prototype.toString = function() {
 		var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);

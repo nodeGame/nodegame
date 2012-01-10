@@ -16,8 +16,8 @@ module.exports.NDDB = NDDB.NDDB;
 var Document = require('../client/nodeWindow/Document.js');
 module.exports.Document = Document;
 
-var GameWindow = require('../client/nodeWindow/GameWindow.js');
-module.exports.node.window = GameWindow;
+//var GameWindow = require('../client/nodeWindow/GameWindow.js');
+//module.exports.node.window = GameWindow;
 
 var Table = require('../client/nodeWindow/Table.js');
 module.exports.Table = Table;
@@ -52,31 +52,6 @@ t.select('x','>',1)
 console.log('--');
 console.log(t.fetch());
 
-t.removeClass('culo');
-console.log('--');
-console.log(t.fetch());
-
-
-
-
-//t.addColumn([1,'a']);
-//t.addColumn([2]);
-//t.addColumn([3,'c']);
-//t.addColumn([3]);
-//
-//
-//
-//t.sort('x');
-//t.reverse();
-//console.log(t.pointers);
+//t.removeClass('culo');
+//console.log('--');
 //console.log(t.fetch());
-////console.log(t.parse());
-//
-//t.addColumn([2,2,2]);
-//
-//
-//aa = t.select('x','>',2);
-//
-//aa.addColumn([1,2]);
-//console.log(aa.fetch());
-

@@ -167,5 +167,11 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.select('value.r', '><', [0.4,0.5]);
 //console.log(v.fetchValues());
 
-var v = nddb.select('value.mario', '!in', ['syes']);
-console.log(v.fetch());
+nddb.select('value.mario', '=', 'yes').delete(true);
+
+console.log(nddb.fetchValues());
+console.log(nddb.size());
+
+
+
+
