@@ -73,15 +73,20 @@
 	
 	NDDB.prototype.delete = function (confirm) {
 		if (confirm) {
-			//this.db.slice(0,this.size());
-//			for (var i=0; i < this.db.length; i++) {
-//				this.db[i] = ['a'];
-//			}
-			// TODO: Why is this working only if I change the property of an object
-			// not if I delete, or change the object???
-			this.forEach(function (el) {
-				el = 1;
-			});
+//			console.log(this.constructor);
+//			
+//			console.log(this.db.length);
+//			console.log(this.db.length);
+			for (var i=0; i < this.db.length; i++) {
+				delete this.db[i];
+			}
+			var o = this.db.splice(0,this.db.length);
+			
+//			// TODO: Why is this working only if I change the property of an object
+//			// not if I delete, or change the object???
+//			this.forEach(function (el) {
+//				el = 1;
+//			});
 			this.db = [];
 		}
 		else {

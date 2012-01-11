@@ -167,10 +167,52 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.select('value.r', '><', [0.4,0.5]);
 //console.log(v.fetchValues());
 
-nddb.select('value.mario', '=', 'yes').delete(true);
+//var v = nddb.select('value.mario', '=', 'yes');
+//
+//console.log(v.size());
+//
+//console.log(nddb);
+//console.log(nddb.size());
 
-console.log(nddb.fetchValues());
-console.log(nddb.size());
+
+a = [1,2,3];
+b = a;
+
+c = b.filter(function(elem){if (elem>1) return elem});
+console.log(c);
+delete c[0];
+
+console.log(a);
+console.log(b);
+console.log(c);
+
+
+//var db = [{a:1},{b:2}];
+//
+//function O (db){
+//	this.db = db;
+//	this.count = -1;
+//}
+//
+//O.prototype.delete = function(){
+//	//delete this.db[this.count++];
+//	this.db.splice(0,this.db.length);
+//}
+//
+//var o = new O(db);
+//
+//var o2 = new O(o.db);
+//
+//
+//
+//o2.db.push({c: 3});
+//o2.delete();
+//
+//console.log(o);
+//console.log(o2);
+
+
+
 
 
 
