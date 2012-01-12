@@ -48,14 +48,62 @@
 			this.options = options;
 			NDDB.log = options.log || NDDB.log;
 			this.D = options.D || this.D;
+			if ('undefined' !== typeof options.parentDB) {
+				this.parentDB = options.parentDB;
+			}	
 		}
 	  		
-		this.db = db || [];	// The actual database
+		this.db = this.initDB(db);	// The actual database
 
-  		this.size = function() { return this.db.length };
+	};
+
+	// TODO: Do we need this?
+	// Can we set a length attribute
+	// Count?
+	NDDB.prototype.size = function() {
+		return this.db.length 
 	};
 	
-	NDDB.prototype.create = function (options, db) {
+	NDDB.prototype.prototyfy = function (o, db) {
+		if (!o) return false;
+		var db = db || this.db;
+		if ('undefined' !== o.prototype) {
+			var out = new Function();
+			var out = JSUS.extend(o,out);
+		}
+		else {
+			var out = JSUS.clone(o);
+		}
+//		
+////		if ('undefined' !== o.constructor) {
+////			out.constructor = o.constructor;
+////		}
+//		if ('undefined' !== out.prototype) {
+//			out.prototype = {};
+//		}
+		if ('undefined' !== out.prototype.___nddbid___) {
+			out.prototype.___nddbid___ = db.length;
+		}
+		
+		out.prototype.toString = function() {
+			return o.toString();
+		}
+		
+		return out;
+	};
+
+	NDDB.prototype.initDB = function (db) {
+		if (!db) return [];
+		var out = [];
+		for (var i = 0; i < db.length; i++) {
+			out[i] = this.prototyfy(db[i], out);
+		}
+		return out;
+	};
+	
+	NDDB.prototype.create = function (db) {
+		var options = this.cloneSettings();
+		options.parentDB = this.db;
 		//In case the class was inherited
 		return new this.constructor(options, db);
 	};
@@ -70,32 +118,6 @@
 		
 		return confirm;
 	};	
-	
-	NDDB.prototype.delete = function (confirm) {
-		if (confirm) {
-//			console.log(this.constructor);
-//			
-//			console.log(this.db.length);
-//			console.log(this.db.length);
-			for (var i=0; i < this.db.length; i++) {
-				delete this.db[i];
-			}
-			var o = this.db.splice(0,this.db.length);
-			
-//			// TODO: Why is this working only if I change the property of an object
-//			// not if I delete, or change the object???
-//			this.forEach(function (el) {
-//				el = 1;
-//			});
-			this.db = [];
-		}
-		else {
-			NDDB.log('Do you really want to delete all the records? Please use delete(true)', 'WARN');
-		}
-		
-		return confirm;
-	};	
-	
 	
 	NDDB.prototype.cloneSettings = function () {
 		if (!this.options) return {};
@@ -148,13 +170,13 @@
 	};
 	
 	NDDB.prototype.insert = function (o) {
-		this.db.push(o);
+		this.db.push(this.prototyfy(o));
 	};
 	
 	// Sorting Operation
 	
 	NDDB.prototype.reverse = function () {
-		return this.create(this.cloneSettings(), this.db.reverse());
+		return this.create(this.db.reverse());
 	};
 	
 //	/**
@@ -207,11 +229,21 @@
 	      var func = this.comparator(d);
 	    }
 	    
-	    return this.create(this.cloneSettings(), this.db.sort(func));
+	    return this.create(this.db.sort(func));
 	  };
 
+	  NDDB.prototype.delete = function () {
+		  if (this.parentDB) {
+			  for (var i=0; i < this.db.length; i++) {
+				  var idx = this.db[i].prototype.___nddbid___ - i;
+				  this.parentDB.splice(idx,1);
+			  };
+		  }
+		  this.db = [];
+		  return this;
+	  };	
 	
-	NDDB.prototype._analyzeQuery = function (d,op,value) {
+	  NDDB.prototype._analyzeQuery = function (d,op,value) {
 		
 		var raiseError = function (d,op,value) {
 			var miss = '(?)';
@@ -336,7 +368,7 @@
 	};
 	
 	NDDB.prototype.filter = function (func) {
-		return this.create(this.cloneSettings(), this.db.filter(func));
+		return this.create(this.db.filter(func));
 	};
 	
 	
@@ -403,7 +435,7 @@
 			}
 		}
 		
-		return this.create(this.cloneSettings(), out);
+		return this.create(out);
 	};
 	
 	
@@ -467,11 +499,11 @@
 	};
 	
 	NDDB.prototype.limit = function (limit) {
-		if (limit === 0) return this.create(this.cloneSettings());
+		if (limit === 0) return this.create();
 		var db = (limit > 0) ? this.db.slice(0, limit) :
 							   this.db.slice(limit);
 		
-		return this.create(this.cloneSettings(), db);
+		return this.create(db);
 	};
 	
 	NDDB.prototype._split = function (o, key) {		
@@ -508,7 +540,7 @@
 		for (var i=0; i<this.db.length;i++) {
 			out = out.concat(this._split(this.db[i], key));
 		}
-		return this.create(this.cloneSettings(), out);
+		return this.create(out);
 	};
 	
 	NDDB.prototype.count = function (key) {
@@ -615,7 +647,7 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};
+	};	
 	
 })(
 		

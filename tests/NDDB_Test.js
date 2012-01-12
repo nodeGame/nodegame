@@ -126,7 +126,17 @@ for (var i=0;i<clients.length;i++) {
 	}
 }
 
-//console.log(nddb.fetch());
+
+//var v = nddb.fetch();
+
+//console.log(v);
+
+//console.log(nddb.insert.toString())
+//
+//for (var i=0; i<v.length; i++) {
+//	console.log(v[i].prototype);
+//}
+
 
 //var v = nddb.select('key','=','x');
 //console.log(v);
@@ -167,33 +177,41 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.select('value.r', '><', [0.4,0.5]);
 //console.log(v.fetchValues());
 
-//var v = nddb.select('value.mario', '=', 'yes');
+var v = nddb.select('value.mario', '=', 'yes');
+//console.log(v);
+//console.log(v.fetch());
+
+v.delete();
+
+console.log(nddb);
+console.log(nddb.size());
+
+
+//a = [1,2,3];
+//b = a;
 //
-//console.log(v.size());
+//c = b.filter(function(elem){if (elem>1) return elem});
 //
-//console.log(nddb);
-//console.log(nddb.size());
-
-
-a = [1,2,3];
-b = a;
-
-c = b.filter(function(elem){if (elem>1) return elem});
-console.log(c);
-delete c[0];
-
-console.log(a);
-console.log(b);
-console.log(c);
-
-
-//var db = [{a:1},{b:2}];
+//for (var i=0; i<c.length; i++) {
+//	var t = c[i];
+//	t = undefined;
+//	c[i] = undefined;
+//}
+//
+//console.log(a);
+//console.log(b);
+//console.log(c);
+//
+//
+//
+//
+//var db = [{a:1},{b:2},{b:3}];
 //
 //function O (db){
 //	this.db = db;
 //	this.count = -1;
 //}
-//
+
 //O.prototype.delete = function(){
 //	//delete this.db[this.count++];
 //	this.db.splice(0,this.db.length);
@@ -214,6 +232,9 @@ console.log(c);
 
 
 
+//var o = new Function();
+//
+//console.log(o.prototype);
 
 
 
