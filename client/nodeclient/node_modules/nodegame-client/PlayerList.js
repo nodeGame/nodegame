@@ -31,7 +31,11 @@
 	};
 	
 	PlayerList.prototype.add = function (player) {
-		if (!player || !player.id) return;
+		if (!player || !player.id){
+//			console.log('ahah');
+//			console.log(player);
+			return;
+		}
 
 		// Check if the id is unique
 		if (this.exist(player.id)) {
@@ -44,6 +48,8 @@
 								name: player.name,
 								count: this.countid
 		}));
+//		console.log('------------------------------SO I JUST INSERTED');
+//		console.log(this.db);
 		this.countid++;
 		return true;
 	};

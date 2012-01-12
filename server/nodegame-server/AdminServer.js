@@ -34,6 +34,8 @@ AdminServer.prototype.attachCustomListeners = function() {
 	
 	this.on(say+'HI', function(msg) {
 		// Add the player to to the list
+		console.log('------------------------INPLAYER');
+		console.log(msg.data);
 		that.pl.add(msg.data);
 		// Tell everybody a new player is connected;
 		var connected = new Player(msg.data) + ' connected.';

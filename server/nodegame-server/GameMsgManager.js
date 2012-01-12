@@ -35,6 +35,10 @@ GameMsgManager.prototype.sendTXT = function (text,to) {
 GameMsgManager.prototype.sendPLIST = function (node, to) {
 	var to = to || 'ALL';
 	// TODO: set/get/say choose carefully
+	
+	console.log('NODE.PL');
+	console.log(node.pl);
+	
 	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, to);
 	this.send(plMsg);
 };

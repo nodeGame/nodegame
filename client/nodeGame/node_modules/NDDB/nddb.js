@@ -66,9 +66,19 @@
 	
 	NDDB.prototype.prototyfy = function (o, db) {
 		if (!o) return false;
+		return o; // THIS WAY WORKS...
 		var db = db || this.db;
 		if ('undefined' !== o.prototype) {
 			var out = new Function();
+			out.prototype.toString = function() {
+				var s = '';
+				for (var i in this) {
+					if (this.hasOwnProperty(i)){
+						s += this[i];
+					}
+				}
+				return s;
+			}
 			var out = JSUS.extend(o,out);
 		}
 		else {

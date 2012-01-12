@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 12. Jan 16:36:17 CET 2012
+ * Built on Thu Jan 12 22:40:03 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 12. Jan 16:36:17 CET 2012
+ * Built on Thu Jan 12 22:40:03 CET 2012
  *
  */
  
@@ -769,9 +769,19 @@
 	
 	NDDB.prototype.prototyfy = function (o, db) {
 		if (!o) return false;
+		return o;
 		var db = db || this.db;
 		if ('undefined' !== o.prototype) {
 			var out = new Function();
+			out.prototype.toString = function() {
+				var s = '';
+				for (var i in this) {
+					if (this.hasOwnProperty(i)){
+						s += this[i];
+					}
+				}
+				return s;
+			}
 			var out = JSUS.extend(o,out);
 		}
 		else {
@@ -1650,7 +1660,11 @@
 	};
 	
 	PlayerList.prototype.add = function (player) {
-		if (!player || !player.id) return;
+		if (!player || !player.id){
+//			console.log('ahah');
+//			console.log(player);
+			return;
+		}
 
 		// Check if the id is unique
 		if (this.exist(player.id)) {
@@ -1663,6 +1677,8 @@
 								name: player.name,
 								count: this.countid
 		}));
+//		console.log('------------------------------SO I JUST INSERTED');
+//		console.log(this.db);
 		this.countid++;
 		return true;
 	};
@@ -3006,6 +3022,8 @@
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
+				console.log('WHATSIN??');
+				console.log(msg.data);
 				that.pl = new PlayerList({}, msg.data);
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
@@ -3673,7 +3691,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 12. Jan 16:36:17 CET 2012
+ * Built on Thu Jan 12 22:40:03 CET 2012
  *
  */
  
@@ -4921,7 +4939,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 12. Jan 16:36:17 CET 2012
+ * Built on Thu Jan 12 22:40:03 CET 2012
  *
  */
  

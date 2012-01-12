@@ -32,6 +32,8 @@ PlayerServer.prototype.attachCustomListeners = function() {
 	var get = GameMsg.actions.GET + '.'; 
 	
     this.on(say+'HI', function(msg) {
+		console.log('------------------------INPLAYER');
+		console.log(msg.data);
     	that.pl.add(msg.data);
         // TODO: check if we need to do it
     	that.gmm.sendPLIST(that); // Send the list of players to all the clients
