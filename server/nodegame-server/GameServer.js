@@ -122,7 +122,7 @@ GameServer.prototype.attachListeners = function() {
 	// TODO: Check this
 	this.server.sockets.on("shutdown", function(message) {
 		log.log("Server is shutting down.");
-		that.pl.pl = {};
+		that.pl.clear(true);
 		that.gmm.sendPLIST(that);
 		log.close();
 	});

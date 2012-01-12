@@ -186,6 +186,10 @@ v.delete();
 console.log(nddb);
 console.log(nddb.size());
 
+//for (var i=0; i < nddb.size(); i++) {
+//	console.log('e');
+//	console.log(nddb.db[i].prototype);
+//}
 
 //a = [1,2,3];
 //b = a;

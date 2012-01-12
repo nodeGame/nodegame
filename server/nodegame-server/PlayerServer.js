@@ -32,7 +32,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 	var get = GameMsg.actions.GET + '.'; 
 	
     this.on(say+'HI', function(msg) {
-    	that.pl.addPlayer(msg.data);
+    	that.pl.add(msg.data);
         // TODO: check if we need to do it
     	that.gmm.sendPLIST(that); // Send the list of players to all the clients
     	
@@ -100,7 +100,7 @@ PlayerServer.prototype.attachCustomListeners = function() {
 	// TODO: Check this
 	this.server.sockets.on("shutdown", function(message) {
 		log.log("Server is shutting down.");
-		that.pl.pl = {};
+		that.pl.clear(true);
 		that.gmm.sendPLIST(that);
 		that.gmm.forwardPLIST(that);
 		log.close();

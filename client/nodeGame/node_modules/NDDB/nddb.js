@@ -163,11 +163,20 @@
 		};	
 	};
 	
-	NDDB.prototype.forEach = function(func, params) {
+	NDDB.prototype.forEach = function (func, params) {
 		for (var i=0; i< this.db.length; i++) {
 			func.call(this, this.db[i], params);
 		}
 	};
+	
+	NDDB.prototype.map = function (func, params) {
+		var out = [];
+		for (var i=0; i< this.db.length; i++) {
+			out.push(func.call(this, this.db[i], params));
+		}
+		return out;
+	};
+
 	
 	NDDB.prototype.insert = function (o) {
 		this.db.push(this.prototyfy(o));
@@ -233,10 +242,17 @@
 	  };
 
 	  NDDB.prototype.delete = function () {
+		  if (this.db.length === 0) return this;
 		  if (this.parentDB) {
 			  for (var i=0; i < this.db.length; i++) {
 				  var idx = this.db[i].prototype.___nddbid___ - i;
 				  this.parentDB.splice(idx,1);
+			  };
+			  // TODO: we could make it with only one for loop
+			  // we loop on parent db and check whether the id is in the array
+			  // at the same time we decrement the nddbid depending on i
+			  for (var i=0; i < this.parentDB.length; i++) {
+				  this.parentDB[i].prototype.___nddbid___ = i;
 			  };
 		  }
 		  this.db = [];
