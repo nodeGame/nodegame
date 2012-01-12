@@ -25,7 +25,7 @@
 		this.buffer = [];
 	}
 	
-	GameSocketClient.prototype.setGame = function(game) {
+	GameSocketClient.prototype.setGame = function (game) {
 		this.game = game;
 		this.io = this.connect();
 	};
@@ -122,7 +122,7 @@
 		console.log('nodeGame: Attaching FULL listeners');
 		socket.removeAllListeners('message');
 			
-		this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
+		this.gmg = new GameMsgGenerator(session, this.player.id, new GameState());
 	
 		socket.on('message', function(msg) {
 			var msg = that.secureParse(msg);

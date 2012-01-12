@@ -560,6 +560,7 @@
 	};
 	
 	NDDB.prototype.count = function (key) {
+		if ('undefined' === typeof key) return this.db.length;
 		var count = 0;
 		for (var i=0; i < this.db.length; i++) {
 			try {

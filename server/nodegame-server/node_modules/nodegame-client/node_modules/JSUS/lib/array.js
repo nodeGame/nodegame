@@ -195,7 +195,7 @@
 	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	 * 
 	 */
-	ARRAY.shuffle = function (array, N, callback) {
+	ARRAY.shuffle = function (array) {
 		var copy = array.slice(0);
 		var len = array.length-1; // ! -1
 		for (var i = len; i > 0; i--) {

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.5
+ * nodeGame-all v0.6.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 9. Jan 14:27:42 CET 2012
+ * Built on Do 12. Jan 16:36:17 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.5
+ * nodeGame Client v0.6.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 9. Jan 14:27:42 CET 2012
+ * Built on Do 12. Jan 16:36:17 CET 2012
  *
  */
  
@@ -525,7 +525,7 @@
 	 * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	 * 
 	 */
-	ARRAY.shuffle = function (array, N, callback) {
+	ARRAY.shuffle = function (array) {
 		var copy = array.slice(0);
 		var len = array.length-1; // ! -1
 		for (var i = len; i > 0; i--) {
@@ -751,14 +751,62 @@
 			this.options = options;
 			NDDB.log = options.log || NDDB.log;
 			this.D = options.D || this.D;
+			if ('undefined' !== typeof options.parentDB) {
+				this.parentDB = options.parentDB;
+			}	
 		}
 	  		
-		this.db = db || [];	// The actual database
+		this.db = this.initDB(db);	// The actual database
 
-  		this.size = function() { return this.db.length };
+	};
+
+	// TODO: Do we need this?
+	// Can we set a length attribute
+	// Count?
+	NDDB.prototype.size = function() {
+		return this.db.length 
 	};
 	
-	NDDB.prototype.create = function (options, db) {
+	NDDB.prototype.prototyfy = function (o, db) {
+		if (!o) return false;
+		var db = db || this.db;
+		if ('undefined' !== o.prototype) {
+			var out = new Function();
+			var out = JSUS.extend(o,out);
+		}
+		else {
+			var out = JSUS.clone(o);
+		}
+//		
+////		if ('undefined' !== o.constructor) {
+////			out.constructor = o.constructor;
+////		}
+//		if ('undefined' !== out.prototype) {
+//			out.prototype = {};
+//		}
+		if ('undefined' !== out.prototype.___nddbid___) {
+			out.prototype.___nddbid___ = db.length;
+		}
+		
+		out.prototype.toString = function() {
+			return o.toString();
+		}
+		
+		return out;
+	};
+
+	NDDB.prototype.initDB = function (db) {
+		if (!db) return [];
+		var out = [];
+		for (var i = 0; i < db.length; i++) {
+			out[i] = this.prototyfy(db[i], out);
+		}
+		return out;
+	};
+	
+	NDDB.prototype.create = function (db) {
+		var options = this.cloneSettings();
+		options.parentDB = this.db;
 		//In case the class was inherited
 		return new this.constructor(options, db);
 	};
@@ -768,7 +816,7 @@
 			this.db = [];
 		}
 		else {
-			NDDB.log('Do you really want to delete all the records? Please use clear(true)', 'WARN');
+			NDDB.log('Do you really want to clear the current dataset? Please use clear(true)', 'WARN');
 		}
 		
 		return confirm;
@@ -818,20 +866,29 @@
 		};	
 	};
 	
-	NDDB.prototype.forEach = function(func, params) {
+	NDDB.prototype.forEach = function (func, params) {
 		for (var i=0; i< this.db.length; i++) {
 			func.call(this, this.db[i], params);
 		}
 	};
 	
+	NDDB.prototype.map = function (func, params) {
+		var out = [];
+		for (var i=0; i< this.db.length; i++) {
+			out.push(func.call(this, this.db[i], params));
+		}
+		return out;
+	};
+
+	
 	NDDB.prototype.insert = function (o) {
-		this.db.push(o);
+		this.db.push(this.prototyfy(o));
 	};
 	
 	// Sorting Operation
 	
 	NDDB.prototype.reverse = function () {
-		return this.create(this.cloneSettings(), this.db.reverse());
+		return this.create(this.db.reverse());
 	};
 	
 //	/**
@@ -884,11 +941,28 @@
 	      var func = this.comparator(d);
 	    }
 	    
-	    return this.create(this.cloneSettings(), this.db.sort(func));
+	    return this.create(this.db.sort(func));
 	  };
 
+	  NDDB.prototype.delete = function () {
+		  if (this.db.length === 0) return this;
+		  if (this.parentDB) {
+			  for (var i=0; i < this.db.length; i++) {
+				  var idx = this.db[i].prototype.___nddbid___ - i;
+				  this.parentDB.splice(idx,1);
+			  };
+			  // TODO: we could make it with only one for loop
+			  // we loop on parent db and check whether the id is in the array
+			  // at the same time we decrement the nddbid depending on i
+			  for (var i=0; i < this.parentDB.length; i++) {
+				  this.parentDB[i].prototype.___nddbid___ = i;
+			  };
+		  }
+		  this.db = [];
+		  return this;
+	  };	
 	
-	NDDB.prototype._analyzeQuery = function (d,op,value) {
+	  NDDB.prototype._analyzeQuery = function (d,op,value) {
 		
 		var raiseError = function (d,op,value) {
 			var miss = '(?)';
@@ -1013,7 +1087,13 @@
 	};
 	
 	NDDB.prototype.filter = function (func) {
-		return this.create(this.cloneSettings(), this.db.filter(func));
+		return this.create(this.db.filter(func));
+	};
+	
+	
+	NDDB.prototype.shuffle = function () {
+		this.db = JSUS.shuffle(this.db);
+		return true;
 	};
 	
 	// HERE
@@ -1074,7 +1154,7 @@
 			}
 		}
 		
-		return this.create(this.cloneSettings(), out);
+		return this.create(out);
 	};
 	
 	
@@ -1138,11 +1218,11 @@
 	};
 	
 	NDDB.prototype.limit = function (limit) {
-		if (limit === 0) return this.create(this.cloneSettings());
+		if (limit === 0) return this.create();
 		var db = (limit > 0) ? this.db.slice(0, limit) :
 							   this.db.slice(limit);
 		
-		return this.create(this.cloneSettings(), db);
+		return this.create(db);
 	};
 	
 	NDDB.prototype._split = function (o, key) {		
@@ -1179,10 +1259,11 @@
 		for (var i=0; i<this.db.length;i++) {
 			out = out.concat(this._split(this.db[i], key));
 		}
-		return this.create(this.cloneSettings(), out);
+		return this.create(out);
 	};
 	
 	NDDB.prototype.count = function (key) {
+		if ('undefined' === typeof key) return this.db.length;
 		var count = 0;
 		for (var i=0; i < this.db.length; i++) {
 			try {
@@ -1286,13 +1367,14 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};
+	};	
 	
 })(
 		
 	'undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window
   , 'undefined' != typeof JSUS ? JSUS : module.parent.exports.JSUS
-); 
+);
+ 
  
 (function (exports) {
 	
@@ -1341,7 +1423,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -1537,105 +1619,92 @@
  
 (function (exports, node) {
 	
-	var GameState = node.GameState;
-	var Utils = node.Utils;
-	
 	/*
 	 * Holds information about the list of players.
 	 *
 	 */
 	
+	var JSUS = node.Utils;
+	var NDDB = node.NDDB;
+		
+	var GameState = node.GameState;
+	
 	/**
-	 * Expose constructor
+	 * Expose constructors
 	 */
 	exports.PlayerList = PlayerList;
+
+	/**
+	 * PlayerList interface
+	 *
+	 * @api public
+	 */
 	
-	function PlayerList(list) {
-		
-		this.pl = list || {};
-		
-		this.size = function() {
-			return Utils.getListSize(this.pl);
-		};
-				
-	//	console.log('This is the size ' + this.size());
-	
-	}
-	
-	exports.PlayerList.prototype.importIDS = function(arrayIDS) {
-	
-		var PREFIX = 'P_';
-		var i = this.size();
-		var j = 0;
-		for (;j<arrayIDS.length;j++){
-			this.add(arrayIDS[j],'P_' + ++i);
-		}
-	};
-		
-	PlayerList.prototype.addPlayer = function (player) {
-		if (!player) return false;
-		return this.add(player.id, player.name);
+	function PlayerList (options, db) {
+	  var options = options || {};
+	  // Inheriting from NDDB	
+	  JSUS.extend(node.NDDB, this);
+	  node.NDDB.call(this, options, db);
+	  //this.set('state', GameBit.compareState);
+	  this.countid = 0;
 	};
 	
-	PlayerList.prototype.add = function (pid,name) {	
+	PlayerList.prototype.add = function (player) {
+		if (!player || !player.id) return;
+
 		// Check if the id is unique
-		if (!this.exist(pid)) {
-			this.pl[pid] = new Player({id: pid, name: name});
-			//console.log('Added Player ' + this.pl[pid]);
-			return true;
+		if (this.exist(player.id)) {
+			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
+			return false;
 		}
+		
+		this.insert(new Player({
+								id: player.id,
+								name: player.name,
+								count: this.countid
+		}));
+		this.countid++;
+		return true;
+	};
+	
+	PlayerList.prototype.remove = function (id) {
+		if (!id) return false;
 			
-		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
-		return false;
-	};
-	
-	PlayerList.prototype.remove = function (pid) {	
-		// Check if the id exists
-		if (this.exist(pid)) {
-			delete this.pl[pid];
-		
+		var p = this.select('id', '=', id);
+		if (p.count > 0) {
+			p.delete();
 			return true;
 		}
-		
-		console.log('E: Attempt to remove a non-existing player from the the player list');
+	
+		node.log('Attempt to remove a non-existing player from the the player list. id: ' + id, 'ERR');
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (pid) {	
-		// Check if the id exists
-		if (this.exist(pid)) {
-			return this.pl[pid];
+	PlayerList.prototype.get = function (id) {	
+		if (!id) return false;
+		
+		var p = this.select('id', '=', id);
+		
+		if (p.count > 0) {
+			return p;
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + pid);
+		node.log('Attempt to access a non-existing player from the the player list. id: ' + id, 'ERR');
 		return false;
 	};
-	
-	PlayerList.prototype.pop = function (pid) {	
-		var p = this.get(pid);
-		if (p) {
-			this.remove(pid);
-		}
-		return p;
-	};
-	
-	PlayerList.prototype.getRandom = function () {	
-		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-	};
-	
 	
 	PlayerList.prototype.getAllIDs = function () {	
 		
-	     return this.map(function(o){
-	    	 return o.getId();
-	     	});
+		return this.map(function(o){
+			return o.getId();
+			});
 	};
 	
 	
 	PlayerList.prototype.updatePlayer = function (player) {
 		
-		if (this.exist(pid)) {
-			this.pl[pid] = player;
+		if (this.exist(id)) {
+			this.pl[id] = player;
 		
 			return true;
 		}
@@ -1644,10 +1713,10 @@
 		return false;
 	};
 	
-	PlayerList.prototype.updatePlayerState = function (pid, state) {
+	PlayerList.prototype.updatePlayerState = function (id, state) {
 				
-		if (!this.exist(pid)) {
-			console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+		if (!this.exist(id)) {
+			node.log('Attempt to access a non-existing player from the the player list ' + player.id, 'WARN');
 			return false;	
 		}
 		
@@ -1658,63 +1727,13 @@
 		
 		//console.log(this.pl);
 		
-		this.pl[pid].state = state;	
+		this.select('id', '=', id).first().state = state;	
 	
 		return true;
 	};
 	
-	PlayerList.prototype.exist = function (pid) {
-		return (typeof(this.pl[pid]) !== 'undefined') ? true : false;
-	};
-	
-	// Returns an array of array of n groups of players {pid: name}
-	//The last group could have less elements.
-	PlayerList.prototype.getNGroups = function (n) {
-		
-		var copy = this.toArray();
-		var nPlayers = copy.length;
-		
-		var gSize = Math.floor( nPlayers / n);
-		var inGroupCount = 0;
-		
-		var result = new Array();
-		
-		// Init values for the loop algorithm
-		var i;
-		var idx;
-		var gid = -1;
-		var count = gSize +1; // immediately creates a new group in the loop
-		for (i=0;i<nPlayers;i++){
-			
-			// Prepare the array container for the elements of the new group
-			if (count >= gSize) {
-				gid++;
-				result[gid] = new PlayerList();
-				count = 0;
-			}
-			
-			// Get a random idx between 0 and array length
-			idx = Math.floor(Math.random()*copy.length);
-			
-			result[gid].add(copy[idx].id,copy[idx].name);
-			copy.splice(idx,1);
-			count++;
-		}
-		
-		return result;
-	};
-	
-	// Returns an array of array of groups of n players {pid: name};
-	// The last group could have less elements.
-	PlayerList.prototype.getGroupsSizeN = function (n) {
-		// TODO: getGroupsSizeN
-	};
-	
-	
-	PlayerList.prototype.checkState = function(gameState,strict) {
-		if (this.isStateDone(gameState,strict)) {
-			node.emit('STATEDONE');
-		}
+	PlayerList.prototype.exist = function (id) {
+		return (this.select('id', '=', id).count() > 0) ? true : false;
 	};
 	
 	// TODO: improve
@@ -1771,7 +1790,7 @@
 	};
 	
 	// Returns the number of player whose state is different from 0:0:0
-	PlayerList.prototype.actives = function(gameState) {
+	PlayerList.prototype.actives = function (gameState) {
 		var result = 0;
 		
 		this.forEach(function(p){
@@ -1789,61 +1808,23 @@
 		return result;
 	};
 	
-	
-	PlayerList.prototype.toArray = function () {
-	
-		var result = Array();
-		
-		for (var key in this.pl) {
-		    if (this.pl.hasOwnProperty(key)) {
-		    	result.push(this.pl[key]);
-		    }
+	PlayerList.prototype.checkState = function (gameState, strict) {
+		if (this.isStateDone(gameState,strict)) {
+			node.emit('STATEDONE');
 		}
-		return result;
-		return result.sort();
-		
 	};
-	
-	PlayerList.prototype.forEach = function(callback, thisArg) {
-		  
-		for (var key in this.pl) {
-		    if (this.pl.hasOwnProperty(key)) {
-		    	callback.call(thisArg, this.pl[key]);
-		    }
-		  }
-	};
-	
-	PlayerList.prototype.map = function(callback, thisArg) {
-		 
-		 var result = new Array();
-		 
-		 for (var key in this.pl) {
-			 if (this.pl.hasOwnProperty(key)) {
-				 result.push(callback.call(thisArg, this.pl[key]));
-			 }
-		  }
-	
-		  return result;
-	};
-	
 	
 	PlayerList.prototype.toString = function (eol) {
 		
 		var out = '';
 		var EOL = eol || '\n';
 		
-		for (var key in this.pl) {
-		    if (this.pl.hasOwnProperty(key)) {
-		    	out += key + ': ' + this.pl[key].name;
-		    	var state = new GameState(this.pl[key].state);
-		    	//console.log('STATE: ' + this.pl[key].state.state);
-		    	
-		    	out += ': ' + state + EOL;
-		    }
-		}
-		
+		this.forEach(function(p) {
+	    	out += p.id + ': ' + p.name;
+	    	var state = new GameState(p.state);
+	    	out += ': ' + state + EOL;
+		});
 		return out;
-		
 	};
 	
 	//Player
@@ -1854,31 +1835,125 @@
 	
 	exports.Player = Player;
 	
+	// TODO make them private
 	function Player (pl) {
+		var pl = pl || {};
 		
-		// PRIVATE variables
 		this.id = pl.id;
+		this.count = pl.count;
 		this.name = pl.name;
 		this.state = pl.state || new GameState();
+		this.ip = pl.ip;
 	}
 	
-	Player.prototype.getId = function() {
-		return this.id;
-	};
-	
-	Player.prototype.getName = function() {
-		return this.name;
-	};
-	
-	Player.prototype.updateState = function (state) {
-		this.state = state;
-	};
-	
 	Player.prototype.toString = function() {
-		var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
+		var out = this.name + ' (' + this.id + ') ' + new GameState(this.state);
 		return out;
 	};
 
+	
+	// TODO: implement pl.pop, maybe in NDDB
+//	PlayerList.prototype.pop = function (id) {	
+//		var p = this.get(id);
+//		if (p) {
+//			this.remove(id);
+//		}
+//		return p;
+//	};
+	
+//	PlayerList.prototype.getRandom = function () {	
+//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
+//	};
+	
+	
+//	Player.prototype.getId = function() {
+//		return this.id;
+//	};
+//	
+//	Player.prototype.getName = function() {
+//		return this.name;
+//	};
+//	
+//	Player.prototype.updateState = function (state) {
+//		this.state = state;
+//	};
+	
+
+	
+	// Returns an array of array of n groups of players {id: name}
+	//The last group could have less elements.
+//	PlayerList.prototype.getNGroups = function (n) {
+//		
+//		var copy = this.toArray();
+//		var nPlayers = copy.length;
+//		
+//		var gSize = Math.floor( nPlayers / n);
+//		var inGroupCount = 0;
+//		
+//		var result = new Array();
+//		
+//		// Init values for the loop algorithm
+//		var i;
+//		var idx;
+//		var gid = -1;
+//		var count = gSize +1; // immediately creates a new group in the loop
+//		for (i=0;i<nPlayers;i++){
+//			
+//			// Prepare the array container for the elements of the new group
+//			if (count >= gSize) {
+//				gid++;
+//				result[gid] = new PlayerList();
+//				count = 0;
+//			}
+//			
+//			// Get a random idx between 0 and array length
+//			idx = Math.floor(Math.random()*copy.length);
+//			
+//			result[gid].add(copy[idx].id,copy[idx].name);
+//			copy.splice(idx,1);
+//			count++;
+//		}
+//		
+//		return result;
+//	};
+
+	
+//	PlayerList.prototype.toArray = function () {
+//	
+//		var result = Array();
+//		
+//		for (var key in this.pl) {
+//		    if (this.pl.hasOwnProperty(key)) {
+//		    	result.push(this.pl[key]);
+//		    }
+//		}
+//		return result;
+//		return result.sort();
+//	};
+	
+//	PlayerList.prototype.forEach = function(callback, thisArg) {
+//		  
+//		for (var key in this.pl) {
+//		    if (this.pl.hasOwnProperty(key)) {
+//		    	callback.call(thisArg, this.pl[key]);
+//		    }
+//		  }
+//	};
+	
+//	PlayerList.prototype.map = function(callback, thisArg) {
+//		 
+//		 var result = new Array();
+//		 
+//		 for (var key in this.pl) {
+//			 if (this.pl.hasOwnProperty(key)) {
+//				 result.push(callback.call(thisArg, this.pl[key]));
+//			 }
+//		  }
+//	
+//		  return result;
+//	};
+	
+	
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
@@ -2479,7 +2554,7 @@
 		this.buffer = [];
 	}
 	
-	GameSocketClient.prototype.setGame = function(game) {
+	GameSocketClient.prototype.setGame = function (game) {
 		this.game = game;
 		this.io = this.connect();
 	};
@@ -2576,7 +2651,7 @@
 		console.log('nodeGame: Attaching FULL listeners');
 		socket.removeAllListeners('message');
 			
-		this.gmg = new GameMsgGenerator(session,this.player.getId(),new GameState());
+		this.gmg = new GameMsgGenerator(session, this.player.id, new GameState());
 	
 		socket.on('message', function(msg) {
 			var msg = that.secureParse(msg);
@@ -2931,7 +3006,7 @@
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
-				that.pl = new PlayerList(msg.data);
+				that.pl = new PlayerList({}, msg.data);
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});
@@ -3593,12 +3668,12 @@
  
  
 /*!
- * nodeWindow v0.6.5
+ * nodeWindow v0.6.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 9. Jan 14:27:42 CET 2012
+ * Built on Do 12. Jan 16:36:17 CET 2012
  *
  */
  
@@ -4841,12 +4916,12 @@
  
  
 /*!
- * nodeGadgets v0.6.5
+ * nodeGadgets v0.6.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 9. Jan 14:27:42 CET 2012
+ * Built on Do 12. Jan 16:36:17 CET 2012
  *
  */
  
@@ -5560,16 +5635,10 @@
 //			this.list = new node.window.List(this.id);
 //		}
 		
-		console.log('OP SC');
-		console.log(options);
-		
 		this.hasChanged = false; // TODO: should this be inherited?
 		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
-		
-		console.log('CHANGEEVENT');
-		console.log(this.changeEvent);
 		
 		if (!options.features) return;
 		

@@ -21,39 +21,20 @@
 	 * @api public
 	 */
 	
-	function PlayerList (options, list) {
+	function PlayerList (options, db) {
 	  var options = options || {};
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  //this.set('state', GameBit.compareState);
-	  this.count = 0;
+	  this.countid = 0;
 	};
-	
-	GameDB.prototype.add = function (player, key, value, state) {
-		var state = state || node.game.gameState;
-
-		this.insert(new GameBit({
-										player: player, 
-										key: key,
-										value: value,
-										state: state
-		}));
-
-		return true;
-	};
-	
-
-	// TODO: Deprecated, remove once transition is completed
-//	PlayerList.prototype.addPlayer = function (player) {
-//		return this.add(player);
-//	};
 	
 	PlayerList.prototype.add = function (player) {
 		if (!player || !player.id) return;
 
 		// Check if the id is unique
-		if (this.exist(player)) {
+		if (this.exist(player.id)) {
 			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
 			return false;
 		}
@@ -61,63 +42,37 @@
 		this.insert(new Player({
 								id: player.id,
 								name: player.name,
-								count: this.count
+								count: this.countid
 		}));
-		this.count++;
+		this.countid++;
 		return true;
-		
-			
-		
 	};
 	
-
-//	exports.PlayerList.prototype.importIDS = function(arrayIDS) {
-//	
-//		var PREFIX = 'P_';
-//		var i = this.size();
-//		var j = 0;
-//		for (;j<arrayIDS.length;j++){
-//			this.add(arrayIDS[j],'P_' + ++i);
-//		}
-//	};
-		
-	
-	
-	PlayerList.prototype.remove = function (id) {	
-		// Check if the id exists
-		if (this.exist(id)) {
-			this.select('id', '=', id).delete();
+	PlayerList.prototype.remove = function (id) {
+		if (!id) return false;
+			
+		var p = this.select('id', '=', id);
+		if (p.count > 0) {
+			p.delete();
 			return true;
 		}
-		
-		node.log('Attempt to remove a non-existing player from the the player list', 'ERR');
+	
+		node.log('Attempt to remove a non-existing player from the the player list. id: ' + id, 'ERR');
 		return false;
 	};
 	
-	PlayerList.prototype.get = function (player) {	
-		// Check if the id exists
-		if (this.exist(player.id)) {
-			return this.select('id', '=', player.id);
+	PlayerList.prototype.get = function (id) {	
+		if (!id) return false;
+		
+		var p = this.select('id', '=', id);
+		
+		if (p.count > 0) {
+			return p;
 		}
 		
-		node.log('Attempt to access a non-existing player from the the player list ' + player, 'ERR');
+		node.log('Attempt to access a non-existing player from the the player list. id: ' + id, 'ERR');
 		return false;
 	};
-	
-	
-	// TODO: implement pl.pop, maybe in NDDB
-//	PlayerList.prototype.pop = function (id) {	
-//		var p = this.get(id);
-//		if (p) {
-//			this.remove(id);
-//		}
-//		return p;
-//	};
-	
-//	PlayerList.prototype.getRandom = function () {	
-//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-//	};
-	
 	
 	PlayerList.prototype.getAllIDs = function () {	
 		
@@ -249,7 +204,7 @@
 	    	out += p.id + ': ' + p.name;
 	    	var state = new GameState(p.state);
 	    	out += ': ' + state + EOL;
-		}
+		});
 		return out;
 	};
 	
@@ -273,10 +228,24 @@
 	}
 	
 	Player.prototype.toString = function() {
-		var out = this.getName() + ' (' + this.getId() + ') ' + new GameState(this.state);
+		var out = this.name + ' (' + this.id + ') ' + new GameState(this.state);
 		return out;
 	};
 
+	
+	// TODO: implement pl.pop, maybe in NDDB
+//	PlayerList.prototype.pop = function (id) {	
+//		var p = this.get(id);
+//		if (p) {
+//			this.remove(id);
+//		}
+//		return p;
+//	};
+	
+//	PlayerList.prototype.getRandom = function () {	
+//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
+//	};
+	
 	
 //	Player.prototype.getId = function() {
 //		return this.id;

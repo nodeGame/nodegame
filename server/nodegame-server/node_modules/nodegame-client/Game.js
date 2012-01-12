@@ -96,7 +96,7 @@
 			});
 			
 			node.on( IN + say + 'PLIST', function(msg) {
-				that.pl = new PlayerList(msg.data);
+				that.pl = new PlayerList({}, msg.data);
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});

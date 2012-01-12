@@ -9,7 +9,7 @@
 	exports.Table = Table;
 	
 	// For simple testing
-	module.exports = Table;
+	//module.exports = Table;
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
