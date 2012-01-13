@@ -40,17 +40,31 @@
 		return this.add(player.id, player.name);
 	};
 	
-	PlayerList.prototype.add = function (pid,name) {	
+	PlayerList.prototype.add = function (player) {
+		if (!player) return false;
 		// Check if the id is unique
-		if (!this.exist(pid)) {
-			this.pl[pid] = new Player({id: pid, name: name});
+		if (!this.exist(player.id)) {
+			this.pl[player.id] = new Player(player);
 			//console.log('Added Player ' + this.pl[pid]);
 			return true;
 		}
 			
-		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
+		console.log('E: Attempt to add a new player already in the player list' + this.pl[player.id]);
 		return false;
 	};
+	
+	// OLD ADD
+//	PlayerList.prototype.add = function (pid,name) {	
+//		// Check if the id is unique
+//		if (!this.exist(pid)) {
+//			this.pl[pid] = new Player({id: pid, name: name});
+//			//console.log('Added Player ' + this.pl[pid]);
+//			return true;
+//		}
+//			
+//		console.log('E: Attempt to add a new player already in the player list' + this.pl.id);
+//		return false;
+//	};
 	
 	PlayerList.prototype.remove = function (pid) {	
 		// Check if the id exists

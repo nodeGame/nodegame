@@ -64,49 +64,19 @@
 		return this.db.length 
 	};
 	
-	NDDB.prototype.prototyfy = function (o, db) {
+	NDDB.prototype.masquerade = function (o, db) {
 		if (!o) return false;
-		return o; // THIS WAY WORKS...
 		var db = db || this.db;
-		if ('undefined' !== o.prototype) {
-			var out = new Function();
-			out.prototype.toString = function() {
-				var s = '';
-				for (var i in this) {
-					if (this.hasOwnProperty(i)){
-						s += this[i];
-					}
-				}
-				return s;
-			}
-			var out = JSUS.extend(o,out);
-		}
-		else {
-			var out = JSUS.clone(o);
-		}
-//		
-////		if ('undefined' !== o.constructor) {
-////			out.constructor = o.constructor;
-////		}
-//		if ('undefined' !== out.prototype) {
-//			out.prototype = {};
-//		}
-		if ('undefined' !== out.prototype.___nddbid___) {
-			out.prototype.___nddbid___ = db.length;
-		}
-		
-		out.prototype.toString = function() {
-			return o.toString();
-		}
-		
-		return out;
+		o.__proto__ = JSUS.clone(o.__proto__);
+		o.__proto__.nddbid = db.length;
+		return o;
 	};
 
 	NDDB.prototype.initDB = function (db) {
 		if (!db) return [];
 		var out = [];
 		for (var i = 0; i < db.length; i++) {
-			out[i] = this.prototyfy(db[i], out);
+			out[i] = this.masquerade(db[i], out);
 		}
 		return out;
 	};
@@ -189,7 +159,7 @@
 
 	
 	NDDB.prototype.insert = function (o) {
-		this.db.push(this.prototyfy(o));
+		this.db.push(this.masquerade(o));
 	};
 	
 	// Sorting Operation
@@ -255,14 +225,14 @@
 		  if (this.db.length === 0) return this;
 		  if (this.parentDB) {
 			  for (var i=0; i < this.db.length; i++) {
-				  var idx = this.db[i].prototype.___nddbid___ - i;
+				  var idx = this.db[i].__proto__.nddbid - i;
 				  this.parentDB.splice(idx,1);
 			  };
 			  // TODO: we could make it with only one for loop
 			  // we loop on parent db and check whether the id is in the array
 			  // at the same time we decrement the nddbid depending on i
 			  for (var i=0; i < this.parentDB.length; i++) {
-				  this.parentDB[i].prototype.___nddbid___ = i;
+				  this.parentDB[i].__proto__.nddbid = i;
 			  };
 		  }
 		  this.db = [];
@@ -674,7 +644,7 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};	
+	};		
 	
 })(
 		

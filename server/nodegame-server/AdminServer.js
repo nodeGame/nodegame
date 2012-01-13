@@ -41,7 +41,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 		var connected = new Player(msg.data) + ' connected.';
 		this.gmm.sendTXT(connected,'ALL');
 		
-		// Send the list of connected partners
+		// Send the list of connected players
 		that.gmm.sendPLIST(that.partner, msg.from);
 	});
 
@@ -77,7 +77,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 		
 		// Ask a random player to send the game;
 		//var p = this.pl.getRandom();
-		that.gmm.sendDATA('get', 'CULO', msg.from, msg.txt);
+		//that.gmm.sendDATA('get', 'ABC', msg.from, msg.txt);
 		
 	});
 	

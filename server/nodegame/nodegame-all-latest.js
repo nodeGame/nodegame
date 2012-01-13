@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Jan 12 22:40:03 CET 2012
+ * Built on Fr 13. Jan 14:18:36 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Jan 12 22:40:03 CET 2012
+ * Built on Fr 13. Jan 14:18:36 CET 2012
  *
  */
  
@@ -767,49 +767,19 @@
 		return this.db.length 
 	};
 	
-	NDDB.prototype.prototyfy = function (o, db) {
+	NDDB.prototype.masquerade = function (o, db) {
 		if (!o) return false;
-		return o;
 		var db = db || this.db;
-		if ('undefined' !== o.prototype) {
-			var out = new Function();
-			out.prototype.toString = function() {
-				var s = '';
-				for (var i in this) {
-					if (this.hasOwnProperty(i)){
-						s += this[i];
-					}
-				}
-				return s;
-			}
-			var out = JSUS.extend(o,out);
-		}
-		else {
-			var out = JSUS.clone(o);
-		}
-//		
-////		if ('undefined' !== o.constructor) {
-////			out.constructor = o.constructor;
-////		}
-//		if ('undefined' !== out.prototype) {
-//			out.prototype = {};
-//		}
-		if ('undefined' !== out.prototype.___nddbid___) {
-			out.prototype.___nddbid___ = db.length;
-		}
-		
-		out.prototype.toString = function() {
-			return o.toString();
-		}
-		
-		return out;
+		o.__proto__ = JSUS.clone(o.__proto__);
+		o.__proto__.nddbid = db.length;
+		return o;
 	};
 
 	NDDB.prototype.initDB = function (db) {
 		if (!db) return [];
 		var out = [];
 		for (var i = 0; i < db.length; i++) {
-			out[i] = this.prototyfy(db[i], out);
+			out[i] = this.masquerade(db[i], out);
 		}
 		return out;
 	};
@@ -892,7 +862,7 @@
 
 	
 	NDDB.prototype.insert = function (o) {
-		this.db.push(this.prototyfy(o));
+		this.db.push(this.masquerade(o));
 	};
 	
 	// Sorting Operation
@@ -958,14 +928,14 @@
 		  if (this.db.length === 0) return this;
 		  if (this.parentDB) {
 			  for (var i=0; i < this.db.length; i++) {
-				  var idx = this.db[i].prototype.___nddbid___ - i;
+				  var idx = this.db[i].__proto__.nddbid - i;
 				  this.parentDB.splice(idx,1);
 			  };
 			  // TODO: we could make it with only one for loop
 			  // we loop on parent db and check whether the id is in the array
 			  // at the same time we decrement the nddbid depending on i
 			  for (var i=0; i < this.parentDB.length; i++) {
-				  this.parentDB[i].prototype.___nddbid___ = i;
+				  this.parentDB[i].__proto__.nddbid = i;
 			  };
 		  }
 		  this.db = [];
@@ -1377,7 +1347,7 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};	
+	};		
 	
 })(
 		
@@ -1651,21 +1621,22 @@
 	 */
 	
 	function PlayerList (options, db) {
+//		
+//	  console.log('RECEIVED');	
+//	  console.log(db);	
 	  var options = options || {};
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  //this.set('state', GameBit.compareState);
+//	  console.log('JUST CREATED PL');
+//	  console.log(this);
 	  this.countid = 0;
 	};
 	
 	PlayerList.prototype.add = function (player) {
-		if (!player || !player.id){
-//			console.log('ahah');
-//			console.log(player);
-			return;
-		}
-
+		if (!player || !player.id) return;
+	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
 			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
@@ -1677,8 +1648,7 @@
 								name: player.name,
 								count: this.countid
 		}));
-//		console.log('------------------------------SO I JUST INSERTED');
-//		console.log(this.db);
+
 		this.countid++;
 		return true;
 	};
@@ -1702,7 +1672,7 @@
 		var p = this.select('id', '=', id);
 		
 		if (p.count > 0) {
-			return p;
+			return p.first();
 		}
 		
 		node.log('Attempt to access a non-existing player from the the player list. id: ' + id, 'ERR');
@@ -1712,7 +1682,7 @@
 	PlayerList.prototype.getAllIDs = function () {	
 		
 		return this.map(function(o){
-			return o.getId();
+			return o.id;
 			});
 	};
 	
@@ -1779,7 +1749,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -2198,7 +2168,7 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		//console.log('NEXT OF THIS ' + gameState);
+		console.log('NEXT OF THIS ' + gameState);
 		//console.log(this.limits);
 		
 		// Game has not started yet, do it!
@@ -3021,9 +2991,7 @@
 				}
 			});
 			
-			node.on( IN + say + 'PLIST', function(msg) {
-				console.log('WHATSIN??');
-				console.log(msg.data);
+			node.on( IN + say + 'PLIST', function (msg) {
 				that.pl = new PlayerList({}, msg.data);
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
@@ -3083,10 +3051,13 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					//node.log('WE PLAY AUTO', 'DEBUG');
+					node.log('WE PLAY AUTO', 'DEBUG');
+					console.log(that.pl);
+					console.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
+					console.log(morePlayers);
 					
-					if (morePlayers > 0 ) {
+					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
 						node.log( morePlayers + ' player/s still needed to play the game');
 					}
@@ -3184,7 +3155,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -3691,7 +3662,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Jan 12 22:40:03 CET 2012
+ * Built on Fr 13. Jan 14:18:36 CET 2012
  *
  */
  
@@ -4939,7 +4910,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Jan 12 22:40:03 CET 2012
+ * Built on Fr 13. Jan 14:18:36 CET 2012
  *
  */
  

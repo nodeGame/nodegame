@@ -22,21 +22,22 @@
 	 */
 	
 	function PlayerList (options, db) {
+//		
+//	  console.log('RECEIVED');	
+//	  console.log(db);	
 	  var options = options || {};
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  //this.set('state', GameBit.compareState);
+//	  console.log('JUST CREATED PL');
+//	  console.log(this);
 	  this.countid = 0;
 	};
 	
 	PlayerList.prototype.add = function (player) {
-		if (!player || !player.id){
-//			console.log('ahah');
-//			console.log(player);
-			return;
-		}
-
+		if (!player || !player.id) return;
+	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
 			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
@@ -48,8 +49,7 @@
 								name: player.name,
 								count: this.countid
 		}));
-//		console.log('------------------------------SO I JUST INSERTED');
-//		console.log(this.db);
+
 		this.countid++;
 		return true;
 	};
@@ -73,7 +73,7 @@
 		var p = this.select('id', '=', id);
 		
 		if (p.count > 0) {
-			return p;
+			return p.first();
 		}
 		
 		node.log('Attempt to access a non-existing player from the the player list. id: ' + id, 'ERR');
@@ -83,7 +83,7 @@
 	PlayerList.prototype.getAllIDs = function () {	
 		
 		return this.map(function(o){
-			return o.getId();
+			return o.id;
 			});
 	};
 	
@@ -150,7 +150,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {

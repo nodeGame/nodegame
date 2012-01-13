@@ -10,11 +10,18 @@ var GameState = GameState.GameState;
 var GameBit = require('../client/nodeGame/GameDB.js').GameBit;
 
 var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js').NDDB;
+module.exports.NDDB = NDDB;
+
+module.exports.Utils = JSUS.JSUS;
+
+var PlayerList = require('../client/nodeGame/PlayerList.js').PlayerList;
 
 var log = function (txt, level) {
 	var level = level || 'INFO';
 	console.log(txt);
 };
+
+
 
 var nddb = new NDDB({log: log});
 nddb.set('state', GameBit.compareState);
@@ -177,14 +184,14 @@ for (var i=0;i<clients.length;i++) {
 //var v = nddb.select('value.r', '><', [0.4,0.5]);
 //console.log(v.fetchValues());
 
-var v = nddb.select('value.mario', '=', 'yes');
+//var v = nddb.select('value.mario', '=', 'yes');
 //console.log(v);
 //console.log(v.fetch());
 
-v.delete();
-
-console.log(nddb);
-console.log(nddb.size());
+//v.delete();
+//
+//console.log(nddb);
+//console.log(nddb.size());
 
 //for (var i=0; i < nddb.size(); i++) {
 //	console.log('e');
@@ -240,5 +247,16 @@ console.log(nddb.size());
 //
 //console.log(o.prototype);
 
+
+var pl = new PlayerList({}, nddb.db);
+
+var v = pl.fetch();
+for (var i=0; i < v.length; i++) {
+console.log(v[i].__proto__);
+}
+
+for (var i=0; i < v.length; i++) {
+	console.log(v[i]);
+}
 
 

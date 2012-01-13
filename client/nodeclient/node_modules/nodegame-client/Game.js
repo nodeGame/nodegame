@@ -95,9 +95,7 @@
 				}
 			});
 			
-			node.on( IN + say + 'PLIST', function(msg) {
-				console.log('WHATSIN??');
-				console.log(msg.data);
+			node.on( IN + say + 'PLIST', function (msg) {
 				that.pl = new PlayerList({}, msg.data);
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
@@ -157,10 +155,13 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					//node.log('WE PLAY AUTO', 'DEBUG');
+					node.log('WE PLAY AUTO', 'DEBUG');
+					console.log(that.pl);
+					console.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
+					console.log(morePlayers);
 					
-					if (morePlayers > 0 ) {
+					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
 						node.log( morePlayers + ' player/s still needed to play the game');
 					}
@@ -258,7 +259,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
