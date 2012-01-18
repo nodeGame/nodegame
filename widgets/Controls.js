@@ -205,7 +205,8 @@
 		this.name = 'RadioControls'
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
-		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
+		this.groupName = ('undefined' !== typeof options.name) ? options.name : 
+																 Math.floor(Math.random(0,1)*10000); 
 		//alert(this.groupName);
 	};
 	
@@ -213,10 +214,12 @@
 		console.log('ADDDING radio');
 		console.log(attributes);
 		// add the group name if not specified
+		// TODO: is this a javascript bug?
 		if ('undefined' === typeof attributes.name) {
 			console.log(this);
-			console.log('MODMOD ' + this.groupName);
-			attributes.name = 'asdasd'; //this.groupName;
+			console.log(this.name);
+			console.log('MODMOD ' + this.name);
+			attributes.name = this.groupName;
 		}
 		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	

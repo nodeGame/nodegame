@@ -17,6 +17,7 @@ function PeerReviewGame () {
 		this.timer = node.window.addWidget('VisualTimer', this.header);
 		this.outlet = null;
 		this.exs = ['A','B','C'];
+		this.donetxt = 'Done!';
 	};
 	
 	
@@ -60,8 +61,10 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 500
+								milliseconds: 10000
 			};
+			
+			node.window.addEventButton('CREATION_DONE', this.donetxt);
 			
 			this.timer.restart(timerOptions);
 			
@@ -77,6 +80,8 @@ function PeerReviewGame () {
 	
 	var submission = function() {
 		var root = node.window.getElementById('root');
+		
+		node.emit('INPUT_DISABLE');
 		
 		var ctrl_options = { id: 'exhib',
 							 name: 'exhib',
@@ -126,8 +131,11 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 200
+							milliseconds: 20000
 		};
+		
+		
+		node.window.addEventButton('SUBMISSION_DONE', this.donetxt);
 		
 		this.timer.restart(timerOptions);
 		
@@ -164,7 +172,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 3000
+								milliseconds: 30000
 			};	
 			
 			this.timer.restart(timerOptions);
@@ -199,6 +207,7 @@ function PeerReviewGame () {
 				}, 10);
 			});
 			
+			node.window.addEventButton('EVALUATION_DONE', this.donetxt);
 			
 			node.on('EVALUATION_DONE', function(){
 				
@@ -282,10 +291,12 @@ function PeerReviewGame () {
 				
 				this.timer.restart({
 									event: 'DONE',
-									milliseconds: 200
+									milliseconds: 20000
 				});	
 				
 			});
+			
+			node.window.addEventButton('DONE', this.donetxt);
 			
 		});
 		
@@ -296,11 +307,15 @@ function PeerReviewGame () {
 	
 	var questionnaire = function(){
 		node.window.loadFrame('postgame.html', function(){
+			
+			node.window.addEventButton('DONE', this.donetxt);
+			
 			this.timer.restart({
 								event: 'DONE',
-								milliseconds: 300
+								milliseconds: 10000
 			});
 		});
+		
 		console.log('Postgame');
 	};
 	

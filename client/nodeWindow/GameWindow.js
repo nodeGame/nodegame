@@ -118,11 +118,18 @@
 	 * property is toggled. (i.e. false means enable, true means disable) 
 	 * 
 	 */
-	GameWindow.prototype.toggleInputs = function(id, op) {
+	GameWindow.prototype.toggleInputs = function (id, op) {
 		
-		var container = this.getElementById(id) || this;			
-		if (!container) return;
-
+		if ('undefined' !== typeof id) {
+			var container = this.getElementById(id);
+		}
+		if ('undefined' === typeof container) {
+			var container = this.frame.body;
+		}
+		
+		console.log('DISABLING in CONTAINER');
+		console.log(container);
+		
 		var inputTags = ['button', 'select', 'textarea', 'input'];
 
 		var j=0;
@@ -390,6 +397,21 @@
 	GameWindow.prototype.addStateSelector = function (root, id) {
 		var stateSelector = this.addTextInput(root,id);
 		return stateSelector;
+	};
+	
+	
+	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
+		if (!event) return;
+		if (!root) {
+			var root = root || this.frame.body;
+			root = root.lastElementChild || root;
+		}
+		
+		var b = this.addButton(root, id, text, attributes);
+		b.onclick = function () {
+			node.emit(event);
+		};
+		return b;
 	};
 	
 	

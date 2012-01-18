@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 15:00:18 CET 2012
+ * Built on Mi 18. Jan 17:41:15 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 15:00:18 CET 2012
+ * Built on Mi 18. Jan 17:41:15 CET 2012
  *
  */
  
@@ -3204,7 +3204,7 @@
 	node.verbosity = 0;
 	
 	node.verbosity_levels = {
-			ALWAYS: - Number.MIN_VALUE,
+			ALWAYS: - Number.MIN_VALUE + 1, // Actually, it is not really always...
 			ERR: -1,
 			WARN: 0,
 			INFO: 1,
@@ -3615,7 +3615,6 @@
 	}
 	// end node
 	
-	
 	node.log('nodeGame ' + node.version + ' loaded', 'ALWAYS');
 	
 })('undefined' != typeof node ? node : module.exports); 
@@ -3630,7 +3629,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 15:00:18 CET 2012
+ * Built on Mi 18. Jan 17:41:15 CET 2012
  *
  */
  
@@ -4089,11 +4088,18 @@
 	 * property is toggled. (i.e. false means enable, true means disable) 
 	 * 
 	 */
-	GameWindow.prototype.toggleInputs = function(id, op) {
+	GameWindow.prototype.toggleInputs = function (id, op) {
 		
-		var container = this.getElementById(id) || this;			
-		if (!container) return;
-
+		if ('undefined' !== typeof id) {
+			var container = this.getElementById(id);
+		}
+		if ('undefined' === typeof container) {
+			var container = this.frame.body;
+		}
+		
+		console.log('DISABLING in CONTAINER');
+		console.log(container);
+		
 		var inputTags = ['button', 'select', 'textarea', 'input'];
 
 		var j=0;
@@ -4361,6 +4367,21 @@
 	GameWindow.prototype.addStateSelector = function (root, id) {
 		var stateSelector = this.addTextInput(root,id);
 		return stateSelector;
+	};
+	
+	
+	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
+		if (!event) return;
+		if (!root) {
+			var root = root || this.frame.body;
+			root = root.lastElementChild || root;
+		}
+		
+		var b = this.addButton(root, id, text, attributes);
+		b.onclick = function () {
+			node.emit(event);
+		};
+		return b;
 	};
 	
 	
@@ -4878,7 +4899,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 15:00:18 CET 2012
+ * Built on Mi 18. Jan 17:41:15 CET 2012
  *
  */
  
@@ -5756,7 +5777,8 @@
 		this.name = 'RadioControls'
 		this.version = '0.1.1';
 		this.id = options.id || this.name;
-		this.groupName = options.name || Math.floor(Math.random(0,1)*10000); 
+		this.groupName = ('undefined' !== typeof options.name) ? options.name : 
+																 Math.floor(Math.random(0,1)*10000); 
 		//alert(this.groupName);
 	};
 	
@@ -5764,10 +5786,12 @@
 		console.log('ADDDING radio');
 		console.log(attributes);
 		// add the group name if not specified
+		// TODO: is this a javascript bug?
 		if ('undefined' === typeof attributes.name) {
 			console.log(this);
-			console.log('MODMOD ' + this.groupName);
-			attributes.name = 'asdasd'; //this.groupName;
+			console.log(this.name);
+			console.log('MODMOD ' + this.name);
+			attributes.name = this.groupName;
 		}
 		console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
