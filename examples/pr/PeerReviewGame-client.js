@@ -2,9 +2,10 @@ function PeerReviewGame () {
 	
 	this.name = 'Peer Review Game';
 	this.description = 'Create, submit, and evaluate contributions from your peers.';
-	this.version = '0.1';
+	this.version = '0.3';
 	
-	this.automatic_step = false;
+	this.auto_step = false;
+	this.auto_wait = true;
 	
 	this.minPlayers = 2;
 	this.maxPlayers = 8;
@@ -196,6 +197,8 @@ function PeerReviewGame () {
 				// Add the slider to the container
 				evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
 				
+				node.window.addEventButton('EVALUATION_DONE', this.donetxt);
+				
 				// AUTOPLAY
 				node.random.exec(function(){
 					var choice = Math.random();
@@ -207,7 +210,7 @@ function PeerReviewGame () {
 				}, 10);
 			});
 			
-			node.window.addEventButton('EVALUATION_DONE', this.donetxt);
+			
 			
 			node.on('EVALUATION_DONE', function(){
 				
@@ -289,6 +292,8 @@ function PeerReviewGame () {
 				node.log(table.fetch());
 				root.appendChild(table.parse());
 				
+				node.window.addEventButton('DONE', this.donetxt);
+				
 				this.timer.restart({
 									event: 'DONE',
 									milliseconds: 20000
@@ -296,7 +301,7 @@ function PeerReviewGame () {
 				
 			});
 			
-			node.window.addEventButton('DONE', this.donetxt);
+			
 			
 		});
 		

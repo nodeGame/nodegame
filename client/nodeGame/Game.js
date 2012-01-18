@@ -23,10 +23,11 @@
 		// modified  by the execution of the loops functions
 		
 		// If not defined they take default settings
-		this.name = settings.name || "A standard game";
+		this.name = settings.name || 'A standard game';
 		this.description = settings.description || 'No Description';
 		
-		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer : false;
+		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer 
+																   : false;
 		
 		this.gameLoop = new GameLoop(settings.loops);
 		 
@@ -34,7 +35,10 @@
 		this.player = null;	
 		this.gameState = new GameState();
 		
-		this.automatic_step = settings.automatic_step || false;
+		this.auto_step = ('undefined' !== typeof settings.auto_step) ? settings.auto_step 
+																	 : true;
+		this.auto_wait = ('undefined' !== typeof settings.auto_wait) ? settings.auto_wait 
+																	 : false; 
 		
 		this.minPlayers = settings.minPlayers || 1;
 		this.maxPlayers = settings.maxPlayers || 1000;
@@ -109,7 +113,7 @@
 			node.on( OUT + say + 'HI', function(){
 				// Upon establishing a successful connection with the server
 				// Enter the first state
-				if (that.automatic_step) {
+				if (that.auto_step) {
 					that.updateState(that.next());
 				}
 				else {
@@ -152,9 +156,10 @@
 		
 		var internalListeners = function() {
 			
+			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.automatic_step) {
+				if (that.auto_step) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
@@ -172,6 +177,7 @@
 						that.updateState(that.next());
 					}
 				}
+		
 //				else {
 //					node.log('WAITING FOR MONITOR TO STEP', 'DEBUG');
 //				}
@@ -180,6 +186,12 @@
 			node.on('DONE', function(msg) {
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
+				
+				if (this.auto_wait) {
+					if (node.window) {
+						node.emit('WAITING...');
+					}
+				}
 			});
 			
 			node.on('WAIT', function(msg) {
@@ -254,6 +266,7 @@
 		}
 		
 		node.emit('STATECHANGE');
+		
 		node.log('New State = ' + this.gameState);
 	};
 	

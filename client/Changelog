@@ -1,5 +1,10 @@
 6.6
 
+- WAIT -> WAITING...
+- automatic_step -> auto_step
+- auto_wait introduced
+- GameWindow addEventButton created
+- Log output is controlled on the client
 - Log output is controlled on the server
 
 6.5

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 17:41:15 CET 2012
+ * Built on Mi 18. Jan 18:24:16 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 17:41:15 CET 2012
+ * Built on Mi 18. Jan 18:24:16 CET 2012
  *
  */
  
@@ -2870,10 +2870,11 @@
 		// modified  by the execution of the loops functions
 		
 		// If not defined they take default settings
-		this.name = settings.name || "A standard game";
+		this.name = settings.name || 'A standard game';
 		this.description = settings.description || 'No Description';
 		
-		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer : false;
+		this.observer = ('undefined' !== typeof settings.observer) ? settings.observer 
+																   : false;
 		
 		this.gameLoop = new GameLoop(settings.loops);
 		 
@@ -2881,7 +2882,10 @@
 		this.player = null;	
 		this.gameState = new GameState();
 		
-		this.automatic_step = settings.automatic_step || false;
+		this.auto_step = ('undefined' !== typeof settings.auto_step) ? settings.auto_step 
+																	 : true;
+		this.auto_wait = ('undefined' !== typeof settings.auto_wait) ? settings.auto_wait 
+																	 : false; 
 		
 		this.minPlayers = settings.minPlayers || 1;
 		this.maxPlayers = settings.maxPlayers || 1000;
@@ -2956,7 +2960,7 @@
 			node.on( OUT + say + 'HI', function(){
 				// Upon establishing a successful connection with the server
 				// Enter the first state
-				if (that.automatic_step) {
+				if (that.auto_step) {
 					that.updateState(that.next());
 				}
 				else {
@@ -2999,9 +3003,10 @@
 		
 		var internalListeners = function() {
 			
+			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.automatic_step) {
+				if (that.auto_step) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
@@ -3019,6 +3024,7 @@
 						that.updateState(that.next());
 					}
 				}
+		
 //				else {
 //					node.log('WAITING FOR MONITOR TO STEP', 'DEBUG');
 //				}
@@ -3027,6 +3033,12 @@
 			node.on('DONE', function(msg) {
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
+				
+				if (this.auto_wait) {
+					if (node.window) {
+						node.emit('WAITING...');
+					}
+				}
 			});
 			
 			node.on('WAIT', function(msg) {
@@ -3101,6 +3113,7 @@
 		}
 		
 		node.emit('STATECHANGE');
+		
 		node.log('New State = ' + this.gameState);
 	};
 	
@@ -3629,7 +3642,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 17:41:15 CET 2012
+ * Built on Mi 18. Jan 18:24:16 CET 2012
  *
  */
  
@@ -4059,7 +4072,6 @@
 				that.toggleInputs(id);
 			});
 			
-			
 		}();
 	};
 	
@@ -4096,9 +4108,6 @@
 		if ('undefined' === typeof container) {
 			var container = this.frame.body;
 		}
-		
-		console.log('DISABLING in CONTAINER');
-		console.log(container);
 		
 		var inputTags = ['button', 'select', 'textarea', 'input'];
 
@@ -4254,23 +4263,12 @@
 		var root = root || this.root;
 		var options = options || {};
 		
-		// TODO: remove the eval
+
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
 			g = JSUS.getNestedValue(g,this.widgets);
 			g = new g(options);
-			
-//			var tokens = g.split('.');
-//			var i = 0;
-//			var strg = 'g = new this.widgets';
-//			for (;i<tokens.length;i++) {
-//				strg += '[\''+tokens[i]+'\']';
-//			}
-//			strg+='(options);';
-//			//node.log(strg);
-//			eval(strg);
-//			//g = new this.widgets[tokens](options);
 		}
 		
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
@@ -4899,7 +4897,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 17:41:15 CET 2012
+ * Built on Mi 18. Jan 18:24:16 CET 2012
  *
  */
  
@@ -6642,15 +6640,15 @@
 	
 	exports.WaitScreen = WaitScreen;
 	
-	function WaitScreen(id) {
+	function WaitScreen (options) {
 		
 		this.game = node.game;
-		this.id = id || 'waiting';
+		this.id = options.id || 'waiting';
 		this.name = 'WaitingScreen';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		
-		this.text = 'Waiting for other players...';
+		this.text = 'Waiting for other players to be done...';
 		this.waitingDiv = null;
 		
 	}
@@ -6659,13 +6657,17 @@
 	
 	WaitScreen.prototype.listeners = function () {
 		var that = this;
-		node.on('WAIT', function(text) {
-			that.waitingDiv = node.window.addDiv(document.body, that.id);
-			if (that.waitingDiv.style.display === "none"){
-				that.waitingDiv.style.display = "";
+		node.on('WAITING...', function (text) {
+			console.log('WOWO');
+			if (!that.waitingDiv) {
+				that.waitingDiv = node.window.addDiv(document.body, that.id);
 			}
+			
+			if (that.waitingDiv.style.display === 'none'){
+				that.waitingDiv.style.display = '';
+			}			
 		
-			that.waitingDiv.appendChild(document.createTextNode(that.text || text));
+			that.waitingDiv.innerHTML = text || that.text;
 			that.game.pause();
 		});
 		
@@ -6673,8 +6675,8 @@
 		node.on('STATECHANGE', function(text) {
 			if (that.waitingDiv) {
 				
-				if (that.waitingDiv.style.display == ""){
-					that.waitingDiv.style.display = "none";
+				if (that.waitingDiv.style.display == ''){
+					that.waitingDiv.style.display = 'none';
 				}
 			// TODO: Document.js add method to remove element
 			}

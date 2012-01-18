@@ -89,7 +89,6 @@
 				that.toggleInputs(id);
 			});
 			
-			
 		}();
 	};
 	
@@ -126,9 +125,6 @@
 		if ('undefined' === typeof container) {
 			var container = this.frame.body;
 		}
-		
-		console.log('DISABLING in CONTAINER');
-		console.log(container);
 		
 		var inputTags = ['button', 'select', 'textarea', 'input'];
 
@@ -284,23 +280,12 @@
 		var root = root || this.root;
 		var options = options || {};
 		
-		// TODO: remove the eval
+
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		if ('object' !== typeof g) {
 			g = JSUS.getNestedValue(g,this.widgets);
 			g = new g(options);
-			
-//			var tokens = g.split('.');
-//			var i = 0;
-//			var strg = 'g = new this.widgets';
-//			for (;i<tokens.length;i++) {
-//				strg += '[\''+tokens[i]+'\']';
-//			}
-//			strg+='(options);';
-//			//node.log(strg);
-//			eval(strg);
-//			//g = new this.widgets[tokens](options);
 		}
 		
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
