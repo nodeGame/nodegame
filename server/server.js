@@ -7,7 +7,9 @@ var ServerNode = require('./nodegame-server');
 var options = { 
 				name: "nodeGame Server",
 				port: 8080,
-				dump: true,
+				verbosity: -1,
+				dumpsys: false,
+				dumpmsg: false,
 				mail: false
 };
 

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 13. Jan 14:18:36 CET 2012
+ * Built on Mi 18. Jan 10:59:50 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 13. Jan 14:18:36 CET 2012
+ * Built on Mi 18. Jan 10:59:50 CET 2012
  *
  */
  
@@ -472,8 +472,8 @@
 	 * If strict is equal to true, elements cannot be matched multiple times.
 	 */
 	ARRAY.matchN = function (array, N, strict) {
-		console.log('TO MATCH');
-		console.log(array.length);
+//		console.log('TO MATCH');
+//		console.log(array.length);
 		
 		var result = []
 		var len = array.length;
@@ -1749,7 +1749,7 @@
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			console.log('Going to compare ' + gs + ' and ' + gameState);
+			//console.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -3051,9 +3051,9 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					node.log('WE PLAY AUTO', 'DEBUG');
-					console.log(that.pl);
-					console.log(that.pl.size());
+//					node.log('WE PLAY AUTO', 'DEBUG');
+//					console.log(that.pl);
+//					console.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					console.log(morePlayers);
 					
@@ -3155,7 +3155,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		node.log('New state is going to be ' + new GameState(state));
+		//node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -3662,7 +3662,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 13. Jan 14:18:36 CET 2012
+ * Built on Mi 18. Jan 10:59:50 CET 2012
  *
  */
  
@@ -4910,7 +4910,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 13. Jan 14:18:36 CET 2012
+ * Built on Mi 18. Jan 10:59:50 CET 2012
  *
  */
  

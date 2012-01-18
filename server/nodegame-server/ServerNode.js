@@ -10,12 +10,18 @@ var path = require('path');
 
 var ServerChannel = require('./ServerChannel');
 
-function ServerNode (options, server, io) {
+var JSUS = require('nodegame-client').JSUS;
 
-	this.options = options;
+function ServerNode (options, server, io) {
+	if (!options) {
+		throw new Error('No configuration found to create a server. Aborting');
+	}
+	this.options = {};
+	this.options.mail = ('undefined' !== typeof options.mail) ? options.mail : false;
+	this.options.dumpmsg = ('undefined' !== typeof options.dumpmsg) ? options.dumpmsg : false;
+	this.options.dumpsys = ('undefined' !== typeof options.dumpsys) ? options.dumpsys : true;
+	this.options.verbosity = ('undefined' !== typeof options.verbosity) ? options.verbosity : 1;
 	
-	this.options.mail = this.options.mail || false;
-	this.options.dump = this.options.mail || true;
 	this.port = options.port || '80'; // port of the express server and sio
 	
 	this.maxChannels = options.maxChannels;
@@ -37,6 +43,10 @@ ServerNode.prototype.createHTTPServer = function (options) {
 		}
 		else if (filePath === './nodegame.js') {
 			filePath = './nodegame/nodegame-all-latest.js';
+		}
+		
+		else if (filePath === './fabric.js') {
+			filePath = './libs/fabric.js/all.min.js';
 		}
 		
 		// Added path.normalize here. TODO: Check if it works on windows.
@@ -94,6 +104,12 @@ ServerNode.prototype.listen = function (http, io) {
 }
 
 ServerNode.prototype.addChannel = function (options) {
+	if (!options) {
+		console.log('Options are not correctly defined for the channel. Aborting');
+		return;
+	}
+	
+	var options = JSUS.extend(this.options, options);
 	// TODO merge global options with local options
 	var channel = new ServerChannel(options, this.server, this.io);
 	// TODO return false in case of error in creating the channel

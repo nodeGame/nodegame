@@ -60,7 +60,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 20000
+								milliseconds: 1000
 			};
 			
 			this.timer.restart(timerOptions);
@@ -126,7 +126,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 100
+							milliseconds: 4000
 		};
 		
 		this.timer.restart(timerOptions);

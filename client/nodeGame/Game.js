@@ -155,9 +155,9 @@
 			node.on('STATEDONE', function() {
 				// If we go auto
 				if (that.automatic_step) {
-					node.log('WE PLAY AUTO', 'DEBUG');
-					console.log(that.pl);
-					console.log(that.pl.size());
+//					node.log('WE PLAY AUTO', 'DEBUG');
+//					console.log(that.pl);
+//					console.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
 					console.log(morePlayers);
 					
@@ -259,7 +259,7 @@
 	
 	Game.prototype.updateState = function(state) {
 		
-		node.log('New state is going to be ' + new GameState(state));
+		//node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;

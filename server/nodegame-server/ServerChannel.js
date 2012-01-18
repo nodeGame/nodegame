@@ -15,11 +15,13 @@ var Utils = require('nodegame-client').Utils;
 var GameState = require('nodegame-client').GameState;
 var GameMsg = require('nodegame-client').GameMsg;
 
+var JSUS = require('nodegame-client').JSUS;
 var PlayerList = require('nodegame-client').PlayerList;
 var Player = require('nodegame-client').Player;
 
 function ServerChannel (options, server, io) {
 	
+	this.options = options;
 	this.server = server;
 	this.io = io;
 		
@@ -38,36 +40,35 @@ function ServerChannel (options, server, io) {
 	
 	this.nPlayers = options.nPlayers;
 	
-	this.dump = options.dump; // Should it dump all the msgs?
 	
 	this.adminChannel = options.admin;
 	this.playerChannel = options.player;
 	
 	this.port = options.port;
-
-	var dumpmsg = options.dumpmsg || true;
 		
 	this.createServers();
 }
 
 ServerChannel.prototype.createServers = function() {
 	
-		
-	this.adminServer = new AdminServer ({
-										 io: 		this.io,
-										 server: 	this.server,
-										 channel: 	this.adminChannel,
-										 parent:	this.name,
-										 name: 		'A'
-										});
+	var adminOptions = {
+						 	io: 		this.io,
+						 	server: 	this.server,
+						 	channel: 	this.adminChannel,
+						 	parent:		this.name,
+						 	user_options: JSUS.extend(this.options, {name: 'A'})
+						};
 	
-	this.playerServer = new PlayerServer ({
-										   io: 		this.io,
-										   server: 	this.server,
-										   channel: this.playerChannel,
-										   parent: 	this.name,
-										   name: 	'P'
-										 });
+	var playerOptions = {
+						   io: 		this.io,
+						   server: 	this.server,
+						   channel: this.playerChannel,
+						   parent: 	this.name,
+						   user_options: JSUS.extend(this.options, {name: 'P'})
+						};
+		
+	this.adminServer = new AdminServer(adminOptions);
+	this.playerServer = new PlayerServer(playerOptions);
 	
 	this.adminServer.setPartner(this.playerServer);
 	this.playerServer.setPartner(this.adminServer);

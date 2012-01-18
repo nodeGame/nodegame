@@ -36,8 +36,8 @@ GameMsgManager.prototype.sendPLIST = function (node, to) {
 	var to = to || 'ALL';
 	// TODO: set/get/say choose carefully
 	
-	console.log('NODE.PL');
-	console.log(node.pl);
+	this.log.log('NODE.PL');
+	this.log.log(node.pl);
 	
 	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, to);
 	this.send(plMsg);
@@ -71,7 +71,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	var msg = gameMsg.stringify();
 	
 	if (to === 'SERVER' || to === null) {
-		this.log.log('E, Trying to send msg to nobody: ' + to, 'ERR');
+		this.log.log('Trying to send msg to nobody: ' + to, 'ERR');
 		return false;
 	}
 	
@@ -84,7 +84,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 //			var v =  this.node.channel;
 //			for (var i in v) {
 //				if (v.hasOwnProperty(i)){
-//					console.log(v[i]);
+//					this.log(v[i]);
 //				}
 //			}
 			this.node.channel.volatile.json.send(msg);
@@ -119,13 +119,13 @@ GameMsgManager.prototype.broadcast = function(gameMsg) {
 
 	for (var client in this.node.channel.sockets) {
 		if (this.node.channel.sockets.hasOwnProperty(client)) { 
-			console.log(client);
+			this.log.log(client);
 			if (client !== from) {
-				console.log(client + ' different ' + from);
+				this.log.log(client + ' different ' + from);
 				gameMsg.to = client;
 				this.send(gameMsg);
 			}
-			//console.log(this.node.channel.sockets[client]);
+			//this.log(this.node.channel.sockets[client]);
 			//this.node.channel.sockets[client].send(msg);
 		}
 	}

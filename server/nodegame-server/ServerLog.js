@@ -8,10 +8,22 @@ var Utils = require('nodegame-client').Utils;
 
 module.exports = ServerLog;
 
-function ServerLog(options) {
+ServerLog.verbosity_levels = {
+		ERR: -1,
+		WARN: 0,
+		INFO: 1,
+		DEBUG: 3
+};
+
+
+function ServerLog (options) {
+	
+	
 	
 	this.name = options.name || 'Noname';
-	this.dumpmsg = options.dumpmsg || 0;
+	this.verbosity = ('undefined' !== typeof options.verbosity) ? options.verbosity : 1;
+	this.dumpmsg = ('undefined' !== typeof options.dumpmsg) ? options.dumpmsg : false;
+	this.dumpsys = ('undefined' !== typeof options.dumpsys) ? options.dumpsys : true;
 	this.logdir = path.normalize(options.logdir || 'log');
 	this.logdir = path.resolve(this.logdir);
 		
@@ -19,24 +31,28 @@ function ServerLog(options) {
 	
 	this.sysfile = path.normalize(options.sysfile || this.logdir + '/syslog');
 	this.msgfile = path.normalize(options.msgfile || this.logdir + '/messages');
-	
-	try {
-		this.logSysStream = fs.createWriteStream( this.sysfile, {'flags': 'a'});
-		
-		if (this.dumpmsg) {
-			try {
-				this.logMsgStream = fs.createWriteStream( this.msgfile, {'flags': 'a'});
-				this.log('Log of Messages active');
-			}
-			catch (e) {
-				this.log('Msg Log could not be started');
-			}
+			
+	if (this.dumpsys) {
+		console.log('AHAH');
+		try {
+			this.logSysStream = fs.createWriteStream( this.sysfile, {'flags': 'a'});
+			this.log('Log of System Messages active');
+		}
+		catch (e) {
+			this.log('System Messages log could not be started');
 		}
 	}
-	catch(e) {
-		console.log('Log service could not be started ' + e);
-	}
 	
+	if (this.dumpmsg) {
+		console.log('HUHU');
+		try {
+			this.logMsgStream = fs.createWriteStream( this.msgfile, {'flags': 'a'});
+			this.log('Log of Messages active');
+		}
+		catch (e) {
+			this.log('Msg Log could not be started');
+		}
+	}	
 };
 
 /**
@@ -50,9 +66,13 @@ ServerLog.prototype.checkLogDir = function() {
 	}
 }
 
-ServerLog.prototype.log = function (text, type) {	
-	this.console(text,type);
-	this.sys(text,type);
+ServerLog.prototype.log = function (text, type) {
+	if (this.verbosity > ServerLog.verbosity_levels[type]) {
+		this.console(text,type);
+		if (this.logSysStream) {
+			this.sys(text,type);
+		}
+	}
 };
 
 
@@ -82,8 +102,10 @@ ServerLog.prototype.msg = function(gameMsg, type) {
 };
 
 ServerLog.prototype.sys = function(text, type) {
-	var text = Utils.getDate() + ', ' + this.name + ' ' + text;
-	this.logSysStream.write(text + '\n');	
+	if (this.logSysStream) {
+		var text = Utils.getDate() + ', ' + this.name + ' ' + text;
+		this.logSysStream.write(text + '\n');	
+	}
 };
 
 ServerLog.prototype.close = function() {

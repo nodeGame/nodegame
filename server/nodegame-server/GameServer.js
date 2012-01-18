@@ -25,18 +25,20 @@ function GameServer(options) {
 
 	EventEmitter.call(this);
 
+	this.options = options;
+	this.user_options = options.user_options;
+	
 	this.io = options.io;
 	this.channel = '/' + options.channel;
 	this.socket = null; // to be init after a connection is created
-
 	this.parent = options.parent;
-	this.name = options.name;
-
-	var dumpmsg = options.dumpmsg || true;
+	this.name = this.user_options.name;
 
 	this.log = new ServerLog({
 		name : '[' + this.parent + ' - ' + this.name + ']',
-		dumpmsg : dumpmsg
+		dumpmsg : ('undefined' === typeof this.user_options.dumpmsg) ? false : this.user_options.dumpmsg,
+		dumpsys : ('undefined' === typeof this.user_options.dumpsys) ? true : this.user_options.dumpsys,
+		verbosity : ('undefined' === typeof this.user_options.verbosity) ? 1 : this.user_options.verbosity
 	});
 
 	this.server = options.server;
@@ -102,9 +104,9 @@ GameServer.prototype.attachListeners = function() {
 						// TODO: KEEP THE
 						// FORWADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ?
 						// that.gmm.forward(msg);
-						console.log(that.name + ' About to emit ' + msg.toEvent());
-
-						that.log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
+						
+						log.log(that.name + ' About to emit ' + msg.toEvent());
+						log.log(msg.toEvent() + ' ' + msg.to + '-> ' + msg.from);
 						
 						that.emit(msg.toEvent(), msg);
 					}
@@ -150,7 +152,7 @@ GameServer.prototype.getConnections = function() {
 	for ( var i in this.channel.sockets) {
 		if (this.channel.sockets.hasOwnProperty(i)) {
 			clientids.push(i);
-			console.log(i);
+			this.log(i);
 		}
 	}
 	return clientids;
