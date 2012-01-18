@@ -156,10 +156,10 @@
 				// If we go auto
 				if (that.automatic_step) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
-//					console.log(that.pl);
-//					console.log(that.pl.size());
+//					node.log(that.pl);
+//					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					console.log(morePlayers);
+					node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -237,7 +237,7 @@
 
 	
 //	Game.prototype.is = function(is) {
-//		//console.log('IS ' + is);
+//		//node.log('IS ' + is);
 //		this.gameState.is = is;
 //		// TODO Check whether we should do it here or no
 //		// this.publishState();

@@ -16,22 +16,6 @@
 	
 	exports.GameLoop = GameLoop;
 	
-//	function GameLoop (loop) {
-//		this.loop = loop;
-//		
-//		this.limits = Array();
-//		
-//		for (var key in this.loop) {
-//			if (this.loop.hasOwnProperty(key)) {
-//				var round = loop[key].rounds || 1;
-//				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
-//			}
-//		}
-//		
-//		this.nStates = this.limits.length;
-//		
-//	}
-	
 	function GameLoop (loop) {
 		this.loop = loop;
 		
@@ -67,33 +51,33 @@
 	GameLoop.prototype.exist = function (gameState) {
 	
 		if (typeof(this.loop[gameState.state]) === 'undefined') {
-			console.log('(E): Unexisting state: ' + gameState.state);
+			node.log('Unexisting state: ' + gameState.state, 'WARN');
 			return false;
 		}
 		
 		if (typeof(this.loop[gameState.state]['state'][gameState.step]) === 'undefined'){
-			console.log('(E): Unexisting step: ' + gameState.step);
+			node.log('Unexisting step: ' + gameState.step, 'WARN');
 			return false;
 		}
 		// States are 1 based, arrays are 0-based => -1
 		if (gameState.round > this.limits[gameState.state-1]['rounds']) {
-			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
+			node.log('Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds'], 'WARN');
 			return false;
 		}
 		
-		//console.log('This exist: ' + gameState);
+		//node.log('This exist: ' + gameState, 'ERR');
 			
 		return true;
 	};
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		console.log('NEXT OF THIS ' + gameState);
-		//console.log(this.limits);
+		node.log('NEXT OF THIS ' + gameState);
+		//node.log(this.limits);
 		
 		// Game has not started yet, do it!
 		if (gameState.state === 0) {
-			//console.log('NEXT: NEW');
+			//node.log('NEXT: NEW');
 			return new GameState({
 								 state: 1,
 								 step: 1,
@@ -102,7 +86,7 @@
 		}
 		
 		if (!this.exist(gameState)) {
-			console.log('No next state of non-existing state: ' + gameState);
+			node.log('No next state of non-existing state: ' + gameState, 'WARN');
 			return false;
 		}
 		
@@ -110,8 +94,8 @@
 		
 		if (this.limits[idxLimit]['steps'] > gameState.step){
 			var newStep = Number(gameState.step)+1;
-	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-//			console.log('NEXT STEP: '  + new GameState({
+	//		node.log('Limit: ' + this.limits[gameState.state]['steps']);
+//			node.log('NEXT STEP: '  + new GameState({
 //														state: gameState.state,
 //														step: newStep,
 //														round: gameState.round
@@ -126,7 +110,7 @@
 		
 		if (this.limits[idxLimit]['rounds'] > gameState.round){
 			var newRound = Number(gameState.round)+1;
-			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
+			//node.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
 			return new GameState({
 				state: gameState.state,
 				step: 1,
@@ -136,7 +120,7 @@
 		
 		if (this.nStates > gameState.state){		
 			var newState = Number(gameState.state)+1;
-			//console.log('NEXT STATE: ' + new GameState(newState,1,1));
+			//node.log('NEXT STATE: ' + new GameState(newState,1,1));
 			//return new GameState(newState,1,1);
 			return new GameState({
 				state: newState,
@@ -151,7 +135,7 @@
 	GameLoop.prototype.previous = function (gameState) {
 		
 		if (!this.exist(gameState)) {
-			console.log('No previous state of non-existing state: ' + gameState);
+			node.log('No previous state of non-existing state: ' + gameState, 'WARN');
 		}
 		
 		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
@@ -210,10 +194,10 @@
 			if (!gs) return false;
 		}
 		
-//		console.log('FROM');
-//		console.log(gameState);		
-//		console.log('TO');
-//		console.log(gs);
+//		node.log('FROM');
+//		node.log(gameState);		
+//		node.log('TO');
+//		node.log(gs);
 		
 		return gs;
 	};

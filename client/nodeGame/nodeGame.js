@@ -10,6 +10,24 @@
 	// Will be initialized later
 	node.memory = {};
 	
+	node.verbosity = 0;
+	
+	node.verbosity_levels = {
+			ALWAYS: - Number.MIN_VALUE,
+			ERR: -1,
+			WARN: 0,
+			INFO: 1,
+			DEBUG: 3
+	};
+	
+	node.log = function (txt, level) {
+		if ('number' !== typeof level) {
+			var level = node.verbosity_levels[level];
+		}
+		if (this.verbosity > level) {
+			console.log(txt);
+		}
+	};
 
 	// Load the auxiliary library if available in the browser
 	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
@@ -189,16 +207,16 @@
 	
 	node.on = function (event, listener) {
 		var state = this.state();
-		//console.log(state);
+		//node.log(state);
 		
 		// It is in the init function;
 		if (!state || (GameState.compare(state, new GameState(), true) === 0 )) {
 			that.addListener(event, listener);
-			//console.log('global');
+			//node.log('global');
 		}
 		else {
 			that.addLocalListener(event, listener);
-			//console.log('local');
+			//node.log('local');
 		}
 	};
 	
@@ -218,8 +236,8 @@
 		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
-		console.log('nodeGame: game loaded...');
-		console.log('nodeGame: ready.');
+		node.log('nodeGame: game loaded...');
+		node.log('nodeGame: ready.');
 	};	
 	
 	node.observe = function (conf) {	
@@ -237,8 +255,8 @@
 //			
 //			that.gsc.setGame(that.game);
 //			
-//			console.log('nodeGame: game loaded...');
-//			console.log('nodeGame: ready.');
+//			node.log('nodeGame: game loaded...');
+//			node.log('nodeGame: ready.');
 		});
 		
 	};	
@@ -366,11 +384,6 @@
 	node.goto = function(state) {
 		node.game.updateState(state);
 	};
-	
-	node.log = function(txt,level) {
-		console.log(txt);
-	};
-	
 	
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {

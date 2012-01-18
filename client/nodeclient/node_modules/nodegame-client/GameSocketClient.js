@@ -32,7 +32,7 @@
 	
 	GameSocketClient.prototype.connect = function() {
 		// TODO: add check if http:// is already in
-		console.log('nodeGame: connecting to ' + this.url);
+		node.log('nodeGame: connecting to ' + this.url);
 		var socket = io.connect(this.url);
 	    this.attachFirstListeners(socket);
 	    return socket;
@@ -49,16 +49,17 @@
 	GameSocketClient.prototype.secureParse = function (msg) {
 		
 		try {
-			//console.log(msg);
+			//node.log(msg);
 			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
-			console.log('R: ' + gameMsg);			
+			node.log('R: ' + gameMsg);			
 			node.emit('LOG', 'R: ' + gameMsg.toSMS());
 			return gameMsg;
 		}
 		catch(e) {
 			var error = "Malformed msg received: " + e;
-			console.log(error);
+			node.log(error, 'ERR');
+			// TODO: Automatically log errors
 			node.emit('LOG', 'E: ' + error);
 			return false;
 		}
@@ -71,7 +72,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//console.log('Debuffered ' + msg);
+			//node.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -86,7 +87,7 @@
 		
 		socket.on('connect', function (msg) {
 			var connString = 'nodeGame: connection open';
-		    console.log(connString); 
+		    node.log(connString); 
 		    
 		    socket.on('message', function (msg) {	
 		    	
@@ -112,14 +113,14 @@
 		
 	    socket.on('disconnect', function() {
 	    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
-	    	console.log('closed');
+	    	node.log('closed');
 	    });
 	};
 	
 	GameSocketClient.prototype.attachMsgListeners = function (socket, session) {   
 		var that = this;
 		
-		console.log('nodeGame: Attaching FULL listeners');
+		node.log('nodeGame: Attaching FULL listeners');
 		socket.removeAllListeners('message');
 			
 		this.gmg = new GameMsgGenerator(session, this.player.id, new GameState());
@@ -128,10 +129,10 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				//console.log('GM is: ' + that.game.gameState.is);
+				//node.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
 				if (that.game && that.game.isGameReady()) {
-					//console.log('GM is now: ' + that.game.gameState.is);
+					//node.log('GM is now: ' + that.game.gameState.is);
 					
 //					var event = msg.toInEvent();
 //					
@@ -146,8 +147,8 @@
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
-					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					//console.log('Buffering: ' + msg);
+					//node.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
+					//node.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
@@ -194,7 +195,7 @@
 		//else {
 		//	this.io.volatile.send(msg.stringify());
 		//}
-		console.log('S: ' + msg);
+		node.log('S: ' + msg);
 		node.emit('LOG', 'S: ' + msg.toSMS());
 	};
 

@@ -6,15 +6,9 @@ var path = require('path');
 
 var Utils = require('nodegame-client').Utils;
 
+ServerLog.verbosity_levels = require('nodegame-client').verbosity_levels;
+
 module.exports = ServerLog;
-
-ServerLog.verbosity_levels = {
-		ERR: -1,
-		WARN: 0,
-		INFO: 1,
-		DEBUG: 3
-};
-
 
 function ServerLog (options) {
 	

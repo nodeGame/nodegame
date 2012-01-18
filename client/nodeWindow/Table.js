@@ -17,7 +17,7 @@
 	Table.H = ['x','y','z'];
 	Table.V = ['y','x', 'z'];
 	
-	Table.log = console.log;
+	Table.log = node.log;
 	
   function Table (options, data) {
 	var options = options || {};
@@ -139,8 +139,8 @@
 		dims = Table.H;
 	}
 	
-//	console.log('DATA TBL');
-//	console.log(data);
+//	Table.log('DATA TBL');
+//	Table.log(data);
 	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
@@ -150,16 +150,16 @@
 	if ('object' !== typeof data) data = [data]; 
 	
 	var insertCell = function (content){	
-		//console.log('content');
-//		console.log(x + ' ' + y + ' ' + z);
-//		console.log(i + ' ' + j + ' ' + h);
+		//Table.log('content');
+//		Table.log(x + ' ' + y + ' ' + z);
+//		Table.log(i + ' ' + j + ' ' + h);
 		
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? y+j : y;
 		cell[dims[2]] = (h) ? z+h : z;
 		cell['content'] = content;	
-		//console.log(cell);
+		//Table.log(cell);
 		this.insert(new Cell(cell));
 		this.updatePointer(dims[0],cell[dims[0]]);
 		this.updatePointer(dims[1],cell[dims[1]]);
@@ -170,37 +170,37 @@
 	var cell = null;
 	// Loop Dim1
 	for (var i = 0; i < data.length; i++) {
-		//console.log('data_i');
-		//console.log(data[i]);
+		//Table.log('data_i');
+		//Table.log(data[i]);
 		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
-//				console.log(data[i]);
+//				Table.log(data[i]);
 				if (data[i][j] instanceof Array) {
 //					Table.log(data[i][j]);
 //					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
-						//console.log('Here h');
+						//Table.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
 					h=0; // reset h
 				}
 				else {
-					//console.log('Here j');
+					//Table.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
 			j=0; // reset j
 		}
 		else {
-			//console.log('Here i');
+			//Table.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
 //	
-//	console.log('After insert');
-//	console.log(this.db);
+//	Table.log('After insert');
+//	Table.log(this.db);
 	
   };
     
@@ -270,7 +270,7 @@
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
 				  trid = this.db[i].y;
-				  //console.log(trid);
+				  //Table.log(trid);
 				  old_x = f.x - 1; // must start exactly from the first
 			  }
 			  

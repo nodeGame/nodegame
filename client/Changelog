@@ -1,3 +1,7 @@
+6.6
+
+- Log output is controlled on the server
+
 6.5
 
 - NDDB in, !in, <> and >< select queries added

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 10:59:50 CET 2012
+ * Built on Mi 18. Jan 12:29:24 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 10:59:50 CET 2012
+ * Built on Mi 18. Jan 12:29:24 CET 2012
  *
  */
  
@@ -1622,15 +1622,15 @@
 	
 	function PlayerList (options, db) {
 //		
-//	  console.log('RECEIVED');	
-//	  console.log(db);	
+//	  node.log('RECEIVED');	
+//	  node.log(db);	
 	  var options = options || {};
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  //this.set('state', GameBit.compareState);
-//	  console.log('JUST CREATED PL');
-//	  console.log(this);
+//	  node.log('JUST CREATED PL');
+//	  node.log(this);
 	  this.countid = 0;
 	};
 	
@@ -1695,7 +1695,7 @@
 			return true;
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+		node.log('Attempt to access a non-existing player from the the player list ' + player.id, 'WARN');
 		return false;
 	};
 	
@@ -1707,11 +1707,11 @@
 		}
 		
 		if ('undefined' === typeof state) {
-			console.log('W: Attempt to assign to a player an undefined state');
+			node.log('Attempt to assign to a player an undefined state', 'WARN');
 			return false;
 		}
 		
-		//console.log(this.pl);
+		//node.log(this.pl);
 		
 		this.select('id', '=', id).first().state = state;	
 	
@@ -1728,7 +1728,7 @@
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
 		
-		//console.log('1--------> ' + gameState);
+		//node.log('1--------> ' + gameState);
 		
 		// Check whether a gameState variable is passed
 		// if not try to use the node.game.gameState as the default state
@@ -1742,14 +1742,14 @@
 			}
 		}
 		
-		//console.log('2--------> ' + gameState);
+		//node.log('2--------> ' + gameState);
 		
 		var strict = strict || false;
 		
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			//node.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -1789,7 +1789,7 @@
 			
 		});
 		
-		//console.log('ACTIVES: ' + result);
+		//node.log('ACTIVES: ' + result);
 		
 		return result;
 	};
@@ -2096,22 +2096,6 @@
 	
 	exports.GameLoop = GameLoop;
 	
-//	function GameLoop (loop) {
-//		this.loop = loop;
-//		
-//		this.limits = Array();
-//		
-//		for (var key in this.loop) {
-//			if (this.loop.hasOwnProperty(key)) {
-//				var round = loop[key].rounds || 1;
-//				this.limits.push({rounds:round,steps:Utils.getListSize(this.loop[key]['loop'])});
-//			}
-//		}
-//		
-//		this.nStates = this.limits.length;
-//		
-//	}
-	
 	function GameLoop (loop) {
 		this.loop = loop;
 		
@@ -2147,33 +2131,33 @@
 	GameLoop.prototype.exist = function (gameState) {
 	
 		if (typeof(this.loop[gameState.state]) === 'undefined') {
-			console.log('(E): Unexisting state: ' + gameState.state);
+			node.log('Unexisting state: ' + gameState.state, 'WARN');
 			return false;
 		}
 		
 		if (typeof(this.loop[gameState.state]['state'][gameState.step]) === 'undefined'){
-			console.log('(E): Unexisting step: ' + gameState.step);
+			node.log('Unexisting step: ' + gameState.step, 'WARN');
 			return false;
 		}
 		// States are 1 based, arrays are 0-based => -1
 		if (gameState.round > this.limits[gameState.state-1]['rounds']) {
-			console.log('(E): Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds']);
+			node.log('Unexisting round: ' + gameState.round + 'Max round: ' + this.limits[gameState.state]['rounds'], 'WARN');
 			return false;
 		}
 		
-		//console.log('This exist: ' + gameState);
+		//node.log('This exist: ' + gameState, 'ERR');
 			
 		return true;
 	};
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		console.log('NEXT OF THIS ' + gameState);
-		//console.log(this.limits);
+		node.log('NEXT OF THIS ' + gameState);
+		//node.log(this.limits);
 		
 		// Game has not started yet, do it!
 		if (gameState.state === 0) {
-			//console.log('NEXT: NEW');
+			//node.log('NEXT: NEW');
 			return new GameState({
 								 state: 1,
 								 step: 1,
@@ -2182,7 +2166,7 @@
 		}
 		
 		if (!this.exist(gameState)) {
-			console.log('No next state of non-existing state: ' + gameState);
+			node.log('No next state of non-existing state: ' + gameState, 'WARN');
 			return false;
 		}
 		
@@ -2190,8 +2174,8 @@
 		
 		if (this.limits[idxLimit]['steps'] > gameState.step){
 			var newStep = Number(gameState.step)+1;
-	//		console.log('Limit: ' + this.limits[gameState.state]['steps']);
-//			console.log('NEXT STEP: '  + new GameState({
+	//		node.log('Limit: ' + this.limits[gameState.state]['steps']);
+//			node.log('NEXT STEP: '  + new GameState({
 //														state: gameState.state,
 //														step: newStep,
 //														round: gameState.round
@@ -2206,7 +2190,7 @@
 		
 		if (this.limits[idxLimit]['rounds'] > gameState.round){
 			var newRound = Number(gameState.round)+1;
-			//console.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
+			//node.log('NEXT ROUND: ' + new GameState(gameState.state,1,newRound));
 			return new GameState({
 				state: gameState.state,
 				step: 1,
@@ -2216,7 +2200,7 @@
 		
 		if (this.nStates > gameState.state){		
 			var newState = Number(gameState.state)+1;
-			//console.log('NEXT STATE: ' + new GameState(newState,1,1));
+			//node.log('NEXT STATE: ' + new GameState(newState,1,1));
 			//return new GameState(newState,1,1);
 			return new GameState({
 				state: newState,
@@ -2231,7 +2215,7 @@
 	GameLoop.prototype.previous = function (gameState) {
 		
 		if (!this.exist(gameState)) {
-			console.log('No previous state of non-existing state: ' + gameState);
+			node.log('No previous state of non-existing state: ' + gameState, 'WARN');
 		}
 		
 		var idxLimit = Number(gameState.state)-1; // 0 vs 1 based
@@ -2290,10 +2274,10 @@
 			if (!gs) return false;
 		}
 		
-//		console.log('FROM');
-//		console.log(gameState);		
-//		console.log('TO');
-//		console.log(gs);
+//		node.log('FROM');
+//		node.log(gameState);		
+//		node.log('TO');
+//		node.log(gs);
 		
 		return gs;
 	};
@@ -2403,7 +2387,7 @@
 	
 	GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
 		
-		//console.log('Creating plist msg ' + plist + ' ' + plist.size());
+		//node.log('Creating plist msg ' + plist + ' ' + plist.size());
 		
 		var rel = reliable || 1;
 		
@@ -2426,7 +2410,7 @@
 	
 	GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 		
-		//console.log("STE: " + text);
+		//node.log("STE: " + text);
 		
 		var rel = reliable || 0;
 		
@@ -2547,7 +2531,7 @@
 	
 	GameSocketClient.prototype.connect = function() {
 		// TODO: add check if http:// is already in
-		console.log('nodeGame: connecting to ' + this.url);
+		node.log('nodeGame: connecting to ' + this.url);
 		var socket = io.connect(this.url);
 	    this.attachFirstListeners(socket);
 	    return socket;
@@ -2564,16 +2548,17 @@
 	GameSocketClient.prototype.secureParse = function (msg) {
 		
 		try {
-			//console.log(msg);
+			//node.log(msg);
 			//debugger;
 			var gameMsg = GameMsg.clone(JSON.parse(msg));
-			console.log('R: ' + gameMsg);			
+			node.log('R: ' + gameMsg);			
 			node.emit('LOG', 'R: ' + gameMsg.toSMS());
 			return gameMsg;
 		}
 		catch(e) {
 			var error = "Malformed msg received: " + e;
-			console.log(error);
+			node.log(error, 'ERR');
+			// TODO: Automatically log errors
 			node.emit('LOG', 'E: ' + error);
 			return false;
 		}
@@ -2586,7 +2571,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//console.log('Debuffered ' + msg);
+			//node.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -2601,7 +2586,7 @@
 		
 		socket.on('connect', function (msg) {
 			var connString = 'nodeGame: connection open';
-		    console.log(connString); 
+		    node.log(connString); 
 		    
 		    socket.on('message', function (msg) {	
 		    	
@@ -2627,14 +2612,14 @@
 		
 	    socket.on('disconnect', function() {
 	    	// TODO: this generates an error: attempt to run compile-and-go script on a cleared scope
-	    	console.log('closed');
+	    	node.log('closed');
 	    });
 	};
 	
 	GameSocketClient.prototype.attachMsgListeners = function (socket, session) {   
 		var that = this;
 		
-		console.log('nodeGame: Attaching FULL listeners');
+		node.log('nodeGame: Attaching FULL listeners');
 		socket.removeAllListeners('message');
 			
 		this.gmg = new GameMsgGenerator(session, this.player.id, new GameState());
@@ -2643,10 +2628,10 @@
 			var msg = that.secureParse(msg);
 			
 			if (msg) { // Parsing successful
-				//console.log('GM is: ' + that.game.gameState.is);
+				//node.log('GM is: ' + that.game.gameState.is);
 				// Wait to fire the msgs if the game state is loading
 				if (that.game && that.game.isGameReady()) {
-					//console.log('GM is now: ' + that.game.gameState.is);
+					//node.log('GM is now: ' + that.game.gameState.is);
 					
 //					var event = msg.toInEvent();
 //					
@@ -2661,8 +2646,8 @@
 					node.emit(msg.toInEvent(), msg);
 				}
 				else {
-					//console.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
-					//console.log('Buffering: ' + msg);
+					//node.log(that.game.gameState.is + ' < ' + GameState.iss.PLAYING);
+					//node.log('Buffering: ' + msg);
 					that.buffer.push(msg);
 				}
 			}
@@ -2709,7 +2694,7 @@
 		//else {
 		//	this.io.volatile.send(msg.stringify());
 		//}
-		console.log('S: ' + msg);
+		node.log('S: ' + msg);
 		node.emit('LOG', 'S: ' + msg.toSMS());
 	};
 
@@ -2854,45 +2839,7 @@
 })(
 	'undefined' != typeof node ? node : module.exports
   , 'undefined' != typeof node ? node : module.parent.exports
-);
-
-// @TODO check this comments
-
-/**
- * Write data into the memory of a client.
- * It overwrites data with the same key.
- * @data can be an object, or an object containing other objects,
- * but these cannot contain other objects in turn.
- * 
- * @param {String} client
- * @param {Object} data
- * @param {String} state
- * 
- * @api public
- */
-
-
-/** 
- *  Reverse the memory: instead of the history of a player for all rounds,
- *  we get the history of a round of all players
- */
-
-
-/**
- * Returns an array of arrays. Each row is unique combination of:
- * 
- * A) state, client, key1, key2, value
- * 
- * or 
- * 
- * B) state, client, key1, value
- * 
- * Since getLine returns the same array of array, the task is here to merge
- * all together.
- * 
- */
-
- 
+); 
  
 (function (exports, node) {
 	
@@ -3052,10 +2999,10 @@
 				// If we go auto
 				if (that.automatic_step) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
-//					console.log(that.pl);
-//					console.log(that.pl.size());
+//					node.log(that.pl);
+//					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					console.log(morePlayers);
+					node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -3133,7 +3080,7 @@
 
 	
 //	Game.prototype.is = function(is) {
-//		//console.log('IS ' + is);
+//		//node.log('IS ' + is);
 //		this.gameState.is = is;
 //		// TODO Check whether we should do it here or no
 //		// this.publishState();
@@ -3252,6 +3199,24 @@
 	// Will be initialized later
 	node.memory = {};
 	
+	node.verbosity = 0;
+	
+	node.verbosity_levels = {
+			ALWAYS: - Number.MIN_VALUE,
+			ERR: -1,
+			WARN: 0,
+			INFO: 1,
+			DEBUG: 3
+	};
+	
+	node.log = function (txt, level) {
+		if ('number' !== typeof level) {
+			var level = node.verbosity_levels[level];
+		}
+		if (this.verbosity > level) {
+			console.log(txt);
+		}
+	};
 
 	// Load the auxiliary library if available in the browser
 	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
@@ -3431,16 +3396,16 @@
 	
 	node.on = function (event, listener) {
 		var state = this.state();
-		//console.log(state);
+		//node.log(state);
 		
 		// It is in the init function;
 		if (!state || (GameState.compare(state, new GameState(), true) === 0 )) {
 			that.addListener(event, listener);
-			//console.log('global');
+			//node.log('global');
 		}
 		else {
 			that.addLocalListener(event, listener);
-			//console.log('local');
+			//node.log('local');
 		}
 	};
 	
@@ -3460,8 +3425,8 @@
 		that.game.init.call(that.game);
 		that.gsc.setGame(that.game);
 		
-		console.log('nodeGame: game loaded...');
-		console.log('nodeGame: ready.');
+		node.log('nodeGame: game loaded...');
+		node.log('nodeGame: ready.');
 	};	
 	
 	node.observe = function (conf) {	
@@ -3479,8 +3444,8 @@
 //			
 //			that.gsc.setGame(that.game);
 //			
-//			console.log('nodeGame: game loaded...');
-//			console.log('nodeGame: ready.');
+//			node.log('nodeGame: game loaded...');
+//			node.log('nodeGame: ready.');
 		});
 		
 	};	
@@ -3609,11 +3574,6 @@
 		node.game.updateState(state);
 	};
 	
-	node.log = function(txt,level) {
-		console.log(txt);
-	};
-	
-	
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 		
@@ -3662,7 +3622,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 10:59:50 CET 2012
+ * Built on Mi 18. Jan 12:29:24 CET 2012
  *
  */
  
@@ -3796,10 +3756,10 @@
 		if (!root) return;
 		if (!text) return;
 		var tn = document.createTextNode(text);
-		console.log('ROOT');
-		console.log(root);
-		console.log('TEXT');
-		console.log(text);
+		node.log('ROOT');
+		node.log(root);
+		node.log('TEXT');
+		node.log(text);
 		root.appendChild(tn);
 		return tn;
 	};
@@ -3892,11 +3852,11 @@
 		
 		// Check for the various File API support.
 		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-		  console.log('The File APIs are not fully supported in this browser.');
+		  node.log('The File APIs are not fully supported in this browser.', 'ERR');
 		  return false;
 		}
 		function onInitFs(fs) {
-		  console.log('Opened file system: ' + fs.name);
+		  node.log('Opened file system: ' + fs.name);
 		}
 		
 		function errorHandler(e) {
@@ -3923,7 +3883,7 @@
 			      break;
 			  }
 	
-			  console.log('Error: ' + msg);
+			  node.log('Error: ' + msg, 'ERR');
 		};
 		
 		// second param is 5MB, reserved space for storage
@@ -4028,7 +3988,7 @@
 			var game = node.game || null;
 		}
 		else {
-			console.log('nodeWindow: nodeGame not found');
+			node.log('nodeWindow: nodeGame not found');
 		}
 		
 		Document.call(this);
@@ -4236,17 +4196,17 @@
 			
 		if (func) {
     		func.call(node.game); // TODO: Pass the right this reference
-    		//console.log('Frame Loaded correctly!');
+    		//node.log('Frame Loaded correctly!');
     	}
 			
 		this.areLoading--;
-		//console.log('ARE LOADING: ' + that.areLoading);
+		//node.log('ARE LOADING: ' + that.areLoading);
 		if (this.areLoading === 0) {
 			this.state = GameState.iss.LOADED;
 			node.emit('WINDOW_LOADED');
 		}
 		else {
-			console.log('still gw loading');
+			node.log('Attempt to update state, before the window object was loaded', 'DEBUG');
 		}
  	};
  		
@@ -4267,7 +4227,7 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//console.log(this.widgets);
+		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -4294,12 +4254,12 @@
 //				strg += '[\''+tokens[i]+'\']';
 //			}
 //			strg+='(options);';
-//			//console.log(strg);
+//			//node.log(strg);
 //			eval(strg);
 //			//g = new this.widgets[tokens](options);
 		}
 		
-		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
+		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
 			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
@@ -4370,7 +4330,7 @@
 				toSelector);
 		}
 		catch (e) {
-			console.log('(E) Bad Formatted Player List. Discarded. ' + p);
+			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');
 		}
 	};
 	
@@ -4594,7 +4554,7 @@
 	Table.H = ['x','y','z'];
 	Table.V = ['y','x', 'z'];
 	
-	Table.log = console.log;
+	Table.log = node.log;
 	
   function Table (options, data) {
 	var options = options || {};
@@ -4716,8 +4676,8 @@
 		dims = Table.H;
 	}
 	
-//	console.log('DATA TBL');
-//	console.log(data);
+//	Table.log('DATA TBL');
+//	Table.log(data);
 	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
@@ -4727,16 +4687,16 @@
 	if ('object' !== typeof data) data = [data]; 
 	
 	var insertCell = function (content){	
-		//console.log('content');
-//		console.log(x + ' ' + y + ' ' + z);
-//		console.log(i + ' ' + j + ' ' + h);
+		//Table.log('content');
+//		Table.log(x + ' ' + y + ' ' + z);
+//		Table.log(i + ' ' + j + ' ' + h);
 		
 		var cell = {};
 		cell[dims[0]] = i; // i always defined
 		cell[dims[1]] = (j) ? y+j : y;
 		cell[dims[2]] = (h) ? z+h : z;
 		cell['content'] = content;	
-		//console.log(cell);
+		//Table.log(cell);
 		this.insert(new Cell(cell));
 		this.updatePointer(dims[0],cell[dims[0]]);
 		this.updatePointer(dims[1],cell[dims[1]]);
@@ -4747,37 +4707,37 @@
 	var cell = null;
 	// Loop Dim1
 	for (var i = 0; i < data.length; i++) {
-		//console.log('data_i');
-		//console.log(data[i]);
+		//Table.log('data_i');
+		//Table.log(data[i]);
 		if (data[i] instanceof Array) {
 			// Loop Dim2
 			for (var j = 0; j < data[i].length; j++) {
-//				console.log(data[i]);
+//				Table.log(data[i]);
 				if (data[i][j] instanceof Array) {
 //					Table.log(data[i][j]);
 //					Table.log(typeof data[i][j]);
 					// Loop Dim3
 					for (var h = 0; h < data[i][j].length; h++) {
-						//console.log('Here h');
+						//Table.log('Here h');
 						insertCell.call(this, data[i][j][h]);
 					}
 					h=0; // reset h
 				}
 				else {
-					//console.log('Here j');
+					//Table.log('Here j');
 					insertCell.call(this, data[i][j]);
 				}
 			}
 			j=0; // reset j
 		}
 		else {
-			//console.log('Here i');
+			//Table.log('Here i');
 			insertCell.call(this, data[i]);
 		}
 	}
 //	
-//	console.log('After insert');
-//	console.log(this.db);
+//	Table.log('After insert');
+//	Table.log(this.db);
 	
   };
     
@@ -4847,7 +4807,7 @@
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
 				  trid = this.db[i].y;
-				  //console.log(trid);
+				  //Table.log(trid);
 				  old_x = f.x - 1; // must start exactly from the first
 			  }
 			  
@@ -4910,7 +4870,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 10:59:50 CET 2012
+ * Built on Mi 18. Jan 12:29:24 CET 2012
  *
  */
  

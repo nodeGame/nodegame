@@ -25,7 +25,7 @@
 			var game = node.game || null;
 		}
 		else {
-			console.log('nodeWindow: nodeGame not found');
+			node.log('nodeWindow: nodeGame not found');
 		}
 		
 		Document.call(this);
@@ -233,17 +233,17 @@
 			
 		if (func) {
     		func.call(node.game); // TODO: Pass the right this reference
-    		//console.log('Frame Loaded correctly!');
+    		//node.log('Frame Loaded correctly!');
     	}
 			
 		this.areLoading--;
-		//console.log('ARE LOADING: ' + that.areLoading);
+		//node.log('ARE LOADING: ' + that.areLoading);
 		if (this.areLoading === 0) {
 			this.state = GameState.iss.LOADED;
 			node.emit('WINDOW_LOADED');
 		}
 		else {
-			console.log('still gw loading');
+			node.log('Attempt to update state, before the window object was loaded', 'DEBUG');
 		}
  	};
  		
@@ -264,7 +264,7 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//console.log(this.widgets);
+		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -291,12 +291,12 @@
 //				strg += '[\''+tokens[i]+'\']';
 //			}
 //			strg+='(options);';
-//			//console.log(strg);
+//			//node.log(strg);
 //			eval(strg);
 //			//g = new this.widgets[tokens](options);
 		}
 		
-		console.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
+		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
 			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
@@ -367,7 +367,7 @@
 				toSelector);
 		}
 		catch (e) {
-			console.log('(E) Bad Formatted Player List. Discarded. ' + p);
+			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');
 		}
 	};
 	

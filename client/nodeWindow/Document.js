@@ -127,10 +127,10 @@
 		if (!root) return;
 		if (!text) return;
 		var tn = document.createTextNode(text);
-		console.log('ROOT');
-		console.log(root);
-		console.log('TEXT');
-		console.log(text);
+		node.log('ROOT');
+		node.log(root);
+		node.log('TEXT');
+		node.log(text);
 		root.appendChild(tn);
 		return tn;
 	};
@@ -223,11 +223,11 @@
 		
 		// Check for the various File API support.
 		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-		  console.log('The File APIs are not fully supported in this browser.');
+		  node.log('The File APIs are not fully supported in this browser.', 'ERR');
 		  return false;
 		}
 		function onInitFs(fs) {
-		  console.log('Opened file system: ' + fs.name);
+		  node.log('Opened file system: ' + fs.name);
 		}
 		
 		function errorHandler(e) {
@@ -254,7 +254,7 @@
 			      break;
 			  }
 	
-			  console.log('Error: ' + msg);
+			  node.log('Error: ' + msg, 'ERR');
 		};
 		
 		// second param is 5MB, reserved space for storage

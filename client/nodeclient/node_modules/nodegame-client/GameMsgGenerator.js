@@ -97,7 +97,7 @@
 	
 	GameMsgGenerator.prototype.createPLIST = function (action, plist, to, reliable) {
 		
-		//console.log('Creating plist msg ' + plist + ' ' + plist.size());
+		//node.log('Creating plist msg ' + plist + ' ' + plist.size());
 		
 		var rel = reliable || 1;
 		
@@ -120,7 +120,7 @@
 	
 	GameMsgGenerator.prototype.createTXT = function (text, to, reliable) {
 		
-		//console.log("STE: " + text);
+		//node.log("STE: " + text);
 		
 		var rel = reliable || 0;
 		

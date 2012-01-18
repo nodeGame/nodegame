@@ -23,15 +23,15 @@
 	
 	function PlayerList (options, db) {
 //		
-//	  console.log('RECEIVED');	
-//	  console.log(db);	
+//	  node.log('RECEIVED');	
+//	  node.log(db);	
 	  var options = options || {};
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  //this.set('state', GameBit.compareState);
-//	  console.log('JUST CREATED PL');
-//	  console.log(this);
+//	  node.log('JUST CREATED PL');
+//	  node.log(this);
 	  this.countid = 0;
 	};
 	
@@ -96,7 +96,7 @@
 			return true;
 		}
 		
-		console.log('W: Attempt to access a non-existing player from the the player list ' + player.id);
+		node.log('Attempt to access a non-existing player from the the player list ' + player.id, 'WARN');
 		return false;
 	};
 	
@@ -108,11 +108,11 @@
 		}
 		
 		if ('undefined' === typeof state) {
-			console.log('W: Attempt to assign to a player an undefined state');
+			node.log('Attempt to assign to a player an undefined state', 'WARN');
 			return false;
 		}
 		
-		//console.log(this.pl);
+		//node.log(this.pl);
 		
 		this.select('id', '=', id).first().state = state;	
 	
@@ -129,7 +129,7 @@
 	// If strict is TRUE, also not initialized players are taken into account
 	PlayerList.prototype.isStateDone = function(gameState, strict) {
 		
-		//console.log('1--------> ' + gameState);
+		//node.log('1--------> ' + gameState);
 		
 		// Check whether a gameState variable is passed
 		// if not try to use the node.game.gameState as the default state
@@ -143,14 +143,14 @@
 			}
 		}
 		
-		//console.log('2--------> ' + gameState);
+		//node.log('2--------> ' + gameState);
 		
 		var strict = strict || false;
 		
 		var result = this.map(function(p){
 			var gs = new GameState(p.state);
 			
-			//console.log('Going to compare ' + gs + ' and ' + gameState);
+			//node.log('Going to compare ' + gs + ' and ' + gameState);
 			
 			// Player is done for his state
 			if (p.state.is !== GameState.iss.DONE) {
@@ -190,7 +190,7 @@
 			
 		});
 		
-		//console.log('ACTIVES: ' + result);
+		//node.log('ACTIVES: ' + result);
 		
 		return result;
 	};
