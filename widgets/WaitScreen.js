@@ -28,7 +28,6 @@
 	WaitScreen.prototype.listeners = function () {
 		var that = this;
 		node.on('WAITING...', function (text) {
-			console.log('WOWO');
 			if (!that.waitingDiv) {
 				that.waitingDiv = node.window.addDiv(document.body, that.id);
 			}
