@@ -60,7 +60,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 1000
+								milliseconds: 500
 			};
 			
 			this.timer.restart(timerOptions);
@@ -126,7 +126,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 4000
+							milliseconds: 200
 		};
 		
 		this.timer.restart(timerOptions);
@@ -164,12 +164,13 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 100
-			};			
+								milliseconds: 3000
+			};	
+			
 			this.timer.restart(timerOptions);
 			
 			node.onDATA('CF', function(msg) {
-				//console.log(msg);
+				
 				var cf_options = { id: 'cf',
 								   width: 300,
 								   height: 300,
@@ -281,7 +282,7 @@ function PeerReviewGame () {
 				
 				this.timer.restart({
 									event: 'DONE',
-									milliseconds: 5000
+									milliseconds: 200
 				});	
 				
 			});
@@ -297,7 +298,7 @@ function PeerReviewGame () {
 		node.window.loadFrame('postgame.html', function(){
 			this.timer.restart({
 								event: 'DONE',
-								milliseconds: 10000
+								milliseconds: 300
 			});
 		});
 		console.log('Postgame');

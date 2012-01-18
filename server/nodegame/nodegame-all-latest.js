@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 12:29:24 CET 2012
+ * Built on Mi 18. Jan 15:00:18 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 12:29:24 CET 2012
+ * Built on Mi 18. Jan 15:00:18 CET 2012
  *
  */
  
@@ -470,11 +470,15 @@
 	/**
 	 * Match each element of the array with N random others.
 	 * If strict is equal to true, elements cannot be matched multiple times.
+	 * 
+	 * TODO: This has a bug / feature. The last element could remain alone, 
+	 * because all the other have been already coupled. Another recombination
+	 * would be able to match all the elements instead.
 	 */
 	ARRAY.matchN = function (array, N, strict) {
 //		console.log('TO MATCH');
 //		console.log(array.length);
-		
+//		
 		var result = []
 		var len = array.length;
 		var found = [];
@@ -3195,9 +3199,7 @@
 	
 	var node = exports;
 
-	// Memory related operations
-	// Will be initialized later
-	node.memory = {};
+	node.version = '0.6.6';
 	
 	node.verbosity = 0;
 	
@@ -3213,11 +3215,15 @@
 		if ('number' !== typeof level) {
 			var level = node.verbosity_levels[level];
 		}
-		if (this.verbosity > level) {
+		if (node.verbosity > level) {
 			console.log(txt);
 		}
 	};
 
+	// Memory related operations
+	// Will be initialized later
+	node.memory = {};
+	
 	// Load the auxiliary library if available in the browser
 	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
 	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
@@ -3415,8 +3421,10 @@
 			that.removeListener(event, listener);
 		});
 	};
-	
+	// TODO: create conf objects
 	node.play = function (conf, game) {	
+		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
+		
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
@@ -3608,7 +3616,7 @@
 	// end node
 	
 	
-	
+	node.log('nodeGame ' + node.version + ' loaded', 'ALWAYS');
 	
 })('undefined' != typeof node ? node : module.exports); 
  
@@ -3622,7 +3630,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 12:29:24 CET 2012
+ * Built on Mi 18. Jan 15:00:18 CET 2012
  *
  */
  
@@ -4870,7 +4878,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 12:29:24 CET 2012
+ * Built on Mi 18. Jan 15:00:18 CET 2012
  *
  */
  

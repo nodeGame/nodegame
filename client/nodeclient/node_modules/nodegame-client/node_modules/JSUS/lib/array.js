@@ -140,11 +140,15 @@
 	/**
 	 * Match each element of the array with N random others.
 	 * If strict is equal to true, elements cannot be matched multiple times.
+	 * 
+	 * TODO: This has a bug / feature. The last element could remain alone, 
+	 * because all the other have been already coupled. Another recombination
+	 * would be able to match all the elements instead.
 	 */
 	ARRAY.matchN = function (array, N, strict) {
 //		console.log('TO MATCH');
 //		console.log(array.length);
-		
+//		
 		var result = []
 		var len = array.length;
 		var found = [];
