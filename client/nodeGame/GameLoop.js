@@ -17,7 +17,7 @@
 	exports.GameLoop = GameLoop;
 	
 	function GameLoop (loop) {
-		this.loop = loop;
+		this.loop = loop || {};
 		
 		this.limits = Array();
 		

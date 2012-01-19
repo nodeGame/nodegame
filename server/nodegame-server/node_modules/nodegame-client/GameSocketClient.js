@@ -13,7 +13,7 @@
 	
 	
 	
-	function GameSocketClient (options, nodeGame) {
+	function GameSocketClient (options) {
 		
 		this.name = options.name;
 		this.url = options.url;
@@ -153,6 +153,8 @@
 				}
 			}
 		});
+		
+		node.emit('NODEGAME_READY');
 	};
 	
 	GameSocketClient.prototype.sendHI = function (state, to) {

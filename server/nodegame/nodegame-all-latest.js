@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:23:26 CET 2012
+ * Built on Do 19. Jan 12:58:04 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:23:26 CET 2012
+ * Built on Do 19. Jan 12:58:04 CET 2012
  *
  */
  
@@ -2101,7 +2101,7 @@
 	exports.GameLoop = GameLoop;
 	
 	function GameLoop (loop) {
-		this.loop = loop;
+		this.loop = loop || {};
 		
 		this.limits = Array();
 		
@@ -2516,7 +2516,7 @@
 	
 	
 	
-	function GameSocketClient (options, nodeGame) {
+	function GameSocketClient (options) {
 		
 		this.name = options.name;
 		this.url = options.url;
@@ -2656,6 +2656,8 @@
 				}
 			}
 		});
+		
+		node.emit('NODEGAME_READY');
 	};
 	
 	GameSocketClient.prototype.sendHI = function (state, to) {
@@ -2865,7 +2867,7 @@
 	exports.Game = Game;
 	
 	function Game (settings, gamesocketclient) {
-		
+		var settings = settings || {};
 		// TODO: transform into private variables, otherwise they can accidentally 
 		// modified  by the execution of the loops functions
 		
@@ -2912,16 +2914,16 @@
 			// Get
 			
 			// TODO: can we avoid the double emit?
-			node.on( IN + get + 'DATA', function(msg){
+			node.on( IN + get + 'DATA', function (msg) {
 				node.emit(msg.text, msg.data);
 			});
 			
 			// Set
-			node.on( IN + set + 'STATE', function(msg){
+			node.on( IN + set + 'STATE', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
-			node.on( IN + set + 'DATA', function(msg){
+			node.on( IN + set + 'DATA', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
@@ -2929,7 +2931,7 @@
 
 			// If the message is from the server, update the game state
 			// If the message is from a player, update the player state
-			node.on( IN + say + 'STATE', function(msg){
+			node.on( IN + say + 'STATE', function (msg) {
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
@@ -2996,6 +2998,8 @@
 			// GET
 			
 			node.on( OUT + get + 'DATA', function (data, to, key) {
+				console.log('Sending GET DATA ' + key + ' ' + to + ' ' + data);
+				console.log(that.gsc);
 				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
 			});
 			
@@ -3451,26 +3455,31 @@
 		node.log('nodeGame: ready.');
 	};	
 	
-	node.observe = function (conf) {
+	node.observe = function (conf, game) {
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
+		var game = game || {};
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
+		node.game = that.game =  new Game(game, that.gsc);
+		node.gsc.setGame(that.game);
 		
-		
-		// Retrieve the game and set is as observer
-		node.get('GAME', function(game) {
+		node.on('NODEGAME_READY', function(){
 			
-			alert(game);
-			
-//			var game = game.observer = true;
-//			node.game = that.game = game;
-//			
-//			that.game.init();
-//			
-//			that.gsc.setGame(that.game);
-//			
-//			node.log('nodeGame: game loaded...');
-//			node.log('nodeGame: ready.');
+			// Retrieve the game and set is as observer
+			node.get('GAME', function(game) {
+				
+				alert(game);
+				
+	//			var game = game.observer = true;
+	//			node.game = that.game = game;
+	//			
+	//			that.game.init();
+	//			
+	//			that.gsc.setGame(that.game);
+	//			
+	//			node.log('nodeGame: game loaded...');
+	//			node.log('nodeGame: ready.');
+			});
 		});
 		
 	};	
@@ -3646,7 +3655,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:23:26 CET 2012
+ * Built on Do 19. Jan 12:58:04 CET 2012
  *
  */
  
@@ -4901,7 +4910,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:23:26 CET 2012
+ * Built on Do 19. Jan 12:58:04 CET 2012
  *
  */
  

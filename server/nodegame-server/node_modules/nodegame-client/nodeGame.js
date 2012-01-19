@@ -245,26 +245,31 @@
 		node.log('nodeGame: ready.');
 	};	
 	
-	node.observe = function (conf) {
+	node.observe = function (conf, game) {
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
+		var game = game || {};
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
+		node.game = that.game =  new Game(game, that.gsc);
+		node.gsc.setGame(that.game);
 		
-		
-		// Retrieve the game and set is as observer
-		node.get('GAME', function(game) {
+		node.on('NODEGAME_READY', function(){
 			
-			alert(game);
-			
-//			var game = game.observer = true;
-//			node.game = that.game = game;
-//			
-//			that.game.init();
-//			
-//			that.gsc.setGame(that.game);
-//			
-//			node.log('nodeGame: game loaded...');
-//			node.log('nodeGame: ready.');
+			// Retrieve the game and set is as observer
+			node.get('GAME', function(game) {
+				
+				alert(game);
+				
+	//			var game = game.observer = true;
+	//			node.game = that.game = game;
+	//			
+	//			that.game.init();
+	//			
+	//			that.gsc.setGame(that.game);
+	//			
+	//			node.log('nodeGame: game loaded...');
+	//			node.log('nodeGame: ready.');
+			});
 		});
 		
 	};	
