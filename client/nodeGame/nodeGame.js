@@ -11,7 +11,7 @@
 	node.verbosity = 0;
 	
 	node.verbosity_levels = {
-			ALWAYS: - Number.MIN_VALUE + 1, // Actually, it is not really always...
+			ALWAYS: -(Number.MIN_VALUE+1), // Actually, it is not really always...
 			ERR: -1,
 			WARN: 0,
 			INFO: 1,
@@ -19,7 +19,8 @@
 	};
 	
 	node.log = function (txt, level) {
-		if ('number' !== typeof level) {
+		var level = level || 0;
+		if ('string' === typeof level) {
 			var level = node.verbosity_levels[level];
 		}
 		if (node.verbosity > level) {
@@ -244,8 +245,11 @@
 		node.log('nodeGame: ready.');
 	};	
 	
-	node.observe = function (conf) {	
+	node.observe = function (conf) {
+		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
 		node.gsc = that.gsc = new GameSocketClient(conf);
+		
+		
 		
 		// Retrieve the game and set is as observer
 		node.get('GAME', function(game) {

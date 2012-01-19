@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Do 19. Jan 12:23:26 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Do 19. Jan 12:23:26 CET 2012
  *
  */
  
@@ -3217,7 +3217,7 @@
 	node.verbosity = 0;
 	
 	node.verbosity_levels = {
-			ALWAYS: - Number.MIN_VALUE + 1, // Actually, it is not really always...
+			ALWAYS: -(Number.MIN_VALUE+1), // Actually, it is not really always...
 			ERR: -1,
 			WARN: 0,
 			INFO: 1,
@@ -3225,7 +3225,8 @@
 	};
 	
 	node.log = function (txt, level) {
-		if ('number' !== typeof level) {
+		var level = level || 0;
+		if ('string' === typeof level) {
 			var level = node.verbosity_levels[level];
 		}
 		if (node.verbosity > level) {
@@ -3450,8 +3451,11 @@
 		node.log('nodeGame: ready.');
 	};	
 	
-	node.observe = function (conf) {	
+	node.observe = function (conf) {
+		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
 		node.gsc = that.gsc = new GameSocketClient(conf);
+		
+		
 		
 		// Retrieve the game and set is as observer
 		node.get('GAME', function(game) {
@@ -3642,7 +3646,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Do 19. Jan 12:23:26 CET 2012
  *
  */
  
@@ -4897,7 +4901,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Do 19. Jan 12:23:26 CET 2012
  *
  */
  
@@ -6658,7 +6662,6 @@
 	WaitScreen.prototype.listeners = function () {
 		var that = this;
 		node.on('WAITING...', function (text) {
-			console.log('WOWO');
 			if (!that.waitingDiv) {
 				that.waitingDiv = node.window.addDiv(document.body, that.id);
 			}
