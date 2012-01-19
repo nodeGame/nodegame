@@ -14,7 +14,7 @@
 		this.game = node.game;
 		this.id = id || 'statedisplay';
 		this.name = 'State Display';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.fieldset = null;
 		this.stateDiv = null;
@@ -69,7 +69,7 @@
 		var checkStateDiv = setInterval(function(){
 			if(that.stateDiv){
 				clearInterval(checkStateDiv);
-				that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
+				that.stateDiv.innerHTML = 'State: ' +  new GameState(state).toString() + '<br />';
 				// was
 				//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
 			}
@@ -84,8 +84,8 @@
 		var IN =  node.IN;
 		var OUT = node.OUT;
 		
-		node.on( 'STATECHANGE', function(state) {
-			that.updateState(state);
+		node.on( 'STATECHANGE', function() {
+			that.updateState(node.game.gameState);
 		}); 
 	}; 
 })(node.window.widgets);

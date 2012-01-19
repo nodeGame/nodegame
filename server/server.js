@@ -9,7 +9,7 @@ var options = {
 				port: 8080,
 				verbosity: 100,
 				dumpsys: false,
-				dumpmsg: false,
+				dumpmsg: true,
 				mail: false
 };
 

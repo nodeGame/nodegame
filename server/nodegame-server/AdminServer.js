@@ -73,12 +73,26 @@ AdminServer.prototype.attachCustomListeners = function() {
 		}
 	});
 	
-	this.on(get+'DATA', function(msg) {
+	this.on(get+'DATA', function (msg) {
+		console.log('HERE A!!!');
 		
 		// Ask a random player to send the game;
-		//var p = this.pl.getRandom();
-		//that.gmm.sendDATA('get', 'ABC', msg.from, msg.txt);
+		var p = this.pl.getRandom();
+
+		var game = {game: 'ohyes'};
+
+		if (msg.text === 'LOOP') {
 		
+//			var func = function(){
+//				node.emit('out.say.DATA')
+//			}
+			
+			
+			
+			that.gmm.sendDATA(GameMsg.actions.GET, 'GAME', msg.from, msg.txt);
+			
+			that.gmm.sendDATA(GameMsg.actions.SAY, game, msg.from, msg.text);
+		}		
 	});
 	
 	// SET

@@ -367,14 +367,14 @@
 		return this.create(this.db.filter(func));
 	};
 	
-	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.shuffle = function () {
 		this.db = JSUS.shuffle(this.db);
 		return true;
 	};
 	
-	// HERE
 	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.join = function (key1, key2, pos, select) {
 		// Construct a better comparator function
 		// than the generic JSUS.equals

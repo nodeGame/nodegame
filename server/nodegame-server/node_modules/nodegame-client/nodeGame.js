@@ -247,19 +247,20 @@
 	
 	node.observe = function (conf, game) {
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
-		var game = game || {};
+		var game = game || {loops: {1: {state: function(){}}}};
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
-		node.game = that.game =  new Game(game, that.gsc);
+		node.game = that.game = new Game(game, that.gsc);
 		node.gsc.setGame(that.game);
 		
 		node.on('NODEGAME_READY', function(){
 			
 			// Retrieve the game and set is as observer
-			node.get('GAME', function(game) {
+			node.get('LOOP', function(game) {
 				
-				alert(game);
-				
+				//alert(game);
+				console.log('ONLY ONE');
+				console.log(game);
 	//			var game = game.observer = true;
 	//			node.game = that.game = game;
 	//			
@@ -272,6 +273,16 @@
 			});
 		});
 		
+		
+//		node.onDATA('GAME', function(data){
+//			alert(data);
+//			console.log(data);
+//		});
+		
+//		node.on('DATA', function(msg){
+//			console.log('--------->Eh!')
+//			console.log(msg);
+//		});
 	};	
 	
 	node.fire = node.emit = function (event, p1, p2, p3) {	
@@ -296,12 +307,19 @@
 	
 	node.get = function (key, func) {
 		that.emit('out.get.DATA', key);
-		node.once(key, function(data) {
-			func.call(node.game,data);
-		});
+		
+		var listener = function(msg) {
+			if (msg.text === key) {
+				func.call(node.game, msg.data);
+				if(that.removeListener('in.say.DATA',listener)){
+					console.log('yes!!!');
+				}
+			}
+			//that.printAllListeners();
+		};
+		
+		node.on('in.say.DATA', listener);
 	};
-	
-
 	
 	// *Aliases*
 	//

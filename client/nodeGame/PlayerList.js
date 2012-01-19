@@ -238,6 +238,10 @@
 		return out;
 	};
 
+	PlayerList.prototype.getRandom = function () {	
+		this.shuffle();
+		return this.first();
+	};
 	
 	// TODO: implement pl.pop, maybe in NDDB
 //	PlayerList.prototype.pop = function (id) {	
@@ -248,9 +252,7 @@
 //		return p;
 //	};
 	
-//	PlayerList.prototype.getRandom = function () {	
-//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-//	};
+
 	
 	
 //	Player.prototype.getId = function() {

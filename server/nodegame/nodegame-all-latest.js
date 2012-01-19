@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:58:04 CET 2012
+ * Built on Do 19. Jan 16:43:57 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:58:04 CET 2012
+ * Built on Do 19. Jan 16:43:57 CET 2012
  *
  */
  
@@ -1074,14 +1074,14 @@
 		return this.create(this.db.filter(func));
 	};
 	
-	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.shuffle = function () {
 		this.db = JSUS.shuffle(this.db);
 		return true;
 	};
 	
-	// HERE
 	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.join = function (key1, key2, pos, select) {
 		// Construct a better comparator function
 		// than the generic JSUS.equals
@@ -1427,11 +1427,6 @@
 	        }
 	       
 	    },
-	    
-	    // TODO: remove fire when all the code has been updated
-//	    fire: function(event, p1, p2, p3) { // Up to 3 parameters
-//	    	this.emit(event, p1, p2, p3);
-//	    },
 	
 	    removeListener: function(type, listener) {
 	
@@ -1439,19 +1434,18 @@
 		    	//console.log('Trying to remove ' + type + ' ' + listener);
 		    	
 		        if (list[type] instanceof Array) {
-		        	
-		        	if (listener === null || listener === undefined) {
+		        	if (!listener) {
 		        		delete list[type];
 		        		//console.log('Removed listener ' + type);
 		        		return true;
 		        	}
 		        	
 		            var listeners = list[type];
-		            for (var i=0, len=listeners.length; i < len; i++) {
-		            	
+		            var len=listeners.length;
+		            for (var i=0; i < len; i++) {
 		            	//console.log(listeners[i]);
 		            	
-		                if (listeners[i] === listener){
+		                if (listeners[i] == listener) {
 		                    listeners.splice(i, 1);
 		                    //console.log('Removed listener ' + type + ' ' + listener);
 		                    return true;
@@ -1841,6 +1835,10 @@
 		return out;
 	};
 
+	PlayerList.prototype.getRandom = function () {	
+		this.shuffle();
+		return this.first();
+	};
 	
 	// TODO: implement pl.pop, maybe in NDDB
 //	PlayerList.prototype.pop = function (id) {	
@@ -1851,9 +1849,7 @@
 //		return p;
 //	};
 	
-//	PlayerList.prototype.getRandom = function () {	
-//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-//	};
+
 	
 	
 //	Player.prototype.getId = function() {
@@ -2913,9 +2909,14 @@
 			
 			// Get
 			
-			// TODO: can we avoid the double emit?
 			node.on( IN + get + 'DATA', function (msg) {
-				node.emit(msg.text, msg.data);
+				
+				if (msg.text === 'LOOP'){
+					that.gsc.sendDATA(GameMsg.actions.SAY, this.gameLoop, msg.from, 'GAME');
+				}
+				
+				// We could double emit
+				//node.emit(msg.text, msg.data);
 			});
 			
 			// Set
@@ -2953,6 +2954,7 @@
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});
+			
 		}();
 		
 		var outgoingListeners = function() {
@@ -2998,9 +3000,7 @@
 			// GET
 			
 			node.on( OUT + get + 'DATA', function (data, to, key) {
-				console.log('Sending GET DATA ' + key + ' ' + to + ' ' + data);
-				console.log(that.gsc);
-				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
+				that.gsc.sendDATA(GameMsg.actions.GET, data, to, data);
 			});
 			
 		}();
@@ -3457,19 +3457,20 @@
 	
 	node.observe = function (conf, game) {
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
-		var game = game || {};
+		var game = game || {loops: {1: {state: function(){}}}};
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
-		node.game = that.game =  new Game(game, that.gsc);
+		node.game = that.game = new Game(game, that.gsc);
 		node.gsc.setGame(that.game);
 		
 		node.on('NODEGAME_READY', function(){
 			
 			// Retrieve the game and set is as observer
-			node.get('GAME', function(game) {
+			node.get('LOOP', function(game) {
 				
-				alert(game);
-				
+				//alert(game);
+				console.log('ONLY ONE');
+				console.log(game);
 	//			var game = game.observer = true;
 	//			node.game = that.game = game;
 	//			
@@ -3482,6 +3483,16 @@
 			});
 		});
 		
+		
+//		node.onDATA('GAME', function(data){
+//			alert(data);
+//			console.log(data);
+//		});
+		
+//		node.on('DATA', function(msg){
+//			console.log('--------->Eh!')
+//			console.log(msg);
+//		});
 	};	
 	
 	node.fire = node.emit = function (event, p1, p2, p3) {	
@@ -3506,12 +3517,19 @@
 	
 	node.get = function (key, func) {
 		that.emit('out.get.DATA', key);
-		node.once(key, function(data) {
-			func.call(node.game,data);
-		});
+		
+		var listener = function(msg) {
+			if (msg.text === key) {
+				func.call(node.game, msg.data);
+				if(that.removeListener('in.say.DATA',listener)){
+					console.log('yes!!!');
+				}
+			}
+			//that.printAllListeners();
+		};
+		
+		node.on('in.say.DATA', listener);
 	};
-	
-
 	
 	// *Aliases*
 	//
@@ -3655,7 +3673,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:58:04 CET 2012
+ * Built on Do 19. Jan 16:43:57 CET 2012
  *
  */
  
@@ -4910,7 +4928,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 12:58:04 CET 2012
+ * Built on Do 19. Jan 16:43:57 CET 2012
  *
  */
  
@@ -6359,7 +6377,7 @@
 		this.game = node.game;
 		this.id = id || 'statedisplay';
 		this.name = 'State Display';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.fieldset = null;
 		this.stateDiv = null;
@@ -6414,7 +6432,7 @@
 		var checkStateDiv = setInterval(function(){
 			if(that.stateDiv){
 				clearInterval(checkStateDiv);
-				that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
+				that.stateDiv.innerHTML = 'State: ' +  new GameState(state).toString() + '<br />';
 				// was
 				//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
 			}
@@ -6429,8 +6447,8 @@
 		var IN =  node.IN;
 		var OUT = node.OUT;
 		
-		node.on( 'STATECHANGE', function(state) {
-			that.updateState(state);
+		node.on( 'STATECHANGE', function() {
+			that.updateState(node.game.gameState);
 		}); 
 	}; 
 })(node.window.widgets); 

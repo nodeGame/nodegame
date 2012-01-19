@@ -64,9 +64,14 @@
 			
 			// Get
 			
-			// TODO: can we avoid the double emit?
 			node.on( IN + get + 'DATA', function (msg) {
-				node.emit(msg.text, msg.data);
+				
+				if (msg.text === 'LOOP'){
+					that.gsc.sendDATA(GameMsg.actions.SAY, this.gameLoop, msg.from, 'GAME');
+				}
+				
+				// We could double emit
+				//node.emit(msg.text, msg.data);
 			});
 			
 			// Set
@@ -104,6 +109,7 @@
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});
+			
 		}();
 		
 		var outgoingListeners = function() {
@@ -149,9 +155,7 @@
 			// GET
 			
 			node.on( OUT + get + 'DATA', function (data, to, key) {
-				console.log('Sending GET DATA ' + key + ' ' + to + ' ' + data);
-				console.log(that.gsc);
-				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
+				that.gsc.sendDATA(GameMsg.actions.GET, data, to, data);
 			});
 			
 		}();
