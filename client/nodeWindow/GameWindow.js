@@ -182,6 +182,7 @@
 			this.addWidget('DataBar');
 			this.addWidget('MsgBar');
 			this.addWidget('GameBoard');
+			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
 	
 			break;

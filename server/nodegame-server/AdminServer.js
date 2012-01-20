@@ -86,6 +86,11 @@ AdminServer.prototype.attachCustomListeners = function() {
 		if (msg.text === 'LOOP') {
 			that.gmm.sendDATA(GameMsg.actions.SAY, that.loop, msg.from, 'LOOP');
 		}		
+		
+		if (msg.text === 'INFO') {
+			that.gmm.sendDATA(GameMsg.actions.SAY, that.generateInfo(), msg.from, 'INFO');
+		}
+		
 	});
 	
 	// SET
@@ -104,5 +109,15 @@ AdminServer.prototype.attachCustomListeners = function() {
 		
 	});
 	
+	AdminServer.prototype.generateInfo = function(){
+		var info = {
+					name: this.name,
+					status: 'OK',
+					nplayers: this.partner.pl.size(),
+					nadmins: this.pl.size(),
+		};
+							
+		return info;		
+	};
 	
 };

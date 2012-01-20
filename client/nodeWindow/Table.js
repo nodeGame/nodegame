@@ -319,5 +319,5 @@
 	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	
+	// TODO: add it node.window
 })(('undefined' !== typeof node) ? node : module.parent.exports);
