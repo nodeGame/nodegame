@@ -68,7 +68,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 		}
 		else {
 			
-			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
+			that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
 			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
 			that.gmm.broadcast(msg, msg.from);

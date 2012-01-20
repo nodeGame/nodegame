@@ -89,6 +89,10 @@
 			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function (msg) {
 				
+				
+				console.log('RECEIVE STATE');
+				console.log(msg);
+				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
 					//node.log('updatePlayer', 'DEBUG);
@@ -165,7 +169,7 @@
 			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.auto_step) {
+				if (that.auto_step && !that.observer) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
@@ -273,12 +277,12 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState, 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;

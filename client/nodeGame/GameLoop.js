@@ -72,7 +72,7 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		node.log('NEXT OF THIS ' + gameState);
+		node.log('NEXT OF THIS ' + gameState, 'DEBUG');
 		//node.log(this.limits);
 		
 		// Game has not started yet, do it!

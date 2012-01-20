@@ -103,6 +103,8 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		// that.gmm.sendDATA('get', 'ABC', msg.from, msg.txt);
 	});
     
+    
+    // TODO: Save removed player in another list, to check whether they reconnect
     this.on('closed', function(id) {
       	log.log(that.name + ' ----------------- Got Closed ' + id);
     	that.pl.remove(id);

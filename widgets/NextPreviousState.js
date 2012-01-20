@@ -7,6 +7,8 @@
 	 * 
 	 */
 	
+	// TODO: Introduce rules for update: other vs self
+	
 	exports.NextPreviousState =	NextPreviousState;
 		
 	function NextPreviousState(id) {
@@ -37,36 +39,29 @@
 		
 		var that = this;
 	
-		fwd.onclick = function() {
-			
-			var state = that.game.next();
-			
+		var updateState = function (state) {
 			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
+				var stateEvent = node.IN + node.actions.SAY + '.STATE';
+				var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+				// Self Update
+				node.emit(stateEvent, stateMsg);
+				
+				// Update Others
+				stateEvent = node.OUT + node.actions.SAY + '.STATE';
+				node.emit(stateEvent, state, 'ALL');
 			}
 			else {
-				console.log('No next state. Not sent.');
-				node.gsc.sendTXT('E: no next state. Not sent');
-			}
-		};
-	
-		rew.onclick = function() {
-			
-			var state = that.game.previous();
-			
-			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
-			}
-			else {
-				console.log('No previous state. Not sent.');
-				node.gsc.sendTXT('E: no previous state. Not sent');
+				node.log('No next/previous state. Not sent', 'ERR');
 			}
 		};
 		
+		fwd.onclick = function() {
+			updateState(that.game.next());
+		}
+			
+		rew.onclick = function() {
+			updateState(that.game.previous());
+		}
 		
 		return fieldset;
 	};

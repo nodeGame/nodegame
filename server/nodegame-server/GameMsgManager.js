@@ -117,7 +117,7 @@ GameMsgManager.prototype.broadcast = function(gameMsg) {
 
 	for (var client in this.node.channel.sockets) {
 		if (this.node.channel.sockets.hasOwnProperty(client)) { 
-			this.log.log(client);
+			//this.log.log(client);
 			if (client !== from) {
 				this.log.log(client + ' different ' + from);
 				gameMsg.to = client;

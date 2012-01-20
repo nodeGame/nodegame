@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:10:28 CET 2012
+ * Built on Fr 20. Jan 12:44:54 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:10:28 CET 2012
+ * Built on Fr 20. Jan 12:44:54 CET 2012
  *
  */
  
@@ -1619,16 +1619,11 @@
 	 */
 	
 	function PlayerList (options, db) {
-//		
-//	  node.log('RECEIVED');	
-//	  node.log(db);	
 	  var options = options || {};
+	  if (!options.log) options.log = node.log;
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
-	  //this.set('state', GameBit.compareState);
-//	  node.log('JUST CREATED PL');
-//	  node.log(this);
 	  this.countid = 0;
 	};
 	
@@ -1669,7 +1664,7 @@
 		
 		var p = this.select('id', '=', id);
 		
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			return p.first();
 		}
 		
@@ -2152,7 +2147,7 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		node.log('NEXT OF THIS ' + gameState);
+		node.log('NEXT OF THIS ' + gameState, 'DEBUG');
 		//node.log(this.limits);
 		
 		// Game has not started yet, do it!
@@ -2934,6 +2929,10 @@
 			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function (msg) {
 				
+				
+				console.log('RECEIVE STATE');
+				console.log(msg);
+				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
 					//node.log('updatePlayer', 'DEBUG);
@@ -3010,7 +3009,7 @@
 			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.auto_step) {
+				if (that.auto_step && !that.observer) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
@@ -3118,12 +3117,12 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState, 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -3673,7 +3672,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:10:28 CET 2012
+ * Built on Fr 20. Jan 12:44:54 CET 2012
  *
  */
  
@@ -4927,7 +4926,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:10:28 CET 2012
+ * Built on Fr 20. Jan 12:44:54 CET 2012
  *
  */
  
@@ -5970,13 +5969,13 @@
 		
 		
 		node.on('UPDATED_PLIST', function () {
-			console.log('I Updating Board');
+			node.log('I Updating Board');
 			that.updateBoard(node.game.pl);
 
 		});
 		
 //		node.onPLIST( function (msg) {
-//			console.log('I Updating Board ' + msg.text);
+//			node.log('I Updating Board ' + msg.text);
 //			that.updateBoard(msg.data);
 //		});
 	};
@@ -5985,12 +5984,12 @@
 		var that = this;
 		that.board.innerHTML = 'Updating...';
 
-		//console.log(pl);
+		//node.log(pl);
 		
 		if (pl.size() !== 0) {
 			that.board.innerHTML = '';
 			pl.forEach( function(p) {
-				//console.log(p);
+				//node.log(p);
 				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
 				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
@@ -6184,6 +6183,8 @@
 	 * 
 	 */
 	
+	// TODO: Introduce rules for update: other vs self
+	
 	exports.NextPreviousState =	NextPreviousState;
 		
 	function NextPreviousState(id) {
@@ -6214,36 +6215,29 @@
 		
 		var that = this;
 	
-		fwd.onclick = function() {
-			
-			var state = that.game.next();
-			
+		var updateState = function (state) {
 			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
+				var stateEvent = node.IN + node.actions.SAY + '.STATE';
+				var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+				// Self Update
+				node.emit(stateEvent, stateMsg);
+				
+				// Update Others
+				stateEvent = node.OUT + node.actions.SAY + '.STATE';
+				node.emit(stateEvent, state, 'ALL');
 			}
 			else {
-				console.log('No next state. Not sent.');
-				node.gsc.sendTXT('E: no next state. Not sent');
-			}
-		};
-	
-		rew.onclick = function() {
-			
-			var state = that.game.previous();
-			
-			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
-			}
-			else {
-				console.log('No previous state. Not sent.');
-				node.gsc.sendTXT('E: no previous state. Not sent');
+				node.log('No next/previous state. Not sent', 'ERR');
 			}
 		};
 		
+		fwd.onclick = function() {
+			updateState(that.game.next());
+		}
+			
+		rew.onclick = function() {
+			updateState(that.game.previous());
+		}
 		
 		return fieldset;
 	};
@@ -6261,6 +6255,8 @@
 	 * 
 	 * Sends STATE msgs
 	 */
+	
+	// TODO: Introduce rules for update: other vs self
 	
 	exports.StateBar = StateBar;	
 		
@@ -6328,8 +6324,16 @@
 													round: round
 				});
 				
+				// Self Update
+				if (to === 'ALL') {
+					var stateEvent = node.IN + node.actions.SAY + '.STATE';
+					var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+					node.emit(stateEvent, stateMsg);
+				}
+				
+				// Update Others
 				var stateEvent = node.OUT + that.actionSel.value + '.STATE';
-				node.fire(stateEvent,state,to);
+				node.emit(stateEvent,state,to);
 			}
 			else {
 				console.log('Not valid state. Not sent.');
