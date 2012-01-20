@@ -337,7 +337,7 @@
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
 			return;
 		}
 		
@@ -346,7 +346,7 @@
 		
 		
 		var opt;
-		var pl = new PlayerList(playerList);
+		var pl = new PlayerList({}, playerList);
 		
 		
 		try {
@@ -355,8 +355,7 @@
 				opt.value = p.id;
 				opt.appendChild(document.createTextNode(p.name));
 				toSelector.appendChild(opt);
-				}, 
-				toSelector);
+			});
 		}
 		catch (e) {
 			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');

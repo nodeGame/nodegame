@@ -55,12 +55,10 @@
 	};
 	
 	MsgBar.prototype.listeners = function(){
-		var that = this;
-		
+		var that = this;	
 		node.onPLIST( function(msg) {
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		
 		}); 
 	};
 })(node.window.widgets);

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.6
+ * nodeGame-all v0.6.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 16:43:57 CET 2012
+ * Built on Fr 20. Jan 11:04:59 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.6
+ * nodeGame Client v0.6.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 16:43:57 CET 2012
+ * Built on Fr 20. Jan 11:04:59 CET 2012
  *
  */
  
@@ -3015,7 +3015,7 @@
 //					node.log(that.pl);
 //					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					node.log(morePlayers);
+					//node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -3577,17 +3577,17 @@
 	
 	node.onSTATE = function(func) {
 		node.on("in.set.STATE", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
 	node.onPLIST = function(func) {
 		node.on("in.set.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 		
 		node.on("in.say.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
@@ -3668,12 +3668,12 @@
  
  
 /*!
- * nodeWindow v0.6.6
+ * nodeWindow v0.6.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 16:43:57 CET 2012
+ * Built on Fr 20. Jan 11:04:59 CET 2012
  *
  */
  
@@ -4351,7 +4351,7 @@
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
 			return;
 		}
 		
@@ -4360,7 +4360,7 @@
 		
 		
 		var opt;
-		var pl = new PlayerList(playerList);
+		var pl = new PlayerList({}, playerList);
 		
 		
 		try {
@@ -4369,8 +4369,7 @@
 				opt.value = p.id;
 				opt.appendChild(document.createTextNode(p.name));
 				toSelector.appendChild(opt);
-				}, 
-				toSelector);
+			});
 		}
 		catch (e) {
 			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');
@@ -4923,12 +4922,12 @@
  
  
 /*!
- * nodeGadgets v0.6.6
+ * nodeGadgets v0.6.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 19. Jan 16:43:57 CET 2012
+ * Built on Fr 20. Jan 11:04:59 CET 2012
  *
  */
  
@@ -6166,12 +6165,10 @@
 	};
 	
 	MsgBar.prototype.listeners = function(){
-		var that = this;
-		
+		var that = this;	
 		node.onPLIST( function(msg) {
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		
 		}); 
 	};
 })(node.window.widgets); 

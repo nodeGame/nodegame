@@ -20,6 +20,9 @@ AdminServer.prototype.constructor = AdminServer;
 
 function AdminServer(options) {
 	GameServer.call(this,options);	
+	
+	// extra variables
+	this.loop = null;
 }
 
 // AdminServer hides the id of the sender when forwarding msgs
@@ -79,27 +82,26 @@ AdminServer.prototype.attachCustomListeners = function() {
 		// Ask a random player to send the game;
 		var p = this.pl.getRandom();
 
-		var game = {game: 'ohyes'};
 
 		if (msg.text === 'LOOP') {
-		
-//			var func = function(){
-//				node.emit('out.say.DATA')
-//			}
-			
-			
-			
-			that.gmm.sendDATA(GameMsg.actions.GET, 'GAME', msg.from, msg.txt);
-			
-			that.gmm.sendDATA(GameMsg.actions.SAY, game, msg.from, msg.text);
+			that.gmm.sendDATA(GameMsg.actions.SAY, that.loop, msg.from, 'LOOP');
 		}		
 	});
 	
 	// SET
 	
 	// Transform in say
-	this.on(set+'STATE', function(msg){
+	this.on(set+'STATE', function (msg){
 		//this.emit(say+'STATE', msg);
+	});
+	
+	this.on(set+'DATA', function (msg) {
+	
+		if (msg.text === 'LOOP') {
+			that.loop = msg.data;
+		}
+		
+		
 	});
 	
 	

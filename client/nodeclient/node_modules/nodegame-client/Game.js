@@ -170,7 +170,7 @@
 //					node.log(that.pl);
 //					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					node.log(morePlayers);
+					//node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');

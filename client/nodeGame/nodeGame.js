@@ -367,17 +367,17 @@
 	
 	node.onSTATE = function(func) {
 		node.on("in.set.STATE", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
 	node.onPLIST = function(func) {
 		node.on("in.set.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 		
 		node.on("in.say.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
