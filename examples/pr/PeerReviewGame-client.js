@@ -16,6 +16,7 @@ function PeerReviewGame () {
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
 		this.timer = node.window.addWidget('VisualTimer', this.header);
+		this.sd = node.window.addWidget('StateDisplay', this.header);
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:04:59 CET 2012
+ * Built on Fr 20. Jan 11:10:28 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:04:59 CET 2012
+ * Built on Fr 20. Jan 11:10:28 CET 2012
  *
  */
  
@@ -1655,7 +1655,7 @@
 		if (!id) return false;
 			
 		var p = this.select('id', '=', id);
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			p.delete();
 			return true;
 		}
@@ -3673,7 +3673,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:04:59 CET 2012
+ * Built on Fr 20. Jan 11:10:28 CET 2012
  *
  */
  
@@ -4927,7 +4927,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 11:04:59 CET 2012
+ * Built on Fr 20. Jan 11:10:28 CET 2012
  *
  */
  
