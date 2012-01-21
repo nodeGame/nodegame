@@ -12,7 +12,8 @@ var options = {
 				dumpmsg: true,
 				mail: false,
 				io: {set: {
-							transports: ['websocket']
+							transports: ['websocket'],
+							'log level': -1
 					}
 				},
 				http: {}
@@ -31,19 +32,6 @@ sn.addChannel({
 			  	admin: 'ultimatum2/admin',
 			  	player: 'ultimatum2'
 });
-
-//sn.addChannel({
-//				name: '3',
-//				admin: 'ultimatum3/admin',
-//				player: 'ultimatum3'
-//});
-
-//sn.addChannel({
-//				name: '4',
-//				admin: 'ultimatum4/admin',
-//				player: 'ultimatum4'
-//});
-
 
 sn.addChannel({
         name: 'pr',

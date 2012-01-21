@@ -51,23 +51,26 @@ function ServerChannel (options, server, io) {
 
 ServerChannel.prototype.createServers = function() {
 	
+	// INDAGANDO!!!
+	
 	var adminOptions = {
 						 	io: 		this.io,
 						 	server: 	this.server,
 						 	channel: 	this.adminChannel,
 						 	parent:		this.name,
-						 	user_options: JSUS.extend(this.options, {name: 'A'})
+						 	user_options: JSUS.extend({name: 'A'}, JSUS.clone(this.options))
 						};
+	
+	this.adminServer = new AdminServer(adminOptions);
 	
 	var playerOptions = {
 						   io: 		this.io,
 						   server: 	this.server,
 						   channel: this.playerChannel,
 						   parent: 	this.name,
-						   user_options: JSUS.extend(this.options, {name: 'P'})
+						   user_options: JSUS.extend({name: 'P'}, JSUS.clone(this.options))
 						};
 		
-	this.adminServer = new AdminServer(adminOptions);
 	this.playerServer = new PlayerServer(playerOptions);
 	
 	this.adminServer.setPartner(this.playerServer);

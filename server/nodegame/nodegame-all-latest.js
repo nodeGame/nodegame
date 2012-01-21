@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 16:08:03 CET 2012
+ * Built on Sa 21. Jan 17:19:47 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 16:08:03 CET 2012
+ * Built on Sa 21. Jan 17:19:47 CET 2012
  *
  */
  
@@ -2508,7 +2508,7 @@
 	
 	
 	function GameSocketClient (options) {
-		
+		this.options = options;
 		this.name = options.name;
 		this.url = options.url;
 		
@@ -2521,17 +2521,16 @@
 	
 	GameSocketClient.prototype.setGame = function (game) {
 		this.game = game;
-		this.io = this.connect();
+		this.connect();
 	};
 	
 	GameSocketClient.prototype.connect = function() {
 		// TODO: add check if http:// is already in
 		node.log('nodeGame: connecting to ' + this.url);
-		var socket = io.connect(this.url);
-	    this.attachFirstListeners(socket);
-	    return socket;
+		this.io = io.connect(this.url, this.options.io);
+	    this.attachFirstListeners(this.io);
+	    return this.io;
 	};
-	
 	
 	/*
 	
@@ -3666,7 +3665,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 16:08:03 CET 2012
+ * Built on Sa 21. Jan 17:19:47 CET 2012
  *
  */
  
@@ -4919,7 +4918,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 16:08:03 CET 2012
+ * Built on Sa 21. Jan 17:19:47 CET 2012
  *
  */
  

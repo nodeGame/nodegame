@@ -16,7 +16,7 @@ function ServerNode (options, server, io) {
 	if (!options) {
 		throw new Error('No configuration found to create a server. Aborting');
 	}
-	this.options = {};
+	this.options = options;
 	this.options.mail = ('undefined' !== typeof options.mail) ? options.mail : false;
 	this.options.dumpmsg = ('undefined' !== typeof options.dumpmsg) ? options.dumpmsg : false;
 	this.options.dumpsys = ('undefined' !== typeof options.dumpsys) ? options.dumpsys : true;
@@ -108,7 +108,7 @@ ServerNode.prototype._configure = function (obj, options) {
 		if (options.hasOwnProperty(i)) {
 			if (i === 'set') {
 				for (var j in options[i]) {
-					if (options[i].hasOwnProperty[j]) {
+					if (options[i].hasOwnProperty(j)) {
 						obj.set(j, options[i][j]);
 					}
 				}
@@ -125,7 +125,7 @@ ServerNode.prototype._configure = function (obj, options) {
 
 ServerNode.prototype.configureIO = function (options) {
 	this.server.enable('browser client etag');
-	this.server.set('log level', 1);
+	this.server.set('log level', -1);
 	this._configure(this.server, options);
 };
 
@@ -139,7 +139,13 @@ ServerNode.prototype.addChannel = function (options) {
 		return;
 	}
 	
+	var cname = options.name;
+	// Some options must not be overwritten
 	var options = JSUS.extend(this.options, options);
+	if (cname){
+		options.name = cname;
+	}
+	
 	// TODO merge global options with local options
 	var channel = new ServerChannel(options, this.server, this.io);
 	// TODO return false in case of error in creating the channel
