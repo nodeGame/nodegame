@@ -9,9 +9,7 @@
 	
 	exports.ServerInfoDisplay = ServerInfoDisplay;	
 		
-	function ServerInfoDisplay(options) {
-		var options = options || {};
-		
+	function ServerInfoDisplay (options) {	
 		this.game = node.game;
 		this.id = options.id || 'ServerInfoDisplay';
 		this.name = 'Server Info Display';

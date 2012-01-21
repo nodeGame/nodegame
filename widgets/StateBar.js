@@ -10,10 +10,10 @@
 	
 	exports.StateBar = StateBar;	
 		
-	function StateBar(id) {
+	function StateBar(options) {
 		
 		this.game = node.game;;
-		this.id = id || 'statebar';
+		this.id = options.id || 'statebar';
 		this.name = 'State Bar';
 		this.version = '0.2.1';
 		

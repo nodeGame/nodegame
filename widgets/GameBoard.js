@@ -9,10 +9,10 @@
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
 		
-	function GameBoard (id) {
+	function GameBoard (options) {
 		
 		this.game = node.game;
-		this.id = id || 'gboard';
+		this.id = options.id || 'gboard';
 		this.name = 'GameBoard';
 		
 		this.version = '0.3';

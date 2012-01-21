@@ -12,9 +12,9 @@
 	
 	var Utils = node.Utils;
 	
-	function Wall(id) {
+	function Wall(options) {
 		this.game = node.game;
-		this.id = id || 'wall';
+		this.id = options.id || 'wall';
 		this.name = 'Wall';
 		this.version = '0.2.1';
 		

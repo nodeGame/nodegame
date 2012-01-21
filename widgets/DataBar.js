@@ -10,10 +10,10 @@
 	
 	exports.DataBar	= DataBar;
 		
-	function DataBar(id) {
+	function DataBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'databar';
+		this.id = options.id || 'databar';
 		this.name = 'Data Bar';
 		this.version = '0.2.1';
 		

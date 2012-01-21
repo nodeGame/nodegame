@@ -11,9 +11,9 @@
 	
 	exports.NextPreviousState =	NextPreviousState;
 		
-	function NextPreviousState(id) {
+	function NextPreviousState(options) {
 		this.game = node.game;
-		this.id = id || 'nextprevious';
+		this.id = options.id || 'nextprevious';
 		this.name = 'Next,Previous State';
 		this.version = '0.2.1';
 		
