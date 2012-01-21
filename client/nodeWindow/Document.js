@@ -314,12 +314,8 @@
 	
 	Document.prototype.removeChildrenFromNode = function (e) {
 		
-	    if(!e) {
-	        return false;
-	    }
-	    if(typeof(e)=='string') {
-	        e = xGetElementById(e);
-	    }
+	    if (!e) return false;
+	    
 	    while (e.hasChildNodes()) {
 	        e.removeChild(e.firstChild);
 	    }

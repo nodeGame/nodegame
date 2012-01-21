@@ -9,10 +9,10 @@
 	
 	exports.StateDisplay = StateDisplay;	
 		
-	function StateDisplay(id) {
+	function StateDisplay(options) {
 		
 		this.game = node.game;
-		this.id = id || 'statedisplay';
+		this.id = options.id || 'statedisplay';
 		this.name = 'State Display';
 		this.version = '0.3';
 		

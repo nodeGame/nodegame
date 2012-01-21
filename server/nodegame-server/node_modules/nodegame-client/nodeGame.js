@@ -311,9 +311,7 @@
 		var listener = function(msg) {
 			if (msg.text === key) {
 				func.call(node.game, msg.data);
-				if(that.removeListener('in.say.DATA',listener)){
-					console.log('yes!!!');
-				}
+				that.removeListener('in.say.DATA',listener);
 			}
 			//that.printAllListeners();
 		};

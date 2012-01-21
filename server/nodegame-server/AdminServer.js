@@ -77,7 +77,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 	});
 	
 	this.on(get+'DATA', function (msg) {
-		console.log('HERE A!!!');
+		//console.log('HERE A!!!');
 		
 		// Ask a random player to send the game;
 		var p = this.pl.getRandom();
@@ -109,15 +109,35 @@ AdminServer.prototype.attachCustomListeners = function() {
 		
 	});
 	
-	AdminServer.prototype.generateInfo = function(){
-		var info = {
-					name: this.name,
-					status: 'OK',
-					nplayers: this.partner.pl.size(),
-					nadmins: this.pl.size(),
-		};
-							
-		return info;		
-	};
+	// TODO: Check if the methods for closed and shutdown (copied from PlayerServer) apply here
 	
+    // TODO: Save removed player in another list, to check whether they reconnect
+    this.on('closed', function(id) {
+      	log.log(that.name + ' ----------------- Got Closed ' + id);
+    	that.pl.remove(id);
+    	that.gmm.sendPLIST(that);
+    	//that.gmm.forwardPLIST(that);
+    });
+	
+	// TODO: Check this
+	this.server.sockets.on("shutdown", function(message) {
+		log.log("Server is shutting down.");
+		that.pl.clear(true);
+		that.gmm.sendPLIST(that);
+		//that.gmm.forwardPLIST(that);
+		log.close();
+	});
+	
+};
+
+
+AdminServer.prototype.generateInfo = function(){
+	var info = {
+				name: this.name,
+				status: 'OK',
+				nplayers: this.partner.pl.size(),
+				nadmins: this.pl.size(),
+	};
+						
+	return info;		
 };
