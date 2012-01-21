@@ -1,11 +1,10 @@
-(function(exports){
+(function(exports, node){
 	
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
 	 * 
 	 */
-	var node = exports;
 	exports.Table = Table;
 	
 	// For simple testing
@@ -320,4 +319,7 @@
   };
   
 	// TODO: add it node.window
-})(('undefined' !== typeof node) ? node : module.parent.exports);
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+);

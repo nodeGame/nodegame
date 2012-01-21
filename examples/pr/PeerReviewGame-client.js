@@ -233,7 +233,7 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var table = new node.Table({id: 'exhibition'});
+			var table = new node.window.Table({id: 'exhibition'});
 			table.setHeader(['','A','B','C']);
 			table.addColumn([1,2,3]);
 			
@@ -253,7 +253,7 @@ function PeerReviewGame () {
 							for (var i=0; i < winners.length; i++) {
 							
 							
-								var details_tbl = new node.Table();
+								var details_tbl = new node.window.Table();
 								details_tbl.addColumn(['Author: ' + winners[i].author,
 								                       'Score: ' + winners[i].mean
 								]);

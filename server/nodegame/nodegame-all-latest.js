@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 15:51:56 CET 2012
+ * Built on Sa 21. Jan 14:24:36 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 15:51:56 CET 2012
+ * Built on Sa 21. Jan 14:24:36 CET 2012
  *
  */
  
@@ -2929,10 +2929,6 @@
 			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function (msg) {
 				
-				
-				console.log('RECEIVE STATE');
-				console.log(msg);
-				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
 					//node.log('updatePlayer', 'DEBUG);
@@ -3672,7 +3668,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 15:51:56 CET 2012
+ * Built on Sa 21. Jan 14:24:36 CET 2012
  *
  */
  
@@ -4592,14 +4588,13 @@
 })(node.window);
  
  
-(function(exports){
+(function(exports, node){
 	
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
 	 * 
 	 */
-	var node = exports;
 	exports.Table = Table;
 	
 	// For simple testing
@@ -4913,8 +4908,11 @@
 	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	
-})(('undefined' !== typeof node) ? node : module.parent.exports);
+	// TODO: add it node.window
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+);
  
  
  
@@ -4927,7 +4925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fr 20. Jan 15:51:56 CET 2012
+ * Built on Sa 21. Jan 14:24:36 CET 2012
  *
  */
  
@@ -6273,8 +6271,6 @@
 		
 		this.div = null;
 		this.table = null; //new node.window.Table();
-		
-		console.log(node.window);
 		
 		var button = null;
 		

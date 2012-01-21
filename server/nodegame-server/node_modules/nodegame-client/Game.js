@@ -89,10 +89,6 @@
 			// If the message is from a player, update the player state
 			node.on( IN + say + 'STATE', function (msg) {
 				
-				
-				console.log('RECEIVE STATE');
-				console.log(msg);
-				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
 					//node.log('updatePlayer', 'DEBUG);
