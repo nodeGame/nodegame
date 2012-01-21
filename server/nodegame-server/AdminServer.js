@@ -20,7 +20,6 @@ AdminServer.prototype.constructor = AdminServer;
 
 function AdminServer(options) {
 	GameServer.call(this,options);	
-	
 	// extra variables
 	this.loop = null;
 }

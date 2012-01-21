@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 17:19:47 CET 2012
+ * Built on Sa 21. Jan 19:19:12 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 17:19:47 CET 2012
+ * Built on Sa 21. Jan 19:19:12 CET 2012
  *
  */
  
@@ -3665,7 +3665,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 17:19:47 CET 2012
+ * Built on Sa 21. Jan 19:19:13 CET 2012
  *
  */
  
@@ -4097,9 +4097,16 @@
 	// Overriding Document.write and Document.writeln
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
+
+	// TODO: findLastElement
+	GameWindow.prototype.findLastElement = function() {
+		var el = document.(this.frame && this.frame.body)
+			
+		return el.lastElementChild || el;
+	};
 	
 	GameWindow.prototype.write = function (text, root) {		
-		var root = root || this.frame.body;
+		var root = root || (this.frame.body || document.body);
 		root = root.lastElementChild || root;
 		return this._write(root, text);
 	};
@@ -4918,7 +4925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 17:19:47 CET 2012
+ * Built on Sa 21. Jan 19:19:13 CET 2012
  *
  */
  

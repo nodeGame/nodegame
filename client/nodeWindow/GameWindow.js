@@ -95,9 +95,16 @@
 	// Overriding Document.write and Document.writeln
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
+
+	// TODO: findLastElement
+	GameWindow.prototype.findLastElement = function() {
+		var el = document.(this.frame && this.frame.body)
+			
+		return el.lastElementChild || el;
+	};
 	
 	GameWindow.prototype.write = function (text, root) {		
-		var root = root || this.frame.body;
+		var root = root || (this.frame.body || document.body);
 		root = root.lastElementChild || root;
 		return this._write(root, text);
 	};

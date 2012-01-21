@@ -13,6 +13,7 @@ function Monitor_Example () {
 	
 	this.init = function() {
 		node.window.setup('MONITOR');
+		this.summary = new node.window.Table();
 	};
 	
 	var pregame = function(){
@@ -23,11 +24,14 @@ function Monitor_Example () {
 		console.log('Instructions');
 	};
 		
-	var creation = function(){};
+	var creation = function() {
+		console.log('creation');
+	};
 	
-	var submission = function(){
-		//node.memory.dump('./pr.csv');
-					
+	var submission = function() {
+		console.log(this.memory);
+		this.summary.addRow(this.memory.select('state','=', this.previous()));
+		document.body.appendChild(this.summary.parse());
 		console.log('submission');
 	};
 	
