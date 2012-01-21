@@ -10,8 +10,15 @@ var options = {
 				verbosity: 100,
 				dumpsys: false,
 				dumpmsg: true,
-				mail: false
+				mail: false,
+				io: {set: {
+							transports: ['websocket']
+					}
+				},
+				http: {}
 };
+
+
 
 // ServerNode accepts two additional parameters:
 // - an instance of an http Express server

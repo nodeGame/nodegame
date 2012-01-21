@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.7
+ * nodeGame-all v0.6.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 15:13:12 CET 2012
+ * Built on Sa 21. Jan 16:08:03 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.7
+ * nodeGame Client v0.6.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 15:13:12 CET 2012
+ * Built on Sa 21. Jan 16:08:03 CET 2012
  *
  */
  
@@ -3661,12 +3661,12 @@
  
  
 /*!
- * nodeWindow v0.6.7
+ * nodeWindow v0.6.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 15:13:12 CET 2012
+ * Built on Sa 21. Jan 16:08:03 CET 2012
  *
  */
  
@@ -4914,12 +4914,12 @@
  
  
 /*!
- * nodeGadgets v0.6.7
+ * nodeGadgets v0.6.8
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 21. Jan 15:13:12 CET 2012
+ * Built on Sa 21. Jan 16:08:03 CET 2012
  *
  */
  
@@ -5847,10 +5847,10 @@
 	
 	exports.DataBar	= DataBar;
 		
-	function DataBar(id) {
+	function DataBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'databar';
+		this.id = options.id || 'databar';
 		this.name = 'Data Bar';
 		this.version = '0.2.1';
 		
@@ -5930,10 +5930,10 @@
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
 		
-	function GameBoard (id) {
+	function GameBoard (options) {
 		
 		this.game = node.game;
-		this.id = id || 'gboard';
+		this.id = options.id || 'gboard';
 		this.name = 'GameBoard';
 		
 		this.version = '0.3';
@@ -6041,10 +6041,10 @@
 	
 	exports.GameSummary	= GameSummary;
 	
-	function GameSummary(id) {
+	function GameSummary(options) {
 		//debugger;
 		this.game = node.game;
-		this.id = id || 'gamesummary';
+		this.id = options.id || 'gamesummary';
 		this.name = 'Game Summary';
 		this.version = '0.2.1';
 		
@@ -6110,10 +6110,10 @@
 	
 	exports.MsgBar	= MsgBar;
 		
-	function MsgBar(id){
+	function MsgBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'msgbar';
+		this.id = options.id || 'msgbar';
 		this.name = 'Msg Bar';
 		this.version = '0.2.1';
 		
@@ -6180,9 +6180,9 @@
 	
 	exports.NextPreviousState =	NextPreviousState;
 		
-	function NextPreviousState(id) {
+	function NextPreviousState(options) {
 		this.game = node.game;
-		this.id = id || 'nextprevious';
+		this.id = options.id || 'nextprevious';
 		this.name = 'Next,Previous State';
 		this.version = '0.2.1';
 		
@@ -6252,9 +6252,7 @@
 	
 	exports.ServerInfoDisplay = ServerInfoDisplay;	
 		
-	function ServerInfoDisplay(options) {
-		var options = options || {};
-		
+	function ServerInfoDisplay (options) {	
 		this.game = node.game;
 		this.id = options.id || 'ServerInfoDisplay';
 		this.name = 'Server Info Display';
@@ -6338,10 +6336,10 @@
 	
 	exports.StateBar = StateBar;	
 		
-	function StateBar(id) {
+	function StateBar(options) {
 		
 		this.game = node.game;;
-		this.id = id || 'statebar';
+		this.id = options.id || 'statebar';
 		this.name = 'State Bar';
 		this.version = '0.2.1';
 		
@@ -6810,9 +6808,9 @@
 	
 	var Utils = node.Utils;
 	
-	function Wall(id) {
+	function Wall(options) {
 		this.game = node.game;
-		this.id = id || 'wall';
+		this.id = options.id || 'wall';
 		this.name = 'Wall';
 		this.version = '0.2.1';
 		

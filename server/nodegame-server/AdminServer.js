@@ -37,8 +37,8 @@ AdminServer.prototype.attachCustomListeners = function() {
 	
 	this.on(say+'HI', function(msg) {
 		// Add the player to to the list
-		log.log('------------------------INPLAYER');
-		log.log(msg.data);
+//		log.log('------------------------INPLAYER');
+//		log.log(msg.data);
 		that.pl.add(msg.data);
 		// Tell everybody a new player is connected;
 		var connected = new Player(msg.data) + ' connected.';
@@ -67,8 +67,7 @@ AdminServer.prototype.attachCustomListeners = function() {
 			that.gmm.sendTXT('**Not possible to change state: some players are not ready**', msg.from);
 		}
 		else {
-			
-			that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
+			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
 			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
 			that.gmm.broadcast(msg, msg.from);
