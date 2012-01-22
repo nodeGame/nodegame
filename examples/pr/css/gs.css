@@ -82,3 +82,7 @@ fieldset#wall_fieldset, fieldset#gb_fieldset {
   padding: 5px;
   margin: 5px;
 }
+
+table#summary {
+	border: 1px solid #CCC;
+}

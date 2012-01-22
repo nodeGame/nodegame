@@ -13,7 +13,29 @@ function Monitor_Example () {
 	
 	this.init = function() {
 		node.window.setup('MONITOR');
-		this.summary = new node.window.Table();
+		this.summary = new node.window.Table({auto_update: true,
+											  id: 'summary'
+		});
+		
+		this.summary.render = function (cell) {
+			if ((cell.y % 2) === 1) {
+				var cf_options = { id: 'cf_' + cell.content.player,
+						   width: 200,
+						   height: 200,
+						   features: cell.content.value,
+						   controls: false
+				};
+				
+				var container = document.createElement('div');
+				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+				return container;
+			}
+			else {
+				return cell.content.value;
+			}
+		};
+		
+		document.body.appendChild(this.summary.table);
 	};
 	
 	var pregame = function(){
@@ -29,9 +51,9 @@ function Monitor_Example () {
 	};
 	
 	var submission = function() {
-		console.log(this.memory);
-		this.summary.addRow(this.memory.select('state','=', this.previous()));
-		document.body.appendChild(this.summary.parse());
+		var row = this.memory.select('state','=', this.previous()).fetch();
+		this.summary.addRow(row);
+		//document.body.appendChild(this.summary.parse());
 		console.log('submission');
 	};
 	

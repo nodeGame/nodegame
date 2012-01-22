@@ -29,6 +29,12 @@
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
+    this.table = options.table || document.createElement('table'); 
+    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
+    this.table.id = this.id;
+    
+    this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
+    
     // Class for missing cells
     this.missing = options.missing || 'missing';
     this.pointers = {
@@ -37,10 +43,12 @@
     				z: options.pointerZ || 0
     };
     
-    this.id = options.id || 'table';  
-    
     this.header = null;
     this.footer = null;
+    
+    
+    // By default return the element content as it is
+    this.render = function(el) { return el.content };
   };
   
   Table.prototype.addClass = function (c) {
@@ -201,6 +209,10 @@
 //	Table.log('After insert');
 //	Table.log(this.db);
 	
+	if (this.auto_update) {
+		this.parse(true);
+	}
+	
   };
     
   Table.prototype.addColumn = function (data, attributes, container) {
@@ -214,40 +226,42 @@
 	  };
   
   Table.prototype.getRoot = function() {
-    return this.root;
+	  return this.root;
+  };
+  
+  Table.prototype.setRoot = function(root) {
+	  this.root = root;
   };
   
   // TODO: Only 2D for now
   // TODO: improve algorithm, rewrite
-  Table.prototype.parse = function() {
+  Table.prototype.parse = function () {
 	  
 	  var fromCell2TD = function (cell, el) {
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = cell.content;
+		  var c = this.render(cell);
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
 		  return TD;
 	  };
 	  
-//	  var appendContent = function (td, c) {
-//		  if (!td) return;
-//		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-//		  td.appendChild(content);
-//		  return td;
-//	  };
+	  if (this.table) {
+		  while (this.table.hasChildNodes()) {
+		        this.table.removeChild(this.table.firstChild);
+		    }
+	  }
 	  
-	  var TABLE = document.createElement('table');
-	  TABLE.id = this.id;
+	  var TABLE = this.table;
 	  
 	  // HEADER
 	  if (this.header && this.header.length > 0) {
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.header[i]),'th');
+			  TR.appendChild(fromCell2TD.call(this, this.header[i],'th'));
 		  }
 		  THEAD.appendChild(TR);
 		  i=0;
@@ -283,7 +297,7 @@
 				  }
 			  }
 			  // Normal Insert
-			  TR.appendChild(fromCell2TD(this.db[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.db[i]));
 			  
 			  // Update old refs
 			  old_x = this.db[i].x;
@@ -297,14 +311,24 @@
 		  var TFOOT = document.createElement('tfoot');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.footer[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.footer[i]));
 		  }
 		  TFOOT.appendChild(TR);
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
 	  return TABLE;
-  }
+  };
+  
+//  Table.prototype.update = function(){
+//	  if (this.table) {
+//		  while (this.table.hasChildNodes()) {
+//		        this.table.removeChild(this.root.firstChild);
+//		    }
+//	  }
+//	  
+//	  this.parse();
+//  };
   
   // Cell Class
   

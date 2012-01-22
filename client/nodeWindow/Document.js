@@ -4,6 +4,7 @@
 	 * Document
 	 * 
 	 */
+	var JSUS = node.JSUS;
 	
 	// Create the window obj
 	node.window = {};
@@ -126,13 +127,13 @@
 	Document.prototype.write = function (root, text) {
 		if (!root) return;
 		if (!text) return;
-		var tn = document.createTextNode(text);
+		var content = (!JSUS.isNode(text) || !JSUS.isElement(text)) ? document.createTextNode(text) : text;
 		node.log('ROOT');
 		node.log(root);
 		node.log('TEXT');
-		node.log(text);
-		root.appendChild(tn);
-		return tn;
+		node.log(content);
+		root.appendChild(content);
+		return content;
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {

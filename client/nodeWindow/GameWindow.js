@@ -98,20 +98,29 @@
 
 	// TODO: findLastElement
 	GameWindow.prototype.findLastElement = function() {
-		var el = document.(this.frame && this.frame.body)
-			
-		return el.lastElementChild || el;
-	};
+		var el = this.frame;
+		if (el) {
+			el = this.frame.body || el;
+		}
+		else {
+			el = document.body || document.lastElementChild;
+		}
+		return 	el;
+	}
 	
 	GameWindow.prototype.write = function (text, root) {		
-		var root = root || (this.frame.body || document.body);
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		var root = root || this.frame.body;
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._writeln(root, text, br);
 	};
 	

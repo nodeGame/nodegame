@@ -20,6 +20,7 @@ function PeerReviewGame () {
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
+		this.milli = 200;
 	};
 	
 	
@@ -63,7 +64,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: this.milli
 			};
 			
 			node.window.addEventButton('CREATION_DONE', this.donetxt);
@@ -133,7 +134,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 20000
+							milliseconds: this.milli
 		};
 		
 		
@@ -174,7 +175,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 30000
+								milliseconds: this.milli
 			};	
 			
 			this.timer.restart(timerOptions);
@@ -297,7 +298,7 @@ function PeerReviewGame () {
 				
 				this.timer.restart({
 									event: 'DONE',
-									milliseconds: 20000
+									milliseconds: this.milli
 				});	
 				
 			});
@@ -318,7 +319,7 @@ function PeerReviewGame () {
 			
 			this.timer.restart({
 								event: 'DONE',
-								milliseconds: 10000
+								milliseconds: this.milli
 			});
 		});
 		
