@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.8
+ * nodeGame-all v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 13:16:33 CET 2012
+ * Built on So 22. Jan 16:48:17 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.8
+ * nodeGame Client v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 13:16:33 CET 2012
+ * Built on So 22. Jan 16:48:17 CET 2012
  *
  */
  
@@ -211,14 +211,14 @@
 		if (!obj) return;
 		var clone = {};
 		for (var i in obj) {
-			if (obj.hasOwnProperty(i)) {
+			//if (obj.hasOwnProperty(i)) {
 				if ( 'object' === typeof obj[i] ) {
 					clone[i] = OBJ.clone(obj[i]);
 				}
 				else {
 					clone[i] = obj[i];
 				}
-			}
+			//}
 		}
 		return clone;
 	};
@@ -3660,12 +3660,12 @@
  
  
 /*!
- * nodeWindow v0.6.8
+ * nodeWindow v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 13:16:33 CET 2012
+ * Built on So 22. Jan 16:48:17 CET 2012
  *
  */
  
@@ -4203,6 +4203,7 @@
 			this.addWidget('GameBoard');
 			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
+			this.addWidget('GameTable');
 	
 			break;
 		
@@ -4287,7 +4288,6 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -4311,8 +4311,8 @@
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
-			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root,fieldsetOptions,g);
+			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
 		}
@@ -4648,7 +4648,11 @@
     
     
     // By default return the element content as it is
-    this.render = function(el) { return el.content };
+    this.render = function (el) { return el.content };
+    
+    // Not used now
+    // Matches properties and dimensions
+    //this.binds = {};
   };
   
   Table.prototype.addClass = function (c) {
@@ -4746,9 +4750,6 @@
 		dims = Table.H;
 	}
 	
-//	Table.log('DATA TBL');
-//	Table.log(data);
-	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
 	var y = y || this.pointers[dims[1]] + 1;
@@ -4821,16 +4822,12 @@
   };
   
   Table.prototype.addRow = function (data, attributes, container) {
-		if (!data) return false;
-		return this._add(data, Table.H);
-	  };
-  
-  Table.prototype.getRoot = function() {
-	  return this.root;
+	if (!data) return false;
+	return this._add(data, Table.H);
   };
   
-  Table.prototype.setRoot = function(root) {
-	  this.root = root;
+  Table.prototype.bind = function (dim, property) {
+	  this.binds[property] = dim;
   };
   
   // TODO: Only 2D for now
@@ -4954,12 +4951,12 @@
  
  
 /*!
- * nodeGadgets v0.6.8
+ * nodeGadgets v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 13:16:34 CET 2012
+ * Built on So 22. Jan 16:48:17 CET 2012
  *
  */
  
@@ -6135,6 +6132,79 @@
 	};
 	
 	GameSummary.prototype.listeners = function() {}; 
+
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+
+	var GameState = node.GameState;
+	
+	/*!
+	 * GameTable
+	 * 
+	 * Show the memory state of the game
+	 */
+	
+	exports.GameTable = GameTable;
+	
+	function GameTable (options) {
+		this.options = options;
+		this.id = options.id || 'gametable';
+		this.name = 'Game Table';
+		this.version = '0.1';
+		
+		this.fieldset = { legend: this.name,
+				  		  id: this.id + '_fieldset'
+		};
+		
+		this.root = null;
+		this.gtbl = null;
+		
+		this.init(this.options);
+	};
+	
+	GameTable.prototype.init = function (options) {
+		
+		this.gtbl = new node.window.Table({
+											auto_update: true,
+											id: options.id || this.options.id
+		}, node.game.memory.db);
+		if (options.render) {
+			this.setRender(options.render);
+		}
+		
+		//var glCopy = JSUS.clone(node.game.gameLoop);
+		var state = new GameState();
+		while (state) { 
+			//console.log(glCopy);
+			this.gtbl.addRow([state.toString()].concat(new Array(10)));
+			var state = node.game.gameLoop.next(state);
+		}
+		
+		if (this.gtbl.size() === 0) {
+			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
+		}
+	};
+	
+	GameTable.prototype.setRender = function(func) {
+		this.gtbl.render = func;
+	};
+	
+	GameTable.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.gtbl.table);
+		return root;
+	};
+	
+	GameTable.prototype.listeners = function () {
+		var that = this;
+		node.on('in.set.DATA', function () {
+			that.gtbl.db = node.game.memory.db;
+			that.gtbl.parse(true);
+		});
+	}; 
 
 })(node.window.widgets); 
  

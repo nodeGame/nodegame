@@ -48,7 +48,11 @@
     
     
     // By default return the element content as it is
-    this.render = function(el) { return el.content };
+    this.render = function (el) { return el.content };
+    
+    // Not used now
+    // Matches properties and dimensions
+    //this.binds = {};
   };
   
   Table.prototype.addClass = function (c) {
@@ -146,9 +150,6 @@
 		dims = Table.H;
 	}
 	
-//	Table.log('DATA TBL');
-//	Table.log(data);
-	
 	// By default, only the second dimension is incremented
 	var x = x || this.pointers[dims[0]]; 
 	var y = y || this.pointers[dims[1]] + 1;
@@ -221,16 +222,12 @@
   };
   
   Table.prototype.addRow = function (data, attributes, container) {
-		if (!data) return false;
-		return this._add(data, Table.H);
-	  };
-  
-  Table.prototype.getRoot = function() {
-	  return this.root;
+	if (!data) return false;
+	return this._add(data, Table.H);
   };
   
-  Table.prototype.setRoot = function(root) {
-	  this.root = root;
+  Table.prototype.bind = function (dim, property) {
+	  this.binds[property] = dim;
   };
   
   // TODO: Only 2D for now

@@ -200,6 +200,7 @@
 			this.addWidget('GameBoard');
 			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
+			this.addWidget('GameTable');
 	
 			break;
 		
@@ -284,7 +285,6 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -308,8 +308,8 @@
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
-			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root,fieldsetOptions,g);
+			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
 		}
