@@ -646,8 +646,40 @@
 		return outs;
 	};	
 	
-	NDDB.prototype.diff = function (nddb, key) {
-		
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.diff = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				console.log('ahah!')
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return !(JSUS.in_array(el,nddb));
+		});
+	};
+	
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.intersect = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				console.log('ahah!')
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return JSUS.in_array(el,nddb);
+		});
 	};
 	
 })(
