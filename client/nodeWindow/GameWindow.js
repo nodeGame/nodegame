@@ -200,7 +200,7 @@
 			this.addWidget('GameBoard');
 			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
-			this.addWidget('GameTable');
+			//this.addWidget('GameTable');
 	
 			break;
 		

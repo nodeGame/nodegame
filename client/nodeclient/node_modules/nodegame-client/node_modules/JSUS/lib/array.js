@@ -183,15 +183,26 @@
 		return result;
 	};
 	
-	
+
 	/**
-	 * Performs a diff between two arrays. 
+	 * Compute the intersection between two arrays. 
+	 * Arrays can contain both primitive types and objects.
+	 */
+	ARRAY.arrayIntersect = function (a1, a2) {
+		return a1.filter( function(i) {
+			return JSUS.in_array(i, a2);
+		});
+	};
+		
+	/**
+	 * Perform a diff between two arrays.
+	 * Arrays can contain both primitive types and objects.
 	 * Returns all the values of the first array which are not present 
 	 * in the second one.
 	 */
-	ARRAY.arrayDiff = function(a1, a2) {
+	ARRAY.arrayDiff = function (a1, a2) {
 		return a1.filter( function(i) {
-			return !(a2.indexOf(i) > -1);
+			return !(JSUS.in_array(i, a2));
 		});
 	};
 	

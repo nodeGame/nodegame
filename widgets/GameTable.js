@@ -1,6 +1,7 @@
 (function (exports) {
 
 	var GameState = node.GameState;
+	var PlayerList = node.PlayerList;
 	
 	/*!
 	 * GameTable
@@ -31,30 +32,25 @@
 	
 	GameTable.prototype.init = function (options) {
 		
+		this.stateColumn = node.game.gameLoop.toArray();
+		
 		this.gtbl = new node.window.Table({
 											auto_update: true,
-											id: options.id || this.options.id
+											id: options.id || this.options.id,
+											render: options.render
 		}, node.game.memory.db);
+		
+		this.gtbl.setLeft(node.game.gameLoop.toArray());
+		
 		if (options.render) {
 			this.setRender(options.render);
 		}
 		
-		//var glCopy = JSUS.clone(node.game.gameLoop);
+//		if (this.gtbl.size() === 0) {
+//			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
+//		}
 		
-		console.log('PRIMA');
-		console.log(node.game.gameLoop);
-		var state = new GameState();
-		while (state) { 
-			//console.log(glCopy);
-			this.gtbl.addRow([state.toString()].concat(new Array(10)));
-			var state = node.game.gameLoop.next(state);
-		}
-		console.log('DOPO');
-		console.log(node.game.gameLoop);
-		
-		if (this.gtbl.size() === 0) {
-			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
-		}
+		this.gtbl.parse(true);
 	};
 	
 	GameTable.prototype.setRender = function(func) {
@@ -71,13 +67,48 @@
 		var that = this;
 		
 		node.onPLIST(function(msg){
-			that.plist = msg.data;
-		});
-		
-		node.on('in.set.DATA', function () {
-			that.gtbl.db = node.game.memory.db;
+			var plist = new PlayerList(null,msg.data);
+			if (plist.size() === 0) return;
+			
+			if (!that.plist) {
+				that.plist = plist;
+//				console.log('Created new plist in gtable');
+//				console.log(that.plist);
+				that.plist.forEach(function(el){that.addPlayer(el);});
+			}
+			else {
+				var diff = plist.diff(that.plist);
+//				console.log('THIS IS THE DIFF');
+//				console.log(diff);
+				if (diff) {
+					diff.forEach(function(el){that.addPlayer(el);});
+				}
+//				console.log('added by diff');
+				console.log(that.plist);
+			}
+			
 			that.gtbl.parse(true);
 		});
+		
+		node.on('in.set.DATA', function (msg) {
+//			console.log(that.plist);
+//			console.log(msg);
+			var x = that.plist.select('id', '=', msg.from).first().count;
+			var y = node.game.gameLoop.indexOf(node.game.gameState);
+//			console.log('DATA RECEIVED')
+//			console.log(x + ' ' + y);
+			
+			that.gtbl.add(msg.data, x, y);
+			that.gtbl.parse(true);
+			console.log(that.gtbl);
+		});
 	}; 
+	
+	GameTable.prototype.addPlayer = function (player) {
+		var header = this.plist.map(function(el){return el.name});
+		this.gtbl.setHeader(header);
+		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
+		this.plist.add(player);
+	};
 
 })(node.window.widgets);

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 16:48:17 CET 2012
+ * Built on Mo 23. Jan 13:10:43 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 16:48:17 CET 2012
+ * Built on Mo 23. Jan 13:10:43 CET 2012
  *
  */
  
@@ -513,15 +513,26 @@
 		return result;
 	};
 	
-	
+
 	/**
-	 * Performs a diff between two arrays. 
+	 * Compute the intersection between two arrays. 
+	 * Arrays can contain both primitive types and objects.
+	 */
+	ARRAY.arrayIntersect = function (a1, a2) {
+		return a1.filter( function(i) {
+			return JSUS.in_array(i, a2);
+		});
+	};
+		
+	/**
+	 * Perform a diff between two arrays.
+	 * Arrays can contain both primitive types and objects.
 	 * Returns all the values of the first array which are not present 
 	 * in the second one.
 	 */
-	ARRAY.arrayDiff = function(a1, a2) {
+	ARRAY.arrayDiff = function (a1, a2) {
 		return a1.filter( function(i) {
-			return !(a2.indexOf(i) > -1);
+			return !(JSUS.in_array(i, a2));
 		});
 	};
 	
@@ -737,7 +748,6 @@
 	
 	// Stdout redirect
 	NDDB.log = console.log;
-	
 	
 	/**
 	 * NDDB interface
@@ -1351,7 +1361,43 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};		
+	};	
+	
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.diff = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				console.log('ahah!')
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return !(JSUS.in_array(el,nddb));
+		});
+	};
+	
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.intersect = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				console.log('ahah!')
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return JSUS.in_array(el,nddb);
+		});
+	};
 	
 })(
 		
@@ -2277,6 +2323,43 @@
 		return gs;
 	};
 	
+	/**
+	 * Compute the total number of steps to go.
+	 */
+	GameLoop.prototype.length = function (state) {
+		var state = state || new GameState();
+		var count = 0;
+		while (state) { 
+			//console.log(glCopy);
+			count++;
+			var state = this.next(state);
+		}
+		return count;
+	};
+	
+	GameLoop.prototype.toArray = function() {
+		var state = new GameState();
+		var out = [];
+		while (state) { 
+			out.push(state.toString());
+			var state = this.next(state);
+		}
+		return out;
+	};
+	
+	GameLoop.prototype.indexOf = function (state) {
+		if (!state) return -1;
+		var idx = 0;
+		var search = new GameState();
+		while (search) {
+			if (GameState.compare(search,state) === 0){
+				return idx;
+			}
+			search = this.next(search);
+			idx++;
+		}
+		return -1;
+	};
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -3665,7 +3748,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 16:48:17 CET 2012
+ * Built on Mo 23. Jan 13:10:43 CET 2012
  *
  */
  
@@ -4203,7 +4286,7 @@
 			this.addWidget('GameBoard');
 			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
-			this.addWidget('GameTable');
+			//this.addWidget('GameTable');
 	
 			break;
 		
@@ -4646,9 +4729,11 @@
     this.header = null;
     this.footer = null;
     
+    this.left = null;
+    this.right = null;
     
     // By default return the element content as it is
-    this.render = function (el) { return el.content };
+    this.render = options.render || function (el) { return el.content };
     
     // Not used now
     // Matches properties and dimensions
@@ -4707,6 +4792,15 @@
 	  this.header = this._addSpecial(header);
   };
 
+  Table.prototype.setLeft = function (left) {
+	  this.left = this._addSpecial(left, 'left');
+  };
+
+// TODO: setRight  
+//  Table.prototype.setRight = function (left) {
+//	  this.right = this._addSpecial(left, 'right');
+//  };
+  
   Table.prototype.setFooter = function (footer) {
 	  this.footer = this._addSpecial(footer, 'footer');
   };
@@ -4749,14 +4843,7 @@
 	else {
 		dims = Table.H;
 	}
-	
-	// By default, only the second dimension is incremented
-	var x = x || this.pointers[dims[0]]; 
-	var y = y || this.pointers[dims[1]] + 1;
-	var z = z || this.pointers[dims[2]];
-	
-	if ('object' !== typeof data) data = [data]; 
-	
+		
 	var insertCell = function (content){	
 		//Table.log('content');
 //		Table.log(x + ' ' + y + ' ' + z);
@@ -4774,6 +4861,12 @@
 		this.updatePointer(dims[2],cell[dims[2]]);
 	};
 	
+	// By default, only the second dimension is incremented
+	var x = x || this.pointers[dims[0]]; 
+	var y = y || this.pointers[dims[1]] + 1;
+	var z = z || this.pointers[dims[2]];
+	
+	if ('object' !== typeof data) data = [data]; 
 	
 	var cell = null;
 	// Loop Dim1
@@ -4810,20 +4903,37 @@
 //	Table.log('After insert');
 //	Table.log(this.db);
 	
+	// TODO: if coming from addRow or Column this should be done only at the end
 	if (this.auto_update) {
 		this.parse(true);
 	}
 	
   };
+  
+  Table.prototype.add = function (data, x, y) {
+	  if (!data) return;
+	  
+	  var result = this.insert(new Cell({
+		  x: x,
+		  y: y,
+		  content: data
+	  }));
+	  
+	  if (result) {
+		  this.updatePointer('x',x);
+		  this.updatePointer('y',y);
+	  }
+	  return result;
+  };
     
-  Table.prototype.addColumn = function (data, attributes, container) {
+  Table.prototype.addColumn = function (data, x, y) {
 	if (!data) return false;
-	return this._add(data, Table.V);
+	return this._add(data, Table.V, x, y);
   };
   
-  Table.prototype.addRow = function (data, attributes, container) {
+  Table.prototype.addRow = function (data, x, y) {
 	if (!data) return false;
-	return this._add(data, Table.H);
+	return this._add(data, Table.H, x, y);
   };
   
   Table.prototype.bind = function (dim, property) {
@@ -4857,6 +4967,10 @@
 	  if (this.header && this.header.length > 0) {
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
+		  // Add an empty cell to balance the left header column
+		  if (this.left) {
+			  TR.appendChild(document.createElement('th'));
+		  }
 		  for (var i=0; i < this.header.length; i++) {
 			  TR.appendChild(fromCell2TD.call(this, this.header[i],'th'));
 		  }
@@ -4865,24 +4979,49 @@
 		  TABLE.appendChild(THEAD);
 	  }
 	  
-	  // BODY
-	  if (this.size() !==  0) {
-		  var TBODY = document.createElement('tbody');
+//	  console.log(this.table);
+//	  console.log(this.id);
+//	  console.log(this.db.length);
 	  
+	  console.log('BEFOR BODY LOOP');
+	  console.log(this.id);
+	  console.log(this.db.length);
+	  
+	  // BODY
+	  if (this.size() !== 0) {
+		  var TBODY = document.createElement('tbody');
+		 
 		  this.sort(['y','x']); // z to add first
 		  var trid = -1;
 		  // TODO: What happens if the are missing at the beginning ??
 		  var f = this.first();
 		  var old_x = f.x;
+		  var old_left = 0
 
+		  console.log('BEFOR TBODY LOOP');
+		  console.log(this.id);
+		  
+		
 		  for (var i=0; i < this.db.length; i++) {
+			  console.log('INSIDE TBODY LOOP');
+			  console.log(this.id);
 			  if (trid !== this.db[i].y) {
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
 				  trid = this.db[i].y;
 				  //Table.log(trid);
 				  old_x = f.x - 1; // must start exactly from the first
+				  
+				// Insert left header, if any
+				  if (this.left) {
+					  var TD = document.createElement('td');
+					  //TD.className = this.missing;
+					  TR.appendChild(fromCell2TD.call(this, this.left[old_left]));
+					  old_left++;
+				  }
 			  }
+			  
+			  
 			  
 			  // Insert missing cells
 			  if (this.db[i].x > old_x + 1) {
@@ -4914,18 +5053,21 @@
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
+//	  console.log('TESTING WRITING');
+//	  console.log(TABLE);
+//	  console.log(this.table)
+	  
 	  return TABLE;
   };
   
-//  Table.prototype.update = function(){
-//	  if (this.table) {
-//		  while (this.table.hasChildNodes()) {
-//		        this.table.removeChild(this.root.firstChild);
-//		    }
-//	  }
-//	  
-//	  this.parse();
-//  };
+
+  
+  Table.prototype.set = function (x, y, content) {
+	  var el = this.select('x','=',x).select('y','=',y).first();
+	  if (!el) return;
+	  el.content = content;
+	  return true;
+  };
   
   // Cell Class
   
@@ -4956,7 +5098,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on So 22. Jan 16:48:17 CET 2012
+ * Built on Mo 23. Jan 13:10:43 CET 2012
  *
  */
  
@@ -6140,6 +6282,7 @@
 (function (exports) {
 
 	var GameState = node.GameState;
+	var PlayerList = node.PlayerList;
 	
 	/*!
 	 * GameTable
@@ -6161,31 +6304,34 @@
 		
 		this.root = null;
 		this.gtbl = null;
+		this.plist = null;
 		
 		this.init(this.options);
+		
+		
 	};
 	
 	GameTable.prototype.init = function (options) {
 		
+		this.stateColumn = node.game.gameLoop.toArray();
+		
 		this.gtbl = new node.window.Table({
 											auto_update: true,
-											id: options.id || this.options.id
+											id: options.id || this.options.id,
+											render: options.render
 		}, node.game.memory.db);
+		
+		this.gtbl.setLeft(node.game.gameLoop.toArray());
+		
 		if (options.render) {
 			this.setRender(options.render);
 		}
 		
-		//var glCopy = JSUS.clone(node.game.gameLoop);
-		var state = new GameState();
-		while (state) { 
-			//console.log(glCopy);
-			this.gtbl.addRow([state.toString()].concat(new Array(10)));
-			var state = node.game.gameLoop.next(state);
-		}
+//		if (this.gtbl.size() === 0) {
+//			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
+//		}
 		
-		if (this.gtbl.size() === 0) {
-			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
-		}
+		this.gtbl.parse(true);
 	};
 	
 	GameTable.prototype.setRender = function(func) {
@@ -6200,11 +6346,51 @@
 	
 	GameTable.prototype.listeners = function () {
 		var that = this;
-		node.on('in.set.DATA', function () {
-			that.gtbl.db = node.game.memory.db;
+		
+		node.onPLIST(function(msg){
+			var plist = new PlayerList(null,msg.data);
+			if (plist.size() === 0) return;
+			
+			if (!that.plist) {
+				that.plist = plist;
+//				console.log('Created new plist in gtable');
+//				console.log(that.plist);
+				that.plist.forEach(function(el){that.addPlayer(el);});
+			}
+			else {
+				var diff = plist.diff(that.plist);
+//				console.log('THIS IS THE DIFF');
+//				console.log(diff);
+				if (diff) {
+					diff.forEach(function(el){that.addPlayer(el);});
+				}
+//				console.log('added by diff');
+				console.log(that.plist);
+			}
+			
 			that.gtbl.parse(true);
 		});
+		
+		node.on('in.set.DATA', function (msg) {
+//			console.log(that.plist);
+//			console.log(msg);
+			var x = that.plist.select('id', '=', msg.from).first().count;
+			var y = node.game.gameLoop.indexOf(node.game.gameState);
+//			console.log('DATA RECEIVED')
+//			console.log(x + ' ' + y);
+			
+			that.gtbl.add(msg.data, x, y);
+			that.gtbl.parse(true);
+			console.log(that.gtbl);
+		});
 	}; 
+	
+	GameTable.prototype.addPlayer = function (player) {
+		var header = this.plist.map(function(el){return el.name});
+		this.gtbl.setHeader(header);
+		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
+		this.plist.add(player);
+	};
 
 })(node.window.widgets); 
  

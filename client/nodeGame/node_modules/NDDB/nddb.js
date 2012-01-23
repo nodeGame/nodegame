@@ -31,7 +31,6 @@
 	// Stdout redirect
 	NDDB.log = console.log;
 	
-	
 	/**
 	 * NDDB interface
 	 *

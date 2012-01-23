@@ -117,7 +117,7 @@ AdminServer.prototype.attachCustomListeners = function() {
     	//that.gmm.forwardPLIST(that);
     });
 	
-	// TODO: Check this
+	// TODO: Check this. This influence the player list of observers!
 	this.server.sockets.on("shutdown", function(message) {
 		log.log("Server is shutting down.");
 		that.pl.clear(true);
