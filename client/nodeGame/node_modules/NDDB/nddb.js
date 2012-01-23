@@ -644,7 +644,11 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};		
+	};	
+	
+	NDDB.prototype.diff = function (nddb, key) {
+		
+	};
 	
 })(
 		

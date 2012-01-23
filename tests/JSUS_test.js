@@ -10,27 +10,27 @@ var c = [1, 'b', 3, 'd', 5, 'g'];
 
 
 var a = [{a:1},{a:1},{b:1},{c:2},{c: 'b'},{h:{c:1}},6];
-//var b = ['a','b',{a:1},'d','e','g'];
+var b = ['a','b',{a:1},'d','e','g'];
 //var c = [1, 'b', 3, 'd', 5, 'g'];
 //
 //
 //var o = JSUS.arrayDiff(a,c);
 //console.log(o);
+var test = [];
 
+//for (var j=0; j < b.length; j++) {
+//	if (JSUS.in_array(b[j], a)) {
+//		console.log('IN ARRAY ');
+//		console.log(b[j])
+//		test.push(b[j]);
+//	}
+//}
+//
+//console.log(test);
 
-for (var i=0; i < 1000000; i++) {
-	var g = JSUS.matchN(a,1,true);
-	var test = [];
-	for (var j=0; j<g.length;j++) {
-		if (!JSUS.in_array(g[j],test)) {
-			test.push(g[j]);
-		}
-		else {
-			console.log(g);
-			console.log('ERR');
-		}
-	}
-}
+console.log(JSUS.arrayDiff(a,b));
+console.log(JSUS.arrayIntersect(a,b));
+
 
 
 //function A(){

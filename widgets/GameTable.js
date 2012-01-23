@@ -22,8 +22,11 @@
 		
 		this.root = null;
 		this.gtbl = null;
+		this.plist = null;
 		
 		this.init(this.options);
+		
+		
 	};
 	
 	GameTable.prototype.init = function (options) {
@@ -66,6 +69,11 @@
 	
 	GameTable.prototype.listeners = function () {
 		var that = this;
+		
+		node.onPLIST(function(msg){
+			that.plist = msg.data;
+		});
+		
 		node.on('in.set.DATA', function () {
 			that.gtbl.db = node.game.memory.db;
 			that.gtbl.parse(true);
