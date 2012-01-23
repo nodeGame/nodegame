@@ -20,7 +20,7 @@ function PeerReviewGame () {
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
-		this.milli = 200;
+		this.milli = 2000;
 	};
 	
 	

@@ -35,7 +35,8 @@
 	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
-			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
+			console.log(this.db);
+			node.log('Attempt to add a new player already in the player list: ' + player.id, 'ERR');
 			return false;
 		}
 		

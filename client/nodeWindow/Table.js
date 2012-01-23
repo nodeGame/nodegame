@@ -321,7 +321,7 @@
 		  // TODO: What happens if the are missing at the beginning ??
 		  var f = this.first();
 		  var old_x = f.x;
-		  var old_left = 0
+		  var old_left = 0;
 		
 		  for (var i=0; i < this.db.length; i++) {
 			  //console.log('INSIDE TBODY LOOP');

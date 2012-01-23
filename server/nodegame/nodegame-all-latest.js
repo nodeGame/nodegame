@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 14:53:22 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 14:53:22 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -76,7 +76,9 @@
 
 	
     OBJ.equals = function (o1, o2) {
-    	
+    	console.log('Equals');
+    	console.log(o1);
+    	console.log(o2);
         if (!o1 || !o2) return false;
       	
     	// Check whether arguments are not objects
@@ -120,6 +122,8 @@
     	  }
       }
 
+      console.log('yes');
+      
       return true;
     };
 	
@@ -1372,7 +1376,6 @@
 	NDDB.prototype.diff = function (nddb) {
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
-				console.log('ahah!')
 				var nddb = nddb.db;
 			}
 		}
@@ -1390,7 +1393,6 @@
 	NDDB.prototype.intersect = function (nddb) {
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
-				console.log('ahah!')
 				var nddb = nddb.db;
 			}
 		}
@@ -1678,7 +1680,8 @@
 	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
-			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
+			console.log(this.db);
+			node.log('Attempt to add a new player already in the player list: ' + player.id, 'ERR');
 			return false;
 		}
 		
@@ -3748,7 +3751,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 14:53:23 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -5004,7 +5007,7 @@
 		  // TODO: What happens if the are missing at the beginning ??
 		  var f = this.first();
 		  var old_x = f.x;
-		  var old_left = 0
+		  var old_left = 0;
 		
 		  for (var i=0; i < this.db.length; i++) {
 			  //console.log('INSIDE TBODY LOOP');
@@ -5100,7 +5103,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 14:53:23 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -6308,17 +6311,12 @@
 		this.gtbl = null;
 		this.plist = null;
 		
-		console.log('Las opciones');
-		console.log(this.options);
-		
 		this.init(this.options);
-		
-		
 	};
 	
 	GameTable.prototype.init = function (options) {
 		
-		this.stateColumn = node.game.gameLoop.toArray();
+		if (!this.plist) this.plist = new PlayerList();
 		
 		this.gtbl = new node.window.Table({
 											auto_update: true,
@@ -6360,46 +6358,36 @@
 			var plist = new PlayerList(null,msg.data);
 			if (plist.size() === 0) return;
 			
-			if (!that.plist) {
-				that.plist = plist;
-//				console.log('Created new plist in gtable');
-//				console.log(that.plist);
-				that.plist.forEach(function(el){that.addPlayer(el);});
+			var diff = plist.diff(that.plist);
+			console.log('New Players found');
+			console.log(diff);
+			if (diff) {
+				diff.forEach(function(el){that.addPlayer(el);});
 			}
-			else {
-				var diff = plist.diff(that.plist);
-//				console.log('THIS IS THE DIFF');
-//				console.log(diff);
-				if (diff) {
-					diff.forEach(function(el){that.addPlayer(el);});
-				}
-//				console.log('added by diff');
-				console.log(that.plist);
-			}
+			
 			
 			that.gtbl.parse(true);
 		});
 		
 		node.on('in.set.DATA', function (msg) {
-//			console.log(that.plist);
+//			console.log('received set data');
 //			console.log(msg);
+			
 			that.addLeft(msg.state, msg.from);
 			var x = that.player2x(msg.from);
 			var y = that.state2y(node.game.gameState);
-//			console.log('DATA RECEIVED')
-//			console.log(x + ' ' + y);
 			
 			that.gtbl.add(msg.data, x, y);
 			that.gtbl.parse(true);
-			console.log(that.gtbl);
 		});
 	}; 
 	
 	GameTable.prototype.addPlayer = function (player) {
+		this.plist.add(player);
 		var header = this.plist.map(function(el){return el.name});
 		this.gtbl.setHeader(header);
 		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
-		this.plist.add(player);
+		
 	};
 	
 	/**
@@ -6409,6 +6397,9 @@
 		if (!state) return;
 		var state = new GameState(state);
 		if (!JSUS.in_array(state, this.gtbl.left)){
+			console.log('The State is new');
+			console.log(state);
+			console.log(this.gtbl.left);
 			this.gtbl.add2Left(state.toString());
 		}
 		// Is it a new display associated to the same state?
@@ -6416,6 +6407,9 @@
 			var y = this.state2y(state);
 			var x = this.player2x(player);
 			if (this.select('y','=',y).select('x','=',x).count() > 1) {
+				console.log('The State is doubled or more');
+				console.log(state);
+				console.log(this.gtbl.left);
 				this.gtbl.add2Left(state.toString());
 			}
 		}

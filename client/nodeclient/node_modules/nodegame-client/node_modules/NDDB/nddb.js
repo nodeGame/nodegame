@@ -654,7 +654,6 @@
 	NDDB.prototype.diff = function (nddb) {
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
-				console.log('ahah!')
 				var nddb = nddb.db;
 			}
 		}
@@ -672,7 +671,6 @@
 	NDDB.prototype.intersect = function (nddb) {
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
-				console.log('ahah!')
 				var nddb = nddb.db;
 			}
 		}

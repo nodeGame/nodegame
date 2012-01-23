@@ -113,7 +113,8 @@ AdminServer.prototype.attachCustomListeners = function() {
     this.on('closed', function(id) {
       	log.log(that.name + ' ----------------- Got Closed ' + id);
     	that.pl.remove(id);
-    	that.gmm.sendPLIST(that);
+    	// TODO: Check this. This influence the player list of observers!
+    	//that.gmm.sendPLIST(that);
     	//that.gmm.forwardPLIST(that);
     });
 	

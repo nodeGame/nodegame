@@ -25,17 +25,12 @@
 		this.gtbl = null;
 		this.plist = null;
 		
-		console.log('Las opciones');
-		console.log(this.options);
-		
 		this.init(this.options);
-		
-		
 	};
 	
 	GameTable.prototype.init = function (options) {
 		
-		this.stateColumn = node.game.gameLoop.toArray();
+		if (!this.plist) this.plist = new PlayerList();
 		
 		this.gtbl = new node.window.Table({
 											auto_update: true,
@@ -77,46 +72,36 @@
 			var plist = new PlayerList(null,msg.data);
 			if (plist.size() === 0) return;
 			
-			if (!that.plist) {
-				that.plist = plist;
-//				console.log('Created new plist in gtable');
-//				console.log(that.plist);
-				that.plist.forEach(function(el){that.addPlayer(el);});
+			var diff = plist.diff(that.plist);
+			console.log('New Players found');
+			console.log(diff);
+			if (diff) {
+				diff.forEach(function(el){that.addPlayer(el);});
 			}
-			else {
-				var diff = plist.diff(that.plist);
-//				console.log('THIS IS THE DIFF');
-//				console.log(diff);
-				if (diff) {
-					diff.forEach(function(el){that.addPlayer(el);});
-				}
-//				console.log('added by diff');
-				console.log(that.plist);
-			}
+			
 			
 			that.gtbl.parse(true);
 		});
 		
 		node.on('in.set.DATA', function (msg) {
-//			console.log(that.plist);
+//			console.log('received set data');
 //			console.log(msg);
+			
 			that.addLeft(msg.state, msg.from);
 			var x = that.player2x(msg.from);
 			var y = that.state2y(node.game.gameState);
-//			console.log('DATA RECEIVED')
-//			console.log(x + ' ' + y);
 			
 			that.gtbl.add(msg.data, x, y);
 			that.gtbl.parse(true);
-			console.log(that.gtbl);
 		});
 	}; 
 	
 	GameTable.prototype.addPlayer = function (player) {
+		this.plist.add(player);
 		var header = this.plist.map(function(el){return el.name});
 		this.gtbl.setHeader(header);
 		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
-		this.plist.add(player);
+		
 	};
 	
 	/**
@@ -126,6 +111,9 @@
 		if (!state) return;
 		var state = new GameState(state);
 		if (!JSUS.in_array(state, this.gtbl.left)){
+			console.log('The State is new');
+			console.log(state);
+			console.log(this.gtbl.left);
 			this.gtbl.add2Left(state.toString());
 		}
 		// Is it a new display associated to the same state?
@@ -133,6 +121,9 @@
 			var y = this.state2y(state);
 			var x = this.player2x(player);
 			if (this.select('y','=',y).select('x','=',x).count() > 1) {
+				console.log('The State is doubled or more');
+				console.log(state);
+				console.log(this.gtbl.left);
 				this.gtbl.add2Left(state.toString());
 			}
 		}
