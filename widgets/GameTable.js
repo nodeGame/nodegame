@@ -25,6 +25,9 @@
 		this.gtbl = null;
 		this.plist = null;
 		
+		console.log('Las opciones');
+		console.log(this.options);
+		
 		this.init(this.options);
 		
 		
@@ -36,11 +39,15 @@
 		
 		this.gtbl = new node.window.Table({
 											auto_update: true,
-											id: options.id || this.options.id,
+											id: options.id || this.id,
 											render: options.render
 		}, node.game.memory.db);
 		
-		this.gtbl.setLeft(node.game.gameLoop.toArray());
+		
+		this.gtbl.set('state', GameState.compare);
+		
+		this.gtbl.setLeft([]);
+		
 		
 		if (options.render) {
 			this.setRender(options.render);
@@ -93,8 +100,9 @@
 		node.on('in.set.DATA', function (msg) {
 //			console.log(that.plist);
 //			console.log(msg);
-			var x = that.plist.select('id', '=', msg.from).first().count;
-			var y = node.game.gameLoop.indexOf(node.game.gameState);
+			that.addLeft(msg.state, msg.from);
+			var x = that.player2x(msg.from);
+			var y = that.state2y(node.game.gameState);
 //			console.log('DATA RECEIVED')
 //			console.log(x + ' ' + y);
 			
@@ -110,5 +118,49 @@
 		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
 		this.plist.add(player);
 	};
+	
+	/**
+	 * Check if 
+	 */
+	GameTable.prototype.addLeft = function (state, player) {
+		if (!state) return;
+		var state = new GameState(state);
+		if (!JSUS.in_array(state, this.gtbl.left)){
+			this.gtbl.add2Left(state.toString());
+		}
+		// Is it a new display associated to the same state?
+		else {
+			var y = this.state2y(state);
+			var x = this.player2x(player);
+			if (this.select('y','=',y).select('x','=',x).count() > 1) {
+				this.gtbl.add2Left(state.toString());
+			}
+		}
+		
+		console.log(this.gtbl.left);
+			
+	};
+	
+	GameTable.prototype.player2x = function (player) {
+		if (!player) return false;
+		return this.plist.select('id', '=', player).first().count;
+	};
+	
+	GameTable.prototype.x2Player = function (x) {
+		if (!x) return false;
+		return this.plist.select('count', '=', x).first().count;
+	};
+	
+	GameTable.prototype.state2y = function (state) {
+		if (!state) return false;
+		return node.game.gameLoop.indexOf(state);
+	};
+	
+	GameTable.prototype.y2State = function (y) {
+		if (!y) return false;
+		return node.game.gameLoop.jumpTo(new GameState(),y);
+	};
+	
+	
 
 })(node.window.widgets);

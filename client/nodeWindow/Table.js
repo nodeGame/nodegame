@@ -98,6 +98,10 @@
   Table.prototype._addSpecial = function (data, type) {
 	if (!data) return;
 	var type = type || 'header';
+	if ('object' !== typeof data) {
+		return {content: data, type: type};
+	}
+	
 	var out = [];
 	for (var i=0; i < data.length; i++) {
 		out.push({content: data[i], type: type});
@@ -109,8 +113,16 @@
 	  this.header = this._addSpecial(header);
   };
 
+  Table.prototype.add2Header = function (header) {
+	  this.header = this.header.concat(this._addSpecial(header));
+  };
+  
   Table.prototype.setLeft = function (left) {
 	  this.left = this._addSpecial(left, 'left');
+  };
+  
+  Table.prototype.add2Left = function (left) {
+	  this.left = this.left.concat(this._addSpecial(left, 'left'));
   };
 
 // TODO: setRight  
@@ -300,10 +312,6 @@
 //	  console.log(this.id);
 //	  console.log(this.db.length);
 	  
-	  console.log('BEFOR BODY LOOP');
-	  console.log(this.id);
-	  console.log(this.db.length);
-	  
 	  // BODY
 	  if (this.size() !== 0) {
 		  var TBODY = document.createElement('tbody');
@@ -314,14 +322,10 @@
 		  var f = this.first();
 		  var old_x = f.x;
 		  var old_left = 0
-
-		  console.log('BEFOR TBODY LOOP');
-		  console.log(this.id);
-		  
 		
 		  for (var i=0; i < this.db.length; i++) {
-			  console.log('INSIDE TBODY LOOP');
-			  console.log(this.id);
+			  //console.log('INSIDE TBODY LOOP');
+			  //console.log(this.id);
 			  if (trid !== this.db[i].y) {
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
@@ -330,15 +334,13 @@
 				  old_x = f.x - 1; // must start exactly from the first
 				  
 				// Insert left header, if any
-				  if (this.left) {
+				  if (this.left && this.left.length > 0) {
 					  var TD = document.createElement('td');
 					  //TD.className = this.missing;
 					  TR.appendChild(fromCell2TD.call(this, this.left[old_left]));
 					  old_left++;
 				  }
 			  }
-			  
-			  
 			  
 			  // Insert missing cells
 			  if (this.db[i].x > old_x + 1) {
@@ -378,13 +380,13 @@
   };
   
 
-  
-  Table.prototype.set = function (x, y, content) {
-	  var el = this.select('x','=',x).select('y','=',y).first();
-	  if (!el) return;
-	  el.content = content;
-	  return true;
-  };
+  // TODO: set is not the right word
+//  Table.prototype.set = function (x, y, content) {
+//	  var el = this.select('x','=',x).select('y','=',y).first();
+//	  if (!el) return;
+//	  el.content = content;
+//	  return true;
+//  };
   
   // Cell Class
   

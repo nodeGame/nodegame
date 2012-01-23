@@ -83,6 +83,14 @@ fieldset#wall_fieldset, fieldset#gb_fieldset {
   margin: 5px;
 }
 
-table#summary {
+table#gametable {
 	border: 1px solid #CCC;
 }
+
+table#gametable tr td {
+  border: 1px solid #CCC;
+}
+
+
+
+

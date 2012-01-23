@@ -2,31 +2,39 @@ function Monitor_Example () {
 	
 	this.name = 'Peer Review Game Observer';
 	this.description = 'General Description';
-	this.version = '0.2';
+	this.version = '0.3';
 	
-	this.observer = true;
-	
-	this.minPlayers = 2;
-	this.maxPlayers = 10;
-	
+	this.observer = true;	
 	this.automatic_step = false;
+//	this.minPlayers = 2;
+//	this.maxPlayers = 10;
 	
 	this.init = function() {
 		node.window.setup('MONITOR');
-		
+		var that = this;
 		var render = function (cell) {
 			//if ((cell.y % 2) === 1) {
 			if ('object' === typeof cell.content) {
-				var cf_options = { id: 'cf_' + cell.x,
-						   width: 200,
-						   height: 200,
-						   features: cell.content,
-						   controls: false
-				};
 				
-				var container = document.createElement('div');
-				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-				return container;
+				// Evaluation
+				if (cell.content.for) {
+					var str =  'For: ' + that.pl.select('id', '=', cell.content.for).first().name;
+					str += ' eva: ' +  new Number(cell.content.eva).toFixed(2);
+					return str;
+				}
+				// Chernoff Face
+				else {
+					var cf_options = { id: 'cf_' + cell.x,
+							   width: 200,
+							   height: 200,
+							   features: cell.content,
+							   controls: false
+					};
+					
+					var container = document.createElement('div');
+					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+					return container;
+				}
 			}
 			else {
 				return cell.content;
@@ -35,29 +43,6 @@ function Monitor_Example () {
 		
 		this.summary = node.window.addWidget('GameTable', document.body, {render: render});
 		
-//		this.summary = new node.window.Table({auto_update: true,
-//											  id: 'summary'
-//		});
-//		
-//		this.summary.render = function (cell) {
-//			if ((cell.y % 2) === 1) {
-//				var cf_options = { id: 'cf_' + cell.content.player,
-//						   width: 200,
-//						   height: 200,
-//						   features: cell.content.value,
-//						   controls: false
-//				};
-//				
-//				var container = document.createElement('div');
-//				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-//				return container;
-//			}
-//			else {
-//				return cell.content.value;
-//			}
-//		};
-		
-		//document.body.appendChild(this.summary.table);
 	};
 	
 	var pregame = function(){
