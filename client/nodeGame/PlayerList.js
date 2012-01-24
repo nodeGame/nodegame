@@ -28,6 +28,23 @@
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  this.countid = 0;
+	  
+	  this.globalCompare = function (pl1, pl2) {
+		  if (pl1.id === pl2.id) {
+			return 0;
+		  }
+		  else if (pl1.count < pl2.count) {
+			  return 1;
+		  }
+		  else if (pl1.count > pl2.count) {
+			  return -1;
+		  }
+		  else {
+			  this.log('Two players with different id have the same count number', 'WARN');
+			  return 0;
+		  }
+	  };
+
 	};
 	
 	PlayerList.prototype.add = function (player) {

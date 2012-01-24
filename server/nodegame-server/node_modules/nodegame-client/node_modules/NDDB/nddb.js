@@ -55,6 +55,16 @@
 		this.db = this.initDB(db);	// The actual database
 
 	};
+	
+	NDDB.prototype.globalCompare = function(o1, o2) {
+		console.log('NDDB COMPARE');
+		if (!o1 && !o2) return 0;
+		if (!o1) return -1;
+		if (!o2) return 1;	
+		if (o1.nddbid < o2.nddbid) return 1;
+		if (o1.nddbid > o2.nddbid) return -1;
+		return 0;
+	};
 
 	// TODO: Do we need this?
 	// Can we set a length attribute
@@ -194,9 +204,13 @@
 	   * 
 	   */
 	  NDDB.prototype.sort = function (d) {
+		// GLOBAL compare  
+	    if (!d) {
+	    	var func = this.globalCompare;
+	    }
 	    
 		// FUNCTION  
-	    if ('function' === typeof d) {
+	    else if ('function' === typeof d) {
 	      var func = d;
 	    }
 	    
@@ -657,8 +671,14 @@
 				var nddb = nddb.db;
 			}
 		}
+		if (nddb.length === 0) return this;
+		var that = this;
 		return this.filter(function(el){
-			return !(JSUS.in_array(el,nddb));
+			for (var i=0; i < nddb.length; i++) {
+				if (that.globalCompare(el,nddb[i]) != 0) {
+					return el;
+				}
+			}
 		});
 	};
 	
@@ -674,8 +694,13 @@
 				var nddb = nddb.db;
 			}
 		}
+		var that = this;
 		return this.filter(function(el){
-			return JSUS.in_array(el,nddb);
+			for (var i=0; i < nddb.length; i++) {
+				if (that.globalCompare(el,nddb[i]) === 0) {
+					return el;
+				}
+			}
 		});
 	};
 	

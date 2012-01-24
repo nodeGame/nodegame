@@ -6,9 +6,9 @@
 
 	
     OBJ.equals = function (o1, o2) {
-    	console.log('Equals');
-    	console.log(o1);
-    	console.log(o2);
+//    	console.log('Equals');
+//    	console.log(o1);
+//    	console.log(o2);
         if (!o1 || !o2) return false;
       	
     	// Check whether arguments are not objects
@@ -52,7 +52,7 @@
     	  }
       }
 
-      console.log('yes');
+      //console.log('yes');
       
       return true;
     };

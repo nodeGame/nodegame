@@ -72,25 +72,23 @@
 	GameTable.prototype.listeners = function () {
 		var that = this;
 		
-		node.onPLIST(function(msg){
-			var plist = new PlayerList(null,msg.data);
-			if (plist.size() === 0) return;
+		node.onPLIST(function(msg) {
+			if (msg.data.length == 0) return;
 			
+			//var diff = JSUS.arrayDiff(msg.data,that.plist.db);
+			var plist = new PlayerList({}, msg.data);
 			var diff = plist.diff(that.plist);
-			console.log('New Players found');
-			console.log(diff);
 			if (diff) {
+//				console.log('New Players found');
+//				console.log(diff);
 				diff.forEach(function(el){that.addPlayer(el);});
 			}
-			
-			
+
 			that.gtbl.parse(true);
 		});
 		
 		node.on('in.set.DATA', function (msg) {
-//			console.log('received set data');
-//			console.log(msg);
-			
+
 			that.addLeft(msg.state, msg.from);
 			var x = that.player2x(msg.from);
 			var y = that.state2y(node.game.gameState);
@@ -104,13 +102,8 @@
 		this.plist.add(player);
 		var header = this.plist.map(function(el){return el.name});
 		this.gtbl.setHeader(header);
-		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
-		
 	};
 	
-	/**
-	 * Check if 
-	 */
 	GameTable.prototype.addLeft = function (state, player) {
 		if (!state) return;
 		var state = new GameState(state);
@@ -125,8 +118,6 @@
 				this.gtbl.add2Left(state.toString());
 			}
 		}
-		
-		console.log(this.gtbl.left);
 			
 	};
 	

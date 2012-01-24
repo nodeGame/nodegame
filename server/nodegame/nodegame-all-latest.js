@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 10:14:10 CET 2012
+ * Built on Tue Jan 24 11:51:11 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 10:14:10 CET 2012
+ * Built on Tue Jan 24 11:51:11 CET 2012
  *
  */
  
@@ -76,9 +76,9 @@
 
 	
     OBJ.equals = function (o1, o2) {
-    	console.log('Equals');
-    	console.log(o1);
-    	console.log(o2);
+//    	console.log('Equals');
+//    	console.log(o1);
+//    	console.log(o2);
         if (!o1 || !o2) return false;
       	
     	// Check whether arguments are not objects
@@ -122,7 +122,7 @@
     	  }
       }
 
-      console.log('yes');
+      //console.log('yes');
       
       return true;
     };
@@ -777,6 +777,16 @@
 		this.db = this.initDB(db);	// The actual database
 
 	};
+	
+	NDDB.prototype.globalCompare = function(o1, o2) {
+		console.log('NDDB COMPARE');
+		if (!o1 && !o2) return 0;
+		if (!o1) return -1;
+		if (!o2) return 1;	
+		if (o1.nddbid < o2.nddbid) return 1;
+		if (o1.nddbid > o2.nddbid) return -1;
+		return 0;
+	};
 
 	// TODO: Do we need this?
 	// Can we set a length attribute
@@ -916,9 +926,13 @@
 	   * 
 	   */
 	  NDDB.prototype.sort = function (d) {
+		// GLOBAL compare  
+	    if (!d) {
+	    	var func = this.globalCompare;
+	    }
 	    
 		// FUNCTION  
-	    if ('function' === typeof d) {
+	    else if ('function' === typeof d) {
 	      var func = d;
 	    }
 	    
@@ -1379,8 +1393,14 @@
 				var nddb = nddb.db;
 			}
 		}
+		if (nddb.length === 0) return this;
+		var that = this;
 		return this.filter(function(el){
-			return !(JSUS.in_array(el,nddb));
+			for (var i=0; i < nddb.length; i++) {
+				if (that.globalCompare(el,nddb[i]) != 0) {
+					return el;
+				}
+			}
 		});
 	};
 	
@@ -1396,8 +1416,13 @@
 				var nddb = nddb.db;
 			}
 		}
+		var that = this;
 		return this.filter(function(el){
-			return JSUS.in_array(el,nddb);
+			for (var i=0; i < nddb.length; i++) {
+				if (that.globalCompare(el,nddb[i]) === 0) {
+					return el;
+				}
+			}
 		});
 	};
 	
@@ -1673,6 +1698,23 @@
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
 	  this.countid = 0;
+	  
+	  this.globalCompare = function (pl1, pl2) {
+		  if (pl1.id === pl2.id) {
+			return 0;
+		  }
+		  else if (pl1.count < pl2.count) {
+			  return 1;
+		  }
+		  else if (pl1.count > pl2.count) {
+			  return -1;
+		  }
+		  else {
+			  this.log('Two players with different id have the same count number', 'WARN');
+			  return 0;
+		  }
+	  };
+
 	};
 	
 	PlayerList.prototype.add = function (player) {
@@ -3751,7 +3793,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 10:14:10 CET 2012
+ * Built on Tue Jan 24 11:51:11 CET 2012
  *
  */
  
@@ -5165,7 +5207,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 10:14:10 CET 2012
+ * Built on Tue Jan 24 11:51:11 CET 2012
  *
  */
  
@@ -6420,25 +6462,23 @@
 	GameTable.prototype.listeners = function () {
 		var that = this;
 		
-		node.onPLIST(function(msg){
-			var plist = new PlayerList(null,msg.data);
-			if (plist.size() === 0) return;
+		node.onPLIST(function(msg) {
+			if (msg.data.length == 0) return;
 			
+			//var diff = JSUS.arrayDiff(msg.data,that.plist.db);
+			var plist = new PlayerList({}, msg.data);
 			var diff = plist.diff(that.plist);
-			console.log('New Players found');
-			console.log(diff);
 			if (diff) {
+//				console.log('New Players found');
+//				console.log(diff);
 				diff.forEach(function(el){that.addPlayer(el);});
 			}
-			
-			
+
 			that.gtbl.parse(true);
 		});
 		
 		node.on('in.set.DATA', function (msg) {
-//			console.log('received set data');
-//			console.log(msg);
-			
+
 			that.addLeft(msg.state, msg.from);
 			var x = that.player2x(msg.from);
 			var y = that.state2y(node.game.gameState);
@@ -6452,13 +6492,8 @@
 		this.plist.add(player);
 		var header = this.plist.map(function(el){return el.name});
 		this.gtbl.setHeader(header);
-		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
-		
 	};
 	
-	/**
-	 * Check if 
-	 */
 	GameTable.prototype.addLeft = function (state, player) {
 		if (!state) return;
 		var state = new GameState(state);
@@ -6473,8 +6508,6 @@
 				this.gtbl.add2Left(state.toString());
 			}
 		}
-		
-		console.log(this.gtbl.left);
 			
 	};
 	
