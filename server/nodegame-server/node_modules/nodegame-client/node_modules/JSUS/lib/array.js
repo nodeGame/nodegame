@@ -64,8 +64,9 @@
     };
     
     
-    ARRAY.in_array = function (needle, haystack){
-  	  
+    ARRAY.in_array = function (needle, haystack) {
+  	  	if ('undefined' === typeof needle || !haystack) return false;
+  	  	
         if ('object' === typeof needle) {
       	  var func = JSUS.equals;
         }

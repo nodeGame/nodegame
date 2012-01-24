@@ -31,13 +31,40 @@ function Monitor_Example () {
 		
 		this.summary = node.window.addWidget('GameTable', document.body, {render: renderCF});		
 		
-		this.dtable = node.window.addWidget('DynamicTable', document.body);
-		this.dtable.binds.x = function(msg) {
-			return node.game.pl.select('id', '=', msg.from).first().count;
-		};
-		this.dtable.binds.y = function(msg) {
-			return node.game.pl.select('id', '=', msg.from).first().count;
-		};
+//		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
+//		this.dtable.addBind('x', function (msg) {
+//			if (msg.text === 'WIN_CF') {
+//				var out = [];
+//				for (var i=0; i< msg.data.length; i++) {
+//					var author = msg.data[i].author;
+//					var x = node.game.pl.select('name', '=', author).first().count;
+//					if (count) {
+//						out.push(x);
+//					}
+//				}
+//			}
+//			return out;
+//		};
+//		this.dtable.addBind('y', function (msg) {
+//			if (msg.text === 'WIN_CF') {
+//				return [1,2,3];
+//			}
+//		};
+//		
+//		this.dtable.addBind('y', function (msg) {
+//			if (msg.text === 'WIN_CF') {
+//				return [1,2,3];
+//			}
+//		};
+//		
+//		this.dtable.addBind('content', function (msg) {
+//			if (msg.text === 'WIN_CF') {
+//				var out = [];
+//				for (var i=0; i< msg.data.length; i++) {
+//					out.push(msg.data.mean);
+//				}
+//			}
+//		};
 		
 	};
 	

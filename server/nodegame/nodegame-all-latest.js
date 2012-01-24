@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 13:55:10 CET 2012
+ * Built on Tue Jan 24 20:47:10 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 13:55:10 CET 2012
+ * Built on Tue Jan 24 20:47:10 CET 2012
  *
  */
  
@@ -398,8 +398,9 @@
     };
     
     
-    ARRAY.in_array = function (needle, haystack){
-  	  
+    ARRAY.in_array = function (needle, haystack) {
+  	  	if ('undefined' === typeof needle || !haystack) return false;
+  	  	
         if ('object' === typeof needle) {
       	  var func = JSUS.equals;
         }
@@ -773,7 +774,6 @@
 				this.parentDB = options.parentDB;
 			}	
 		}
-	  		
 		this.db = this.initDB(db);	// The actual database
 
 	};
@@ -797,6 +797,8 @@
 	
 	NDDB.prototype.masquerade = function (o, db) {
 		if (!o) return false;
+		// TODO: check this
+		if (o.__proto__.nddbid) return o;
 		var db = db || this.db;
 		o.__proto__ = JSUS.clone(o.__proto__);
 		o.__proto__.nddbid = db.length;
@@ -1388,6 +1390,7 @@
 	 * If the 'key' parameter
 	 */
 	NDDB.prototype.diff = function (nddb) {
+		if (!nddb) return this;
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
 				var nddb = nddb.db;
@@ -1412,19 +1415,25 @@
 	 * If the 'key' parameter
 	 */
 	NDDB.prototype.intersect = function (nddb) {
+		if (!nddb) return this;
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
 				var nddb = nddb.db;
 			}
 		}
 		var that = this;
-		return this.filter(function(el){
+		return this.filter(function(el) {
 			for (var i=0; i < nddb.length; i++) {
 				if (that.globalCompare(el,nddb[i]) === 0) {
 					return el;
 				}
 			}
 		});
+	};
+	
+	NDDB.prototype.get = function (nddbid) {
+		if (arguments.length === 0) return;
+		return this.select('nddbid','=',nddbid).first();
 	};
 	
 })(
@@ -1951,45 +1960,6 @@
 //		this.state = state;
 //	};
 	
-
-	
-	// Returns an array of array of n groups of players {id: name}
-	//The last group could have less elements.
-//	PlayerList.prototype.getNGroups = function (n) {
-//		
-//		var copy = this.toArray();
-//		var nPlayers = copy.length;
-//		
-//		var gSize = Math.floor( nPlayers / n);
-//		var inGroupCount = 0;
-//		
-//		var result = new Array();
-//		
-//		// Init values for the loop algorithm
-//		var i;
-//		var idx;
-//		var gid = -1;
-//		var count = gSize +1; // immediately creates a new group in the loop
-//		for (i=0;i<nPlayers;i++){
-//			
-//			// Prepare the array container for the elements of the new group
-//			if (count >= gSize) {
-//				gid++;
-//				result[gid] = new PlayerList();
-//				count = 0;
-//			}
-//			
-//			// Get a random idx between 0 and array length
-//			idx = Math.floor(Math.random()*copy.length);
-//			
-//			result[gid].add(copy[idx].id,copy[idx].name);
-//			copy.splice(idx,1);
-//			count++;
-//		}
-//		
-//		return result;
-//	};
-
 	
 //	PlayerList.prototype.toArray = function () {
 //	
@@ -2003,29 +1973,7 @@
 //		return result;
 //		return result.sort();
 //	};
-	
-//	PlayerList.prototype.forEach = function(callback, thisArg) {
-//		  
-//		for (var key in this.pl) {
-//		    if (this.pl.hasOwnProperty(key)) {
-//		    	callback.call(thisArg, this.pl[key]);
-//		    }
-//		  }
-//	};
-	
-//	PlayerList.prototype.map = function(callback, thisArg) {
-//		 
-//		 var result = new Array();
-//		 
-//		 for (var key in this.pl) {
-//			 if (this.pl.hasOwnProperty(key)) {
-//				 result.push(callback.call(thisArg, this.pl[key]));
-//			 }
-//		  }
-//	
-//		  return result;
-//	};
-	
+		
 	
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -3794,7 +3742,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 13:55:10 CET 2012
+ * Built on Tue Jan 24 20:47:10 CET 2012
  *
  */
  
@@ -4738,10 +4686,13 @@
 	exports.Table.Cell = Cell;
 	
 	// For simple testing
-	//module.exports = Table;
+	// module.exports = Table;
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
+	
+	Table.prototype = new NDDB();
+	Table.prototype.constructor = Table;	
 	
 	Table.H = ['x','y','z'];
 	Table.V = ['y','x', 'z'];
@@ -4750,9 +4701,9 @@
 	
   function Table (options, data) {
 	var options = options || {};
-	        
-	JSUS.extend(node.NDDB,this);
-    node.NDDB.call(this, options, data);  
+
+//	JSUS.extend(node.NDDB,this);
+	NDDB.call(this, options, data);  
     
     Table.log = options.log || Table.log;
     this.defaultDim1 = options.defaultDim1 || 'x';
@@ -4773,17 +4724,30 @@
     				z: options.pointerZ || 0
     };
     
-    this.header = null;
-    this.footer = null;
+    this.header = [];
+    this.footer = [];
     
-    this.left = null;
-    this.right = null;
+    this.left = [];
+    this.right = [];
     
     this.initRender();
-    
+       
     // Not used now
     // Matches properties and dimensions
     //this.binds = {};
+  };
+  
+  // TODO: make it 3D
+  Table.prototype.get = function (x, y) {
+	  var out = this;
+	  if (x) {
+		  out = this.select('x','=',x);
+	  }
+	  if (y) {
+		  out = out.select('y','=',y);
+	  }
+	 
+	  return out.fetch();	  
   };
   
   Table.prototype.initRender = function() {
@@ -5094,7 +5058,7 @@
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
 		  // Add an empty cell to balance the left header column
-		  if (this.left) {
+		  if (this.left && this.left.length > 0) {
 			  TR.appendChild(document.createElement('th'));
 		  }
 		  for (var i=0; i < this.header.length; i++) {
@@ -5214,7 +5178,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 13:55:10 CET 2012
+ * Built on Tue Jan 24 20:47:10 CET 2012
  *
  */
  
@@ -6210,6 +6174,154 @@
 			}); 
 	};
 	
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+
+	var GameState = node.GameState;
+	var PlayerList = node.PlayerList;
+	var Table = node.window.Table
+	/*!
+	 * DynamicTable
+	 * 
+	 * Show the memory state of the game
+	 */
+	
+	DynamicTable.prototype = new Table();
+	DynamicTable.prototype.constructor = Table;	
+	
+	exports.DynamicTable = DynamicTable;
+	
+	function DynamicTable (options, data) {
+		//JSUS.extend(node.window.Table,this);
+	    Table.call(this, options, data); 
+	    
+		this.options = options;
+		this.id = options.id || 'dynamictable';
+		this.name = 'Dynamic Table';
+		this.version = '0.2';
+		
+		this.fieldset = { legend: this.name,
+				  		  id: this.id + '_fieldset'
+		};
+		
+		this.root = null;
+		this.binds = {};
+		this.init(this.options);
+	};
+	
+	DynamicTable.prototype.init = function (options) {
+		this.options = options;
+		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : true;
+		this.replace = options.replace || false;
+		this.initRender();
+		this.set('state', GameState.compare);
+		this.setLeft([]);
+		this.parse(true);
+	};
+	
+	
+	DynamicTable.prototype.addBind = function(dim, func){
+		if (!JSUS.in_array(dim,['x','y','content','header','left'])) return;
+		if (!this.binds[dim]) this.binds[dim] = [];
+		this.binds[dim].push(func);
+	}
+	
+	DynamicTable.prototype._bind = function (dim, msg) {
+		if (!dim) return false;
+		if ('undefined' === typeof msg) return false;
+		if (!this.binds[dim]) return false;
+		if (this.binds[dim].length === 0) return false; 
+		var out = [];
+		for (var i=0; i < this.binds[dim].length; i++) {
+			out.push(this.binds[dim][i].call(this, msg));
+		}
+		return out;
+	};
+	
+	DynamicTable.prototype.bindLeft = function (msg) {
+		return this._bind('left', msg);
+	};
+	
+	DynamicTable.prototype.bindHeader = function (msg) {
+		return this._bind('header', msg);
+	};
+	
+	DynamicTable.prototype.bindX = function (msg) {
+		return this._bind('x', msg);
+	};
+	
+	DynamicTable.prototype.bindY = function (msg) {
+		return this._bind('y', msg);
+	};
+	
+	DynamicTable.prototype.bindContent = function (msg) {
+		return this._bind('content', msg);
+	};
+	
+	DynamicTable.prototype.listenTo = function () {
+		if (!arguments) return;
+		var that = this;
+		for (var i=0; i<arguments.length;i++) {
+			node.on(arguments[i], function(msg) {
+				
+				// Cell
+				if (that.replace) {
+					var func = function (content, x, y) {
+						var found = that.get(x,y);
+						if (found.length === 0) return;
+						for (var i=0; i< found.length; i++) {
+							found[i].content = content;
+						}
+					}
+				}
+				else {
+					var func = that.add;
+				}
+				
+				
+				var x = that.bindX(msg);
+				var y = that.bindY(msg);
+				var content = that.bindContent(msg);
+				if (x && y) {
+					for (var xi=0; xi < x.length; xi++) {
+						for (var yi=0; yi < y.length; yi++) {
+							for (var ci=0; ci < content.length; ci++) {
+								func.call(this, content[ci], x[xi], y[yi]);
+							}
+						}
+					}
+				}
+				// End Cell
+				
+				// Header
+				var h = that.bindHeader(msg);
+				if (h && !JSUS.in_array(h, that.header)) {
+					that.header.push(h);
+				}
+				// Left
+				var l = that.bindLeft(msg);
+				if (l && !JSUS.in_array(l, that.left)) {
+					that.header.push(l);
+				}
+				// Auto Update?
+				if (that.auto_update) {
+					that.parse();
+				}
+			});
+		}
+	};
+
+	DynamicTable.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.table);
+		return root;
+	};
+	
+	DynamicTable.prototype.listeners = function () {}; 
+
 })(node.window.widgets); 
  
  

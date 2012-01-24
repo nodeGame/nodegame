@@ -9,7 +9,7 @@
 	exports.Table.Cell = Cell;
 	
 	// For simple testing
-	module.exports = Table;
+	// module.exports = Table;
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
@@ -33,11 +33,9 @@
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
-    // to simple test
-    this.table = options.table
-    //this.table = options.table || document.createElement('table'); 
+    this.table = options.table || document.createElement('table'); 
     this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
-    //this.table.id = this.id;
+    this.table.id = this.id;
     
     this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
     
@@ -49,11 +47,11 @@
     				z: options.pointerZ || 0
     };
     
-    this.header = null;
-    this.footer = null;
+    this.header = [];
+    this.footer = [];
     
-    this.left = null;
-    this.right = null;
+    this.left = [];
+    this.right = [];
     
     this.initRender();
        
@@ -64,7 +62,6 @@
   
   // TODO: make it 3D
   Table.prototype.get = function (x, y) {
-	  console.log('here!');
 	  var out = this;
 	  if (x) {
 		  out = this.select('x','=',x);
@@ -72,13 +69,8 @@
 	  if (y) {
 		  out = out.select('y','=',y);
 	  }
-	  
-	  if (out.size() === 1) {
-		  return out.first();
-	  }
-	  else {
-		  return out.fetch();
-	  }
+	 
+	  return out.fetch();	  
   };
   
   Table.prototype.initRender = function() {
@@ -389,7 +381,7 @@
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
 		  // Add an empty cell to balance the left header column
-		  if (this.left) {
+		  if (this.left && this.left.length > 0) {
 			  TR.appendChild(document.createElement('th'));
 		  }
 		  for (var i=0; i < this.header.length; i++) {

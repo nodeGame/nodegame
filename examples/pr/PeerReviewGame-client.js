@@ -21,6 +21,56 @@ function PeerReviewGame () {
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
 		this.milli = 2000;
+		
+		
+		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
+		this.dtable.addBind('x', function (msg) {
+			if (msg.text === 'WIN_CF') {
+				var out = [];
+				for (var i=0; i< msg.data.length; i++) {
+					var author = msg.data[i].author;
+					var x = node.game.pl.select('name', '=', author).first().count;
+					if (x) {
+						out.push(x);
+					}
+				}
+			}
+			return out;
+		});
+		
+		this.dtable.addBind('y', function (msg) {
+			if (msg.text === 'WIN_CF') {
+				return [1,2,3];
+			}
+		});
+		
+		this.dtable.addBind('y', function (msg) {
+			if (msg.text === 'WIN_CF') {
+				return [1,2,3];
+			}
+		});
+		
+		this.dtable.addBind('content', function (msg) {
+			if (msg.text === 'WIN_CF') {
+				var out = [];
+				for (var i=0; i< msg.data.length; i++) {
+					out.push(msg.data.mean);
+				}
+			}
+		});
+		
+		this.dtable.addBind('PLIST', 'header', function (msg) {
+			
+			if (msg.data.length == 0) return;
+			var plist = new node.PlayerList({}, msg.data);
+			var diff = plist.diff(that.plist);
+			if (diff) {
+				diff.forEach(function(el){that.addPlayer(el);});
+			}
+			
+		});
+		
+		this.dtable.listenTo('in.say.DATA');
 	};
 	
 	

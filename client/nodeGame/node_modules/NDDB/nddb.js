@@ -51,7 +51,6 @@
 				this.parentDB = options.parentDB;
 			}	
 		}
-	  		
 		this.db = this.initDB(db);	// The actual database
 
 	};
