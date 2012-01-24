@@ -249,14 +249,26 @@ for (var i=0;i<clients.length;i++) {
 
 
 var pl = new PlayerList({}, nddb.db);
+pl.add({id:124123523423});
 
-var v = pl.fetch();
-for (var i=0; i < v.length; i++) {
-console.log(v[i].__proto__);
-}
+//var v = pl.fetch();
+//for (var i=0; i < v.length; i++) {
+//console.log(v[i].__proto__);
+//}
+//
+//for (var i=0; i < v.length; i++) {
+//	console.log(v[i]);
+//}
 
-for (var i=0; i < v.length; i++) {
-	console.log(v[i]);
-}
+
+//console.log(pl.fetch());
 
 
+var nddb2 = JSUS.JSUS.clone(nddb.db);
+
+
+console.log('TESTING DIFF and INTERSECT');
+var a = pl.diff(nddb2.db);
+var b = pl.intersect(nddb2.db);
+console.log(a.fetch());
+console.log(b.size());

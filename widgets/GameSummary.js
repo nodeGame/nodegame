@@ -9,10 +9,10 @@
 	
 	exports.GameSummary	= GameSummary;
 	
-	function GameSummary(id) {
+	function GameSummary(options) {
 		//debugger;
 		this.game = node.game;
-		this.id = id || 'gamesummary';
+		this.id = options.id || 'gamesummary';
 		this.name = 'Game Summary';
 		this.version = '0.2.1';
 		

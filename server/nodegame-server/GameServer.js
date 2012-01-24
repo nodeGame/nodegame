@@ -22,7 +22,6 @@ var PlayerList = require('nodegame-client').PlayerList;
 var Player = require('nodegame-client').Player;
 
 function GameServer(options) {
-
 	EventEmitter.call(this);
 
 	this.options = options;

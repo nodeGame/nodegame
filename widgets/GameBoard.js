@@ -9,10 +9,10 @@
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
 		
-	function GameBoard (id) {
+	function GameBoard (options) {
 		
 		this.game = node.game;
-		this.id = id || 'gboard';
+		this.id = options.id || 'gboard';
 		this.name = 'GameBoard';
 		
 		this.version = '0.3';
@@ -41,13 +41,13 @@
 		
 		
 		node.on('UPDATED_PLIST', function () {
-			console.log('I Updating Board');
+			node.log('I Updating Board');
 			that.updateBoard(node.game.pl);
 
 		});
 		
 //		node.onPLIST( function (msg) {
-//			console.log('I Updating Board ' + msg.text);
+//			node.log('I Updating Board ' + msg.text);
 //			that.updateBoard(msg.data);
 //		});
 	};
@@ -56,12 +56,12 @@
 		var that = this;
 		that.board.innerHTML = 'Updating...';
 
-		//console.log(pl);
+		//node.log(pl);
 		
 		if (pl.size() !== 0) {
 			that.board.innerHTML = '';
 			pl.forEach( function(p) {
-				//console.log(p);
+				//node.log(p);
 				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
 				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 

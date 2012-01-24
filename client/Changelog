@@ -1,4 +1,17 @@
-6.6
+6.6.9
+
+- widget GameTable
+- NDDB diff and intersect
+
+6.6.8
+
+- Table render and auto_update
+
+6.6.7
+
+- widget ServerInfoDisplay
+
+6.6.6
 
 - WAIT -> WAITING...
 - automatic_step -> auto_step

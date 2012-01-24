@@ -17,7 +17,7 @@
 	exports.GameLoop = GameLoop;
 	
 	function GameLoop (loop) {
-		this.loop = loop;
+		this.loop = loop || {};
 		
 		this.limits = Array();
 		
@@ -72,7 +72,7 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		node.log('NEXT OF THIS ' + gameState);
+		node.log('NEXT OF THIS ' + gameState, 'DEBUG');
 		//node.log(this.limits);
 		
 		// Game has not started yet, do it!
@@ -202,6 +202,43 @@
 		return gs;
 	};
 	
+	/**
+	 * Compute the total number of steps to go.
+	 */
+	GameLoop.prototype.length = function (state) {
+		var state = state || new GameState();
+		var count = 0;
+		while (state) { 
+			//console.log(glCopy);
+			count++;
+			var state = this.next(state);
+		}
+		return count;
+	};
+	
+	GameLoop.prototype.toArray = function() {
+		var state = new GameState();
+		var out = [];
+		while (state) { 
+			out.push(state.toString());
+			var state = this.next(state);
+		}
+		return out;
+	};
+	
+	GameLoop.prototype.indexOf = function (state) {
+		if (!state) return -1;
+		var idx = 0;
+		var search = new GameState();
+		while (search) {
+			if (GameState.compare(search,state) === 0){
+				return idx;
+			}
+			search = this.next(search);
+			idx++;
+		}
+		return -1;
+	};
 
 })(
 	'undefined' != typeof node ? node : module.exports

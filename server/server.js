@@ -7,11 +7,19 @@ var ServerNode = require('./nodegame-server');
 var options = { 
 				name: "nodeGame Server",
 				port: 8080,
-				verbosity: -1,
+				verbosity: 100,
 				dumpsys: false,
-				dumpmsg: false,
-				mail: false
+				dumpmsg: true,
+				mail: false,
+				io: {set: {
+							transports: ['websocket'],
+							'log level': -1
+					}
+				},
+				http: {}
 };
+
+
 
 // ServerNode accepts two additional parameters:
 // - an instance of an http Express server
@@ -24,19 +32,6 @@ sn.addChannel({
 			  	admin: 'ultimatum2/admin',
 			  	player: 'ultimatum2'
 });
-
-//sn.addChannel({
-//				name: '3',
-//				admin: 'ultimatum3/admin',
-//				player: 'ultimatum3'
-//});
-
-//sn.addChannel({
-//				name: '4',
-//				admin: 'ultimatum4/admin',
-//				player: 'ultimatum4'
-//});
-
 
 sn.addChannel({
         name: 'pr',

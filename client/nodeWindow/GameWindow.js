@@ -95,16 +95,32 @@
 	// Overriding Document.write and Document.writeln
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
+
+	// TODO: findLastElement
+	GameWindow.prototype.findLastElement = function() {
+		var el = this.frame;
+		if (el) {
+			el = this.frame.body || el;
+		}
+		else {
+			el = document.body || document.lastElementChild;
+		}
+		return 	el;
+	}
 	
 	GameWindow.prototype.write = function (text, root) {		
-		var root = root || this.frame.body;
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		var root = root || this.frame.body;
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._writeln(root, text, br);
 	};
 	
@@ -182,7 +198,9 @@
 			this.addWidget('DataBar');
 			this.addWidget('MsgBar');
 			this.addWidget('GameBoard');
+			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
+			//this.addWidget('GameTable');
 	
 			break;
 		
@@ -267,7 +285,6 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -291,8 +308,8 @@
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
-			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root,fieldsetOptions,g);
+			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
 		}
@@ -337,7 +354,7 @@
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
 			return;
 		}
 		
@@ -346,7 +363,7 @@
 		
 		
 		var opt;
-		var pl = new PlayerList(playerList);
+		var pl = new PlayerList({}, playerList);
 		
 		
 		try {
@@ -355,8 +372,7 @@
 				opt.value = p.id;
 				opt.appendChild(document.createTextNode(p.name));
 				toSelector.appendChild(opt);
-				}, 
-				toSelector);
+			});
 		}
 		catch (e) {
 			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');

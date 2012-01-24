@@ -8,10 +8,10 @@
 	
 	exports.MsgBar	= MsgBar;
 		
-	function MsgBar(id){
+	function MsgBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'msgbar';
+		this.id = options.id || 'msgbar';
 		this.name = 'Msg Bar';
 		this.version = '0.2.1';
 		
@@ -55,12 +55,10 @@
 	};
 	
 	MsgBar.prototype.listeners = function(){
-		var that = this;
-		
+		var that = this;	
 		node.onPLIST( function(msg) {
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		
 		}); 
 	};
 })(node.window.widgets);

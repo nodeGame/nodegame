@@ -16,9 +16,11 @@ function PeerReviewGame () {
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
 		this.timer = node.window.addWidget('VisualTimer', this.header);
+		this.sd = node.window.addWidget('StateDisplay', this.header);
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
+		this.milli = 2000;
 	};
 	
 	
@@ -62,7 +64,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: 10000
+								milliseconds: this.milli
 			};
 			
 			node.window.addEventButton('CREATION_DONE', this.donetxt);
@@ -132,7 +134,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: 20000
+							milliseconds: this.milli
 		};
 		
 		
@@ -173,7 +175,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: 30000
+								milliseconds: this.milli
 			};	
 			
 			this.timer.restart(timerOptions);
@@ -232,7 +234,7 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var table = new node.Table({id: 'exhibition'});
+			var table = new node.window.Table({id: 'exhibition'});
 			table.setHeader(['','A','B','C']);
 			table.addColumn([1,2,3]);
 			
@@ -252,7 +254,7 @@ function PeerReviewGame () {
 							for (var i=0; i < winners.length; i++) {
 							
 							
-								var details_tbl = new node.Table();
+								var details_tbl = new node.window.Table();
 								details_tbl.addColumn(['Author: ' + winners[i].author,
 								                       'Score: ' + winners[i].mean
 								]);
@@ -296,7 +298,7 @@ function PeerReviewGame () {
 				
 				this.timer.restart({
 									event: 'DONE',
-									milliseconds: 20000
+									milliseconds: this.milli
 				});	
 				
 			});
@@ -317,7 +319,7 @@ function PeerReviewGame () {
 			
 			this.timer.restart({
 								event: 'DONE',
-								milliseconds: 10000
+								milliseconds: this.milli
 			});
 		});
 		

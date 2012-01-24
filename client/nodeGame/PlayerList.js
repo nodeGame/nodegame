@@ -22,16 +22,11 @@
 	 */
 	
 	function PlayerList (options, db) {
-//		
-//	  node.log('RECEIVED');	
-//	  node.log(db);	
 	  var options = options || {};
+	  if (!options.log) options.log = node.log;
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
-	  //this.set('state', GameBit.compareState);
-//	  node.log('JUST CREATED PL');
-//	  node.log(this);
 	  this.countid = 0;
 	};
 	
@@ -40,7 +35,8 @@
 	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
-			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
+			console.log(this.db);
+			node.log('Attempt to add a new player already in the player list: ' + player.id, 'ERR');
 			return false;
 		}
 		
@@ -58,7 +54,7 @@
 		if (!id) return false;
 			
 		var p = this.select('id', '=', id);
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			p.delete();
 			return true;
 		}
@@ -72,7 +68,7 @@
 		
 		var p = this.select('id', '=', id);
 		
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			return p.first();
 		}
 		
@@ -238,6 +234,10 @@
 		return out;
 	};
 
+	PlayerList.prototype.getRandom = function () {	
+		this.shuffle();
+		return this.first();
+	};
 	
 	// TODO: implement pl.pop, maybe in NDDB
 //	PlayerList.prototype.pop = function (id) {	
@@ -248,9 +248,7 @@
 //		return p;
 //	};
 	
-//	PlayerList.prototype.getRandom = function () {	
-//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-//	};
+
 	
 	
 //	Player.prototype.getId = function() {

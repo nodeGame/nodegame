@@ -18,7 +18,7 @@
 	exports.Game = Game;
 	
 	function Game (settings, gamesocketclient) {
-		
+		var settings = settings || {};
 		// TODO: transform into private variables, otherwise they can accidentally 
 		// modified  by the execution of the loops functions
 		
@@ -64,17 +64,22 @@
 			
 			// Get
 			
-			// TODO: can we avoid the double emit?
-			node.on( IN + get + 'DATA', function(msg){
-				node.emit(msg.text, msg.data);
+			node.on( IN + get + 'DATA', function (msg) {
+				
+				if (msg.text === 'LOOP'){
+					that.gsc.sendDATA(GameMsg.actions.SAY, this.gameLoop, msg.from, 'GAME');
+				}
+				
+				// We could double emit
+				//node.emit(msg.text, msg.data);
 			});
 			
 			// Set
-			node.on( IN + set + 'STATE', function(msg){
+			node.on( IN + set + 'STATE', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
-			node.on( IN + set + 'DATA', function(msg){
+			node.on( IN + set + 'DATA', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
@@ -82,7 +87,7 @@
 
 			// If the message is from the server, update the game state
 			// If the message is from a player, update the player state
-			node.on( IN + say + 'STATE', function(msg){
+			node.on( IN + say + 'STATE', function (msg) {
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
@@ -104,6 +109,7 @@
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});
+			
 		}();
 		
 		var outgoingListeners = function() {
@@ -149,7 +155,7 @@
 			// GET
 			
 			node.on( OUT + get + 'DATA', function (data, to, key) {
-				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
+				that.gsc.sendDATA(GameMsg.actions.GET, data, to, data);
 			});
 			
 		}();
@@ -159,12 +165,12 @@
 			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.auto_step) {
+				if (that.auto_step && !that.observer) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					node.log(morePlayers);
+					//node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -267,12 +273,12 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState, 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;

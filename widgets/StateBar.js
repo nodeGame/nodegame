@@ -6,12 +6,14 @@
 	 * Sends STATE msgs
 	 */
 	
+	// TODO: Introduce rules for update: other vs self
+	
 	exports.StateBar = StateBar;	
 		
-	function StateBar(id) {
+	function StateBar(options) {
 		
 		this.game = node.game;;
-		this.id = id || 'statebar';
+		this.id = options.id || 'statebar';
 		this.name = 'State Bar';
 		this.version = '0.2.1';
 		
@@ -72,8 +74,16 @@
 													round: round
 				});
 				
+				// Self Update
+				if (to === 'ALL') {
+					var stateEvent = node.IN + node.actions.SAY + '.STATE';
+					var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+					node.emit(stateEvent, stateMsg);
+				}
+				
+				// Update Others
 				var stateEvent = node.OUT + that.actionSel.value + '.STATE';
-				node.fire(stateEvent,state,to);
+				node.emit(stateEvent,state,to);
 			}
 			else {
 				console.log('Not valid state. Not sent.');

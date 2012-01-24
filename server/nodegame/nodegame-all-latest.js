@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.6
+ * nodeGame-all v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.6
+ * nodeGame Client v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -76,7 +76,9 @@
 
 	
     OBJ.equals = function (o1, o2) {
-    	
+    	console.log('Equals');
+    	console.log(o1);
+    	console.log(o2);
         if (!o1 || !o2) return false;
       	
     	// Check whether arguments are not objects
@@ -120,6 +122,8 @@
     	  }
       }
 
+      console.log('yes');
+      
       return true;
     };
 	
@@ -211,14 +215,14 @@
 		if (!obj) return;
 		var clone = {};
 		for (var i in obj) {
-			if (obj.hasOwnProperty(i)) {
+			//if (obj.hasOwnProperty(i)) {
 				if ( 'object' === typeof obj[i] ) {
 					clone[i] = OBJ.clone(obj[i]);
 				}
 				else {
 					clone[i] = obj[i];
 				}
-			}
+			//}
 		}
 		return clone;
 	};
@@ -513,15 +517,26 @@
 		return result;
 	};
 	
-	
+
 	/**
-	 * Performs a diff between two arrays. 
+	 * Compute the intersection between two arrays. 
+	 * Arrays can contain both primitive types and objects.
+	 */
+	ARRAY.arrayIntersect = function (a1, a2) {
+		return a1.filter( function(i) {
+			return JSUS.in_array(i, a2);
+		});
+	};
+		
+	/**
+	 * Perform a diff between two arrays.
+	 * Arrays can contain both primitive types and objects.
 	 * Returns all the values of the first array which are not present 
 	 * in the second one.
 	 */
-	ARRAY.arrayDiff = function(a1, a2) {
+	ARRAY.arrayDiff = function (a1, a2) {
 		return a1.filter( function(i) {
-			return !(a2.indexOf(i) > -1);
+			return !(JSUS.in_array(i, a2));
 		});
 	};
 	
@@ -737,7 +752,6 @@
 	
 	// Stdout redirect
 	NDDB.log = console.log;
-	
 	
 	/**
 	 * NDDB interface
@@ -1074,14 +1088,14 @@
 		return this.create(this.db.filter(func));
 	};
 	
-	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.shuffle = function () {
 		this.db = JSUS.shuffle(this.db);
 		return true;
 	};
 	
-	// HERE
 	
+	// TODO: check do we need to reassign __nddbid__ ?
 	NDDB.prototype.join = function (key1, key2, pos, select) {
 		// Construct a better comparator function
 		// than the generic JSUS.equals
@@ -1351,7 +1365,41 @@
 		//NDDB.log(groups);
 		
 		return outs;
-	};		
+	};	
+	
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.diff = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return !(JSUS.in_array(el,nddb));
+		});
+	};
+	
+	/**
+	 * Performs a diff with the database obj passed as parameter.
+	 * Returns all the element of the database which are not present in the
+	 * database obj passed as parameter.
+	 * If the 'key' parameter
+	 */
+	NDDB.prototype.intersect = function (nddb) {
+		if ('object' === typeof nddb) {
+			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
+				var nddb = nddb.db;
+			}
+		}
+		return this.filter(function(el){
+			return JSUS.in_array(el,nddb);
+		});
+	};
 	
 })(
 		
@@ -1427,11 +1475,6 @@
 	        }
 	       
 	    },
-	    
-	    // TODO: remove fire when all the code has been updated
-//	    fire: function(event, p1, p2, p3) { // Up to 3 parameters
-//	    	this.emit(event, p1, p2, p3);
-//	    },
 	
 	    removeListener: function(type, listener) {
 	
@@ -1439,19 +1482,18 @@
 		    	//console.log('Trying to remove ' + type + ' ' + listener);
 		    	
 		        if (list[type] instanceof Array) {
-		        	
-		        	if (listener === null || listener === undefined) {
+		        	if (!listener) {
 		        		delete list[type];
 		        		//console.log('Removed listener ' + type);
 		        		return true;
 		        	}
 		        	
 		            var listeners = list[type];
-		            for (var i=0, len=listeners.length; i < len; i++) {
-		            	
+		            var len=listeners.length;
+		            for (var i=0; i < len; i++) {
 		            	//console.log(listeners[i]);
 		            	
-		                if (listeners[i] === listener){
+		                if (listeners[i] == listener) {
 		                    listeners.splice(i, 1);
 		                    //console.log('Removed listener ' + type + ' ' + listener);
 		                    return true;
@@ -1625,16 +1667,11 @@
 	 */
 	
 	function PlayerList (options, db) {
-//		
-//	  node.log('RECEIVED');	
-//	  node.log(db);	
 	  var options = options || {};
+	  if (!options.log) options.log = node.log;
 	  // Inheriting from NDDB	
 	  JSUS.extend(node.NDDB, this);
 	  node.NDDB.call(this, options, db);
-	  //this.set('state', GameBit.compareState);
-//	  node.log('JUST CREATED PL');
-//	  node.log(this);
 	  this.countid = 0;
 	};
 	
@@ -1643,7 +1680,8 @@
 	
 		// Check if the id is unique
 		if (this.exist(player.id)) {
-			node.log('Attempt to add a new player already in the player list' + player.id, 'ERR');
+			console.log(this.db);
+			node.log('Attempt to add a new player already in the player list: ' + player.id, 'ERR');
 			return false;
 		}
 		
@@ -1661,7 +1699,7 @@
 		if (!id) return false;
 			
 		var p = this.select('id', '=', id);
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			p.delete();
 			return true;
 		}
@@ -1675,7 +1713,7 @@
 		
 		var p = this.select('id', '=', id);
 		
-		if (p.count > 0) {
+		if (p.count() > 0) {
 			return p.first();
 		}
 		
@@ -1841,6 +1879,10 @@
 		return out;
 	};
 
+	PlayerList.prototype.getRandom = function () {	
+		this.shuffle();
+		return this.first();
+	};
 	
 	// TODO: implement pl.pop, maybe in NDDB
 //	PlayerList.prototype.pop = function (id) {	
@@ -1851,9 +1893,7 @@
 //		return p;
 //	};
 	
-//	PlayerList.prototype.getRandom = function () {	
-//		return this.toArray()[Math.floor(Math.random()*(this.size()))];
-//	};
+
 	
 	
 //	Player.prototype.getId = function() {
@@ -2101,7 +2141,7 @@
 	exports.GameLoop = GameLoop;
 	
 	function GameLoop (loop) {
-		this.loop = loop;
+		this.loop = loop || {};
 		
 		this.limits = Array();
 		
@@ -2156,7 +2196,7 @@
 			
 	GameLoop.prototype.next = function (gameState) {
 
-		node.log('NEXT OF THIS ' + gameState);
+		node.log('NEXT OF THIS ' + gameState, 'DEBUG');
 		//node.log(this.limits);
 		
 		// Game has not started yet, do it!
@@ -2286,6 +2326,43 @@
 		return gs;
 	};
 	
+	/**
+	 * Compute the total number of steps to go.
+	 */
+	GameLoop.prototype.length = function (state) {
+		var state = state || new GameState();
+		var count = 0;
+		while (state) { 
+			//console.log(glCopy);
+			count++;
+			var state = this.next(state);
+		}
+		return count;
+	};
+	
+	GameLoop.prototype.toArray = function() {
+		var state = new GameState();
+		var out = [];
+		while (state) { 
+			out.push(state.toString());
+			var state = this.next(state);
+		}
+		return out;
+	};
+	
+	GameLoop.prototype.indexOf = function (state) {
+		if (!state) return -1;
+		var idx = 0;
+		var search = new GameState();
+		while (search) {
+			if (GameState.compare(search,state) === 0){
+				return idx;
+			}
+			search = this.next(search);
+			idx++;
+		}
+		return -1;
+	};
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -2516,8 +2593,8 @@
 	
 	
 	
-	function GameSocketClient (options, nodeGame) {
-		
+	function GameSocketClient (options) {
+		this.options = options;
 		this.name = options.name;
 		this.url = options.url;
 		
@@ -2530,17 +2607,16 @@
 	
 	GameSocketClient.prototype.setGame = function (game) {
 		this.game = game;
-		this.io = this.connect();
+		this.connect();
 	};
 	
 	GameSocketClient.prototype.connect = function() {
 		// TODO: add check if http:// is already in
 		node.log('nodeGame: connecting to ' + this.url);
-		var socket = io.connect(this.url);
-	    this.attachFirstListeners(socket);
-	    return socket;
+		this.io = io.connect(this.url, this.options.io);
+	    this.attachFirstListeners(this.io);
+	    return this.io;
 	};
-	
 	
 	/*
 	
@@ -2656,6 +2732,8 @@
 				}
 			}
 		});
+		
+		node.emit('NODEGAME_READY');
 	};
 	
 	GameSocketClient.prototype.sendHI = function (state, to) {
@@ -2865,7 +2943,7 @@
 	exports.Game = Game;
 	
 	function Game (settings, gamesocketclient) {
-		
+		var settings = settings || {};
 		// TODO: transform into private variables, otherwise they can accidentally 
 		// modified  by the execution of the loops functions
 		
@@ -2911,17 +2989,22 @@
 			
 			// Get
 			
-			// TODO: can we avoid the double emit?
-			node.on( IN + get + 'DATA', function(msg){
-				node.emit(msg.text, msg.data);
+			node.on( IN + get + 'DATA', function (msg) {
+				
+				if (msg.text === 'LOOP'){
+					that.gsc.sendDATA(GameMsg.actions.SAY, this.gameLoop, msg.from, 'GAME');
+				}
+				
+				// We could double emit
+				//node.emit(msg.text, msg.data);
 			});
 			
 			// Set
-			node.on( IN + set + 'STATE', function(msg){
+			node.on( IN + set + 'STATE', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
-			node.on( IN + set + 'DATA', function(msg){
+			node.on( IN + set + 'DATA', function (msg) {
 				that.memory.add(msg.from, msg.text, msg.data);
 			});
 			
@@ -2929,7 +3012,7 @@
 
 			// If the message is from the server, update the game state
 			// If the message is from a player, update the player state
-			node.on( IN + say + 'STATE', function(msg){
+			node.on( IN + say + 'STATE', function (msg) {
 				
 				// Player exists
 				if (that.pl.exist(msg.from)) {
@@ -2951,6 +3034,7 @@
 				node.emit('UPDATED_PLIST');
 				that.pl.checkState();
 			});
+			
 		}();
 		
 		var outgoingListeners = function() {
@@ -2996,7 +3080,7 @@
 			// GET
 			
 			node.on( OUT + get + 'DATA', function (data, to, key) {
-				that.gsc.sendDATA(GameMsg.actions.SAY, data, to, key);
+				that.gsc.sendDATA(GameMsg.actions.GET, data, to, data);
 			});
 			
 		}();
@@ -3006,12 +3090,12 @@
 			// All the players are done?
 			node.on('STATEDONE', function() {
 				// If we go auto
-				if (that.auto_step) {
+				if (that.auto_step && !that.observer) {
 //					node.log('WE PLAY AUTO', 'DEBUG');
 //					node.log(that.pl);
 //					node.log(that.pl.size());
 					var morePlayers = ('undefined' !== that.minPlayers) ? that.minPlayers - that.pl.size() : 0 ;
-					node.log(morePlayers);
+					//node.log(morePlayers);
 					
 					if ( morePlayers > 0 ) {
 						node.emit('OUT.say.TXT', morePlayers + ' player/s still needed to play the game');
@@ -3114,12 +3198,12 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState);
+		node.log('New State = ' + this.gameState, 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {
 		
-		//node.log('New state is going to be ' + new GameState(state));
+		node.log('New state is going to be ' + new GameState(state));
 		
 		if (this.step(state) !== false){
 			this.paused = false;
@@ -3217,7 +3301,7 @@
 	node.verbosity = 0;
 	
 	node.verbosity_levels = {
-			ALWAYS: - Number.MIN_VALUE + 1, // Actually, it is not really always...
+			ALWAYS: -(Number.MIN_VALUE+1), // Actually, it is not really always...
 			ERR: -1,
 			WARN: 0,
 			INFO: 1,
@@ -3225,7 +3309,8 @@
 	};
 	
 	node.log = function (txt, level) {
-		if ('number' !== typeof level) {
+		var level = level || 0;
+		if ('string' === typeof level) {
 			var level = node.verbosity_levels[level];
 		}
 		if (node.verbosity > level) {
@@ -3450,25 +3535,44 @@
 		node.log('nodeGame: ready.');
 	};	
 	
-	node.observe = function (conf) {	
+	node.observe = function (conf, game) {
+		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
+		var game = game || {loops: {1: {state: function(){}}}};
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
-		// Retrieve the game and set is as observer
-		node.get('GAME', function(game) {
+		node.game = that.game = new Game(game, that.gsc);
+		node.gsc.setGame(that.game);
+		
+		node.on('NODEGAME_READY', function(){
 			
-			alert(game);
-			
-//			var game = game.observer = true;
-//			node.game = that.game = game;
-//			
-//			that.game.init();
-//			
-//			that.gsc.setGame(that.game);
-//			
-//			node.log('nodeGame: game loaded...');
-//			node.log('nodeGame: ready.');
+			// Retrieve the game and set is as observer
+			node.get('LOOP', function(game) {
+				
+				//alert(game);
+				console.log('ONLY ONE');
+				console.log(game);
+	//			var game = game.observer = true;
+	//			node.game = that.game = game;
+	//			
+	//			that.game.init();
+	//			
+	//			that.gsc.setGame(that.game);
+	//			
+	//			node.log('nodeGame: game loaded...');
+	//			node.log('nodeGame: ready.');
+			});
 		});
 		
+		
+//		node.onDATA('GAME', function(data){
+//			alert(data);
+//			console.log(data);
+//		});
+		
+//		node.on('DATA', function(msg){
+//			console.log('--------->Eh!')
+//			console.log(msg);
+//		});
 	};	
 	
 	node.fire = node.emit = function (event, p1, p2, p3) {	
@@ -3493,12 +3597,17 @@
 	
 	node.get = function (key, func) {
 		that.emit('out.get.DATA', key);
-		node.once(key, function(data) {
-			func.call(node.game,data);
-		});
+		
+		var listener = function(msg) {
+			if (msg.text === key) {
+				func.call(node.game, msg.data);
+				that.removeListener('in.say.DATA',listener);
+			}
+			//that.printAllListeners();
+		};
+		
+		node.on('in.say.DATA', listener);
 	};
-	
-
 	
 	// *Aliases*
 	//
@@ -3546,17 +3655,17 @@
 	
 	node.onSTATE = function(func) {
 		node.on("in.set.STATE", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
 	node.onPLIST = function(func) {
 		node.on("in.set.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 		
 		node.on("in.say.PLIST", function(msg) {
-			func.call(that.game,msg);
+			func.call(that.game, msg);
 		});
 	};
 	
@@ -3637,12 +3746,12 @@
  
  
 /*!
- * nodeWindow v0.6.6
+ * nodeWindow v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -3653,6 +3762,7 @@
 	 * Document
 	 * 
 	 */
+	var JSUS = node.JSUS;
 	
 	// Create the window obj
 	node.window = {};
@@ -3775,13 +3885,13 @@
 	Document.prototype.write = function (root, text) {
 		if (!root) return;
 		if (!text) return;
-		var tn = document.createTextNode(text);
+		var content = (!JSUS.isNode(text) || !JSUS.isElement(text)) ? document.createTextNode(text) : text;
 		node.log('ROOT');
 		node.log(root);
 		node.log('TEXT');
-		node.log(text);
-		root.appendChild(tn);
-		return tn;
+		node.log(content);
+		root.appendChild(content);
+		return content;
 	};
 	
 	Document.prototype.writeln = function (root, text, rc) {
@@ -3963,12 +4073,8 @@
 	
 	Document.prototype.removeChildrenFromNode = function (e) {
 		
-	    if(!e) {
-	        return false;
-	    }
-	    if(typeof(e)=='string') {
-	        e = xGetElementById(e);
-	    }
+	    if (!e) return false;
+	    
 	    while (e.hasChildNodes()) {
 	        e.removeChild(e.firstChild);
 	    }
@@ -4078,16 +4184,32 @@
 	// Overriding Document.write and Document.writeln
 	GameWindow.prototype._write = Document.prototype.write;
 	GameWindow.prototype._writeln = Document.prototype.writeln;
+
+	// TODO: findLastElement
+	GameWindow.prototype.findLastElement = function() {
+		var el = this.frame;
+		if (el) {
+			el = this.frame.body || el;
+		}
+		else {
+			el = document.body || document.lastElementChild;
+		}
+		return 	el;
+	}
 	
 	GameWindow.prototype.write = function (text, root) {		
-		var root = root || this.frame.body;
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._write(root, text);
 	};
 	
 	GameWindow.prototype.writeln = function (text, root, br) {
-		var root = root || this.frame.body;
-		root = root.lastElementChild || root;
+		var root = root || this.findLastElement();
+		if (!root) {
+			node.log('Could not determine where writing', 'ERR');
+		}
 		return this._writeln(root, text, br);
 	};
 	
@@ -4165,7 +4287,9 @@
 			this.addWidget('DataBar');
 			this.addWidget('MsgBar');
 			this.addWidget('GameBoard');
+			this.addWidget('ServerInfoDisplay');
 			this.addWidget('Wall');
+			//this.addWidget('GameTable');
 	
 			break;
 		
@@ -4250,7 +4374,6 @@
 	 */
 	GameWindow.prototype.addWidget = function (g, root, options) {
 		var that = this;
-		//node.log(this.widgets);
 		
 		function appendFieldset(root, options, g) {
 			if (!options) return root;
@@ -4274,8 +4397,8 @@
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
 		try {
 			// options exists and options.fieldset exist
-			var fieldsetOptions = (options && 'undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root,fieldsetOptions,g);
+			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
+			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
 		}
@@ -4320,7 +4443,7 @@
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if (typeof(playerList) !== 'object' || typeof(toSelector) !== 'object') {
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
 			return;
 		}
 		
@@ -4329,7 +4452,7 @@
 		
 		
 		var opt;
-		var pl = new PlayerList(playerList);
+		var pl = new PlayerList({}, playerList);
 		
 		
 		try {
@@ -4338,8 +4461,7 @@
 				opt.value = p.id;
 				opt.appendChild(document.createTextNode(p.name));
 				toSelector.appendChild(opt);
-				}, 
-				toSelector);
+			});
 		}
 		catch (e) {
 			node.log('Bad Formatted Player List. Discarded. ' + p, 'ERR');
@@ -4562,14 +4684,13 @@
 })(node.window);
  
  
-(function(exports){
+(function(exports, node){
 	
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
 	 * 
 	 */
-	var node = exports;
 	exports.Table = Table;
 	
 	// For simple testing
@@ -4594,6 +4715,12 @@
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
+    this.table = options.table || document.createElement('table'); 
+    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
+    this.table.id = this.id;
+    
+    this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
+    
     // Class for missing cells
     this.missing = options.missing || 'missing';
     this.pointers = {
@@ -4602,10 +4729,18 @@
     				z: options.pointerZ || 0
     };
     
-    this.id = options.id || 'table';  
-    
     this.header = null;
     this.footer = null;
+    
+    this.left = null;
+    this.right = null;
+    
+    // By default return the element content as it is
+    this.render = options.render || function (el) { return el.content };
+    
+    // Not used now
+    // Matches properties and dimensions
+    //this.binds = {};
   };
   
   Table.prototype.addClass = function (c) {
@@ -4649,6 +4784,10 @@
   Table.prototype._addSpecial = function (data, type) {
 	if (!data) return;
 	var type = type || 'header';
+	if ('object' !== typeof data) {
+		return {content: data, type: type};
+	}
+	
 	var out = [];
 	for (var i=0; i < data.length; i++) {
 		out.push({content: data[i], type: type});
@@ -4660,6 +4799,23 @@
 	  this.header = this._addSpecial(header);
   };
 
+  Table.prototype.add2Header = function (header) {
+	  this.header = this.header.concat(this._addSpecial(header));
+  };
+  
+  Table.prototype.setLeft = function (left) {
+	  this.left = this._addSpecial(left, 'left');
+  };
+  
+  Table.prototype.add2Left = function (left) {
+	  this.left = this.left.concat(this._addSpecial(left, 'left'));
+  };
+
+// TODO: setRight  
+//  Table.prototype.setRight = function (left) {
+//	  this.right = this._addSpecial(left, 'right');
+//  };
+  
   Table.prototype.setFooter = function (footer) {
 	  this.footer = this._addSpecial(footer, 'footer');
   };
@@ -4702,17 +4858,7 @@
 	else {
 		dims = Table.H;
 	}
-	
-//	Table.log('DATA TBL');
-//	Table.log(data);
-	
-	// By default, only the second dimension is incremented
-	var x = x || this.pointers[dims[0]]; 
-	var y = y || this.pointers[dims[1]] + 1;
-	var z = z || this.pointers[dims[2]];
-	
-	if ('object' !== typeof data) data = [data]; 
-	
+		
 	var insertCell = function (content){	
 		//Table.log('content');
 //		Table.log(x + ' ' + y + ' ' + z);
@@ -4730,6 +4876,12 @@
 		this.updatePointer(dims[2],cell[dims[2]]);
 	};
 	
+	// By default, only the second dimension is incremented
+	var x = x || this.pointers[dims[0]]; 
+	var y = y || this.pointers[dims[1]] + 1;
+	var z = z || this.pointers[dims[2]];
+	
+	if ('object' !== typeof data) data = [data]; 
 	
 	var cell = null;
 	// Loop Dim1
@@ -4766,76 +4918,114 @@
 //	Table.log('After insert');
 //	Table.log(this.db);
 	
+	// TODO: if coming from addRow or Column this should be done only at the end
+	if (this.auto_update) {
+		this.parse(true);
+	}
+	
+  };
+  
+  Table.prototype.add = function (data, x, y) {
+	  if (!data) return;
+	  
+	  var result = this.insert(new Cell({
+		  x: x,
+		  y: y,
+		  content: data
+	  }));
+	  
+	  if (result) {
+		  this.updatePointer('x',x);
+		  this.updatePointer('y',y);
+	  }
+	  return result;
   };
     
-  Table.prototype.addColumn = function (data, attributes, container) {
+  Table.prototype.addColumn = function (data, x, y) {
 	if (!data) return false;
-	return this._add(data, Table.V);
+	return this._add(data, Table.V, x, y);
   };
   
-  Table.prototype.addRow = function (data, attributes, container) {
-		if (!data) return false;
-		return this._add(data, Table.H);
-	  };
+  Table.prototype.addRow = function (data, x, y) {
+	if (!data) return false;
+	return this._add(data, Table.H, x, y);
+  };
   
-  Table.prototype.getRoot = function() {
-    return this.root;
+  Table.prototype.bind = function (dim, property) {
+	  this.binds[property] = dim;
   };
   
   // TODO: Only 2D for now
   // TODO: improve algorithm, rewrite
-  Table.prototype.parse = function() {
+  Table.prototype.parse = function () {
 	  
 	  var fromCell2TD = function (cell, el) {
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = cell.content;
+		  var c = this.render(cell);
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
 		  return TD;
 	  };
 	  
-//	  var appendContent = function (td, c) {
-//		  if (!td) return;
-//		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-//		  td.appendChild(content);
-//		  return td;
-//	  };
+	  if (this.table) {
+		  while (this.table.hasChildNodes()) {
+		        this.table.removeChild(this.table.firstChild);
+		    }
+	  }
 	  
-	  var TABLE = document.createElement('table');
-	  TABLE.id = this.id;
+	  var TABLE = this.table;
 	  
 	  // HEADER
 	  if (this.header && this.header.length > 0) {
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
+		  // Add an empty cell to balance the left header column
+		  if (this.left) {
+			  TR.appendChild(document.createElement('th'));
+		  }
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.header[i]),'th');
+			  TR.appendChild(fromCell2TD.call(this, this.header[i],'th'));
 		  }
 		  THEAD.appendChild(TR);
 		  i=0;
 		  TABLE.appendChild(THEAD);
 	  }
 	  
-	  // BODY
-	  if (this.size() !==  0) {
-		  var TBODY = document.createElement('tbody');
+//	  console.log(this.table);
+//	  console.log(this.id);
+//	  console.log(this.db.length);
 	  
+	  // BODY
+	  if (this.size() !== 0) {
+		  var TBODY = document.createElement('tbody');
+		 
 		  this.sort(['y','x']); // z to add first
 		  var trid = -1;
 		  // TODO: What happens if the are missing at the beginning ??
 		  var f = this.first();
 		  var old_x = f.x;
-
+		  var old_left = 0;
+		
 		  for (var i=0; i < this.db.length; i++) {
+			  //console.log('INSIDE TBODY LOOP');
+			  //console.log(this.id);
 			  if (trid !== this.db[i].y) {
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
 				  trid = this.db[i].y;
 				  //Table.log(trid);
 				  old_x = f.x - 1; // must start exactly from the first
+				  
+				// Insert left header, if any
+				  if (this.left && this.left.length > 0) {
+					  var TD = document.createElement('td');
+					  //TD.className = this.missing;
+					  TR.appendChild(fromCell2TD.call(this, this.left[old_left]));
+					  old_left++;
+				  }
 			  }
 			  
 			  // Insert missing cells
@@ -4848,7 +5038,7 @@
 				  }
 			  }
 			  // Normal Insert
-			  TR.appendChild(fromCell2TD(this.db[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.db[i]));
 			  
 			  // Update old refs
 			  old_x = this.db[i].x;
@@ -4862,14 +5052,27 @@
 		  var TFOOT = document.createElement('tfoot');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.footer[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.footer[i]));
 		  }
 		  TFOOT.appendChild(TR);
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
+//	  console.log('TESTING WRITING');
+//	  console.log(TABLE);
+//	  console.log(this.table)
+	  
 	  return TABLE;
-  }
+  };
+  
+
+  // TODO: set is not the right word
+//  Table.prototype.set = function (x, y, content) {
+//	  var el = this.select('x','=',x).select('y','=',y).first();
+//	  if (!el) return;
+//	  el.content = content;
+//	  return true;
+//  };
   
   // Cell Class
   
@@ -4883,8 +5086,11 @@
 	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	
-})(('undefined' !== typeof node) ? node : module.parent.exports);
+	// TODO: add it node.window
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+);
  
  
  
@@ -4892,12 +5098,12 @@
  
  
 /*!
- * nodeGadgets v0.6.6
+ * nodeGadgets v0.6.9
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 18. Jan 18:24:16 CET 2012
+ * Built on Mo 23. Jan 16:19:46 CET 2012
  *
  */
  
@@ -5825,10 +6031,10 @@
 	
 	exports.DataBar	= DataBar;
 		
-	function DataBar(id) {
+	function DataBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'databar';
+		this.id = options.id || 'databar';
 		this.name = 'Data Bar';
 		this.version = '0.2.1';
 		
@@ -5908,10 +6114,10 @@
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
 		
-	function GameBoard (id) {
+	function GameBoard (options) {
 		
 		this.game = node.game;
-		this.id = id || 'gboard';
+		this.id = options.id || 'gboard';
 		this.name = 'GameBoard';
 		
 		this.version = '0.3';
@@ -5940,13 +6146,13 @@
 		
 		
 		node.on('UPDATED_PLIST', function () {
-			console.log('I Updating Board');
+			node.log('I Updating Board');
 			that.updateBoard(node.game.pl);
 
 		});
 		
 //		node.onPLIST( function (msg) {
-//			console.log('I Updating Board ' + msg.text);
+//			node.log('I Updating Board ' + msg.text);
 //			that.updateBoard(msg.data);
 //		});
 	};
@@ -5955,12 +6161,12 @@
 		var that = this;
 		that.board.innerHTML = 'Updating...';
 
-		//console.log(pl);
+		//node.log(pl);
 		
 		if (pl.size() !== 0) {
 			that.board.innerHTML = '';
 			pl.forEach( function(p) {
-				//console.log(p);
+				//node.log(p);
 				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
 				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
@@ -6019,10 +6225,10 @@
 	
 	exports.GameSummary	= GameSummary;
 	
-	function GameSummary(id) {
+	function GameSummary(options) {
 		//debugger;
 		this.game = node.game;
-		this.id = id || 'gamesummary';
+		this.id = options.id || 'gamesummary';
 		this.name = 'Game Summary';
 		this.version = '0.2.1';
 		
@@ -6080,6 +6286,166 @@
  
 (function (exports) {
 
+	var GameState = node.GameState;
+	var PlayerList = node.PlayerList;
+	
+	/*!
+	 * GameTable
+	 * 
+	 * Show the memory state of the game
+	 */
+	
+	exports.GameTable = GameTable;
+	
+	function GameTable (options) {
+		this.options = options;
+		this.id = options.id || 'gametable';
+		this.name = 'Game Table';
+		this.version = '0.1';
+		
+		this.fieldset = { legend: this.name,
+				  		  id: this.id + '_fieldset'
+		};
+		
+		this.root = null;
+		this.gtbl = null;
+		this.plist = null;
+		
+		this.init(this.options);
+	};
+	
+	GameTable.prototype.init = function (options) {
+		
+		if (!this.plist) this.plist = new PlayerList();
+		
+		this.gtbl = new node.window.Table({
+											auto_update: true,
+											id: options.id || this.id,
+											render: options.render
+		}, node.game.memory.db);
+		
+		
+		this.gtbl.set('state', GameState.compare);
+		
+		this.gtbl.setLeft([]);
+		
+		
+		if (options.render) {
+			this.setRender(options.render);
+		}
+		
+//		if (this.gtbl.size() === 0) {
+//			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
+//		}
+		
+		this.gtbl.parse(true);
+	};
+	
+	GameTable.prototype.setRender = function(func) {
+		this.gtbl.render = func;
+	};
+	
+	GameTable.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.gtbl.table);
+		return root;
+	};
+	
+	GameTable.prototype.listeners = function () {
+		var that = this;
+		
+		node.onPLIST(function(msg){
+			var plist = new PlayerList(null,msg.data);
+			if (plist.size() === 0) return;
+			
+			var diff = plist.diff(that.plist);
+			console.log('New Players found');
+			console.log(diff);
+			if (diff) {
+				diff.forEach(function(el){that.addPlayer(el);});
+			}
+			
+			
+			that.gtbl.parse(true);
+		});
+		
+		node.on('in.set.DATA', function (msg) {
+//			console.log('received set data');
+//			console.log(msg);
+			
+			that.addLeft(msg.state, msg.from);
+			var x = that.player2x(msg.from);
+			var y = that.state2y(node.game.gameState);
+			
+			that.gtbl.add(msg.data, x, y);
+			that.gtbl.parse(true);
+		});
+	}; 
+	
+	GameTable.prototype.addPlayer = function (player) {
+		this.plist.add(player);
+		var header = this.plist.map(function(el){return el.name});
+		this.gtbl.setHeader(header);
+		//this.gtbl.addColumn(new Array(node.game.gameLoop.length()));
+		
+	};
+	
+	/**
+	 * Check if 
+	 */
+	GameTable.prototype.addLeft = function (state, player) {
+		if (!state) return;
+		var state = new GameState(state);
+		if (!JSUS.in_array(state, this.gtbl.left)){
+			console.log('The State is new');
+			console.log(state);
+			console.log(this.gtbl.left);
+			this.gtbl.add2Left(state.toString());
+		}
+		// Is it a new display associated to the same state?
+		else {
+			var y = this.state2y(state);
+			var x = this.player2x(player);
+			if (this.select('y','=',y).select('x','=',x).count() > 1) {
+				console.log('The State is doubled or more');
+				console.log(state);
+				console.log(this.gtbl.left);
+				this.gtbl.add2Left(state.toString());
+			}
+		}
+		
+		console.log(this.gtbl.left);
+			
+	};
+	
+	GameTable.prototype.player2x = function (player) {
+		if (!player) return false;
+		return this.plist.select('id', '=', player).first().count;
+	};
+	
+	GameTable.prototype.x2Player = function (x) {
+		if (!x) return false;
+		return this.plist.select('count', '=', x).first().count;
+	};
+	
+	GameTable.prototype.state2y = function (state) {
+		if (!state) return false;
+		return node.game.gameLoop.indexOf(state);
+	};
+	
+	GameTable.prototype.y2State = function (y) {
+		if (!y) return false;
+		return node.game.gameLoop.jumpTo(new GameState(),y);
+	};
+	
+	
+
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+
 	
 	/*!
 	 * MsgBar
@@ -6088,10 +6454,10 @@
 	
 	exports.MsgBar	= MsgBar;
 		
-	function MsgBar(id){
+	function MsgBar(options) {
 		
 		this.game = node.game;
-		this.id = id || 'msgbar';
+		this.id = options.id || 'msgbar';
 		this.name = 'Msg Bar';
 		this.version = '0.2.1';
 		
@@ -6135,12 +6501,10 @@
 	};
 	
 	MsgBar.prototype.listeners = function(){
-		var that = this;
-		
+		var that = this;	
 		node.onPLIST( function(msg) {
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
+		
 		}); 
 	};
 })(node.window.widgets); 
@@ -6156,11 +6520,13 @@
 	 * 
 	 */
 	
+	// TODO: Introduce rules for update: other vs self
+	
 	exports.NextPreviousState =	NextPreviousState;
 		
-	function NextPreviousState(id) {
+	function NextPreviousState(options) {
 		this.game = node.game;
-		this.id = id || 'nextprevious';
+		this.id = options.id || 'nextprevious';
 		this.name = 'Next,Previous State';
 		this.version = '0.2.1';
 		
@@ -6186,36 +6552,29 @@
 		
 		var that = this;
 	
-		fwd.onclick = function() {
-			
-			var state = that.game.next();
-			
+		var updateState = function (state) {
 			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
+				var stateEvent = node.IN + node.actions.SAY + '.STATE';
+				var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+				// Self Update
+				node.emit(stateEvent, stateMsg);
+				
+				// Update Others
+				stateEvent = node.OUT + node.actions.SAY + '.STATE';
+				node.emit(stateEvent, state, 'ALL');
 			}
 			else {
-				console.log('No next state. Not sent.');
-				node.gsc.sendTXT('E: no next state. Not sent');
-			}
-		};
-	
-		rew.onclick = function() {
-			
-			var state = that.game.previous();
-			
-			if (state) {
-				var stateEvent = node.OUT + node.actions.SET + '.STATE';
-				//var stateEvent = 'out.' + action + '.STATE';
-				node.fire(stateEvent,state,'ALL');
-			}
-			else {
-				console.log('No previous state. Not sent.');
-				node.gsc.sendTXT('E: no previous state. Not sent');
+				node.log('No next/previous state. Not sent', 'ERR');
 			}
 		};
 		
+		fwd.onclick = function() {
+			updateState(that.game.next());
+		}
+			
+		rew.onclick = function() {
+			updateState(that.game.previous());
+		}
 		
 		return fieldset;
 	};
@@ -6228,18 +6587,103 @@
  
 (function (exports) {
 	
+
+	/*
+	 * ServerInfoDisplay
+	 * 
+	 * Sends STATE msgs
+	 */
+	
+	exports.ServerInfoDisplay = ServerInfoDisplay;	
+		
+	function ServerInfoDisplay (options) {	
+		this.game = node.game;
+		this.id = options.id || 'ServerInfoDisplay';
+		this.name = 'Server Info Display';
+		this.version = '0.1';
+		
+		this.fieldset = { legend: 'Server Info',
+				  		  id: this.id + '_fieldset'
+		};
+		
+		this.root = null;
+		this.div = document.createElement('div');
+		this.table = null; //new node.window.Table();
+		this.button = null;
+		
+	}
+	
+	ServerInfoDisplay.prototype.init = function (options) {
+		var that = this;
+		if (!this.div) {
+			this.div = document.createElement('div');
+		}
+		this.div.innerHTML = 'Waiting for the reply from Server...';
+		if (!this.table) {
+			this.table = new node.window.Table(options);
+		}
+		this.table.clear(true);
+		this.button = document.createElement('button');
+		this.button.value = 'Refresh';
+		this.button.appendChild(document.createTextNode('Refresh'));
+		this.button.onclick = function(){
+			that.getInfo();
+		}
+		this.root.appendChild(this.button);
+		this.getInfo();
+	};
+	
+	ServerInfoDisplay.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.div);
+		return root;
+	};
+	
+	ServerInfoDisplay.prototype.getInfo = function() {
+		var that = this;
+		node.get('INFO', function (info) {
+			node.window.removeChildrenFromNode(that.div);
+			that.div.appendChild(that.processInfo(info));
+		});
+	};
+	
+	ServerInfoDisplay.prototype.processInfo = function(info) {
+		this.table.clear(true);
+		for (var key in info) {
+			if (info.hasOwnProperty(key)){
+				this.table.addRow([key,info[key]]);
+			}
+		}
+		return this.table.parse();
+	};
+	
+	ServerInfoDisplay.prototype.listeners = function () {
+		var that = this;
+		node.on('NODEGAME_READY', function(){
+			that.init();
+		});
+	}; 
+	
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
 	/*
 	 * StateBar
 	 * 
 	 * Sends STATE msgs
 	 */
 	
+	// TODO: Introduce rules for update: other vs self
+	
 	exports.StateBar = StateBar;	
 		
-	function StateBar(id) {
+	function StateBar(options) {
 		
 		this.game = node.game;;
-		this.id = id || 'statebar';
+		this.id = options.id || 'statebar';
 		this.name = 'State Bar';
 		this.version = '0.2.1';
 		
@@ -6300,8 +6744,16 @@
 													round: round
 				});
 				
+				// Self Update
+				if (to === 'ALL') {
+					var stateEvent = node.IN + node.actions.SAY + '.STATE';
+					var stateMsg = node.gsc.gmg.createSTATE(stateEvent, state);
+					node.emit(stateEvent, stateMsg);
+				}
+				
+				// Update Others
 				var stateEvent = node.OUT + that.actionSel.value + '.STATE';
-				node.fire(stateEvent,state,to);
+				node.emit(stateEvent,state,to);
 			}
 			else {
 				console.log('Not valid state. Not sent.');
@@ -6341,12 +6793,12 @@
 	
 	exports.StateDisplay = StateDisplay;	
 		
-	function StateDisplay(id) {
+	function StateDisplay(options) {
 		
 		this.game = node.game;
-		this.id = id || 'statedisplay';
+		this.id = options.id || 'statedisplay';
 		this.name = 'State Display';
-		this.version = '0.2.1';
+		this.version = '0.3';
 		
 		this.fieldset = null;
 		this.stateDiv = null;
@@ -6401,7 +6853,7 @@
 		var checkStateDiv = setInterval(function(){
 			if(that.stateDiv){
 				clearInterval(checkStateDiv);
-				that.stateDiv.innerHTML = 'State: ' +  state.toString() + '<br />';
+				that.stateDiv.innerHTML = 'State: ' +  new GameState(state).toString() + '<br />';
 				// was
 				//that.stateDiv.innerHTML = 'State: ' +  GameState.stringify(state) + '<br />';
 			}
@@ -6416,8 +6868,8 @@
 		var IN =  node.IN;
 		var OUT = node.OUT;
 		
-		node.on( 'STATECHANGE', function(state) {
-			that.updateState(state);
+		node.on( 'STATECHANGE', function() {
+			that.updateState(node.game.gameState);
 		}); 
 	}; 
 })(node.window.widgets); 
@@ -6658,7 +7110,6 @@
 	WaitScreen.prototype.listeners = function () {
 		var that = this;
 		node.on('WAITING...', function (text) {
-			console.log('WOWO');
 			if (!that.waitingDiv) {
 				that.waitingDiv = node.window.addDiv(document.body, that.id);
 			}
@@ -6701,9 +7152,9 @@
 	
 	var Utils = node.Utils;
 	
-	function Wall(id) {
+	function Wall(options) {
 		this.game = node.game;
-		this.id = id || 'wall';
+		this.id = options.id || 'wall';
 		this.name = 'Wall';
 		this.version = '0.2.1';
 		

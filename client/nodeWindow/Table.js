@@ -1,11 +1,10 @@
-(function(exports){
+(function(exports, node){
 	
 	/*!
 	 * 
 	 * Table: abstract representation of an HTML table
 	 * 
 	 */
-	var node = exports;
 	exports.Table = Table;
 	
 	// For simple testing
@@ -30,6 +29,12 @@
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
+    this.table = options.table || document.createElement('table'); 
+    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
+    this.table.id = this.id;
+    
+    this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
+    
     // Class for missing cells
     this.missing = options.missing || 'missing';
     this.pointers = {
@@ -38,10 +43,18 @@
     				z: options.pointerZ || 0
     };
     
-    this.id = options.id || 'table';  
-    
     this.header = null;
     this.footer = null;
+    
+    this.left = null;
+    this.right = null;
+    
+    // By default return the element content as it is
+    this.render = options.render || function (el) { return el.content };
+    
+    // Not used now
+    // Matches properties and dimensions
+    //this.binds = {};
   };
   
   Table.prototype.addClass = function (c) {
@@ -85,6 +98,10 @@
   Table.prototype._addSpecial = function (data, type) {
 	if (!data) return;
 	var type = type || 'header';
+	if ('object' !== typeof data) {
+		return {content: data, type: type};
+	}
+	
 	var out = [];
 	for (var i=0; i < data.length; i++) {
 		out.push({content: data[i], type: type});
@@ -96,6 +113,23 @@
 	  this.header = this._addSpecial(header);
   };
 
+  Table.prototype.add2Header = function (header) {
+	  this.header = this.header.concat(this._addSpecial(header));
+  };
+  
+  Table.prototype.setLeft = function (left) {
+	  this.left = this._addSpecial(left, 'left');
+  };
+  
+  Table.prototype.add2Left = function (left) {
+	  this.left = this.left.concat(this._addSpecial(left, 'left'));
+  };
+
+// TODO: setRight  
+//  Table.prototype.setRight = function (left) {
+//	  this.right = this._addSpecial(left, 'right');
+//  };
+  
   Table.prototype.setFooter = function (footer) {
 	  this.footer = this._addSpecial(footer, 'footer');
   };
@@ -138,17 +172,7 @@
 	else {
 		dims = Table.H;
 	}
-	
-//	Table.log('DATA TBL');
-//	Table.log(data);
-	
-	// By default, only the second dimension is incremented
-	var x = x || this.pointers[dims[0]]; 
-	var y = y || this.pointers[dims[1]] + 1;
-	var z = z || this.pointers[dims[2]];
-	
-	if ('object' !== typeof data) data = [data]; 
-	
+		
 	var insertCell = function (content){	
 		//Table.log('content');
 //		Table.log(x + ' ' + y + ' ' + z);
@@ -166,6 +190,12 @@
 		this.updatePointer(dims[2],cell[dims[2]]);
 	};
 	
+	// By default, only the second dimension is incremented
+	var x = x || this.pointers[dims[0]]; 
+	var y = y || this.pointers[dims[1]] + 1;
+	var z = z || this.pointers[dims[2]];
+	
+	if ('object' !== typeof data) data = [data]; 
 	
 	var cell = null;
 	// Loop Dim1
@@ -202,76 +232,114 @@
 //	Table.log('After insert');
 //	Table.log(this.db);
 	
+	// TODO: if coming from addRow or Column this should be done only at the end
+	if (this.auto_update) {
+		this.parse(true);
+	}
+	
+  };
+  
+  Table.prototype.add = function (data, x, y) {
+	  if (!data) return;
+	  
+	  var result = this.insert(new Cell({
+		  x: x,
+		  y: y,
+		  content: data
+	  }));
+	  
+	  if (result) {
+		  this.updatePointer('x',x);
+		  this.updatePointer('y',y);
+	  }
+	  return result;
   };
     
-  Table.prototype.addColumn = function (data, attributes, container) {
+  Table.prototype.addColumn = function (data, x, y) {
 	if (!data) return false;
-	return this._add(data, Table.V);
+	return this._add(data, Table.V, x, y);
   };
   
-  Table.prototype.addRow = function (data, attributes, container) {
-		if (!data) return false;
-		return this._add(data, Table.H);
-	  };
+  Table.prototype.addRow = function (data, x, y) {
+	if (!data) return false;
+	return this._add(data, Table.H, x, y);
+  };
   
-  Table.prototype.getRoot = function() {
-    return this.root;
+  Table.prototype.bind = function (dim, property) {
+	  this.binds[property] = dim;
   };
   
   // TODO: Only 2D for now
   // TODO: improve algorithm, rewrite
-  Table.prototype.parse = function() {
+  Table.prototype.parse = function () {
 	  
 	  var fromCell2TD = function (cell, el) {
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = cell.content;
+		  var c = this.render(cell);
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
 		  return TD;
 	  };
 	  
-//	  var appendContent = function (td, c) {
-//		  if (!td) return;
-//		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
-//		  td.appendChild(content);
-//		  return td;
-//	  };
+	  if (this.table) {
+		  while (this.table.hasChildNodes()) {
+		        this.table.removeChild(this.table.firstChild);
+		    }
+	  }
 	  
-	  var TABLE = document.createElement('table');
-	  TABLE.id = this.id;
+	  var TABLE = this.table;
 	  
 	  // HEADER
 	  if (this.header && this.header.length > 0) {
 		  var THEAD = document.createElement('thead');
 		  var TR = document.createElement('tr');
+		  // Add an empty cell to balance the left header column
+		  if (this.left) {
+			  TR.appendChild(document.createElement('th'));
+		  }
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.header[i]),'th');
+			  TR.appendChild(fromCell2TD.call(this, this.header[i],'th'));
 		  }
 		  THEAD.appendChild(TR);
 		  i=0;
 		  TABLE.appendChild(THEAD);
 	  }
 	  
-	  // BODY
-	  if (this.size() !==  0) {
-		  var TBODY = document.createElement('tbody');
+//	  console.log(this.table);
+//	  console.log(this.id);
+//	  console.log(this.db.length);
 	  
+	  // BODY
+	  if (this.size() !== 0) {
+		  var TBODY = document.createElement('tbody');
+		 
 		  this.sort(['y','x']); // z to add first
 		  var trid = -1;
 		  // TODO: What happens if the are missing at the beginning ??
 		  var f = this.first();
 		  var old_x = f.x;
-
+		  var old_left = 0;
+		
 		  for (var i=0; i < this.db.length; i++) {
+			  //console.log('INSIDE TBODY LOOP');
+			  //console.log(this.id);
 			  if (trid !== this.db[i].y) {
 				  var TR = document.createElement('tr');
 				  TBODY.appendChild(TR);
 				  trid = this.db[i].y;
 				  //Table.log(trid);
 				  old_x = f.x - 1; // must start exactly from the first
+				  
+				// Insert left header, if any
+				  if (this.left && this.left.length > 0) {
+					  var TD = document.createElement('td');
+					  //TD.className = this.missing;
+					  TR.appendChild(fromCell2TD.call(this, this.left[old_left]));
+					  old_left++;
+				  }
 			  }
 			  
 			  // Insert missing cells
@@ -284,7 +352,7 @@
 				  }
 			  }
 			  // Normal Insert
-			  TR.appendChild(fromCell2TD(this.db[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.db[i]));
 			  
 			  // Update old refs
 			  old_x = this.db[i].x;
@@ -298,14 +366,27 @@
 		  var TFOOT = document.createElement('tfoot');
 		  var TR = document.createElement('tr');
 		  for (var i=0; i < this.header.length; i++) {
-			  TR.appendChild(fromCell2TD(this.footer[i]));
+			  TR.appendChild(fromCell2TD.call(this, this.footer[i]));
 		  }
 		  TFOOT.appendChild(TR);
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
+//	  console.log('TESTING WRITING');
+//	  console.log(TABLE);
+//	  console.log(this.table)
+	  
 	  return TABLE;
-  }
+  };
+  
+
+  // TODO: set is not the right word
+//  Table.prototype.set = function (x, y, content) {
+//	  var el = this.select('x','=',x).select('y','=',y).first();
+//	  if (!el) return;
+//	  el.content = content;
+//	  return true;
+//  };
   
   // Cell Class
   
@@ -319,5 +400,8 @@
 	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	
-})(('undefined' !== typeof node) ? node : module.parent.exports);
+	// TODO: add it node.window
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+);

@@ -12,8 +12,6 @@ module.exports = ServerLog;
 
 function ServerLog (options) {
 	
-	
-	
 	this.name = options.name || 'Noname';
 	this.verbosity = ('undefined' !== typeof options.verbosity) ? options.verbosity : 1;
 	this.dumpmsg = ('undefined' !== typeof options.dumpmsg) ? options.dumpmsg : false;
@@ -27,7 +25,6 @@ function ServerLog (options) {
 	this.msgfile = path.normalize(options.msgfile || this.logdir + '/messages');
 			
 	if (this.dumpsys) {
-		console.log('AHAH');
 		try {
 			this.logSysStream = fs.createWriteStream( this.sysfile, {'flags': 'a'});
 			this.log('Log of System Messages active');
@@ -38,7 +35,6 @@ function ServerLog (options) {
 	}
 	
 	if (this.dumpmsg) {
-		console.log('HUHU');
 		try {
 			this.logMsgStream = fs.createWriteStream( this.msgfile, {'flags': 'a'});
 			this.log('Log of Messages active');
@@ -60,11 +56,15 @@ ServerLog.prototype.checkLogDir = function() {
 	}
 }
 
-ServerLog.prototype.log = function (text, type) {
-	if (this.verbosity > ServerLog.verbosity_levels[type]) {
-		this.console(text,type);
+ServerLog.prototype.log = function (text, level) {
+	var level = level || 0;
+	if ('string' === typeof level) {
+		var level = ServerLog.verbosity_levels[level];
+	}
+	if (this.verbosity > level) {
+		this.console(text);
 		if (this.logSysStream) {
-			this.sys(text,type);
+			this.sys(text,level);
 		}
 	}
 };

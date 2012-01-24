@@ -35,10 +35,8 @@ GameMsgManager.prototype.sendTXT = function (text,to) {
 GameMsgManager.prototype.sendPLIST = function (node, to) {
 	var to = to || 'ALL';
 	// TODO: set/get/say choose carefully
-	
-	this.log.log('NODE.PL');
-	this.log.log(node.pl);
-	
+//	this.log.log('NODE.PL');
+//	this.log.log(node.pl);
 	var plMsg = this.gmg.createPLIST(GameMsg.actions.SAY, node.pl, to);
 	this.send(plMsg);
 };
@@ -119,7 +117,7 @@ GameMsgManager.prototype.broadcast = function(gameMsg) {
 
 	for (var client in this.node.channel.sockets) {
 		if (this.node.channel.sockets.hasOwnProperty(client)) { 
-			this.log.log(client);
+			//this.log.log(client);
 			if (client !== from) {
 				this.log.log(client + ' different ' + from);
 				gameMsg.to = client;

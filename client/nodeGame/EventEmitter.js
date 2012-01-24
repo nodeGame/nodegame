@@ -65,11 +65,6 @@
 	        }
 	       
 	    },
-	    
-	    // TODO: remove fire when all the code has been updated
-//	    fire: function(event, p1, p2, p3) { // Up to 3 parameters
-//	    	this.emit(event, p1, p2, p3);
-//	    },
 	
 	    removeListener: function(type, listener) {
 	
@@ -77,19 +72,18 @@
 		    	//console.log('Trying to remove ' + type + ' ' + listener);
 		    	
 		        if (list[type] instanceof Array) {
-		        	
-		        	if (listener === null || listener === undefined) {
+		        	if (!listener) {
 		        		delete list[type];
 		        		//console.log('Removed listener ' + type);
 		        		return true;
 		        	}
 		        	
 		            var listeners = list[type];
-		            for (var i=0, len=listeners.length; i < len; i++) {
-		            	
+		            var len=listeners.length;
+		            for (var i=0; i < len; i++) {
 		            	//console.log(listeners[i]);
 		            	
-		                if (listeners[i] === listener){
+		                if (listeners[i] == listener) {
 		                    listeners.splice(i, 1);
 		                    //console.log('Removed listener ' + type + ' ' + listener);
 		                    return true;

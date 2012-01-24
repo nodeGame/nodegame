@@ -92,6 +92,19 @@ PlayerServer.prototype.attachCustomListeners = function() {
 		}
 	});
     
+    
+    // Get
+    
+    this.on(get+'DATA', function (msg) {
+    	//console.log(this.pl);
+		console.log('HERE P!!!');
+		// Ask a random player to send the game;
+		// var p = this.pl.getRandom();
+		// that.gmm.sendDATA('get', 'ABC', msg.from, msg.txt);
+	});
+    
+    
+    // TODO: Save removed player in another list, to check whether they reconnect
     this.on('closed', function(id) {
       	log.log(that.name + ' ----------------- Got Closed ' + id);
     	that.pl.remove(id);

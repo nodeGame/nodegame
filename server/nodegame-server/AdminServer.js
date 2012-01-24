@@ -20,6 +20,8 @@ AdminServer.prototype.constructor = AdminServer;
 
 function AdminServer(options) {
 	GameServer.call(this,options);	
+	// extra variables
+	this.loop = null;
 }
 
 // AdminServer hides the id of the sender when forwarding msgs
@@ -34,8 +36,8 @@ AdminServer.prototype.attachCustomListeners = function() {
 	
 	this.on(say+'HI', function(msg) {
 		// Add the player to to the list
-		log.log('------------------------INPLAYER');
-		log.log(msg.data);
+//		log.log('------------------------INPLAYER');
+//		log.log(msg.data);
 		that.pl.add(msg.data);
 		// Tell everybody a new player is connected;
 		var connected = new Player(msg.data) + ' connected.';
@@ -64,7 +66,6 @@ AdminServer.prototype.attachCustomListeners = function() {
 			that.gmm.sendTXT('**Not possible to change state: some players are not ready**', msg.from);
 		}
 		else {
-			
 			//that.log.log('----------------onSTATE.ADMIN: ' + util.inspect(msg));
 			// Send it to players and other monitors
 			that.gmm.forwardSTATE (GameMsg.actions.SAY,msg.data, msg.to);
@@ -73,20 +74,69 @@ AdminServer.prototype.attachCustomListeners = function() {
 		}
 	});
 	
-	this.on(get+'DATA', function(msg) {
+	this.on(get+'DATA', function (msg) {
+		//console.log('HERE A!!!');
 		
 		// Ask a random player to send the game;
-		//var p = this.pl.getRandom();
-		//that.gmm.sendDATA('get', 'ABC', msg.from, msg.txt);
+		var p = this.pl.getRandom();
+
+
+		if (msg.text === 'LOOP') {
+			that.gmm.sendDATA(GameMsg.actions.SAY, that.loop, msg.from, 'LOOP');
+		}		
+		
+		if (msg.text === 'INFO') {
+			that.gmm.sendDATA(GameMsg.actions.SAY, that.generateInfo(), msg.from, 'INFO');
+		}
 		
 	});
 	
 	// SET
 	
 	// Transform in say
-	this.on(set+'STATE', function(msg){
+	this.on(set+'STATE', function (msg){
 		//this.emit(say+'STATE', msg);
 	});
 	
+	this.on(set+'DATA', function (msg) {
 	
+		if (msg.text === 'LOOP') {
+			that.loop = msg.data;
+		}
+		
+		
+	});
+	
+	// TODO: Check if the methods for closed and shutdown (copied from PlayerServer) apply here
+	
+    // TODO: Save removed player in another list, to check whether they reconnect
+    this.on('closed', function(id) {
+      	log.log(that.name + ' ----------------- Got Closed ' + id);
+    	that.pl.remove(id);
+    	// TODO: Check this. This influence the player list of observers!
+    	//that.gmm.sendPLIST(that);
+    	//that.gmm.forwardPLIST(that);
+    });
+	
+	// TODO: Check this. This influence the player list of observers!
+	this.server.sockets.on("shutdown", function(message) {
+		log.log("Server is shutting down.");
+		that.pl.clear(true);
+		that.gmm.sendPLIST(that);
+		//that.gmm.forwardPLIST(that);
+		log.close();
+	});
+	
+};
+
+
+AdminServer.prototype.generateInfo = function(){
+	var info = {
+				name: this.name,
+				status: 'OK',
+				nplayers: this.partner.pl.size(),
+				nadmins: this.pl.size(),
+	};
+						
+	return info;		
 };
