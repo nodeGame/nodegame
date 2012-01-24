@@ -251,7 +251,7 @@ function PeerReviewGame () {
 					
 						if (winners.length > 0) {
 							var column = [];
-							for (var i=0; i < winners.length; i++) {
+							for (var i=0; i < winners.length; i++) {1
 							
 								var details_tbl = new node.window.Table();
 								details_tbl.addColumn(['Author: ' + winners[i].author,

@@ -675,10 +675,11 @@
 		var that = this;
 		return this.filter(function(el){
 			for (var i=0; i < nddb.length; i++) {
-				if (that.globalCompare(el,nddb[i]) != 0) {
-					return el;
+				if (that.globalCompare(el,nddb[i]) === 0) {
+					return false;
 				}
 			}
+			return el;
 		});
 	};
 	
