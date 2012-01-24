@@ -9,10 +9,13 @@
 	exports.Table.Cell = Cell;
 	
 	// For simple testing
-	//module.exports = Table;
+	module.exports = Table;
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
+	
+	Table.prototype = new NDDB();
+	Table.prototype.constructor = Table;	
 	
 	Table.H = ['x','y','z'];
 	Table.V = ['y','x', 'z'];
@@ -21,18 +24,20 @@
 	
   function Table (options, data) {
 	var options = options || {};
-	        
-	JSUS.extend(node.NDDB,this);
-    node.NDDB.call(this, options, data);  
+
+//	JSUS.extend(node.NDDB,this);
+	NDDB.call(this, options, data);  
     
     Table.log = options.log || Table.log;
     this.defaultDim1 = options.defaultDim1 || 'x';
     this.defaultDim2 = options.defaultDim2 || 'y';
     this.defaultDim3 = options.defaultDim3 || 'z';
     
-    this.table = options.table || document.createElement('table'); 
+    // to simple test
+    this.table = options.table
+    //this.table = options.table || document.createElement('table'); 
     this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
-    this.table.id = this.id;
+    //this.table.id = this.id;
     
     this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
     
@@ -51,10 +56,29 @@
     this.right = null;
     
     this.initRender();
-    
+       
     // Not used now
     // Matches properties and dimensions
     //this.binds = {};
+  };
+  
+  // TODO: make it 3D
+  Table.prototype.get = function (x, y) {
+	  console.log('here!');
+	  var out = this;
+	  if (x) {
+		  out = this.select('x','=',x);
+	  }
+	  if (y) {
+		  out = out.select('y','=',y);
+	  }
+	  
+	  if (out.size() === 1) {
+		  return out.first();
+	  }
+	  else {
+		  return out.fetch();
+	  }
   };
   
   Table.prototype.initRender = function() {

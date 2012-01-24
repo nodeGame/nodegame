@@ -280,45 +280,6 @@
 //		this.state = state;
 //	};
 	
-
-	
-	// Returns an array of array of n groups of players {id: name}
-	//The last group could have less elements.
-//	PlayerList.prototype.getNGroups = function (n) {
-//		
-//		var copy = this.toArray();
-//		var nPlayers = copy.length;
-//		
-//		var gSize = Math.floor( nPlayers / n);
-//		var inGroupCount = 0;
-//		
-//		var result = new Array();
-//		
-//		// Init values for the loop algorithm
-//		var i;
-//		var idx;
-//		var gid = -1;
-//		var count = gSize +1; // immediately creates a new group in the loop
-//		for (i=0;i<nPlayers;i++){
-//			
-//			// Prepare the array container for the elements of the new group
-//			if (count >= gSize) {
-//				gid++;
-//				result[gid] = new PlayerList();
-//				count = 0;
-//			}
-//			
-//			// Get a random idx between 0 and array length
-//			idx = Math.floor(Math.random()*copy.length);
-//			
-//			result[gid].add(copy[idx].id,copy[idx].name);
-//			copy.splice(idx,1);
-//			count++;
-//		}
-//		
-//		return result;
-//	};
-
 	
 //	PlayerList.prototype.toArray = function () {
 //	
@@ -332,29 +293,7 @@
 //		return result;
 //		return result.sort();
 //	};
-	
-//	PlayerList.prototype.forEach = function(callback, thisArg) {
-//		  
-//		for (var key in this.pl) {
-//		    if (this.pl.hasOwnProperty(key)) {
-//		    	callback.call(thisArg, this.pl[key]);
-//		    }
-//		  }
-//	};
-	
-//	PlayerList.prototype.map = function(callback, thisArg) {
-//		 
-//		 var result = new Array();
-//		 
-//		 for (var key in this.pl) {
-//			 if (this.pl.hasOwnProperty(key)) {
-//				 result.push(callback.call(thisArg, this.pl[key]));
-//			 }
-//		  }
-//	
-//		  return result;
-//	};
-	
+		
 	
 })(
 	'undefined' != typeof node ? node : module.exports

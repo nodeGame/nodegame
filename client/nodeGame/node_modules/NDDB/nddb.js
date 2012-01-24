@@ -75,6 +75,8 @@
 	
 	NDDB.prototype.masquerade = function (o, db) {
 		if (!o) return false;
+		// TODO: check this
+		if (o.__proto__.nddbid) return o;
 		var db = db || this.db;
 		o.__proto__ = JSUS.clone(o.__proto__);
 		o.__proto__.nddbid = db.length;
@@ -666,6 +668,7 @@
 	 * If the 'key' parameter
 	 */
 	NDDB.prototype.diff = function (nddb) {
+		if (!nddb) return this;
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
 				var nddb = nddb.db;
@@ -690,19 +693,25 @@
 	 * If the 'key' parameter
 	 */
 	NDDB.prototype.intersect = function (nddb) {
+		if (!nddb) return this;
 		if ('object' === typeof nddb) {
 			if (nddb instanceof NDDB || nddb instanceof this.constructor) {
 				var nddb = nddb.db;
 			}
 		}
 		var that = this;
-		return this.filter(function(el){
+		return this.filter(function(el) {
 			for (var i=0; i < nddb.length; i++) {
 				if (that.globalCompare(el,nddb[i]) === 0) {
 					return el;
 				}
 			}
 		});
+	};
+	
+	NDDB.prototype.get = function (nddbid) {
+		if (arguments.length === 0) return;
+		return this.select('nddbid','=',nddbid).first();
 	};
 	
 })(

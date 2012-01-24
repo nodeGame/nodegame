@@ -30,6 +30,15 @@ function Monitor_Example () {
 		};
 		
 		this.summary = node.window.addWidget('GameTable', document.body, {render: renderCF});		
+		
+		this.dtable = node.window.addWidget('DynamicTable', document.body);
+		this.dtable.binds.x = function(msg) {
+			return node.game.pl.select('id', '=', msg.from).first().count;
+		};
+		this.dtable.binds.y = function(msg) {
+			return node.game.pl.select('id', '=', msg.from).first().count;
+		};
+		
 	};
 	
 	var pregame = function(){

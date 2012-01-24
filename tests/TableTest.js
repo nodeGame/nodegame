@@ -55,3 +55,10 @@ console.log(t.fetch());
 //t.removeClass('culo');
 //console.log('--');
 //console.log(t.fetch());
+
+console.log('Getting');
+var o = t.get(2);
+console.log(o);
+//
+//console.log(t.__proto__.get.toString());
+//console.log(t.get.toString());
