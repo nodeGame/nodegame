@@ -253,7 +253,6 @@ function PeerReviewGame () {
 							var column = [];
 							for (var i=0; i < winners.length; i++) {
 							
-							
 								var details_tbl = new node.window.Table();
 								details_tbl.addColumn(['Author: ' + winners[i].author,
 								                       'Score: ' + winners[i].mean
@@ -290,8 +289,6 @@ function PeerReviewGame () {
 				table.select('y', '=', 2).addClass('third');
 				table.select('y', '>', 2).addClass('other');
 				
-				
-				node.log(table.fetch());
 				root.appendChild(table.parse());
 				
 				node.window.addEventButton('DONE', this.donetxt);

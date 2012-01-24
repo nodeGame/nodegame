@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 11:51:11 CET 2012
+ * Built on Tue Jan 24 12:05:18 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 11:51:11 CET 2012
+ * Built on Tue Jan 24 12:05:18 CET 2012
  *
  */
  
@@ -3793,7 +3793,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 11:51:11 CET 2012
+ * Built on Tue Jan 24 12:05:18 CET 2012
  *
  */
  
@@ -4821,7 +4821,13 @@
     		}
     		return tbl.parse();
 		  }
-	  }); 	
+	  });
+	  this.render.push (function (el) { 
+		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
+    		return el.content;
+		  }
+	  });
+	  
   };
   
   Table.prototype.removeRenderer = function (renderer) {
@@ -5207,7 +5213,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 11:51:11 CET 2012
+ * Built on Tue Jan 24 12:05:18 CET 2012
  *
  */
  

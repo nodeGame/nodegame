@@ -93,7 +93,13 @@
     		}
     		return tbl.parse();
 		  }
-	  }); 	
+	  });
+	  this.render.push (function (el) { 
+		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
+    		return el.content;
+		  }
+	  });
+	  
   };
   
   Table.prototype.removeRenderer = function (renderer) {
