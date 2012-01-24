@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.6.9
+ * nodeGame-all v0.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 12:25:23 CET 2012
+ * Built on Tue Jan 24 13:55:10 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.6.9
+ * nodeGame Client v0.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 12:25:23 CET 2012
+ * Built on Tue Jan 24 13:55:10 CET 2012
  *
  */
  
@@ -3789,12 +3789,12 @@
  
  
 /*!
- * nodeWindow v0.6.9
+ * nodeWindow v0.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 12:25:23 CET 2012
+ * Built on Tue Jan 24 13:55:10 CET 2012
  *
  */
  
@@ -5209,12 +5209,12 @@
  
  
 /*!
- * nodeGadgets v0.6.9
+ * nodeGadgets v0.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Tue Jan 24 12:25:23 CET 2012
+ * Built on Tue Jan 24 13:55:10 CET 2012
  *
  */
  
