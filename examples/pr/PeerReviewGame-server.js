@@ -12,37 +12,24 @@ function Monitor_Example () {
 	this.init = function() {
 		node.window.setup('MONITOR');
 		var that = this;
-		var render = function (cell) {
-			//if ((cell.y % 2) === 1) {
-			if ('object' === typeof cell.content) {
+		
+		var renderCF = function (cell) {
+			// Check if it is really CF obj
+			if (cell.content.head_radius) {
+				var cf_options = { id: 'cf_' + cell.x,
+						   width: 200,
+						   height: 200,
+						   features: cell.content,
+						   controls: false
+				};
 				
-				// Evaluation
-				if (cell.content.for) {
-					var str =  'For: ' + that.pl.select('id', '=', cell.content.for).first().name;
-					str += ' eva: ' +  new Number(cell.content.eva).toFixed(2);
-					return str;
-				}
-				// Chernoff Face
-				else {
-					var cf_options = { id: 'cf_' + cell.x,
-							   width: 200,
-							   height: 200,
-							   features: cell.content,
-							   controls: false
-					};
-					
-					var container = document.createElement('div');
-					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-					return container;
-				}
-			}
-			else {
-				return cell.content;
+				var container = document.createElement('div');
+				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+				return container;
 			}
 		};
 		
-		this.summary = node.window.addWidget('GameTable', document.body, {render: render});
-		
+		this.summary = node.window.addWidget('GameTable', document.body, {render: renderCF});		
 	};
 	
 	var pregame = function(){

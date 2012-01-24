@@ -43,11 +43,6 @@
 		
 		this.gtbl.setLeft([]);
 		
-		
-		if (options.render) {
-			this.setRender(options.render);
-		}
-		
 //		if (this.gtbl.size() === 0) {
 //			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
 //		}
@@ -55,8 +50,17 @@
 		this.gtbl.parse(true);
 	};
 	
-	GameTable.prototype.setRender = function(func) {
-		this.gtbl.render = func;
+
+	GameTable.prototype.addRenderer = function (func) {
+		return this.gtbl.addRenderer(func);
+	};
+	
+	GameTable.prototype.resetRender = function () {
+		return this.gtbl.resetRenderer();
+	};
+	
+	GameTable.prototype.removeRenderer = function (func) {
+		return this.gtbl.removeRenderer(func);
 	};
 	
 	GameTable.prototype.append = function (root) {
@@ -110,20 +114,14 @@
 	GameTable.prototype.addLeft = function (state, player) {
 		if (!state) return;
 		var state = new GameState(state);
-		if (!JSUS.in_array(state, this.gtbl.left)){
-			console.log('The State is new');
-			console.log(state);
-			console.log(this.gtbl.left);
+		if (!JSUS.in_array({content:state.toString(), type: 'left'}, this.gtbl.left)){
 			this.gtbl.add2Left(state.toString());
 		}
 		// Is it a new display associated to the same state?
 		else {
 			var y = this.state2y(state);
 			var x = this.player2x(player);
-			if (this.select('y','=',y).select('x','=',x).count() > 1) {
-				console.log('The State is doubled or more');
-				console.log(state);
-				console.log(this.gtbl.left);
+			if (this.gtbl.select('y','=',y).select('x','=',x).count() > 1) {
 				this.gtbl.add2Left(state.toString());
 			}
 		}

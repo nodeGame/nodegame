@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 16:19:46 CET 2012
+ * Built on Tue Jan 24 10:14:10 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 16:19:46 CET 2012
+ * Built on Tue Jan 24 10:14:10 CET 2012
  *
  */
  
@@ -3751,7 +3751,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 16:19:46 CET 2012
+ * Built on Tue Jan 24 10:14:10 CET 2012
  *
  */
  
@@ -4692,6 +4692,7 @@
 	 * 
 	 */
 	exports.Table = Table;
+	exports.Table.Cell = Cell;
 	
 	// For simple testing
 	//module.exports = Table;
@@ -4735,12 +4736,59 @@
     this.left = null;
     this.right = null;
     
-    // By default return the element content as it is
-    this.render = options.render || function (el) { return el.content };
+    this.initRender();
     
     // Not used now
     // Matches properties and dimensions
     //this.binds = {};
+  };
+  
+  Table.prototype.initRender = function() {
+  	this.resetRender();
+	if (this.options.render) {
+		if (!(this.options.render instanceof Array)) {
+			this.options.render = [this.options.render];
+		}
+		for (var i=0; i< this.options.render.length; i++) {
+			this.render.push(this.options.render[i]);
+		}
+	} 
+  };
+  
+  Table.prototype.addRenderer = function (renderer) {
+	  this.render.push(render);
+  };
+  
+  /**
+   * Delete existing render functions and add two 
+   * standards. By default objects are displayed in
+   * a table of key: values.
+   */
+  Table.prototype.resetRender = function () {
+	  this.render = [];
+	  this.render.push(function(el){
+		  return el.content;
+	  });
+	  this.render.push (function (el) { 
+		  if ('object' === typeof el.content) {
+    		var tbl = new Table();
+    		for (var key in el.content) {
+    			if (el.content.hasOwnProperty(key)){
+    				tbl.addRow([key,el.content[key]]);
+    			}
+    		}
+    		return tbl.parse();
+		  }
+	  }); 	
+  };
+  
+  Table.prototype.removeRenderer = function (renderer) {
+	for (var i=0; i< this.render.length; i++) {
+		if (this.render[i] == renderer) {
+			return this.render.splice(i,1);
+		}
+	}  
+	return false;
   };
   
   Table.prototype.addClass = function (c) {
@@ -4959,11 +5007,25 @@
   // TODO: improve algorithm, rewrite
   Table.prototype.parse = function () {
 	  
+	  // Loop through all the render function
+	  // until a return value is found
+	  var renderCell = function (cell) {
+		  for (var i = this.render.length; i > 0; i--) {
+			  var out = this.render[(i-1)].call(this, cell);
+			  if (out) return out;
+		  }
+		  // Safety return
+		  return cell.content;
+	  };
+	  
+	  // Create a cell element (td,th...)
+	  // and fill it with the return value of a
+	  // render value. 
 	  var fromCell2TD = function (cell, el) {
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = this.render(cell);
+		  var c = renderCell.call(this,cell);
 		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
@@ -5103,7 +5165,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mo 23. Jan 16:19:46 CET 2012
+ * Built on Tue Jan 24 10:14:10 CET 2012
  *
  */
  
@@ -6329,11 +6391,6 @@
 		
 		this.gtbl.setLeft([]);
 		
-		
-		if (options.render) {
-			this.setRender(options.render);
-		}
-		
 //		if (this.gtbl.size() === 0) {
 //			this.gtbl.table.appendChild(document.createTextNode('Empty table'));
 //		}
@@ -6341,8 +6398,17 @@
 		this.gtbl.parse(true);
 	};
 	
-	GameTable.prototype.setRender = function(func) {
-		this.gtbl.render = func;
+
+	GameTable.prototype.addRenderer = function (func) {
+		return this.gtbl.addRenderer(func);
+	};
+	
+	GameTable.prototype.resetRender = function () {
+		return this.gtbl.resetRenderer();
+	};
+	
+	GameTable.prototype.removeRenderer = function (func) {
+		return this.gtbl.removeRenderer(func);
 	};
 	
 	GameTable.prototype.append = function (root) {
@@ -6396,20 +6462,14 @@
 	GameTable.prototype.addLeft = function (state, player) {
 		if (!state) return;
 		var state = new GameState(state);
-		if (!JSUS.in_array(state, this.gtbl.left)){
-			console.log('The State is new');
-			console.log(state);
-			console.log(this.gtbl.left);
+		if (!JSUS.in_array({content:state.toString(), type: 'left'}, this.gtbl.left)){
 			this.gtbl.add2Left(state.toString());
 		}
 		// Is it a new display associated to the same state?
 		else {
 			var y = this.state2y(state);
 			var x = this.player2x(player);
-			if (this.select('y','=',y).select('x','=',x).count() > 1) {
-				console.log('The State is doubled or more');
-				console.log(state);
-				console.log(this.gtbl.left);
+			if (this.gtbl.select('y','=',y).select('x','=',x).count() > 1) {
 				this.gtbl.add2Left(state.toString());
 			}
 		}
