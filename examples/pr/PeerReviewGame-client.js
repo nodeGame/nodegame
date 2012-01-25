@@ -23,13 +23,14 @@ function PeerReviewGame () {
 		this.milli = 10000;
 		this.milli_short = 1000;
 		
+		this.all_ex = [];
 		
+		// DTABLE
 		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
 		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
 					
-		function Bindings() {
-			var that = this;
-			this.x = function (msg) {
+		var bindings = {
+				x: function (msg) {
 				if (msg.text === 'WIN_CF') {
 					var out = [];
 					for (var i=0; i< msg.data.length; i++) {
@@ -41,15 +42,15 @@ function PeerReviewGame () {
 					}
 				}
 				return out;
-			};
+			},
 				
-			this.y = function (msg) {
+			y: function (msg) {
 				if (msg.text === 'WIN_CF') {
 					return [1,2,3];
 				}
-			};
+			},
 
-			this.cell = function (msg, cell) {
+			cell: function (msg, cell) {
 				if (msg.text === 'WIN_CF') {
 					if (cell.y === 1) {
 						var idx = this.header[cell.x].content;
@@ -86,11 +87,11 @@ function PeerReviewGame () {
 					}
 					return cell;	
 				}
-			};
+			}
 		};
 		
 		
-		this.dtable.bind('in.say.DATA', new Bindings());
+		this.dtable.bind('in.say.DATA', bindings);
 		
 		this.dtable.bind('in.say.PLIST', {
 									header: function (msg) {
@@ -102,6 +103,11 @@ function PeerReviewGame () {
 										return out;
 									}
 		});
+		// End TABLE
+		
+		this.displayAllex = function(){
+			
+		};
 		
 	};
 	
@@ -379,6 +385,9 @@ function PeerReviewGame () {
 									event: 'DONE',
 									milliseconds: this.milli
 				});	
+				
+				
+				this.all_ex.push(table);
 				
 			});
 			

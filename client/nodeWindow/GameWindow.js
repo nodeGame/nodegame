@@ -306,16 +306,16 @@
 		}
 		
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
-		try {
+		//try {
 			// options exists and options.fieldset exist
 			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
 			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
-		}
-		catch(e){
-			throw 'Error while loading widget ' + g.name + ': ' + e;
-		}
+//		}
+//		catch(e){
+//			throw 'Error while loading widget ' + g.name + ': ' + e;
+//		}
 		
 		return g;
 	};

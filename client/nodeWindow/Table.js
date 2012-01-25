@@ -13,6 +13,8 @@
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
+	var HTMLRenderer = node.window.HTMLRenderer;
+	var Entity = node.window.HTMLRenderer.Entity;
 	
 	Table.prototype = new NDDB();
 	Table.prototype.constructor = Table;	
@@ -53,11 +55,15 @@
     this.left = [];
     this.right = [];
     
-    this.initRender();
-       
-    // Not used now
-    // Matches properties and dimensions
-    //this.binds = {};
+    this.htmlRenderer = null; 
+    
+    this.init(this.options);
+  };
+  
+  // TODO: improve init
+  Table.prototype.init = function (options) {
+	var options = options || this.options;
+	this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
   };
   
   // TODO: make it 3D
@@ -73,59 +79,59 @@
 	  return out.fetch();	  
   };
   
-  Table.prototype.initRender = function() {
-  	this.resetRender();
-	if (this.options.render) {
-		if (!(this.options.render instanceof Array)) {
-			this.options.render = [this.options.render];
-		}
-		for (var i=0; i< this.options.render.length; i++) {
-			this.render.push(this.options.render[i]);
-		}
-	} 
-  };
-  
-  Table.prototype.addRenderer = function (renderer) {
-	  this.render.push(render);
-  };
-  
-  /**
-   * Delete existing render functions and add two 
-   * standards. By default objects are displayed in
-   * a table of key: values.
-   */
-  Table.prototype.resetRender = function () {
-	  this.render = [];
-	  this.render.push(function(el){
-		  return el.content;
-	  });
-	  this.render.push (function (el) { 
-		  if ('object' === typeof el.content) {
-    		var tbl = new Table();
-    		for (var key in el.content) {
-    			if (el.content.hasOwnProperty(key)){
-    				tbl.addRow([key,el.content[key]]);
-    			}
-    		}
-    		return tbl.parse();
-		  }
-	  });
-	  this.render.push (function (el) { 
-		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
-    		return el.content;
-		  }
-	  });
-	  
-  };
-  
-  Table.prototype.removeRenderer = function (renderer) {
-	for (var i=0; i< this.render.length; i++) {
-		if (this.render[i] == renderer) {
-			return this.render.splice(i,1);
-		}
-	}  
-	return false;
-  };
+//  Table.prototype.initRender = function() {
+//  	this.resetRender();
+//	if (this.options.render) {
+//		if (!(this.options.render instanceof Array)) {
+//			this.options.render = [this.options.render];
+//		}
+//		for (var i=0; i< this.options.render.length; i++) {
+//			this.render.push(this.options.render[i]);
+//		}
+//	} 
+//  };
+//  
+//  Table.prototype.addRenderer = function (renderer) {
+//	  this.render.push(render);
+//  };
+//  
+//  /**
+//   * Delete existing render functions and add two 
+//   * standards. By default objects are displayed in
+//   * a table of key: values.
+//   */
+//  Table.prototype.resetRender = function () {
+//	  this.render = [];
+//	  this.render.push(function(el){
+//		  return el.content;
+//	  });
+//	  this.render.push (function (el) { 
+//		  if ('object' === typeof el.content) {
+//    		var tbl = new Table();
+//    		for (var key in el.content) {
+//    			if (el.content.hasOwnProperty(key)){
+//    				tbl.addRow([key,el.content[key]]);
+//    			}
+//    		}
+//    		return tbl.parse();
+//		  }
+//	  });
+//	  this.render.push (function (el) { 
+//		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
+//    		return el.content;
+//		  }
+//	  });
+//	  
+//  };
+//  
+//  Table.prototype.removeRenderer = function (renderer) {
+//	for (var i=0; i< this.render.length; i++) {
+//		if (this.render[i] == renderer) {
+//			return this.render.splice(i,1);
+//		}
+//	}  
+//	return false;
+//  };
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;
@@ -335,24 +341,24 @@
 	return this._add(data, Table.H, x, y);
   };
   
-  Table.prototype.bind = function (dim, property) {
-	  this.binds[property] = dim;
-  };
+//  Table.prototype.bind = function (dim, property) {
+//	  this.binds[property] = dim;
+//  };
   
   // TODO: Only 2D for now
   // TODO: improve algorithm, rewrite
   Table.prototype.parse = function () {
 	  
-	  // Loop through all the render function
-	  // until a return value is found
-	  var renderCell = function (cell) {
-		  for (var i = this.render.length; i > 0; i--) {
-			  var out = this.render[(i-1)].call(this, cell);
-			  if (out) return out;
-		  }
-		  // Safety return
-		  return cell.content;
-	  };
+//	  // Loop through all the render function
+//	  // until a return value is found
+//	  var renderCell = function (cell) {
+//		  for (var i = this.render.length; i > 0; i--) {
+//			  var out = this.render[(i-1)].call(this, cell);
+//			  if (out) return out;
+//		  }
+//		  // Safety return
+//		  return cell.content;
+//	  };
 	  
 	  // Create a cell element (td,th...)
 	  // and fill it with the return value of a
@@ -361,8 +367,8 @@
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = renderCell.call(this,cell);
-		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
+		  var content = this.htmlRenderer.render(cell);
+		  //var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
 		  return TD;
@@ -456,10 +462,6 @@
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
-//	  console.log('TESTING WRITING');
-//	  console.log(TABLE);
-//	  console.log(this.table)
-	  
 	  return TABLE;
   };
   
@@ -473,18 +475,16 @@
 //  };
   
   // Cell Class
+  Cell.prototype = new Entity();
+  Cell.prototype.constructor = Cell;
   
   function Cell (cell){
-	  
+	  Entity.call(this, cell);
 	  this.x = ('undefined' !== typeof cell.x) ? cell.x : null;
 	  this.y = ('undefined' !== typeof cell.y) ? cell.y : null;
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
-	  
-	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
-	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	// TODO: add it node.window
 })(
 	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
   , ('undefined' !== typeof node) ? node : module.parent.exports

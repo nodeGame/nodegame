@@ -35,7 +35,7 @@
 		this.gtbl = new node.window.Table({
 											auto_update: true,
 											id: options.id || this.id,
-											render: options.render
+											renderers: options.renderers
 		}, node.game.memory.db);
 		
 		

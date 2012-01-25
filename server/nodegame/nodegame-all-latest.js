@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7
+ * nodeGame-all v0.7.0.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 13:54:32 CET 2012
+ * Built on Wed Jan 25 17:04:27 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7
+ * nodeGame Client v0.7.0.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 13:54:32 CET 2012
+ * Built on Wed Jan 25 17:04:27 CET 2012
  *
  */
  
@@ -3287,7 +3287,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7';
+	node.version = '0.7.0.1';
 	
 	node.verbosity = 0;
 	
@@ -3737,12 +3737,12 @@
  
  
 /*!
- * nodeWindow v0.7
+ * nodeWindow v0.7.0.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 13:54:32 CET 2012
+ * Built on Wed Jan 25 17:04:27 CET 2012
  *
  */
  
@@ -4386,16 +4386,16 @@
 		}
 		
 		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
-		try {
+		//try {
 			// options exists and options.fieldset exist
 			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
 			root = appendFieldset(root, fieldsetOptions, g);
 			g.append(root);
 			g.listeners();
-		}
-		catch(e){
-			throw 'Error while loading widget ' + g.name + ': ' + e;
-		}
+//		}
+//		catch(e){
+//			throw 'Error while loading widget ' + g.name + ': ' + e;
+//		}
 		
 		return g;
 	};
@@ -4504,6 +4504,129 @@
 	
 })(window.node); 
  
+(function(exports, node){
+	
+	var JSUS = node.JSUS;
+	var NDDB = node.NDDB;
+
+	var Table = node.window.Table;
+	/*!
+	 * 
+	 * HTMLRenderer: renders objects to HTML according to a series
+	 * of criteria.
+	 * 
+	 */
+	
+	exports.HTMLRenderer = HTMLRenderer;
+	exports.HTMLRenderer.Entity = Entity;
+	
+	function HTMLRenderer (options) {
+		this.options = options = options || {};
+		this.renderers = [];
+		this.init(this.options);
+	};
+	
+	HTMLRenderer.prototype.init = function(options) {
+		this.options = options || this.options;
+		this.initRender();
+	};
+	
+	HTMLRenderer.prototype.initRender = function() {
+	  	this.resetRender();
+		if (this.options.renderers) {
+			if (!(this.options.renderers instanceof Array)) {
+				this.options.renderers = [this.options.renderers];
+			}
+			for (var i=0; i< this.options.renderers.length; i++) {
+				this.renderers.push(this.options.renderers[i]);
+			}
+		} 
+	  };
+	
+	/**
+	   * Delete existing render functions and add two 
+	   * standards. By default objects are displayed in
+	   * a HTMLRenderer of key: values.
+	   */
+	  HTMLRenderer.prototype.resetRender = function () {
+		  this.renderers = [];
+		  this.renderers.push(function(el){
+			  return document.createTextNode(el.content);
+		  });
+		  if (Table) {
+			  this.renderers.push (function (el) { 
+				  if ('object' === typeof el.content) {
+		    		var tbl = new HTMLRenderer();
+		    		for (var key in el.content) {
+		    			if (el.content.hasOwnProperty(key)){
+		    				tbl.addRow([key,el.content[key]]);
+		    			}
+		    		}
+		    		return tbl.parse();
+				  }
+			  });
+		  }
+		  this.renderers.push (function (el) { 
+			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
+	    		return el.content;
+			  }
+		  });
+		  
+	  };
+	  
+	  HTMLRenderer.prototype.clear = function (clear) {
+		  if (!clear) {
+			  NDDB.log('Do you really want to clear the current HTMLRenderer obj? Please use clear(true)', 'WARN');
+			  return false;
+		  }
+		  this.renderers = [];
+		  return clear;
+	  };
+	
+
+	  
+	  HTMLRenderer.prototype.addRenderer = function (renderer) {
+		  if (!renderer) return;
+		  this.renderers.push(renderer);
+	  };
+	  
+	  
+	  
+	  HTMLRenderer.prototype.removeRenderer = function (renderer) {
+		for (var i=0; i< this.renderers.length; i++) {
+			if (this.renderers[i] == renderer) {
+				return this.renderers.splice(i,1);
+			}
+		}  
+		return false;
+	  };
+
+	
+	  HTMLRenderer.prototype.render = function (o) {
+		if (!o) return;
+		console.log('Renderers');
+		console.log(this.renderers);
+		// New criteria are fired first
+		  for (var i = this.renderers.length; i > 0; i--) {
+			  var out = this.renderers[(i-1)].call(this, o);
+			  if (out) return out;
+		  }
+		  // Safety return
+		  return cell.content;
+	  };
+	
+	  // Abstract HTML Entity reprentation
+	  function Entity (e) {		 
+		  var e = e || {};
+		  this.content = ('undefined' !== typeof e.content) ? e.content : '';
+		  this.className = ('undefined' !== typeof e.style) ? e.style : null;
+	  };
+	
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+); 
+ 
 (function(exports) {
 	
 	/*!
@@ -4600,7 +4723,13 @@
 	};
 })(node.window); 
  
-(function(exports){
+(function(exports, node){
+	
+	var JSUS = node.JSUS;
+	var NDDB = node.NDDB;
+
+	var HTMLRenderer = node.window.HTMLRenderer;
+	var Entity = node.window.HTMLRenderer.Entity;
 	
 	/*!
 	 * 
@@ -4610,59 +4739,103 @@
 	
 	exports.List = List;
 	
-	function List (options) {
+	List.prototype = new NDDB();
+	List.prototype.constructor = List;	
+	
+	function List (options, data) {
+		var options = options || {};
+
+		NDDB.call(this, options, data); 
 		
 		this.id = options.id || 'list';
 		
-		this.FIRST_LEVEL = 'dl';
-		this.SECOND_LEVEL = 'dt';
-		this.THIRD_LEVEL = 'dd';
-	
-
+		this.FIRST_LEVEL = options.first_level || 'dl';
+		this.SECOND_LEVEL = options.second_level || 'dt';
+		this.THIRD_LEVEL = options.third_level || 'dd';
 		
-		this.root = this.createRoot(this.id, options);
-		
-		this.list = [];
-	}
+		this.DL = options.list || document.createElement(this.FIRST_LEVEL); 
 	
-	List.prototype.append = function(root) {
-		return root.appendChild(this.write());
+		this.last_dt = 0;
+		this.last_dd = 0;
+		this.auto_update = this.options.auto_update || false;
 	};
 	
-	List.prototype.add = function(elem) {
-		this.list.push(elem);
+	List.prototype.globalCompare = function (o1, o2) {
+		if (!o1 && !o2) return 0;
+		if (!o2) return 1;
+		if (!o1) return -1;
+		if (o1.dt < o2.dt) return 1;
+		if (o1.dt > o2.dt) return -1;
+		if (o1.dt === o2.dt) {
+			if (o1.dd < o2.dd) return -1;
+			if (o1.dd > o2.dd) return 1;
+			if (o1.nddbid < o2.nddbid) return -1;
+			if (o1.nddbid > o2.nddbid) return 1;
+		}
+		return 0;
+	}; 
+	
+	List.prototype.addDT = function (elem, dt) {
+		if ('undefined' === typeof elem) return;
+		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt++;  
+		var node = new Node({dt: dt});
+		return this.insert(node);
 	};
 	
-	List.prototype.write = function() {
-				
-		var i = 0;
-		var len = list.length;
-		for (;i<len;i++) {
-			var elem = document.createElement(this.SECOND_LEVEL);
-			elem.appendChild(list[i]);
-			root.appendChild(elem);
+	List.prototype.addDD = function (elem, dt, dd) {
+		if ('undefined' === typeof elem) return;
+		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;
+		var dt = ('undefined' !== typeof dd) ? dd: this.last_dd++;
+		var node = new Node({dt: dt, dd: dd});
+		return this.insert(node);
+	};
+	
+	List.prototype.parse = function() {
+		this.sort();
+		var old_dt = null;
+		var old_dd = null;
+		
+		var appendDT = function() {
+			var node = document.createElement(that.SECOND_LEVEL);
+			this.DL.appendChild(node);
+			old_dd = null;
+			old_dt = node;
+			return node;
+		};
+		
+		var appendDD = function() {
+			var node = document.createElement(that.THIRD_LEVEL);
+			if (old_dd) {
+				old_dd.appendChild(node);
+			}
+			else if (!old_dt) {
+				old_dt = appendDT();
+			}
+			old_dt.appendChild(node);
+			return node;
+		};
+		
+		
+		for (var i=0; i<this.db.length; i++) {
+			var el = this.db[i];
+			if (!el.dd) {
+				var node = appendDT.call(this);
+			}
+			else {
+				var node = appendDD.call(this);
+			}
+			var content = that.htmlRenderer.render(el); 
+			node.appendChild(content);		
 		}
 		
-		return root;
+		return this.DL;
 	};
 	
 	List.prototype.getRoot = function() {
-		return this.root;
+		return this.DL;
 	};
 	
-	List.prototype.createRoot = function(id, options) {
-		var root = document.createElement(this.FIRST_LEVEL);
-		if (id) {
-			root.id = id;
-		}
-
-		if (options.attributes) {
-			
-			node.window.addAttributes2Elem(root, options.attributes);
-		}
-		
-		return root;
-	};
+	
 	
 	List.prototype.createItem = function(id) {
 		var item = document.createElement(this.SECOND_LEVEL);
@@ -4672,8 +4845,20 @@
 		return item;
 	};
 	
-})(node.window);
- 
+	  // Cell Class
+	  Node.prototype = new Entity();
+	  Node.prototype.constructor = Node;
+	  
+	  function Node (node) {
+		  Entity.call(this, node);
+		  this.dt = ('undefined' !== typeof node.dt) ? node.dt : null;
+		  this.dd = ('undefined' !== typeof node.dd) ? node.dd : null;
+	  };
+	
+})(
+	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+); 
  
 (function(exports, node){
 	
@@ -4690,6 +4875,8 @@
 	
 	var JSUS = node.JSUS;
 	var NDDB = node.NDDB;
+	var HTMLRenderer = node.window.HTMLRenderer;
+	var Entity = node.window.HTMLRenderer.Entity;
 	
 	Table.prototype = new NDDB();
 	Table.prototype.constructor = Table;	
@@ -4730,11 +4917,15 @@
     this.left = [];
     this.right = [];
     
-    this.initRender();
-       
-    // Not used now
-    // Matches properties and dimensions
-    //this.binds = {};
+    this.htmlRenderer = null; 
+    
+    this.init(this.options);
+  };
+  
+  // TODO: improve init
+  Table.prototype.init = function (options) {
+	var options = options || this.options;
+	this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
   };
   
   // TODO: make it 3D
@@ -4750,59 +4941,59 @@
 	  return out.fetch();	  
   };
   
-  Table.prototype.initRender = function() {
-  	this.resetRender();
-	if (this.options.render) {
-		if (!(this.options.render instanceof Array)) {
-			this.options.render = [this.options.render];
-		}
-		for (var i=0; i< this.options.render.length; i++) {
-			this.render.push(this.options.render[i]);
-		}
-	} 
-  };
-  
-  Table.prototype.addRenderer = function (renderer) {
-	  this.render.push(render);
-  };
-  
-  /**
-   * Delete existing render functions and add two 
-   * standards. By default objects are displayed in
-   * a table of key: values.
-   */
-  Table.prototype.resetRender = function () {
-	  this.render = [];
-	  this.render.push(function(el){
-		  return el.content;
-	  });
-	  this.render.push (function (el) { 
-		  if ('object' === typeof el.content) {
-    		var tbl = new Table();
-    		for (var key in el.content) {
-    			if (el.content.hasOwnProperty(key)){
-    				tbl.addRow([key,el.content[key]]);
-    			}
-    		}
-    		return tbl.parse();
-		  }
-	  });
-	  this.render.push (function (el) { 
-		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
-    		return el.content;
-		  }
-	  });
-	  
-  };
-  
-  Table.prototype.removeRenderer = function (renderer) {
-	for (var i=0; i< this.render.length; i++) {
-		if (this.render[i] == renderer) {
-			return this.render.splice(i,1);
-		}
-	}  
-	return false;
-  };
+//  Table.prototype.initRender = function() {
+//  	this.resetRender();
+//	if (this.options.render) {
+//		if (!(this.options.render instanceof Array)) {
+//			this.options.render = [this.options.render];
+//		}
+//		for (var i=0; i< this.options.render.length; i++) {
+//			this.render.push(this.options.render[i]);
+//		}
+//	} 
+//  };
+//  
+//  Table.prototype.addRenderer = function (renderer) {
+//	  this.render.push(render);
+//  };
+//  
+//  /**
+//   * Delete existing render functions and add two 
+//   * standards. By default objects are displayed in
+//   * a table of key: values.
+//   */
+//  Table.prototype.resetRender = function () {
+//	  this.render = [];
+//	  this.render.push(function(el){
+//		  return el.content;
+//	  });
+//	  this.render.push (function (el) { 
+//		  if ('object' === typeof el.content) {
+//    		var tbl = new Table();
+//    		for (var key in el.content) {
+//    			if (el.content.hasOwnProperty(key)){
+//    				tbl.addRow([key,el.content[key]]);
+//    			}
+//    		}
+//    		return tbl.parse();
+//		  }
+//	  });
+//	  this.render.push (function (el) { 
+//		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
+//    		return el.content;
+//		  }
+//	  });
+//	  
+//  };
+//  
+//  Table.prototype.removeRenderer = function (renderer) {
+//	for (var i=0; i< this.render.length; i++) {
+//		if (this.render[i] == renderer) {
+//			return this.render.splice(i,1);
+//		}
+//	}  
+//	return false;
+//  };
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;
@@ -5012,24 +5203,24 @@
 	return this._add(data, Table.H, x, y);
   };
   
-  Table.prototype.bind = function (dim, property) {
-	  this.binds[property] = dim;
-  };
+//  Table.prototype.bind = function (dim, property) {
+//	  this.binds[property] = dim;
+//  };
   
   // TODO: Only 2D for now
   // TODO: improve algorithm, rewrite
   Table.prototype.parse = function () {
 	  
-	  // Loop through all the render function
-	  // until a return value is found
-	  var renderCell = function (cell) {
-		  for (var i = this.render.length; i > 0; i--) {
-			  var out = this.render[(i-1)].call(this, cell);
-			  if (out) return out;
-		  }
-		  // Safety return
-		  return cell.content;
-	  };
+//	  // Loop through all the render function
+//	  // until a return value is found
+//	  var renderCell = function (cell) {
+//		  for (var i = this.render.length; i > 0; i--) {
+//			  var out = this.render[(i-1)].call(this, cell);
+//			  if (out) return out;
+//		  }
+//		  // Safety return
+//		  return cell.content;
+//	  };
 	  
 	  // Create a cell element (td,th...)
 	  // and fill it with the return value of a
@@ -5038,8 +5229,8 @@
 		  if (!cell) return;
 		  var el = el || 'td';
 		  var TD = document.createElement(el);
-		  var c = renderCell.call(this,cell);
-		  var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
+		  var content = this.htmlRenderer.render(cell);
+		  //var content = (!JSUS.isNode(c) || !JSUS.isElement(c)) ? document.createTextNode(c) : c;
 		  TD.appendChild(content);
 		  if (cell.className) TD.className = cell.className;
 		  return TD;
@@ -5133,10 +5324,6 @@
 		  TABLE.appendChild(TFOOT);
 	  }
 	  
-//	  console.log('TESTING WRITING');
-//	  console.log(TABLE);
-//	  console.log(this.table)
-	  
 	  return TABLE;
   };
   
@@ -5150,18 +5337,16 @@
 //  };
   
   // Cell Class
+  Cell.prototype = new Entity();
+  Cell.prototype.constructor = Cell;
   
   function Cell (cell){
-	  
+	  Entity.call(this, cell);
 	  this.x = ('undefined' !== typeof cell.x) ? cell.x : null;
 	  this.y = ('undefined' !== typeof cell.y) ? cell.y : null;
 	  this.z = ('undefined' !== typeof cell.z) ? cell.z : null;
-	  
-	  this.content = ('undefined' !== typeof cell.content) ? cell.content : '';
-	  this.className = ('undefined' !== typeof cell.style) ? cell.style : null;
   };
   
-	// TODO: add it node.window
 })(
 	('undefined' !== typeof node) ? (('undefined' !== typeof node.window) ? node.window : node) : module.parent.exports
   , ('undefined' !== typeof node) ? node : module.parent.exports
@@ -5173,12 +5358,12 @@
  
  
 /*!
- * nodeGadgets v0.7
+ * nodeGadgets v0.7.0.1
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 13:54:32 CET 2012
+ * Built on Wed Jan 25 17:04:27 CET 2012
  *
  */
  
@@ -6183,6 +6368,8 @@
 	var GameState = node.GameState;
 	var PlayerList = node.PlayerList;
 	var Table = node.window.Table
+	var HTMLRenderer = node.window.HTMLRenderer;
+	
 	/*!
 	 * DynamicTable
 	 * 
@@ -6216,61 +6403,16 @@
 		this.options = options;
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : true;
 		this.replace = options.replace || false;
-		this.initRender();
+		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
 		this.set('state', GameState.compare);
 		this.setLeft([]);
 		this.parse(true);
 	};
-	
-	
-//	DynamicTable.prototype.addBind = function (event, dim, func) {
-//		if (!event || !dim || !func) return; 
-//		if (!JSUS.in_array(dim,['x','y','content','header','left'])) return;
-//		if (!this.bindings[event]) this.bindings[event] = {};
-//		if (!this.bindings[dim]) this.bindings[dim] = [];
-//		this.bindings[dim].push(func);
-//		
-//		
-//	};
-//	
-//	DynamicTable.prototype._bind = function (dim, msg) {
-//		if (!dim) return false;
-//		if ('undefined' === typeof msg) return false;
-//		if (!this.bindings[dim]) return false;
-//		if (this.bindings[dim].length === 0) return false; 
-//		var out = [];
-//		for (var i=0; i < this.bindings[dim].length; i++) {
-//			out.push(this.bindings[dim][i].call(this, msg));
-//		}
-//		return out;
-//	};
-//	
-//	DynamicTable.prototype.bindLeft = function (msg) {
-//		return this._bind('left', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindHeader = function (msg) {
-//		return this._bind('header', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindX = function (msg) {
-//		return this._bind('x', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindY = function (msg) {
-//		return this._bind('y', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindContent = function (msg) {
-//		return this._bind('content', msg);
-//	};
-	
+		
 	DynamicTable.prototype.bind = function (event, bindings) {
 		if (!event || !bindings) return;
 		var that = this;
-		
-		
-		
+
 		node.on(event, function(msg) {
 			
 			console.log(bindings.x);
@@ -6293,16 +6435,6 @@
 							 var cell = bindings.cell.call(that, msg, new Table.Cell({x: x, y: y}));
 							 that.add(cell);
 						}
-//						var found = that.get(x,y);
-//						console.log('Found');
-//						console.log(found);
-//						if (found.length !== 0) {
-//							for (var i=0; i< found.length; i++) {
-//								found[i].content = content;
-//								console.log('content');
-//								console.log(content);
-//							}
-//						}
 					}
 				}
 				else {
@@ -6315,18 +6447,15 @@
 				
 				var x = bindings.x.call(that, msg);
 				var y = bindings.y.call(that, msg);
-				//var c = bindings.content.call(that, msg);
+				
 				if (x && y) {
 					
 					var x = (x instanceof Array) ? x : [x];
 					var y = (y instanceof Array) ? y : [y];
-					//var c = (c instanceof Array) ? c : [c];
 					
-					console.log('Bindings found:');
-					console.log(x);
-					console.log(y);
-					//console.log(c);
-					
+//					console.log('Bindings found:');
+//					console.log(x);
+//					console.log(y);
 					
 					for (var xi=0; xi < x.length; xi++) {
 						for (var yi=0; yi < y.length; yi++) {
@@ -6343,13 +6472,6 @@
 				var h = bindings.header.call(that, msg);
 				var h = (h instanceof Array) ? h : [h];
 				that.setHeader(h);
-				
-//				for (var hi=0; hi < h.length; hi++) {
-//					if (!JSUS.in_array(h[hi], that.header)) {
-//						that.header.push(h[hi]);
-//						console.log(h[hi]);
-//					}
-//				}
 			}
 			
 			// Left
@@ -6598,7 +6720,7 @@
 		this.gtbl = new node.window.Table({
 											auto_update: true,
 											id: options.id || this.id,
-											render: options.render
+											renderers: options.renderers
 		}, node.game.memory.db);
 		
 		

@@ -3,6 +3,8 @@
 	var GameState = node.GameState;
 	var PlayerList = node.PlayerList;
 	var Table = node.window.Table
+	var HTMLRenderer = node.window.HTMLRenderer;
+	
 	/*!
 	 * DynamicTable
 	 * 
@@ -36,61 +38,16 @@
 		this.options = options;
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : true;
 		this.replace = options.replace || false;
-		this.initRender();
+		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
 		this.set('state', GameState.compare);
 		this.setLeft([]);
 		this.parse(true);
 	};
-	
-	
-//	DynamicTable.prototype.addBind = function (event, dim, func) {
-//		if (!event || !dim || !func) return; 
-//		if (!JSUS.in_array(dim,['x','y','content','header','left'])) return;
-//		if (!this.bindings[event]) this.bindings[event] = {};
-//		if (!this.bindings[dim]) this.bindings[dim] = [];
-//		this.bindings[dim].push(func);
-//		
-//		
-//	};
-//	
-//	DynamicTable.prototype._bind = function (dim, msg) {
-//		if (!dim) return false;
-//		if ('undefined' === typeof msg) return false;
-//		if (!this.bindings[dim]) return false;
-//		if (this.bindings[dim].length === 0) return false; 
-//		var out = [];
-//		for (var i=0; i < this.bindings[dim].length; i++) {
-//			out.push(this.bindings[dim][i].call(this, msg));
-//		}
-//		return out;
-//	};
-//	
-//	DynamicTable.prototype.bindLeft = function (msg) {
-//		return this._bind('left', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindHeader = function (msg) {
-//		return this._bind('header', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindX = function (msg) {
-//		return this._bind('x', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindY = function (msg) {
-//		return this._bind('y', msg);
-//	};
-//	
-//	DynamicTable.prototype.bindContent = function (msg) {
-//		return this._bind('content', msg);
-//	};
-	
+		
 	DynamicTable.prototype.bind = function (event, bindings) {
 		if (!event || !bindings) return;
 		var that = this;
-		
-		
-		
+
 		node.on(event, function(msg) {
 			
 			console.log(bindings.x);
@@ -113,16 +70,6 @@
 							 var cell = bindings.cell.call(that, msg, new Table.Cell({x: x, y: y}));
 							 that.add(cell);
 						}
-//						var found = that.get(x,y);
-//						console.log('Found');
-//						console.log(found);
-//						if (found.length !== 0) {
-//							for (var i=0; i< found.length; i++) {
-//								found[i].content = content;
-//								console.log('content');
-//								console.log(content);
-//							}
-//						}
 					}
 				}
 				else {
@@ -135,18 +82,15 @@
 				
 				var x = bindings.x.call(that, msg);
 				var y = bindings.y.call(that, msg);
-				//var c = bindings.content.call(that, msg);
+				
 				if (x && y) {
 					
 					var x = (x instanceof Array) ? x : [x];
 					var y = (y instanceof Array) ? y : [y];
-					//var c = (c instanceof Array) ? c : [c];
 					
-					console.log('Bindings found:');
-					console.log(x);
-					console.log(y);
-					//console.log(c);
-					
+//					console.log('Bindings found:');
+//					console.log(x);
+//					console.log(y);
 					
 					for (var xi=0; xi < x.length; xi++) {
 						for (var yi=0; yi < y.length; yi++) {
@@ -163,13 +107,6 @@
 				var h = bindings.header.call(that, msg);
 				var h = (h instanceof Array) ? h : [h];
 				that.setHeader(h);
-				
-//				for (var hi=0; hi < h.length; hi++) {
-//					if (!JSUS.in_array(h[hi], that.header)) {
-//						that.header.push(h[hi]);
-//						console.log(h[hi]);
-//					}
-//				}
 			}
 			
 			// Left

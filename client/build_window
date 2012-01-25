@@ -69,9 +69,10 @@ addBlanks 2 $NODEGAME
 # Add all the classes
 FILES[0]='Document.js'
 FILES[1]='GameWindow.js'
-FILES[2]='Canvas.js'
-FILES[3]='List.js'
-FILES[4]='Table.js'
+FILES[2]='HTMLRenderer.js'
+FILES[3]='Canvas.js'
+FILES[4]='List.js'
+FILES[5]='Table.js'
 
 for f in ${FILES[*]}
 do
