@@ -20,7 +20,8 @@ function PeerReviewGame () {
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
-		this.milli = 2000;
+		this.milli = 10000;
+		this.milli_short = 1000;
 		
 		
 		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
@@ -50,20 +51,40 @@ function PeerReviewGame () {
 
 			this.cell = function (msg, cell) {
 				if (msg.text === 'WIN_CF') {
-					var idx = this.header[cell.x].content;
-					if (!cell.history) cell.history = [];
-					for (var i=0; i< msg.data.length; i++) {
-						if (msg.data[i].author === idx) {
-							cell.history.push(msg.data[i].mean);
+					if (cell.y === 1) {
+						var idx = this.header[cell.x].content;
+						if (!cell.history) cell.history = [];
+						for (var i=0; i< msg.data.length; i++) {
+							if (msg.data[i].author === idx) {
+								cell.history.push(msg.data[i].mean);
+							}
+						}
+						var mean = 0;
+						for (var i=0; i < cell.history.length; i++) {
+							mean += new Number(cell.history[i]); 
+						}
+						cell.content = (mean / cell.history.length).toFixed(2);
+						
+						
+					}
+					else if (cell.y === 2) {
+						if (!cell.content) {
+							cell.content = 1;
+						}
+						else {
+							cell.content += 1;
+						}
+					
+					}
+					else {
+						if (!cell.content) {
+							cell.content = 1;
+						}
+						else {
+							cell.content += 1;
 						}
 					}
-					var mean = 0;
-					for (var i=0; i < cell.history.length; i++) {
-						mean += new Number(cell.history[i]); 
-					}
-					cell.content = (mean / cell.history.length).toFixed(2);
-					
-					return cell;
+					return cell;	
 				}
 			};
 		};
@@ -125,7 +146,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: this.milli
+								milliseconds: this.milli_short
 			};
 			
 			node.window.addEventButton('CREATION_DONE', this.donetxt);
@@ -195,7 +216,7 @@ function PeerReviewGame () {
 		// Add timer
 		var timerOptions = {
 							event: 'SUBMISSION_DONE',
-							milliseconds: this.milli
+							milliseconds: this.milli_short
 		};
 		
 		
@@ -236,7 +257,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'EVALUATION_DONE',
-								milliseconds: this.milli
+								milliseconds: this.milli_short
 			};	
 			
 			this.timer.restart(timerOptions);
@@ -377,7 +398,7 @@ function PeerReviewGame () {
 			
 			this.timer.restart({
 								event: 'DONE',
-								milliseconds: this.milli
+								milliseconds: this.milli_short
 			});
 		});
 		
