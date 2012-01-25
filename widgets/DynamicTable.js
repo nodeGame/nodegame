@@ -50,19 +50,13 @@
 
 		node.on(event, function(msg) {
 			
-			console.log(bindings.x);
-			
 			if (bindings.x || bindings.y) {
-				console.log('IN');
 				// Cell
 				if (that.replace) {
 					var func = function (x, y) {
 						var found = that.get(x,y);
 						if (found.length !== 0) {
-							console.log('this is cell');
-							console.log(cell);
 							for (var ci=0; ci < found.length; ci++) {
-								console.log('qui dentro');
 								bindings.cell.call(that, msg, found[ci]);
 							}
 						}

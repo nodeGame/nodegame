@@ -98,8 +98,6 @@
 	
 	  HTMLRenderer.prototype.render = function (o) {
 		if (!o) return;
-		console.log('Renderers');
-		console.log(this.renderers);
 		// New criteria are fired first
 		  for (var i = this.renderers.length; i > 0; i--) {
 			  var out = this.renderers[(i-1)].call(this, o);

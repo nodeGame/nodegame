@@ -23,7 +23,8 @@ function PeerReviewGame () {
 		this.milli = 10000;
 		this.milli_short = 1000;
 		
-		this.all_ex = [];
+		this.all_ex = new node.window.List({id: 'all_ex'});
+		node.window.write(this.all_ex.getRoot(), document.body);
 		
 		// DTABLE
 		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
@@ -387,7 +388,8 @@ function PeerReviewGame () {
 				});	
 				
 				
-				this.all_ex.push(table);
+				this.all_ex.addDT(table.parse());
+				this.all_ex.parse();
 				
 			});
 			

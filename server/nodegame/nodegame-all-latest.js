@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 17:04:27 CET 2012
+ * Built on Mi 25. Jan 18:50:23 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 17:04:27 CET 2012
+ * Built on Mi 25. Jan 18:50:23 CET 2012
  *
  */
  
@@ -3742,7 +3742,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 17:04:27 CET 2012
+ * Built on Mi 25. Jan 18:50:23 CET 2012
  *
  */
  
@@ -4604,8 +4604,6 @@
 	
 	  HTMLRenderer.prototype.render = function (o) {
 		if (!o) return;
-		console.log('Renderers');
-		console.log(this.renderers);
 		// New criteria are fired first
 		  for (var i = this.renderers.length; i > 0; i--) {
 			  var out = this.renderers[(i-1)].call(this, o);
@@ -4744,21 +4742,36 @@
 	
 	function List (options, data) {
 		var options = options || {};
-
+		this.options = options;
+		
 		NDDB.call(this, options, data); 
 		
-		this.id = options.id || 'list';
+		this.id = options.id || 'list_' + Math.round(Math.random() * 1000);
+		
+		this.DL = null;
+		this.auto_update = this.options.auto_update || false;
+		this.htmlRenderer = null; 
+	    
+	    this.init(this.options);
+	  };
+	  
+	  // TODO: improve init
+	 List.prototype.init = function (options) {
+		var options = options || this.options;
 		
 		this.FIRST_LEVEL = options.first_level || 'dl';
 		this.SECOND_LEVEL = options.second_level || 'dt';
 		this.THIRD_LEVEL = options.third_level || 'dd';
 		
-		this.DL = options.list || document.createElement(this.FIRST_LEVEL); 
-	
 		this.last_dt = 0;
 		this.last_dd = 0;
-		this.auto_update = this.options.auto_update || false;
-	};
+		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update
+																		: this.auto_update;
+	    
+		this.DL = options.list || document.createElement(this.FIRST_LEVEL); 
+		
+		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
+	  };
 	
 	List.prototype.globalCompare = function (o1, o2) {
 		if (!o1 && !o2) return 0;
@@ -4775,11 +4788,19 @@
 		return 0;
 	}; 
 	
+	List.prototype._add = function(node) {
+		if (!node) return;
+		this.insert(node);
+		if (this.auto_update) {
+			this.parse();
+		}
+	};
+	
 	List.prototype.addDT = function (elem, dt) {
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt++;  
 		var node = new Node({dt: dt});
-		return this.insert(node);
+		return this._add(node);
 	};
 	
 	List.prototype.addDD = function (elem, dt, dd) {
@@ -4787,7 +4808,7 @@
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;
 		var dt = ('undefined' !== typeof dd) ? dd: this.last_dd++;
 		var node = new Node({dt: dt, dd: dd});
-		return this.insert(node);
+		return this._add(node);
 	};
 	
 	List.prototype.parse = function() {
@@ -4796,7 +4817,7 @@
 		var old_dd = null;
 		
 		var appendDT = function() {
-			var node = document.createElement(that.SECOND_LEVEL);
+			var node = document.createElement(this.SECOND_LEVEL);
 			this.DL.appendChild(node);
 			old_dd = null;
 			old_dt = node;
@@ -4804,7 +4825,7 @@
 		};
 		
 		var appendDD = function() {
-			var node = document.createElement(that.THIRD_LEVEL);
+			var node = document.createElement(this.THIRD_LEVEL);
 			if (old_dd) {
 				old_dd.appendChild(node);
 			}
@@ -4824,7 +4845,9 @@
 			else {
 				var node = appendDD.call(this);
 			}
-			var content = that.htmlRenderer.render(el); 
+			var content = this.htmlRenderer.render(el);
+			console.log('This is the content');
+			console.log(content);
 			node.appendChild(content);		
 		}
 		
@@ -5363,7 +5386,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Wed Jan 25 17:04:27 CET 2012
+ * Built on Mi 25. Jan 18:50:23 CET 2012
  *
  */
  
@@ -6415,19 +6438,13 @@
 
 		node.on(event, function(msg) {
 			
-			console.log(bindings.x);
-			
 			if (bindings.x || bindings.y) {
-				console.log('IN');
 				// Cell
 				if (that.replace) {
 					var func = function (x, y) {
 						var found = that.get(x,y);
 						if (found.length !== 0) {
-							console.log('this is cell');
-							console.log(cell);
 							for (var ci=0; ci < found.length; ci++) {
-								console.log('qui dentro');
 								bindings.cell.call(that, msg, found[ci]);
 							}
 						}
