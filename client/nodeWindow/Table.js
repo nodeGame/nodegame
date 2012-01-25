@@ -63,10 +63,10 @@
   // TODO: make it 3D
   Table.prototype.get = function (x, y) {
 	  var out = this;
-	  if (x) {
+	  if ('undefined' !== typeof x) {
 		  out = this.select('x','=',x);
 	  }
-	  if (y) {
+	  if ('undefined' !== typeof y) {
 		  out = out.select('y','=',y);
 	  }
 	 
@@ -311,12 +311,12 @@
   
   Table.prototype.add = function (data, x, y) {
 	  if (!data) return;
-	  
-	  var result = this.insert(new Cell({
+	  var cell = (data instanceof Cell) ? data : new Cell({
 		  x: x,
 		  y: y,
 		  content: data
-	  }));
+	  })
+	  var result = this.insert(cell);
 	  
 	  if (result) {
 		  this.updatePointer('x',x);

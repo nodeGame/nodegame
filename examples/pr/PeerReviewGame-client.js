@@ -24,53 +24,64 @@ function PeerReviewGame () {
 		
 		
 		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
-		this.dtable.addBind('x', function (msg) {
-			if (msg.text === 'WIN_CF') {
-				var out = [];
-				for (var i=0; i< msg.data.length; i++) {
-					var author = msg.data[i].author;
-					var x = node.game.pl.select('name', '=', author).first().count;
-					if (x) {
-						out.push(x);
+		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
+					
+		function Bindings() {
+			var that = this;
+			this.x = function (msg) {
+				if (msg.text === 'WIN_CF') {
+					var out = [];
+					for (var i=0; i< msg.data.length; i++) {
+						var author = msg.data[i].author;
+						var x = node.game.pl.select('name', '=', author).first().count;
+						if ('undefined' !== typeof x) {
+							out.push(x);
+						}
 					}
 				}
-			}
-			return out;
-		});
-		
-		this.dtable.addBind('y', function (msg) {
-			if (msg.text === 'WIN_CF') {
-				return [1,2,3];
-			}
-		});
-		
-		this.dtable.addBind('y', function (msg) {
-			if (msg.text === 'WIN_CF') {
-				return [1,2,3];
-			}
-		});
-		
-		this.dtable.addBind('content', function (msg) {
-			if (msg.text === 'WIN_CF') {
-				var out = [];
-				for (var i=0; i< msg.data.length; i++) {
-					out.push(msg.data.mean);
+				return out;
+			};
+				
+			this.y = function (msg) {
+				if (msg.text === 'WIN_CF') {
+					return [1,2,3];
 				}
-			}
+			};
+
+			this.cell = function (msg, cell) {
+				if (msg.text === 'WIN_CF') {
+					var idx = this.header[cell.x].content;
+					if (!cell.history) cell.history = [];
+					for (var i=0; i< msg.data.length; i++) {
+						if (msg.data[i].author === idx) {
+							cell.history.push(msg.data[i].mean);
+						}
+					}
+					var mean = 0;
+					for (var i=0; i < cell.history.length; i++) {
+						mean += new Number(cell.history[i]); 
+					}
+					cell.content = (mean / cell.history.length).toFixed(2);
+					
+					return cell;
+				}
+			};
+		};
+		
+		
+		this.dtable.bind('in.say.DATA', new Bindings());
+		
+		this.dtable.bind('in.say.PLIST', {
+									header: function (msg) {
+										if (msg.data.length === 0) return;
+										var plist = new node.PlayerList({}, msg.data);
+										var out = plist.map(function(player){
+											return player.name;
+										});
+										return out;
+									}
 		});
 		
-		this.dtable.addBind('PLIST', 'header', function (msg) {
-			
-			if (msg.data.length == 0) return;
-			var plist = new node.PlayerList({}, msg.data);
-			var diff = plist.diff(that.plist);
-			if (diff) {
-				diff.forEach(function(el){that.addPlayer(el);});
-			}
-			
-		});
-		
-		this.dtable.listenTo('in.say.DATA');
 	};
 	
 	

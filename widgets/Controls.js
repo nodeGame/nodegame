@@ -211,14 +211,14 @@
 	};
 	
 	RadioControls.prototype.add = function (root, id, attributes) {
-		console.log('ADDDING radio');
-		console.log(attributes);
+		//console.log('ADDDING radio');
+		//console.log(attributes);
 		// add the group name if not specified
 		// TODO: is this a javascript bug?
 		if ('undefined' === typeof attributes.name) {
-			console.log(this);
-			console.log(this.name);
-			console.log('MODMOD ' + this.name);
+//			console.log(this);
+//			console.log(this.name);
+//			console.log('MODMOD ' + this.name);
 			attributes.name = this.groupName;
 		}
 		console.log(attributes);

@@ -21,7 +21,7 @@
 		this.options = options;
 		this.id = options.id || 'dynamictable';
 		this.name = 'Dynamic Table';
-		this.version = '0.2';
+		this.version = '0.3';
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'
@@ -43,96 +43,149 @@
 	};
 	
 	
-	DynamicTable.prototype.addBind = function (event, dim, func) {
-		if (!this.bindings[event]) this.bindings[event] = {}; 
-		if (!JSUS.in_array(dim,['x','y','content','header','left'])) return;
-		if (!this.bindings[dim]) this.bindings[dim] = [];
-		this.bindings[dim].push(func);
-	};
+//	DynamicTable.prototype.addBind = function (event, dim, func) {
+//		if (!event || !dim || !func) return; 
+//		if (!JSUS.in_array(dim,['x','y','content','header','left'])) return;
+//		if (!this.bindings[event]) this.bindings[event] = {};
+//		if (!this.bindings[dim]) this.bindings[dim] = [];
+//		this.bindings[dim].push(func);
+//		
+//		
+//	};
+//	
+//	DynamicTable.prototype._bind = function (dim, msg) {
+//		if (!dim) return false;
+//		if ('undefined' === typeof msg) return false;
+//		if (!this.bindings[dim]) return false;
+//		if (this.bindings[dim].length === 0) return false; 
+//		var out = [];
+//		for (var i=0; i < this.bindings[dim].length; i++) {
+//			out.push(this.bindings[dim][i].call(this, msg));
+//		}
+//		return out;
+//	};
+//	
+//	DynamicTable.prototype.bindLeft = function (msg) {
+//		return this._bind('left', msg);
+//	};
+//	
+//	DynamicTable.prototype.bindHeader = function (msg) {
+//		return this._bind('header', msg);
+//	};
+//	
+//	DynamicTable.prototype.bindX = function (msg) {
+//		return this._bind('x', msg);
+//	};
+//	
+//	DynamicTable.prototype.bindY = function (msg) {
+//		return this._bind('y', msg);
+//	};
+//	
+//	DynamicTable.prototype.bindContent = function (msg) {
+//		return this._bind('content', msg);
+//	};
 	
-	DynamicTable.prototype._bind = function (dim, msg) {
-		if (!dim) return false;
-		if ('undefined' === typeof msg) return false;
-		if (!this.bindings[dim]) return false;
-		if (this.bindings[dim].length === 0) return false; 
-		var out = [];
-		for (var i=0; i < this.bindings[dim].length; i++) {
-			out.push(this.bindings[dim][i].call(this, msg));
-		}
-		return out;
-	};
-	
-	DynamicTable.prototype.bindLeft = function (msg) {
-		return this._bind('left', msg);
-	};
-	
-	DynamicTable.prototype.bindHeader = function (msg) {
-		return this._bind('header', msg);
-	};
-	
-	DynamicTable.prototype.bindX = function (msg) {
-		return this._bind('x', msg);
-	};
-	
-	DynamicTable.prototype.bindY = function (msg) {
-		return this._bind('y', msg);
-	};
-	
-	DynamicTable.prototype.bindContent = function (msg) {
-		return this._bind('content', msg);
-	};
-	
-	DynamicTable.prototype.listenTo = function () {
-		if (!arguments) return;
+	DynamicTable.prototype.bind = function (event, bindings) {
+		if (!event || !bindings) return;
 		var that = this;
-		for (var i=0; i<arguments.length;i++) {
-			node.on(arguments[i], function(msg) {
-				
+		
+		
+		
+		node.on(event, function(msg) {
+			
+			console.log(bindings.x);
+			
+			if (bindings.x || bindings.y) {
+				console.log('IN');
 				// Cell
 				if (that.replace) {
-					var func = function (content, x, y) {
+					var func = function (x, y) {
 						var found = that.get(x,y);
-						if (found.length === 0) return;
-						for (var i=0; i< found.length; i++) {
-							found[i].content = content;
+						if (found.length !== 0) {
+							console.log('this is cell');
+							console.log(cell);
+							for (var ci=0; ci < found.length; ci++) {
+								console.log('qui dentro');
+								bindings.cell.call(that, msg, found[ci]);
+							}
 						}
+						else {
+							 var cell = bindings.cell.call(that, msg, new Table.Cell({x: x, y: y}));
+							 that.add(cell);
+						}
+//						var found = that.get(x,y);
+//						console.log('Found');
+//						console.log(found);
+//						if (found.length !== 0) {
+//							for (var i=0; i< found.length; i++) {
+//								found[i].content = content;
+//								console.log('content');
+//								console.log(content);
+//							}
+//						}
 					}
 				}
 				else {
-					var func = that.add;
+					var func = function (x, y) {
+						var cell = bindings.cell.call(that, msg, new Table.Cell({x: x, y: y}));
+						that.add(cell, x, y);
+					}
 				}
+	
 				
-				
-				var x = that.bindX(msg);
-				var y = that.bindY(msg);
-				var content = that.bindContent(msg);
+				var x = bindings.x.call(that, msg);
+				var y = bindings.y.call(that, msg);
+				//var c = bindings.content.call(that, msg);
 				if (x && y) {
+					
+					var x = (x instanceof Array) ? x : [x];
+					var y = (y instanceof Array) ? y : [y];
+					//var c = (c instanceof Array) ? c : [c];
+					
+					console.log('Bindings found:');
+					console.log(x);
+					console.log(y);
+					//console.log(c);
+					
+					
 					for (var xi=0; xi < x.length; xi++) {
 						for (var yi=0; yi < y.length; yi++) {
-							for (var ci=0; ci < content.length; ci++) {
-								func.call(this, content[ci], x[xi], y[yi]);
-							}
+							// Replace or Add
+							func.call(that, x[xi], y[yi]);
 						}
 					}
 				}
 				// End Cell
+			}
+			
+			// Header
+			if (bindings.header) {
+				var h = bindings.header.call(that, msg);
+				var h = (h instanceof Array) ? h : [h];
+				that.setHeader(h);
 				
-				// Header
-				var h = that.bindHeader(msg);
-				if (h && !JSUS.in_array(h, that.header)) {
-					that.header.push(h);
-				}
-				// Left
-				var l = that.bindLeft(msg);
-				if (l && !JSUS.in_array(l, that.left)) {
+//				for (var hi=0; hi < h.length; hi++) {
+//					if (!JSUS.in_array(h[hi], that.header)) {
+//						that.header.push(h[hi]);
+//						console.log(h[hi]);
+//					}
+//				}
+			}
+			
+			// Left
+			if (bindings.left) {
+				var l = bindings.left.call(that, msg);
+				if (!JSUS.in_array(l, that.left)) {
 					that.header.push(l);
 				}
-				// Auto Update?
-				if (that.auto_update) {
-					that.parse();
-				}
-			});
-		}
+			}
+			
+			// Auto Update?
+			if (that.auto_update) {
+				that.parse();
+			}
+		});
+		
 	};
 
 	DynamicTable.prototype.append = function (root) {
