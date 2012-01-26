@@ -325,7 +325,33 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var table = new node.window.Table({className: 'exhibition'});
+			var renderCF = function (cell) {
+				console.log('about to render');
+				console.log(cell);
+				// Check if it is really CF obj
+				if (cell.content.cf) {
+					var cf_options = { id: 'cf_' + cell.x,
+							   width: 200,
+							   height: 200,
+							   features: cell.content.cf,
+							   controls: false
+					};
+					
+					var container = document.createElement('div');
+					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+					
+					var details_tbl = new node.window.Table();
+					details_tbl.addColumn(['Author: ' + cell.content.author,
+					                       'Score: ' + cell.content.mean
+					]);
+					container.appendChild(details_tbl.parse());
+					return container;
+				}
+			};
+			
+			var table = new node.window.Table({className: 'exhibition',
+										 	   render: renderCF
+			});
 			table.setHeader(['Rank','A','B','C']);
 			table.addColumn([1,2,3]);
 			
@@ -341,29 +367,30 @@ function PeerReviewGame () {
 										.fetch();
 					
 						if (winners.length > 0) {
-							var column = [];
-							for (var i=0; i < winners.length; i++) {1
-							
-								var details_tbl = new node.window.Table();
-								details_tbl.addColumn(['Author: ' + winners[i].author,
-								                       'Score: ' + winners[i].mean
-								]);
-								
-								var cf_options = { id: 'cf_' + winners[i].player,
-										   width: 200,
-										   height: 200,
-										   features: winners[i].cf,
-										   controls: false
-								};
-								
-								
-								var container = document.createElement('div');
-								
-								var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-								container.appendChild(details_tbl.parse());
-								column.push(container);
-							}
-							table.addColumn(column);
+							table.addColumn(winners);
+//							var column = [];
+//							for (var i=0; i < winners.length; i++) {
+//							
+//								var details_tbl = new node.window.Table();
+//								details_tbl.addColumn(['Author: ' + winners[i].author,
+//								                       'Score: ' + winners[i].mean
+//								]);
+//								
+//								var cf_options = { id: 'cf_' + winners[i].player,
+//										   width: 200,
+//										   height: 200,
+//										   features: winners[i].cf,
+//										   controls: false
+//								};
+//								
+//								
+//								var container = document.createElement('div');
+//								
+//								var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+//								container.appendChild(details_tbl.parse());
+//								column.push(container);
+//							}
+//							table.addColumn(column);
 						}
 						else {
 							table.addColumn(['No creation was selected for exhibition ' + this.exs[j]]);

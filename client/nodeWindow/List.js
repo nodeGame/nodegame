@@ -54,7 +54,7 @@
 			this.DL.appendChild(document.createTextNode(options.title));
 		}
 		
-		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
+		this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
 	  };
 	
 	List.prototype.globalCompare = function (o1, o2) {

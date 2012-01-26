@@ -65,7 +65,7 @@
     if (options.className) {
     	this.table.className = options.className;
     }
-    this.initRenderer(options.renderers);
+    this.initRenderer(options.render);
   };
   
   Table.prototype.initRenderer = function(options) {
@@ -83,7 +83,7 @@
 	});
 	if (options) {
 		if (!(options instanceof Array)) {
-			options = [this.options.renderers];
+			options = [options];
 		}
 		for (var i=0; i< options.length; i++) {
 			this.htmlRenderer.addRenderer(options[i]);
@@ -435,15 +435,6 @@
 	  
 	  return TABLE;
   };
-  
-
-  // TODO: set is not the right word
-//  Table.prototype.set = function (x, y, content) {
-//	  var el = this.select('x','=',x).select('y','=',y).first();
-//	  if (!el) return;
-//	  el.content = content;
-//	  return true;
-//  };
   
   // Cell Class
   Cell.prototype = new Entity();

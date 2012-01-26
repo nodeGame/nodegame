@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 11:04:55 CET 2012
+ * Built on Do 26. Jan 11:34:27 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 11:04:55 CET 2012
+ * Built on Do 26. Jan 11:34:27 CET 2012
  *
  */
  
@@ -3742,7 +3742,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 11:04:55 CET 2012
+ * Built on Do 26. Jan 11:34:27 CET 2012
  *
  */
  
@@ -4798,7 +4798,7 @@
 			this.DL.appendChild(document.createTextNode(options.title));
 		}
 		
-		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
+		this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
 	  };
 	
 	List.prototype.globalCompare = function (o1, o2) {
@@ -4952,7 +4952,6 @@
   function Table (options, data) {
 	var options = options || {};
 
-//	JSUS.extend(node.NDDB,this);
 	NDDB.call(this, options, data);  
     
     Table.log = options.log || Table.log;
@@ -4991,7 +4990,7 @@
     if (options.className) {
     	this.table.className = options.className;
     }
-    this.initRenderer(options.renderers);
+    this.initRenderer(options.render);
   };
   
   Table.prototype.initRenderer = function(options) {
@@ -5009,7 +5008,7 @@
 	});
 	if (options) {
 		if (!(options instanceof Array)) {
-			options = [this.options.renderers];
+			options = [options];
 		}
 		for (var i=0; i< options.length; i++) {
 			this.htmlRenderer.addRenderer(options[i]);
@@ -5029,60 +5028,6 @@
 	 
 	  return out.fetch();	  
   };
-  
-//  Table.prototype.initRender = function() {
-//  	this.resetRender();
-//	if (this.options.render) {
-//		if (!(this.options.render instanceof Array)) {
-//			this.options.render = [this.options.render];
-//		}
-//		for (var i=0; i< this.options.render.length; i++) {
-//			this.render.push(this.options.render[i]);
-//		}
-//	} 
-//  };
-//  
-//  Table.prototype.addRenderer = function (renderer) {
-//	  this.render.push(render);
-//  };
-//  
-//  /**
-//   * Delete existing render functions and add two 
-//   * standards. By default objects are displayed in
-//   * a table of key: values.
-//   */
-//  Table.prototype.resetRender = function () {
-//	  this.render = [];
-//	  this.render.push(function(el){
-//		  return el.content;
-//	  });
-//	  this.render.push (function (el) { 
-//		  if ('object' === typeof el.content) {
-//    		var tbl = new Table();
-//    		for (var key in el.content) {
-//    			if (el.content.hasOwnProperty(key)){
-//    				tbl.addRow([key,el.content[key]]);
-//    			}
-//    		}
-//    		return tbl.parse();
-//		  }
-//	  });
-//	  this.render.push (function (el) { 
-//		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
-//    		return el.content;
-//		  }
-//	  });
-//	  
-//  };
-//  
-//  Table.prototype.removeRenderer = function (renderer) {
-//	for (var i=0; i< this.render.length; i++) {
-//		if (this.render[i] == renderer) {
-//			return this.render.splice(i,1);
-//		}
-//	}  
-//	return false;
-//  };
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;
@@ -5416,15 +5361,6 @@
 	  return TABLE;
   };
   
-
-  // TODO: set is not the right word
-//  Table.prototype.set = function (x, y, content) {
-//	  var el = this.select('x','=',x).select('y','=',y).first();
-//	  if (!el) return;
-//	  el.content = content;
-//	  return true;
-//  };
-  
   // Cell Class
   Cell.prototype = new Entity();
   Cell.prototype.constructor = Cell;
@@ -5452,7 +5388,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 11:04:55 CET 2012
+ * Built on Do 26. Jan 11:34:27 CET 2012
  *
  */
  
