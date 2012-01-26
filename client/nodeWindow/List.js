@@ -50,7 +50,7 @@
 		if (options.className) {
 	    	this.DL.className = options.className;
 	    }
-		if (options.title) {
+		if (this.options.title) {
 			this.DL.appendChild(document.createTextNode(options.title));
 		}
 		
@@ -59,21 +59,25 @@
 	
 	List.prototype.globalCompare = function (o1, o2) {
 		if (!o1 && !o2) return 0;
-		if (!o2) return 1;
-		if (!o1) return -1;
+		if (!o2) return -1;
+		if (!o1) return 1;
 		if (o1.dt < o2.dt) return 1;
 		if (o1.dt > o2.dt) return -1;
 		if (o1.dt === o2.dt) {
+			if ('undefined' === typeof o1.dd) return -1;
+			if ('undefined'=== typeof o2.dd) return 1;
 			if (o1.dd < o2.dd) return -1;
 			if (o1.dd > o2.dd) return 1;
-			if (o1.nddbid < o2.nddbid) return -1;
-			if (o1.nddbid > o2.nddbid) return 1;
+			if (o1.nddbid < o2.nddbid) return 1;
+			if (o1.nddbid > o2.nddbid) return -1;
 		}
 		return 0;
 	}; 
 	
-	List.prototype._add = function(node) {
+	List.prototype._add = function (node) {
 		if (!node) return;
+//		console.log('about to add node');
+//		console.log(node);
 		this.insert(node);
 		if (this.auto_update) {
 			this.parse();
@@ -82,7 +86,9 @@
 	
 	List.prototype.addDT = function (elem, dt) {
 		if ('undefined' === typeof elem) return;
-		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt++;  
+		this.last_dt++;
+		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;  
+		this.last_dd = 0;
 		var node = new Node({dt: dt, content: elem});
 		return this._add(node);
 	};
@@ -90,15 +96,21 @@
 	List.prototype.addDD = function (elem, dt, dd) {
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;
-		var dt = ('undefined' !== typeof dd) ? dd: this.last_dd++;
+		var dd = ('undefined' !== typeof dd) ? dd: this.last_dd++;
 		var node = new Node({dt: dt, dd: dd, content: elem});
 		return this._add(node);
 	};
 	
 	List.prototype.parse = function() {
+		console.log('Pre sort')
+		console.log(this.db);
 		this.sort();
 		var old_dt = null;
 		var old_dd = null;
+		
+		console.log('This is the list now');
+		console.log(this.db);
+		
 		
 		var appendDT = function() {
 			var node = document.createElement(this.SECOND_LEVEL);
@@ -110,40 +122,47 @@
 		
 		var appendDD = function() {
 			var node = document.createElement(this.THIRD_LEVEL);
-			if (old_dd) {
-				old_dd.appendChild(node);
-			}
-			else if (!old_dt) {
-				console.log('creating dt for dd');
-				old_dt = appendDT();
-			}
-			old_dt.appendChild(node);
+//			if (old_dd) {
+//				old_dd.appendChild(node);
+//			}
+//			else if (!old_dt) {
+//				old_dt = appendDT.call(this);
+//			}
+//			old_dt.appendChild(node);
+			this.DL.appendChild(node);
+//			old_dd = null;
+//			old_dt = node;
 			return node;
 		};
 		
 		// Reparse all every time
 		// TODO: improve this
 		if (this.DL) {
-			  while (this.DL.hasChildNodes()) {
-			        this.DL.removeChild(this.DL.firstChild);
-			    }
-		  }
-		
+			while (this.DL.hasChildNodes()) {
+				this.DL.removeChild(this.DL.firstChild);
+			}
+			if (this.options.title) {
+				this.DL.appendChild(document.createTextNode(this.options.title));
+			}
+		}
 		
 		for (var i=0; i<this.db.length; i++) {
 			var el = this.db[i];
-			if (!el.dd) {
+			console.log('this the el');
+			console.log(el);
+			console.log(typeof el.dd);
+			if ('undefined' === typeof el.dd) {
 				var node = appendDT.call(this);
-				console.log('just created dt');
+				//console.log('just created dt');
 			}
 			else {
 				var node = appendDD.call(this);
 			}
-			console.log('This is the el')
-			console.log(el);
+//			console.log('This is the el')
+//			console.log(el);
 			var content = this.htmlRenderer.render(el);
-			console.log('This is how it is rendered');
-			console.log(content);
+//			console.log('This is how it is rendered');
+//			console.log(content);
 			node.appendChild(content);		
 		}
 		
@@ -171,7 +190,9 @@
 	  function Node (node) {
 		  Entity.call(this, node);
 		  this.dt = ('undefined' !== typeof node.dt) ? node.dt : null;
-		  this.dd = ('undefined' !== typeof node.dd) ? node.dd : null;
+		  if ('undefined' !== typeof node.dd) {
+			  this.dd = node.dd;
+		  }
 	  };
 	
 })(

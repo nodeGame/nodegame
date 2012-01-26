@@ -26,96 +26,93 @@ function PeerReviewGame () {
 		this.all_ex = new node.window.List({ id: 'all_ex',
 											 title: 'History of previous exhibitions'
 		});
-		node.window.write(this.all_ex.getRoot(), document.body);
 		
 		// DTABLE
-		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
-		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
-					
-		var bindings = {
-				x: function (msg) {
-				if (msg.text === 'WIN_CF') {
-					var out = [];
-					for (var i=0; i< msg.data.length; i++) {
-						var author = msg.data[i].author;
-						var x = node.game.pl.select('name', '=', author).first().count;
-						if ('undefined' !== typeof x) {
-							out.push(x);
-						}
-					}
-				}
-				return out;
-			},
-				
-			y: function (msg) {
-				if (msg.text === 'WIN_CF') {
-					return [1,2,3];
-				}
-			},
-
-			cell: function (msg, cell) {
-				if (msg.text === 'WIN_CF') {
-					if (cell.y === 1) {
-						console.log('header');
-						console.log(this.header);
-						console.log('cell.x');
-						console.log(cell.x);
-						var idx = this.header[cell.x].content;
-						if (!cell.history) cell.history = [];
-						for (var i=0; i< msg.data.length; i++) {
-							if (msg.data[i].author === idx) {
-								cell.history.push(msg.data[i].mean);
-							}
-						}
-						var mean = 0;
-						for (var i=0; i < cell.history.length; i++) {
-							mean += new Number(cell.history[i]); 
-						}
-						cell.content = (mean / cell.history.length).toFixed(2);
-						
-						
-					}
-					else if (cell.y === 2) {
-						if (!cell.content) {
-							cell.content = 1;
-						}
-						else {
-							cell.content += 1;
-						}
-					
-					}
-					else {
-						if (!cell.content) {
-							cell.content = 1;
-						}
-						else {
-							cell.content += 1;
-						}
-					}
-					return cell;	
-				}
-			}
-		};
-		
-		
-		this.dtable.bind('in.say.DATA', bindings);
-		
-		this.dtable.bind('in.say.PLIST', {
-									header: function (msg) {
-										if (msg.data.length === 0) return;
-										var plist = new node.PlayerList({}, msg.data);
-										var out = plist.map(function(player){
-											return player.name;
-										});
-										return out;
-									}
-		});
+//		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
+//		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
+//					
+//		var bindings = {
+//				x: function (msg) {
+//				if (msg.text === 'WIN_CF') {
+//					var out = [];
+//					for (var i=0; i< msg.data.length; i++) {
+//						var author = msg.data[i].author;
+//						var x = node.game.pl.select('name', '=', author).first().count;
+//						if ('undefined' !== typeof x) {
+//							out.push(x);
+//						}
+//					}
+//				}
+//				return out;
+//			},
+//				
+//			y: function (msg) {
+//				if (msg.text === 'WIN_CF') {
+//					return [1,2,3];
+//				}
+//			},
+//
+//			cell: function (msg, cell) {
+//				if (msg.text === 'WIN_CF') {
+//					if (cell.y === 1) {
+//						console.log('header');
+//						console.log(this.header);
+//						console.log('cell.x');
+//						console.log(cell.x);
+//						var idx = this.header[cell.x].content;
+//						if (!cell.history) cell.history = [];
+//						for (var i=0; i< msg.data.length; i++) {
+//							if (msg.data[i].author === idx) {
+//								cell.history.push(msg.data[i].mean);
+//							}
+//						}
+//						var mean = 0;
+//						for (var i=0; i < cell.history.length; i++) {
+//							mean += new Number(cell.history[i]); 
+//						}
+//						cell.content = (mean / cell.history.length).toFixed(2);
+//						
+//						
+//					}
+//					else if (cell.y === 2) {
+//						if (!cell.content) {
+//							cell.content = 1;
+//						}
+//						else {
+//							cell.content += 1;
+//						}
+//					
+//					}
+//					else {
+//						if (!cell.content) {
+//							cell.content = 1;
+//						}
+//						else {
+//							cell.content += 1;
+//						}
+//					}
+//					return cell;	
+//				}
+//			}
+//		};
+//		
+//		
+//		this.dtable.bind('in.say.DATA', bindings);
+//		
+//		this.dtable.bind('in.say.PLIST', {
+//									header: function (msg) {
+//										if (msg.data.length === 0) return;
+//										var plist = new node.PlayerList({}, msg.data);
+//										var out = plist.map(function(player){
+//											return player.name;
+//										});
+//										return out;
+//									}
+//		});
 		// End TABLE
 		
 		
 		this.renderCF = function (cell) {
-			console.log('about to render');
-			console.log(cell);
 			// Check if it is really CF obj
 			if (cell.content.cf) {
 				var cf_options = { id: 'cf_' + cell.x,
@@ -167,23 +164,31 @@ function PeerReviewGame () {
 
 		node.window.loadFrame('creation.html', function(){
 			
-			var root = node.window.getElementById('root');
+			var creationDiv = node.window.getElementById('creation');
 			var cf_options = { id: 'cf',
 								width: 300,
 								height: 300
 			};
 			
-			this.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
+			this.cf = node.window.addWidget('ChernoffFaces', creationDiv, cf_options);
 			// AUTOPLAY
 			this.cf.randomize();
+			
+			// History of previous exhibits
+			var historyDiv = node.window.getElementById('history');
+			this.all_ex.reverse();
+			this.all_ex.parse();
+			node.window.write(this.all_ex.getRoot(), historyDiv);
+			
+
+			node.window.addEventButton('CREATION_DONE', this.donetxt, creationDiv);
+			
 			
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
 								milliseconds: this.milli_short
 			};
-			
-			node.window.addEventButton('CREATION_DONE', this.donetxt);
 			
 			this.timer.restart(timerOptions);
 			
@@ -198,7 +203,7 @@ function PeerReviewGame () {
 	};
 	
 	var submission = function() {
-		var root = node.window.getElementById('root');
+		var root = node.window.getElementById('creation');
 		
 		node.emit('INPUT_DISABLE');
 		
@@ -284,7 +289,7 @@ function PeerReviewGame () {
 				label: 'Evaluation'
 		};
 		
-		node.window.loadFrame('evaluation.html', function(){
+		node.window.loadFrame('evaluation.html', function() {
 		
 			var root = node.window.getElementById('root');
 			
@@ -348,7 +353,8 @@ function PeerReviewGame () {
 	
 	var dissemination = function(){
 		node.window.loadFrame('dissemination.html', function() {
-			var root = node.window.getElementById('root');
+			
+			this.all_ex.addDT('Round: ' + node.game.gameState.round);
 			
 			var table = new node.window.Table({className: 'exhibition',
 										 	   render: this.renderCF
@@ -382,17 +388,18 @@ function PeerReviewGame () {
 					t.select('y', '=', 1).addClass('second');
 					t.select('y', '=', 2).addClass('third');
 					//t.select('y', '>', 2).addClass('other');
+
+					node.window.write(table.parse());
 					
-					root.appendChild(table.parse());
 					
-//					this.all_ex.addDT(table.table);
+					this.all_ex.addDD(table.table);
 
 				}
 				
 				else {
 					var str = 'No work was selected to be published in any exhibition';
-					node.window.write(str, root);
-//					this.all_ex.addDT(str);
+					node.window.write(str);
+					this.all_ex.addDD(str);
 				}
 				
 
@@ -400,7 +407,7 @@ function PeerReviewGame () {
 				
 				this.timer.restart({
 									event: 'DONE',
-									milliseconds: this.milli
+									milliseconds: this.milli_short
 				});	
 				
 			});
