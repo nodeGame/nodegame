@@ -72,3 +72,16 @@ div#VisualState_div {
   width: 200px;
   font-size: 16px;
 }
+
+
+
+dl#all_ex {
+	border: 1px solid #CCC;
+	font-weight: bold;
+	padding: 5px;
+}
+
+dl#all_ex dt{
+  border-bottom: 5px dashed #CCC;
+	
+}

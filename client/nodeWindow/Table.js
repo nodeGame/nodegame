@@ -27,7 +27,6 @@
   function Table (options, data) {
 	var options = options || {};
 
-//	JSUS.extend(node.NDDB,this);
 	NDDB.call(this, options, data);  
     
     Table.log = options.log || Table.log;
@@ -36,8 +35,7 @@
     this.defaultDim3 = options.defaultDim3 || 'z';
     
     this.table = options.table || document.createElement('table'); 
-    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
-    this.table.id = this.id;
+    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);
     
     this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
     
@@ -63,7 +61,34 @@
   // TODO: improve init
   Table.prototype.init = function (options) {
 	var options = options || this.options;
-	this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
+    this.table.id = options.id || this.id;
+    if (options.className) {
+    	this.table.className = options.className;
+    }
+    this.initRenderer(options.renderers);
+  };
+  
+  Table.prototype.initRenderer = function(options) {
+	this.htmlRenderer = new HTMLRenderer();	
+	this.htmlRenderer.addRenderer(function(el) {
+		if ('object' === typeof el.content) {
+    		var tbl = new Table();
+    		for (var key in el.content) {
+    			if (el.content.hasOwnProperty(key)){
+    				tbl.addRow([key,el.content[key]]);
+    			}
+    		}
+    		return tbl.parse();
+		}
+	});
+	if (options) {
+		if (!(options instanceof Array)) {
+			options = [this.options.renderers];
+		}
+		for (var i=0; i< options.length; i++) {
+			this.htmlRenderer.addRenderer(options[i]);
+		}
+	} 
   };
   
   // TODO: make it 3D
@@ -78,60 +103,6 @@
 	 
 	  return out.fetch();	  
   };
-  
-//  Table.prototype.initRender = function() {
-//  	this.resetRender();
-//	if (this.options.render) {
-//		if (!(this.options.render instanceof Array)) {
-//			this.options.render = [this.options.render];
-//		}
-//		for (var i=0; i< this.options.render.length; i++) {
-//			this.render.push(this.options.render[i]);
-//		}
-//	} 
-//  };
-//  
-//  Table.prototype.addRenderer = function (renderer) {
-//	  this.render.push(render);
-//  };
-//  
-//  /**
-//   * Delete existing render functions and add two 
-//   * standards. By default objects are displayed in
-//   * a table of key: values.
-//   */
-//  Table.prototype.resetRender = function () {
-//	  this.render = [];
-//	  this.render.push(function(el){
-//		  return el.content;
-//	  });
-//	  this.render.push (function (el) { 
-//		  if ('object' === typeof el.content) {
-//    		var tbl = new Table();
-//    		for (var key in el.content) {
-//    			if (el.content.hasOwnProperty(key)){
-//    				tbl.addRow([key,el.content[key]]);
-//    			}
-//    		}
-//    		return tbl.parse();
-//		  }
-//	  });
-//	  this.render.push (function (el) { 
-//		  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
-//    		return el.content;
-//		  }
-//	  });
-//	  
-//  };
-//  
-//  Table.prototype.removeRenderer = function (renderer) {
-//	for (var i=0; i< this.render.length; i++) {
-//		if (this.render[i] == renderer) {
-//			return this.render.splice(i,1);
-//		}
-//	}  
-//	return false;
-//  };
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;

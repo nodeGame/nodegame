@@ -23,7 +23,9 @@ function PeerReviewGame () {
 		this.milli = 10000;
 		this.milli_short = 1000;
 		
-		this.all_ex = new node.window.List({id: 'all_ex'});
+		this.all_ex = new node.window.List({ id: 'all_ex',
+											 title: 'History of previous exhibitions'
+		});
 		node.window.write(this.all_ex.getRoot(), document.body);
 		
 		// DTABLE
@@ -54,6 +56,10 @@ function PeerReviewGame () {
 			cell: function (msg, cell) {
 				if (msg.text === 'WIN_CF') {
 					if (cell.y === 1) {
+						console.log('header');
+						console.log(this.header);
+						console.log('cell.x');
+						console.log(cell.x);
 						var idx = this.header[cell.x].content;
 						if (!cell.history) cell.history = [];
 						for (var i=0; i< msg.data.length; i++) {
@@ -105,10 +111,6 @@ function PeerReviewGame () {
 									}
 		});
 		// End TABLE
-		
-		this.displayAllex = function(){
-			
-		};
 		
 	};
 	
@@ -323,8 +325,8 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var table = new node.window.Table({id: 'exhibition'});
-			table.setHeader(['','A','B','C']);
+			var table = new node.window.Table({className: 'exhibition'});
+			table.setHeader(['Rank','A','B','C']);
 			table.addColumn([1,2,3]);
 			
 			node.onDATA('WIN_CF', function(msg) {
@@ -388,8 +390,8 @@ function PeerReviewGame () {
 				});	
 				
 				
-				this.all_ex.addDT(table.parse());
-				this.all_ex.parse();
+//				this.all_ex.addDT(table.table);
+//				this.all_ex.parse();
 				
 			});
 			

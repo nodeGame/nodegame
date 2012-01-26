@@ -1,18 +1,25 @@
-table#exhibition {
-	width: 800px;
+table.exhibition {
 	border: 1px solid #CCC;
 }
 
-table#exhibition thead tr th, {
+table.exhibition thead tr th, {
   font-weight: bold;
   text-align: center;
 }
 
-table#exhibition tr {
+table.exhibition tr {
   border: 1px solid black;
 }
 
-table#exhibition tr:last-child  {
+table.exhibition td {
+  width: 200px;
+}
+
+table.exhibition td:first-child {
+	width: 20px;
+}
+
+table.exhibition tr:last-child  {
   border-bottom: none;
 }
 
@@ -24,19 +31,19 @@ table#exhibition tr:last-child  {
   background: #FFC;
 }
 
-table#exhibition .first {
+table.exhibition .first {
   background: #ffffaa;	
 }
 
-table#exhibition .second {
+table.exhibition .second {
   background: #eeeeee; 
 }
 
-table#exhibition .third {
+table.exhibition .third {
  background: #ffdd66; 
 }
 
-table#exhibition .other {
+table.exhibition .other {
   background: #CCC; 
 }
 

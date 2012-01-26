@@ -45,7 +45,14 @@
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update
 																		: this.auto_update;
 	    
-		this.DL = options.list || document.createElement(this.FIRST_LEVEL); 
+		this.DL = options.list || document.createElement(this.FIRST_LEVEL);
+		this.DL.id = options.id || this.id;
+		if (options.className) {
+	    	this.DL.className = options.className;
+	    }
+		if (options.title) {
+			this.DL.appendChild(document.createTextNode(options.title));
+		}
 		
 		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
 	  };
@@ -76,7 +83,7 @@
 	List.prototype.addDT = function (elem, dt) {
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt++;  
-		var node = new Node({dt: dt});
+		var node = new Node({dt: dt, content: elem});
 		return this._add(node);
 	};
 	
@@ -84,7 +91,7 @@
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;
 		var dt = ('undefined' !== typeof dd) ? dd: this.last_dd++;
-		var node = new Node({dt: dt, dd: dd});
+		var node = new Node({dt: dt, dd: dd, content: elem});
 		return this._add(node);
 	};
 	
@@ -107,23 +114,35 @@
 				old_dd.appendChild(node);
 			}
 			else if (!old_dt) {
+				console.log('creating dt for dd');
 				old_dt = appendDT();
 			}
 			old_dt.appendChild(node);
 			return node;
 		};
 		
+		// Reparse all every time
+		// TODO: improve this
+		if (this.DL) {
+			  while (this.DL.hasChildNodes()) {
+			        this.DL.removeChild(this.DL.firstChild);
+			    }
+		  }
+		
 		
 		for (var i=0; i<this.db.length; i++) {
 			var el = this.db[i];
 			if (!el.dd) {
 				var node = appendDT.call(this);
+				console.log('just created dt');
 			}
 			else {
 				var node = appendDD.call(this);
 			}
+			console.log('This is the el')
+			console.log(el);
 			var content = this.htmlRenderer.render(el);
-			console.log('This is the content');
+			console.log('This is how it is rendered');
 			console.log(content);
 			node.appendChild(content);		
 		}

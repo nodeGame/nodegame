@@ -219,9 +219,19 @@
 		this.frame = window.frames[this.mainframe]; // there is no document yet
 	};
 	
-	
+	/**
+	 * Returns the element with id 'id'. Looks first into the mainframe,
+	 * and then into the rest of the page.
+	 */
 	GameWindow.prototype.getElementById = function (id) {
-		return (this.frame) ? this.frame.getElementById(id) : document.getElementById(id);
+		var el = null;
+		if (this.frame) {
+			el = this.frame.getElementById(id);
+		}
+		if (!el) {
+			el = document.getElementById(id);
+		}
+		return el; 
 	};
 	
 	GameWindow.prototype.getElementsByTagName = function (tag) {

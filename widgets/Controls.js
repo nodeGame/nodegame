@@ -221,7 +221,7 @@
 //			console.log('MODMOD ' + this.name);
 			attributes.name = this.groupName;
 		}
-		console.log(attributes);
+		//console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	

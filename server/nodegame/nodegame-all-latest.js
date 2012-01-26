@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 25. Jan 18:50:23 CET 2012
+ * Built on Do 26. Jan 11:04:55 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 25. Jan 18:50:23 CET 2012
+ * Built on Do 26. Jan 11:04:55 CET 2012
  *
  */
  
@@ -3742,7 +3742,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 25. Jan 18:50:23 CET 2012
+ * Built on Do 26. Jan 11:04:55 CET 2012
  *
  */
  
@@ -4299,9 +4299,19 @@
 		this.frame = window.frames[this.mainframe]; // there is no document yet
 	};
 	
-	
+	/**
+	 * Returns the element with id 'id'. Looks first into the mainframe,
+	 * and then into the rest of the page.
+	 */
 	GameWindow.prototype.getElementById = function (id) {
-		return (this.frame) ? this.frame.getElementById(id) : document.getElementById(id);
+		var el = null;
+		if (this.frame) {
+			el = this.frame.getElementById(id);
+		}
+		if (!el) {
+			el = document.getElementById(id);
+		}
+		return el; 
 	};
 	
 	GameWindow.prototype.getElementsByTagName = function (tag) {
@@ -4553,19 +4563,21 @@
 		  this.renderers.push(function(el){
 			  return document.createTextNode(el.content);
 		  });
-		  if (Table) {
-			  this.renderers.push (function (el) { 
-				  if ('object' === typeof el.content) {
-		    		var tbl = new HTMLRenderer();
-		    		for (var key in el.content) {
-		    			if (el.content.hasOwnProperty(key)){
-		    				tbl.addRow([key,el.content[key]]);
-		    			}
-		    		}
-		    		return tbl.parse();
-				  }
-			  });
-		  }
+		  
+		  this.renderers.push (function (el) { 
+			  if ('object' === typeof el.content) {
+	    		var div = document.createElement('div');
+	    		for (var key in el.content) {
+	    			if (el.content.hasOwnProperty(key)) {
+	    				var str = key + ':\t' + el.content[key];
+	    				div.appendChild(document.createTextNode(str));
+	    				div.appendChild(document.createElement('br'));
+	    			}
+	    		}
+	    		return div;
+			  }
+		  });
+		 
 		  this.renderers.push (function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
@@ -4585,9 +4597,14 @@
 	
 
 	  
-	  HTMLRenderer.prototype.addRenderer = function (renderer) {
+	  HTMLRenderer.prototype.addRenderer = function (renderer, pos) {
 		  if (!renderer) return;
-		  this.renderers.push(renderer);
+		  if (!pos) {
+			  this.renderers.push(renderer);
+		  }
+		  else {
+			  this.renderers.splice(pos, 1, renderer);
+		  }
 	  };
 	  
 	  
@@ -4611,6 +4628,10 @@
 		  }
 		  // Safety return
 		  return cell.content;
+	  };
+	  
+	  HTMLRenderer.prototype.size = function () {
+		  return this.renderers.length;
 	  };
 	
 	  // Abstract HTML Entity reprentation
@@ -4768,7 +4789,14 @@
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update
 																		: this.auto_update;
 	    
-		this.DL = options.list || document.createElement(this.FIRST_LEVEL); 
+		this.DL = options.list || document.createElement(this.FIRST_LEVEL);
+		this.DL.id = options.id || this.id;
+		if (options.className) {
+	    	this.DL.className = options.className;
+	    }
+		if (options.title) {
+			this.DL.appendChild(document.createTextNode(options.title));
+		}
 		
 		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
 	  };
@@ -4799,7 +4827,7 @@
 	List.prototype.addDT = function (elem, dt) {
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt++;  
-		var node = new Node({dt: dt});
+		var node = new Node({dt: dt, content: elem});
 		return this._add(node);
 	};
 	
@@ -4807,7 +4835,7 @@
 		if ('undefined' === typeof elem) return;
 		var dt = ('undefined' !== typeof dt) ? dt: this.last_dt;
 		var dt = ('undefined' !== typeof dd) ? dd: this.last_dd++;
-		var node = new Node({dt: dt, dd: dd});
+		var node = new Node({dt: dt, dd: dd, content: elem});
 		return this._add(node);
 	};
 	
@@ -4830,23 +4858,35 @@
 				old_dd.appendChild(node);
 			}
 			else if (!old_dt) {
+				console.log('creating dt for dd');
 				old_dt = appendDT();
 			}
 			old_dt.appendChild(node);
 			return node;
 		};
 		
+		// Reparse all every time
+		// TODO: improve this
+		if (this.DL) {
+			  while (this.DL.hasChildNodes()) {
+			        this.DL.removeChild(this.DL.firstChild);
+			    }
+		  }
+		
 		
 		for (var i=0; i<this.db.length; i++) {
 			var el = this.db[i];
 			if (!el.dd) {
 				var node = appendDT.call(this);
+				console.log('just created dt');
 			}
 			else {
 				var node = appendDD.call(this);
 			}
+			console.log('This is the el')
+			console.log(el);
 			var content = this.htmlRenderer.render(el);
-			console.log('This is the content');
+			console.log('This is how it is rendered');
 			console.log(content);
 			node.appendChild(content);		
 		}
@@ -4921,8 +4961,7 @@
     this.defaultDim3 = options.defaultDim3 || 'z';
     
     this.table = options.table || document.createElement('table'); 
-    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);  
-    this.table.id = this.id;
+    this.id = options.id || 'table_' + Math.round(Math.random() * 1000);
     
     this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : false;
     
@@ -4948,7 +4987,34 @@
   // TODO: improve init
   Table.prototype.init = function (options) {
 	var options = options || this.options;
-	this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
+    this.table.id = options.id || this.id;
+    if (options.className) {
+    	this.table.className = options.className;
+    }
+    this.initRenderer(options.renderers);
+  };
+  
+  Table.prototype.initRenderer = function(options) {
+	this.htmlRenderer = new HTMLRenderer();	
+	this.htmlRenderer.addRenderer(function(el) {
+		if ('object' === typeof el.content) {
+    		var tbl = new Table();
+    		for (var key in el.content) {
+    			if (el.content.hasOwnProperty(key)){
+    				tbl.addRow([key,el.content[key]]);
+    			}
+    		}
+    		return tbl.parse();
+		}
+	});
+	if (options) {
+		if (!(options instanceof Array)) {
+			options = [this.options.renderers];
+		}
+		for (var i=0; i< options.length; i++) {
+			this.htmlRenderer.addRenderer(options[i]);
+		}
+	} 
   };
   
   // TODO: make it 3D
@@ -5386,7 +5452,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 25. Jan 18:50:23 CET 2012
+ * Built on Do 26. Jan 11:04:55 CET 2012
  *
  */
  
@@ -6280,7 +6346,7 @@
 //			console.log('MODMOD ' + this.name);
 			attributes.name = this.groupName;
 		}
-		console.log(attributes);
+		//console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
 	};
 	

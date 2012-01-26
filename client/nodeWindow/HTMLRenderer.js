@@ -47,19 +47,21 @@
 		  this.renderers.push(function(el){
 			  return document.createTextNode(el.content);
 		  });
-		  if (Table) {
-			  this.renderers.push (function (el) { 
-				  if ('object' === typeof el.content) {
-		    		var tbl = new HTMLRenderer();
-		    		for (var key in el.content) {
-		    			if (el.content.hasOwnProperty(key)){
-		    				tbl.addRow([key,el.content[key]]);
-		    			}
-		    		}
-		    		return tbl.parse();
-				  }
-			  });
-		  }
+		  
+		  this.renderers.push (function (el) { 
+			  if ('object' === typeof el.content) {
+	    		var div = document.createElement('div');
+	    		for (var key in el.content) {
+	    			if (el.content.hasOwnProperty(key)) {
+	    				var str = key + ':\t' + el.content[key];
+	    				div.appendChild(document.createTextNode(str));
+	    				div.appendChild(document.createElement('br'));
+	    			}
+	    		}
+	    		return div;
+			  }
+		  });
+		 
 		  this.renderers.push (function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
@@ -79,9 +81,14 @@
 	
 
 	  
-	  HTMLRenderer.prototype.addRenderer = function (renderer) {
+	  HTMLRenderer.prototype.addRenderer = function (renderer, pos) {
 		  if (!renderer) return;
-		  this.renderers.push(renderer);
+		  if (!pos) {
+			  this.renderers.push(renderer);
+		  }
+		  else {
+			  this.renderers.splice(pos, 1, renderer);
+		  }
 	  };
 	  
 	  
@@ -105,6 +112,10 @@
 		  }
 		  // Safety return
 		  return cell.content;
+	  };
+	  
+	  HTMLRenderer.prototype.size = function () {
+		  return this.renderers.length;
 	  };
 	
 	  // Abstract HTML Entity reprentation
