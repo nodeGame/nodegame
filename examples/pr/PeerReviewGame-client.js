@@ -112,6 +112,31 @@ function PeerReviewGame () {
 		});
 		// End TABLE
 		
+		
+		this.renderCF = function (cell) {
+			console.log('about to render');
+			console.log(cell);
+			// Check if it is really CF obj
+			if (cell.content.cf) {
+				var cf_options = { id: 'cf_' + cell.x,
+						   width: 200,
+						   height: 200,
+						   features: cell.content.cf,
+						   controls: false
+				};
+				
+				var container = document.createElement('div');
+				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
+				
+				var details_tbl = new node.window.Table();
+				details_tbl.addColumn(['Author: ' + cell.content.author,
+				                       'Score: ' + cell.content.mean
+				]);
+				container.appendChild(details_tbl.parse());
+				return container;
+			}
+		};
+		
 	};
 	
 	
@@ -325,35 +350,12 @@ function PeerReviewGame () {
 		node.window.loadFrame('dissemination.html', function() {
 			var root = node.window.getElementById('root');
 			
-			var renderCF = function (cell) {
-				console.log('about to render');
-				console.log(cell);
-				// Check if it is really CF obj
-				if (cell.content.cf) {
-					var cf_options = { id: 'cf_' + cell.x,
-							   width: 200,
-							   height: 200,
-							   features: cell.content.cf,
-							   controls: false
-					};
-					
-					var container = document.createElement('div');
-					var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-					
-					var details_tbl = new node.window.Table();
-					details_tbl.addColumn(['Author: ' + cell.content.author,
-					                       'Score: ' + cell.content.mean
-					]);
-					container.appendChild(details_tbl.parse());
-					return container;
-				}
-			};
-			
 			var table = new node.window.Table({className: 'exhibition',
-										 	   render: renderCF
+										 	   render: this.renderCF
 			});
 			table.setHeader(['Rank','A','B','C']);
 			table.addColumn([1,2,3]);
+			
 			
 			node.onDATA('WIN_CF', function(msg) {
 				
@@ -368,47 +370,32 @@ function PeerReviewGame () {
 					
 						if (winners.length > 0) {
 							table.addColumn(winners);
-//							var column = [];
-//							for (var i=0; i < winners.length; i++) {
-//							
-//								var details_tbl = new node.window.Table();
-//								details_tbl.addColumn(['Author: ' + winners[i].author,
-//								                       'Score: ' + winners[i].mean
-//								]);
-//								
-//								var cf_options = { id: 'cf_' + winners[i].player,
-//										   width: 200,
-//										   height: 200,
-//										   features: winners[i].cf,
-//										   controls: false
-//								};
-//								
-//								
-//								var container = document.createElement('div');
-//								
-//								var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-//								container.appendChild(details_tbl.parse());
-//								column.push(container);
-//							}
-//							table.addColumn(column);
 						}
 						else {
 							table.addColumn(['No creation was selected for exhibition ' + this.exs[j]]);
 						}
 					}
+					
+					// Styling the table
+					var t = table.select('x', '=', 1);
+					t.select('y', '=', 0).addClass('first');
+					t.select('y', '=', 1).addClass('second');
+					t.select('y', '=', 2).addClass('third');
+					//t.select('y', '>', 2).addClass('other');
+					
+					root.appendChild(table.parse());
+					
+//					this.all_ex.addDT(table.table);
+
 				}
+				
 				else {
-					node.window.write('No work was selected to be published in any exhibition', root);
+					var str = 'No work was selected to be published in any exhibition';
+					node.window.write(str, root);
+//					this.all_ex.addDT(str);
 				}
 				
-				// Styling the table
-				table.select('y', '=', 0).addClass('first');
-				table.select('y', '=', 1).addClass('second');
-				table.select('y', '=', 2).addClass('third');
-				table.select('y', '>', 2).addClass('other');
-				
-				root.appendChild(table.parse());
-				
+
 				node.window.addEventButton('DONE', this.donetxt);
 				
 				this.timer.restart({
@@ -416,13 +403,7 @@ function PeerReviewGame () {
 									milliseconds: this.milli
 				});	
 				
-				
-//				this.all_ex.addDT(table.table);
-//				this.all_ex.parse();
-				
 			});
-			
-			
 			
 		});
 		
