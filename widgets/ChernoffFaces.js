@@ -145,16 +145,20 @@
 	
 	ChernoffFaces.prototype.listeners = function () {
 		var that = this;
-		
 		node.on(that.change, function(msg) {
-			var fv = new FaceVector(that.sc.getAllValues());
-			that.fp.redraw(fv);
+			that.draw(that.sc.getAllValues());
 		}); 
 	};
 	
+	ChernoffFaces.prototype.draw = function (features) {
+		if (!features) return;
+		var fv = new FaceVector(features);
+		this.fp.redraw(fv);
+	};
 	
 	ChernoffFaces.prototype.getAllValues = function() {
-		return this.sc.getAllValues();
+		//if (this.sc) return this.sc.getAllValues();
+		return this.fp.face;
 	};
 	
 	ChernoffFaces.prototype.randomize = function() {
@@ -187,7 +191,7 @@
 	//Draws a Chernoff face.
 	FacePainter.prototype.draw = function (face, x, y) {
 		if (!face) return;
-		
+		this.face = face;
 		this.fit2Canvas(face);
 		this.canvas.scale(face.scaleX, face.scaleY);
 		

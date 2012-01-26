@@ -119,7 +119,10 @@ function PeerReviewGame () {
 						   width: 200,
 						   height: 200,
 						   features: cell.content.cf,
-						   controls: false
+						   controls: false,
+						   onclick: function() {
+						      node.game.cf.draw(this.getAllValues());
+						   }
 				};
 				
 				var container = document.createElement('div');
@@ -187,7 +190,7 @@ function PeerReviewGame () {
 			// Add timer
 			var timerOptions = {
 								event: 'CREATION_DONE',
-								milliseconds: this.milli_short
+								milliseconds: this.milli
 			};
 			
 			this.timer.restart(timerOptions);
@@ -391,8 +394,8 @@ function PeerReviewGame () {
 
 					node.window.write(table.parse());
 					
-					
-					this.all_ex.addDD(table.table);
+					// Was table.table
+					this.all_ex.addDD(table);
 
 				}
 				

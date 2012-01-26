@@ -320,17 +320,6 @@
   // TODO: improve algorithm, rewrite
   Table.prototype.parse = function () {
 	  
-//	  // Loop through all the render function
-//	  // until a return value is found
-//	  var renderCell = function (cell) {
-//		  for (var i = this.render.length; i > 0; i--) {
-//			  var out = this.render[(i-1)].call(this, cell);
-//			  if (out) return out;
-//		  }
-//		  // Safety return
-//		  return cell.content;
-//	  };
-	  
 	  // Create a cell element (td,th...)
 	  // and fill it with the return value of a
 	  // render value. 

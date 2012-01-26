@@ -293,14 +293,27 @@
 	 * Add a widget to the browser window.
 	 * TODO: If an already existing id is provided, the existing element is deleted.
 	 */
-	GameWindow.prototype.addWidget = function (g, root, options) {
+	GameWindow.prototype.addWidget = function (w, root, options) {
 		var that = this;
 		
-		function appendFieldset(root, options, g) {
+		function appendFieldset(root, options, w) {
 			if (!options) return root;
-			var idFieldset = options.id || g.id + '_fieldset';
-			var legend = options.legend || g.legend;
+			var idFieldset = options.id || w.id + '_fieldset';
+			var legend = options.legend || w.legend;
 			return that.addFieldset(root, idFieldset, legend, options.attributes);
+		};
+		
+		function attachListeners (options, w) {
+			if (!options || !w) return;
+			for (var i in options) {
+				if (options.hasOwnProperty(i)) {
+					if (JSUS.in_array(i, ['onclick', 'onfocus', 'onblur', 'onchange', 'onsubmit', 'onload', 'onunload', 'onmouseover'])) {
+						w.getRoot()[i] = function() {
+							options[i].call(w);
+						}
+					}
+				}			
+			};
 		};
 		
 		// Init default values
@@ -310,24 +323,28 @@
 
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
-		if ('object' !== typeof g) {
-			g = JSUS.getNestedValue(g,this.widgets);
-			g = new g(options);
+		if ('object' !== typeof w) {
+			w = JSUS.getNestedValue(w,this.widgets);
+			w = new w(options);
 		}
 		
-		node.log('nodeWindow: registering gadget ' + g.name + ' v.' +  g.version);
+		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
 		//try {
 			// options exists and options.fieldset exist
-			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : g.fieldset; 
-			root = appendFieldset(root, fieldsetOptions, g);
-			g.append(root);
-			g.listeners();
+			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : w.fieldset; 
+			root = appendFieldset(root, fieldsetOptions, w);
+			w.append(root);
+			// nodeGame listeners
+			w.listeners();
+			// user listeners
+			attachListeners(options, w);
+			
 //		}
 //		catch(e){
-//			throw 'Error while loading widget ' + g.name + ': ' + e;
+//			throw 'Error while loading widget ' + w.name + ': ' + e;
 //		}
 		
-		return g;
+		return w;
 	};
 	
 	// Recipients

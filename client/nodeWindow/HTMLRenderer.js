@@ -68,6 +68,23 @@
 			  }
 		  });
 		  
+		  if (node.window.Table) {
+			  this.renderers.push (function (el) { 
+				  if (el.content instanceof node.window.Table) {
+		    		return el.content.parse();
+				  }
+			  });
+		  }
+		  
+		  if (node.window.List) {
+			  this.renderers.push (function (el) { 
+				  if (el.content instanceof node.window.List) {
+		    		return el.content.parse();
+				  }
+			  });
+		  }
+		  
+		  
 	  };
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {

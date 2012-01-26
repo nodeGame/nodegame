@@ -29,7 +29,7 @@ function Monitor_Example () {
 			}
 		};
 		
-		this.summary = node.window.addWidget('GameTable', document.body, {renderers: renderCF});		
+		this.summary = node.window.addWidget('GameTable', document.body, {render: renderCF});		
 		
 //		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
 //		this.dtable.addBind('x', function (msg) {
