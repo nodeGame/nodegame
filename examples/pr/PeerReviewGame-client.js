@@ -475,7 +475,8 @@ function PeerReviewGame () {
 			},
 			
 			2: {state: 	instructions,
-				name: 	'Instructions'
+				name: 	'Instructions',
+				timer:  10000
 			},
 				
 			3: {rounds:	10, 
