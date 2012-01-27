@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 14:32:23 CET 2012
+ * Built on Fri Jan 27 16:56:20 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 14:32:23 CET 2012
+ * Built on Fri Jan 27 16:56:20 CET 2012
  *
  */
  
@@ -3245,21 +3245,7 @@
 	
 	Game.prototype.dump = function(reverse) {
 		return this.memory.dump(reverse);
-	}
-	
-	Game.prototype.init = function() {
-		
-	//	var header = this.window.addHeader(document.getElementById('root'), 'header');
-	//	header.innerHTML = '<h1>'+ this.name + '</h1>';
-	//	header.innerHTML += '<p>' + this.description + '</p>';
-	//	var button = this.window.addButton(header,'sendbutton');
-	//	
-	//	var that = this;
-	//	button.onclick = function() {
-	//	  that.DONEWAIT('FUNZIA');
-	//	};
-	}; 
-	
+	};
 	
 	Game.prototype.isGameReady = function() {
 		
@@ -3526,6 +3512,8 @@
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
+		node.emit('NODEGAME_GAME_CREATED');
+		
 		//node.memory = that.game.memory;
 		// INIT the game
 		that.game.init.call(that.game);
@@ -3766,8 +3754,10 @@
 		
 		console.log('op');
 		console.log(options);
-		
 		this.init(this.options);
+		
+		// TODO: remove into a new addon
+		this.listeners();
 	};
 	
 	GameTimer.prototype.init = function (options) {
@@ -3783,7 +3773,7 @@
 				this.addHook(options.hooks[i]);
 			}
 		}
-		this.listeners();
+		
 	};
 	
 	/**
@@ -3866,41 +3856,21 @@
 	GameTimer.prototype.listeners = function () {
 		var that = this;
 		
-		node.on('NODEGAME_READY', function() {
-			// Modify the Game object
-			node.game.gameTimer = null;
-		});
-		
-		node.on('LOADED', function() {
-			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
-			console.log('found');
-			console.log(timer);
-			if (timer) {
-				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
-				if (!options.timeup) {
-					options.timeup = 'DONE';
-				}
-				
-				node.game.gameTimer = new GameTimer(options);
-				node.game.gameTimer.start();
-			}
-		});
-		
-		node.on('GAME_TIMER_START', function() {
-			that.start();
-		}); 
-		
-		node.on('GAME_TIMER_PAUSE', function() {
-			that.pause();
-		});
-		
-		node.on('GAME_TIMER_RESUME', function() {
-			that.resume();
-		});
-		
-		node.on('GAME_TIMER_STOP', function() {
-			that.stop();
-		});
+//		node.on('GAME_TIMER_START', function() {
+//			that.start();
+//		}); 
+//		
+//		node.on('GAME_TIMER_PAUSE', function() {
+//			that.pause();
+//		});
+//		
+//		node.on('GAME_TIMER_RESUME', function() {
+//			that.resume();
+//		});
+//		
+//		node.on('GAME_TIMER_STOP', function() {
+//			that.stop();
+//		});
 		
 		node.on('DONE', function(){
 			that.pause();
@@ -3927,7 +3897,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 14:32:24 CET 2012
+ * Built on Fri Jan 27 16:56:20 CET 2012
  *
  */
  
@@ -5649,7 +5619,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 14:32:24 CET 2012
+ * Built on Fri Jan 27 16:56:20 CET 2012
  *
  */
  
@@ -6647,6 +6617,87 @@
 		node.onPLIST( function(msg) {
 				node.window.populateRecipientSelector(that.recipient,msg.data);
 			}); 
+	};
+	
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	
+	/*
+	 * DoneButton
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
+	
+	exports.DoneButton	= DoneButton;
+	
+	JSUS = node.JSUS;
+	
+	DoneButton.name = 'Done Button';
+	DoneButton.version = '0.1';
+	DoneButton.dependencies = {
+		JSUS: {}
+	};
+	
+	function DoneButton (options) {
+		this.options = options;
+		this.id = options.id || 'donebutton';
+
+		
+		this.root = null;		// the parent element
+		this.text = 'Done!';
+		this.button = document.createElement('button');
+		this.func = options.exec || null;
+		this.init(this.options);
+	};
+	
+	DoneButton.prototype.init = function (options) {
+		var options = options || this.options;
+		this.button.id = options.id || this.id;
+		var text = options.text || this.text;
+		while (this.button.hasChildNodes()) {
+			this.button.removeChild(this.button.firstChild);
+		}
+		this.button.appendChild(document.createTextNode(text));
+		this.func = options.exec || this.func;
+		// Emit DONE only if callback is successful
+		this.button.onclick = function() {
+			var ok = true;
+			if (options.exec) ok = options.exec.call(node.game);
+			if (ok) node.emit('DONE');
+		}
+	};
+	
+	DoneButton.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.button);
+		return root;	
+	};
+	
+	DoneButton.prototype.updateDisplay = function () {
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
+			this.timerDiv.innerHTML = '0:0';
+			return;
+		}
+		var time = this.gameTimer.milliseconds - this.gameTimer.timePassed;
+		time = JSUS.parseMilliseconds(time);
+		this.timerDiv.innerHTML = time[2] + ':' + time[3];
+	};
+	
+	DoneButton.prototype.listeners = function () {
+		var that = this;
+		node.on('LOADED', function() {
+		
+			var done = node.game.gameLoop.getAllParams(node.game.gameState).done;
+			if (done) {
+				// TODO: check for other options
+				that.init({exec: done});
+			}
+		});
 	};
 	
 })(node.window.widgets); 
@@ -7696,8 +7747,17 @@
 			});
 		})();
 		
-	
-		this.gameTimer = options.gameTimer || new node.GameTimer(options);
+		
+		this.gameTimer = (options.gameTimer) || new node.GameTimer();
+		
+		if (this.gameTimer) {
+			this.gameTimer.init(options);
+		}
+		else {
+			node.log('GameTimer object could not be initialized. VisualTimer will not work properly.', 'ERR');
+		}
+		
+		
 	};
 	
 	VisualTimer.prototype.append = function (root) {
@@ -7735,7 +7795,22 @@
 		this.gameTimer.resume();
 	};
 		
-	VisualTimer.prototype.listeners = function () {};
+	VisualTimer.prototype.listeners = function () {
+		var that = this;
+		node.on('LOADED', function() {
+		
+			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
+			if (timer) {
+				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
+				if (!options.timeup) {
+					options.timeup = 'DONE';
+				}
+				
+				that.gameTimer.init(options);
+				that.start();
+			}
+		});
+	};
 	
 })(node.window.widgets); 
  

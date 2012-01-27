@@ -53,8 +53,17 @@
 			});
 		})();
 		
-	
-		this.gameTimer = options.gameTimer || new node.GameTimer(options);
+		
+		this.gameTimer = (options.gameTimer) || new node.GameTimer();
+		
+		if (this.gameTimer) {
+			this.gameTimer.init(options);
+		}
+		else {
+			node.log('GameTimer object could not be initialized. VisualTimer will not work properly.', 'ERR');
+		}
+		
+		
 	};
 	
 	VisualTimer.prototype.append = function (root) {
@@ -92,6 +101,21 @@
 		this.gameTimer.resume();
 	};
 		
-	VisualTimer.prototype.listeners = function () {};
+	VisualTimer.prototype.listeners = function () {
+		var that = this;
+		node.on('LOADED', function() {
+		
+			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
+			if (timer) {
+				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
+				if (!options.timeup) {
+					options.timeup = 'DONE';
+				}
+				
+				that.gameTimer.init(options);
+				that.start();
+			}
+		});
+	};
 	
 })(node.window.widgets);

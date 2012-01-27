@@ -23,8 +23,10 @@
 		
 		console.log('op');
 		console.log(options);
-		
 		this.init(this.options);
+		
+		// TODO: remove into a new addon
+		this.listeners();
 	};
 	
 	GameTimer.prototype.init = function (options) {
@@ -40,7 +42,7 @@
 				this.addHook(options.hooks[i]);
 			}
 		}
-		this.listeners();
+		
 	};
 	
 	/**
@@ -123,41 +125,21 @@
 	GameTimer.prototype.listeners = function () {
 		var that = this;
 		
-		node.on('NODEGAME_READY', function() {
-			// Modify the Game object
-			node.game.gameTimer = null;
-		});
-		
-		node.on('LOADED', function() {
-			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
-			console.log('found');
-			console.log(timer);
-			if (timer) {
-				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
-				if (!options.timeup) {
-					options.timeup = 'DONE';
-				}
-				
-				node.game.gameTimer = new GameTimer(options);
-				node.game.gameTimer.start();
-			}
-		});
-		
-		node.on('GAME_TIMER_START', function() {
-			that.start();
-		}); 
-		
-		node.on('GAME_TIMER_PAUSE', function() {
-			that.pause();
-		});
-		
-		node.on('GAME_TIMER_RESUME', function() {
-			that.resume();
-		});
-		
-		node.on('GAME_TIMER_STOP', function() {
-			that.stop();
-		});
+//		node.on('GAME_TIMER_START', function() {
+//			that.start();
+//		}); 
+//		
+//		node.on('GAME_TIMER_PAUSE', function() {
+//			that.pause();
+//		});
+//		
+//		node.on('GAME_TIMER_RESUME', function() {
+//			that.resume();
+//		});
+//		
+//		node.on('GAME_TIMER_STOP', function() {
+//			that.stop();
+//		});
 		
 		node.on('DONE', function(){
 			that.pause();

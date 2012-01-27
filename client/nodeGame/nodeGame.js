@@ -240,6 +240,8 @@
 		node.gsc = that.gsc = new GameSocketClient(conf);
 		
 		node.game = that.game = new Game(game, that.gsc);
+		node.emit('NODEGAME_GAME_CREATED');
+		
 		//node.memory = that.game.memory;
 		// INIT the game
 		that.game.init.call(that.game);

@@ -324,21 +324,7 @@
 	
 	Game.prototype.dump = function(reverse) {
 		return this.memory.dump(reverse);
-	}
-	
-	Game.prototype.init = function() {
-		
-	//	var header = this.window.addHeader(document.getElementById('root'), 'header');
-	//	header.innerHTML = '<h1>'+ this.name + '</h1>';
-	//	header.innerHTML += '<p>' + this.description + '</p>';
-	//	var button = this.window.addButton(header,'sendbutton');
-	//	
-	//	var that = this;
-	//	button.onclick = function() {
-	//	  that.DONEWAIT('FUNZIA');
-	//	};
-	}; 
-	
+	};
 	
 	Game.prototype.isGameReady = function() {
 		

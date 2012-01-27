@@ -16,13 +16,14 @@ function PeerReviewGame () {
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
 		this.timer = node.window.addWidget('VisualTimer', this.header);
+		this.timer = node.window.addWidget('DoneButton', this.header);
 		this.sd = node.window.addWidget('StateDisplay', this.header);
 		this.outlet = null;
 		this.exs = ['A','B','C'];
 		this.donetxt = 'Done!';
 		this.milli = 10000;
 		this.milli_short = 1000;
-		
+
 		this.all_ex = new node.window.List({ id: 'all_ex',
 											 title: 'History of previous exhibitions'
 		});
@@ -143,23 +144,13 @@ function PeerReviewGame () {
 	
 	var pregame = function() {
 		var frame = node.window.loadFrame('pregame.html');
+		
 		node.emit('DONE');
 		console.log('Pregame');
 	};
 	
 	var instructions = function(){
-		node.window.loadFrame('instructions.html', function() {
-			
-			var b = node.window.getElementById('read');
-			
-			b.onclick = function() {
-				node.DONE('Instructions have been read.');
-				node.fire('WAIT');
-			};
-			
-			//node.random.emit('DONE',100);
-			
-		});
+		node.window.loadFrame('instructions.html');
 		console.log('Instructions');
 	};
 	
@@ -185,15 +176,6 @@ function PeerReviewGame () {
 			
 
 			node.window.addEventButton('CREATION_DONE', this.donetxt, creationDiv);
-			
-			
-			// Add timer
-			var timerOptions = {
-								timeup: 'CREATION_DONE',
-								milliseconds: this.milli
-			};
-			
-			this.timer.restart(timerOptions);
 			
 			node.on('CREATION_DONE', function(){
 				node.set('CF', this.cf.getAllValues());
@@ -253,18 +235,8 @@ function PeerReviewGame () {
 			}
 		}, 10);
 		
-		
-		
-		// Add timer
-		var timerOptions = {
-							timeup: 'SUBMISSION_DONE',
-							milliseconds: this.milli_short
-		};
-		
-		
 		node.window.addEventButton('SUBMISSION_DONE', this.donetxt);
 		
-		this.timer.restart(timerOptions);
 		
 		node.on('SUBMISSION_DONE', function(){
 			if (!this.outlet.hasChanged) {
@@ -295,14 +267,6 @@ function PeerReviewGame () {
 		node.window.loadFrame('evaluation.html', function() {
 		
 			var root = node.window.getElementById('root');
-			
-			// Add timer
-			var timerOptions = {
-								timeup: 'EVALUATION_DONE',
-								milliseconds: this.milli_short
-			};	
-			
-			this.timer.restart(timerOptions);
 			
 			node.onDATA('CF', function(msg) {
 				
@@ -408,11 +372,6 @@ function PeerReviewGame () {
 
 				node.window.addEventButton('DONE', this.donetxt);
 				
-				this.timer.restart({
-									timeup: 'DONE',
-									milliseconds: this.milli_short
-				});	
-				
 			});
 			
 		});
@@ -448,19 +407,32 @@ function PeerReviewGame () {
 	var gameloop = { // The different, subsequent phases in each round
 		
 		1: {state: creation,
-			name: 'Creation'
+			name: 'Creation',
+			timer: {
+				timeup: 'CREATION_DONE',
+				milliseconds: 1000
+			}	
 		},
 		
 		2: {state: submission,
-			name: 'Submission'
+			name: 'Submission',
+			timer: {
+				timeup: 'SUBMISSION_DONE',
+				milliseconds: 1000
+			}	
 		},
 		
 		3: {state: evaluation,
-			name: 'Evaluation'
+			name: 'Evaluation',
+			timer: {
+				timeup: 'EVALUATION_DONE',
+				milliseconds: 1000
+			}
 		},
 		
 		4: {state: dissemination,
-			name: 'Exhibition'
+			name: 'Exhibition',
+			timer: 20000
 		}
 	};
 
@@ -476,7 +448,7 @@ function PeerReviewGame () {
 			
 			2: {state: 	instructions,
 				name: 	'Instructions',
-				timer:  10000
+				timer:  1000
 			},
 				
 			3: {rounds:	10, 
@@ -485,7 +457,8 @@ function PeerReviewGame () {
 			},
 			
 			4: {state:	questionnaire,
-				name: 	'Questionnaire'
+				name: 	'Questionnaire',
+				timer: 	1000
 			},
 				
 			5: {state:	endgame,
