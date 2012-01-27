@@ -49,6 +49,7 @@
 	VisualTimer.prototype.append = function (root) {
 		this.root = root;
 		this.timerDiv = node.window.addDiv(root, this.id + '_div');
+		this.timerDiv.innerHTML = '0:0';
 		return root;	
 	};
 	

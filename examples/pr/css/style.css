@@ -51,13 +51,13 @@ input[type="range"] {
 	margin-left: 5px
 }
 
-fieldset#VisualTimer_fieldset {
+fieldset#visualtimer_fieldset {
 	float: right;
 	width: 80px;
 	border: 5px solid black;
 }
 
-div#VisualTimer_div {
+div#visualtimer_div {
   width: 80px;
 	font-size: 16px;
 }

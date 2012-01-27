@@ -357,7 +357,7 @@
 	
 	// TODO: Check for version and other constraints.
 	GameWindow.prototype.checkDependencies = function (w, quiet) {
-		if (!w.dependencies) return;
+		if (!w.dependencies) return true;
 		
 		var errMsg = function (w, d) {
 			var name = w.name || w.id;// || w.toString();
