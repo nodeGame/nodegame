@@ -1,6 +1,9 @@
 7.1
 
 - HTMLRenderer object renders Table and List correctly
+- Build updated to support addons
+- GameTimer addon created
+- GameTimer and Visual Timer have hooks that can be fired
 
 7.0
 

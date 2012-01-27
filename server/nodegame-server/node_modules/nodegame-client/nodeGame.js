@@ -153,6 +153,10 @@
 	     */
 	
 	    node.Game = require('./Game').Game;
+	    
+	    
+	    // TODO: add a method to scan the addons directory. Based on configuration
+	    node.GameTimer = require('./addons/GameTimer').GameTimer;
 
 	  }
 	  // end node

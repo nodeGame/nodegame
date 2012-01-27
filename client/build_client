@@ -89,6 +89,8 @@ FILES[14]='GameSocketClient.js'
 FILES[15]='GameDB.js'
 FILES[16]='Game.js'
 FILES[17]='nodeGame.js'
+# Addons
+FILES[18]='addons/GameTimer.js'
 
 for f in ${FILES[*]}
 do
@@ -110,5 +112,3 @@ echo $NODEGAME created succesfully.
 
 # Producing a minified version as well
 # exec yui $NODEGAME -o $NODEGAMEMIN   --charset=utf-8
-
-

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 17:18:01 CET 2012
+ * Built on Fri Jan 27 10:51:14 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 17:18:01 CET 2012
+ * Built on Fri Jan 27 10:51:14 CET 2012
  *
  */
  
@@ -3434,6 +3434,10 @@
 	     */
 	
 	    node.Game = require('./Game').Game;
+	    
+	    
+	    // TODO: add a method to scan the addons directory. Based on configuration
+	    node.GameTimer = require('./addons/GameTimer').GameTimer;
 
 	  }
 	  // end node
@@ -3732,6 +3736,138 @@
 	
 })('undefined' != typeof node ? node : module.exports); 
  
+//(function (exports, node) {
+//
+//	/*
+//	 * GameTimer
+//	 * 
+//	 * Sends DATA msgs
+//	 * 
+//	 */
+//	
+//	exports.GameTimer = GameTimer;
+//	
+//	JSUS = node.JSUS;
+//	
+//	function GameTimer (options) {
+//		var options = options || {};
+//		this.options = options;
+//		
+//		this.timer = null; 		// the ID of the interval
+//		this.timeLeft = null;
+//		this.timePassed = 0;
+//		
+//		this.hooks = null;
+//		
+//		this.init(this.options);
+//	};
+//	
+//	GameTimer.prototype.init = function (options) {
+//		if (this.timer) clearInterval(this.timer);
+//		this.milliseconds = options.milliseconds || 0;
+//		this.timeLeft = this.milliseconds;
+//		this.timePassed = 0;
+//		this.update = options.update || 1000;
+//		this.event = options.event || 'TIMEUP'; // event to be fire		
+//		// TODO: update and milliseconds must be multiple now
+//		if (options.hooks) {
+//			for (var i=0; i < options.hooks.length; i++){
+//				this.addHook(options.hooks[i]);
+//			}
+//		}
+//		this.listeners();
+//	};
+//	
+//	/**
+//	 * Fire a registered hook. If it is a string it is emitted
+//	 * as an event, otherwise it called as a function.
+//	 */
+//	GameTimer.prototype.fire = function (h) {
+//		if (!h) return;
+//		if (h instanceof Function) {
+//			h.call(node.game);
+//			return;
+//		}
+//		node.emit(h);
+//	};
+//	
+//	GameTimer.prototype.start = function() {
+//		// fire the event immediately if time is zero
+//		if (this.options.milliseconds === 0){
+//			node.emit(this.event);
+//			return;
+//		}
+//		var that = this;
+//		this.timer = setInterval(function() {
+//			that.timePassed = that.timePassed + that.update;
+//			that.timeLeft = that.milliseconds - that.timePassed;
+//			
+//			// Fire custom hooks from the latest to the first if any
+//			for (var i = that.hooks.length; i> 0; i--) {
+//				that.fire(that.hooks[(i-1)]);
+//			}
+//			// Fire Timeup Event
+//			if (that.timeLeft <= 0) {
+//				that.fire(that.event);
+//				that.stop();
+//			}
+//			
+//		}, this.update);
+//	};
+//	
+//	GameTimer.prototype.addHook = function (hook) {
+//		if (!hook) return;
+//		this.hooks.push(hook);
+//	};
+//	
+//	GameTimer.prototype.pause = function() {
+//		clearInterval(this.timer);
+//	};	
+//
+//	GameTimer.prototype.resume = function() {
+//		if (this.timer) return; // timer was not paused
+//		var options = JSUS.extend({milliseconds: this.milliseconds - this.timePassed}, this.options);
+//		this.restart(options);
+//	};	
+//	
+//	GameTimer.prototype.stop = function() {
+//		clearInterval(this.timer);
+//		this.timePassed = 0;
+//		this.timeLeft = null;
+//	};	
+//	
+//	GameTimer.prototype.restart = function (options) {
+//		var options = options || this.options;
+//		this.init(options);
+//		this.start();
+//	};
+//		
+//	GameTimer.prototype.listeners = function () {
+//		var that = this;
+//		
+//		node.on('GAME_TIMER_START', function() {
+//			that.start();
+//		}); 
+//		
+//		node.on('GAME_TIMER_PAUSE', function() {
+//			that.pause();
+//		});
+//		
+//		node.on('GAME_TIMER_RESUME', function() {
+//			that.resume();
+//		});
+//		
+//		node.on('GAME_TIMER_STOP', function() {
+//			that.stop();
+//		});
+//		
+//	};
+//	
+//})(
+//	'undefined' != typeof node ? node : module.exports
+//  , 'undefined' != typeof node ? node : module.parent.exports
+//); 
+ 
  
  
  
@@ -3742,7 +3878,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 17:18:01 CET 2012
+ * Built on Fri Jan 27 10:51:14 CET 2012
  *
  */
  
@@ -4403,9 +4539,17 @@
 
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
+		// In this case a dependencies check is done
 		if ('object' !== typeof w) {
-			w = JSUS.getNestedValue(w,this.widgets);
-			w = new w(options);
+			w = JSUS.getNestedValue(w, this.widgets);
+			
+			if (this.checkDependencies(w)) {
+				w = new w(options);
+			}
+			else {
+				return false;
+			}
+			
 		}
 		
 		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
@@ -4427,6 +4571,30 @@
 		return w;
 	};
 	
+	// TODO: Check for version and other constraints.
+	GameWindow.prototype.checkDependencies = function (w, quiet) {
+		if (!w.dependencies) return;
+		
+		var errMsg = function (w, d) {
+			var name = w.name || w.id;// || w.toString();
+			node.log(d + ' not found. ' + name + ' cannot be loaded.', 'ERR');
+		}
+		
+		var d = w.dependencies;
+		for (var i in d) {
+			if (d.hasOwnProperty(i)) {
+				console.log(i)
+				if (!window[i] && !node[i]) {
+					if (!quiet) {
+						errMsg(w, i);
+					} 
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	};
 	// Recipients
 	
 	GameWindow.prototype.addRecipientSelector = function (root, id) {
@@ -5433,7 +5601,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 26. Jan 17:18:01 CET 2012
+ * Built on Fri Jan 27 10:51:14 CET 2012
  *
  */
  
@@ -7437,100 +7605,76 @@
 	
 	exports.VisualTimer	= VisualTimer;
 	
-	Utils = node.Utils;
+	JSUS = node.JSUS;
+	
+	VisualTimer.name = 'Visual Timer';
+	VisualTimer.version = '0.3.2';
+	VisualTimer.dependencies = {
+		GameTimer : {},
+		JSUS: {}
+	};
 	
 	function VisualTimer (options) {
-		var options = options || {};
+		this.options = options;
+
+		this.id = options.id || 'visualtimer';
+
+		this.gameTimer = null
 		
-		this.game = node.game;
-		this.id = options.id || 'VisualTimer';
-		this.name = 'Visual Timer';
-		this.version = '0.3.2';
-		
-		this.timer = null; 		// the ID of the interval
 		this.timerDiv = null; 	// the DIV in which to display the timer
 		this.root = null;		// the parent element
 		this.fieldset = { legend: 'Time to go',
 						  id: this.id + '_fieldset'
 		};
 		
-		this.init(options);
+		this.init(this.options);
 	};
 	
 	VisualTimer.prototype.init = function (options) {
-		if (this.timer) clearInterval(this.timer);
-		this.milliseconds = options.milliseconds || 0;
-		this.timePassed = 0;
-		this.update = options.update || 1000;
-		this.text = options.text || 'Time to go';
-		this.event = options.event || 'TIMEUP'; // event to be fire		
-		// TODO: update and milliseconds must be multiple now
+		var options = options || this.options;
+		if (options.hooks) {
+			if (!options.hooks instanceof Array) {
+				options.hooks = [options.hooks];
+			}
+			options.hooks.push(this.updateDisplay);
+		}
+		this.gameTimer = options.gameTimer || new node.GameTimer(options);
 	};
 	
 	VisualTimer.prototype.append = function (root) {
-		var that = this;
-//		var PREF = this.id + '_';
-//		
-//		var idFieldset = PREF + 'fieldset';
-//		var idTimerDiv = PREF + 'div';
-//		
-//		if (ids !== null && ids !== undefined) {
-//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-//		}
-//		
-//		var fieldset = node.window.addFieldset(root, idFieldset, this.text);
-		
 		this.root = root;
 		this.timerDiv = node.window.addDiv(root, this.id + '_div');
-			
-		this.start();
-		
-		return root;
-		
+		return root;	
+	};
+	
+	VisualTimer.prototype.updateDisplay = function () {
+		var time = this.gameTimer.milliseconds - this.gameTimer.timePassed;
+		time = JSUS.parseMilliseconds(time);
+		this.timerDiv.innerHTML = time[2] + ':' + time[3];
 	};
 	
 	VisualTimer.prototype.start = function() {
-		if (!this.milliseconds || this.milliseconds === 0){
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
 			this.timerDiv.innerHTML = '0:0';
 			return;
 		}
-		var that = this;
-		// Init Timer
-		var time = Utils.parseMilliseconds(this.milliseconds);
-		this.timerDiv.innerHTML = time[2] + ':' + time[3];
-		
-		
-		this.timer = setInterval(function() {
-			that.timePassed = that.timePassed + that.update;
-			var time = that.milliseconds - that.timePassed;
-
-			if (time <= 0) {
-				if (that.event) {
-					node.emit(that.event);
-				}
-				clearInterval(that.timer);
-				time = 0;
-			}
-			//console.log(time);
-			time = Utils.parseMilliseconds(time);
-			that.timerDiv.innerHTML = time[2] + ':' + time[3];
-			
-		}, this.update);
+		this.gameTimer.start();
 	};
 	
 	VisualTimer.prototype.restart = function(options) {
 		this.init(options);
-		this.start();
+		this.gameTimer.start();
+	};
+	
+	VisualTimer.prototype.stop = function(options) {
+		this.gameTimer.stop();
+	};
+	
+	VisualTimer.prototype.resume = function(options) {
+		this.gameTimer.resume();
 	};
 		
-	VisualTimer.prototype.listeners = function () {
-		var that = this;
-		var PREFIX = 'in.';
-		
-		node.onPLIST( function(msg) {
-				node.window.populateRecipientSelector(that.recipient,msg.data);
-			}); 
-	};
+	VisualTimer.prototype.listeners = function () {};
 	
 })(node.window.widgets); 
  

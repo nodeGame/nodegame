@@ -323,9 +323,17 @@
 
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
+		// In this case a dependencies check is done
 		if ('object' !== typeof w) {
-			w = JSUS.getNestedValue(w,this.widgets);
-			w = new w(options);
+			w = JSUS.getNestedValue(w, this.widgets);
+			
+			if (this.checkDependencies(w)) {
+				w = new w(options);
+			}
+			else {
+				return false;
+			}
+			
 		}
 		
 		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
@@ -347,6 +355,29 @@
 		return w;
 	};
 	
+	// TODO: Check for version and other constraints.
+	GameWindow.prototype.checkDependencies = function (w, quiet) {
+		if (!w.dependencies) return;
+		
+		var errMsg = function (w, d) {
+			var name = w.name || w.id;// || w.toString();
+			node.log(d + ' not found. ' + name + ' cannot be loaded.', 'ERR');
+		}
+		
+		var d = w.dependencies;
+		for (var i in d) {
+			if (d.hasOwnProperty(i)) {
+				if (!window[i] && !node[i]) {
+					if (!quiet) {
+						errMsg(w, i);
+					} 
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	};
 	// Recipients
 	
 	GameWindow.prototype.addRecipientSelector = function (root, id) {

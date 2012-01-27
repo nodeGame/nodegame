@@ -14,6 +14,8 @@ FILES[8]='GameDB.js'
 FILES[9]='Game.js'
 FILES[10]='nodeGame.js'
 FILES[11]='package.json'
+# Addons
+FILES[11]='addons/GameTimer.js'
 
 DIR="nodeGame/"
 DIR_MODULES="nodeGame/node_modules/"
