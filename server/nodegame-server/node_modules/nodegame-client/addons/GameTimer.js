@@ -21,6 +21,9 @@
 		
 		this.hooks = [];
 		
+		console.log('op');
+		console.log(options);
+		
 		this.init(this.options);
 	};
 	
@@ -119,6 +122,26 @@
 		
 	GameTimer.prototype.listeners = function () {
 		var that = this;
+		
+		node.on('NODEGAME_READY', function() {
+			// Modify the Game object
+			node.game.gameTimer = null;
+		});
+		
+		node.on('LOADED', function() {
+			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
+			console.log('found');
+			console.log(timer);
+			if (timer) {
+				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
+				if (!options.timeup) {
+					options.timeup = 'DONE';
+				}
+				
+				node.game.gameTimer = new GameTimer(options);
+				node.game.gameTimer.start();
+			}
+		});
 		
 		node.on('GAME_TIMER_START', function() {
 			that.start();

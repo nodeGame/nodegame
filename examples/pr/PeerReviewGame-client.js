@@ -157,7 +157,7 @@ function PeerReviewGame () {
 				node.fire('WAIT');
 			};
 			
-			node.random.emit('DONE',100);
+			//node.random.emit('DONE',100);
 			
 		});
 		console.log('Instructions');

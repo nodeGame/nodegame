@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.1
+ * nodeGame-all v0.7.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 12:28:02 CET 2012
+ * Built on Fri Jan 27 14:32:23 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.1
+ * nodeGame Client v0.7.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 12:28:02 CET 2012
+ * Built on Fri Jan 27 14:32:23 CET 2012
  *
  */
  
@@ -2143,19 +2143,18 @@
 				// When a state executes only one step,
 				// it is allowed to pass directly the name of the function.
 				// So such function must be incapsulated in a obj here.
-				var loop = this.loop[key]['state'];
+				var loop = this.loop[key].state;
 				if ('function' === typeof loop) {
-					var steps = 1;
-					this.loop[key]['state'] = {1: {state: loop,
-												   name: this.loop[key].name || key + '.1.1'
-												}};
+					var o = Utils.clone(this.loop[key]);
+					//var steps = 1;
+					this.loop[key].state = {1: o};
 				}
 				
-				var steps = Utils.getListSize(this.loop[key]['state'])
+				var steps = Utils.getListSize(this.loop[key].state)
 				
 				
 				var round = this.loop[key].rounds || 1;
-				this.limits.push({rounds:round,steps:steps});
+				this.limits.push({rounds: round, steps: steps});
 			}
 		}
 		
@@ -2164,7 +2163,8 @@
 	
 	
 	GameLoop.prototype.exist = function (gameState) {
-	
+		if (!gameState) return false;
+		
 		if (typeof(this.loop[gameState.state]) === 'undefined') {
 			node.log('Unexisting state: ' + gameState.state, 'WARN');
 			return false;
@@ -2287,12 +2287,17 @@
 		return false; // game init
 	};
 	
-	GameLoop.prototype.getName = function(gameState) {
+	GameLoop.prototype.getName = function (gameState) {
 		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['state'][gameState.step]['name'];
 	};
 	
-	GameLoop.prototype.getFunction = function(gameState) {
+	GameLoop.prototype.getAllParams = function (gameState) {
+		if (!this.exist(gameState)) return false;
+		return this.loop[gameState.state]['state'][gameState.step];
+	};
+	
+	GameLoop.prototype.getFunction = function (gameState) {
 		if (!this.exist(gameState)) return false;
 		return this.loop[gameState.state]['state'][gameState.step]['state'];
 	};
@@ -3308,7 +3313,7 @@
 			console.log(txt);
 		}
 	};
-
+	
 	// Memory related operations
 	// Will be initialized later
 	node.memory = {};
@@ -3759,6 +3764,9 @@
 		
 		this.hooks = [];
 		
+		console.log('op');
+		console.log(options);
+		
 		this.init(this.options);
 	};
 	
@@ -3858,6 +3866,26 @@
 	GameTimer.prototype.listeners = function () {
 		var that = this;
 		
+		node.on('NODEGAME_READY', function() {
+			// Modify the Game object
+			node.game.gameTimer = null;
+		});
+		
+		node.on('LOADED', function() {
+			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
+			console.log('found');
+			console.log(timer);
+			if (timer) {
+				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
+				if (!options.timeup) {
+					options.timeup = 'DONE';
+				}
+				
+				node.game.gameTimer = new GameTimer(options);
+				node.game.gameTimer.start();
+			}
+		});
+		
 		node.on('GAME_TIMER_START', function() {
 			that.start();
 		}); 
@@ -3894,12 +3922,12 @@
  
  
 /*!
- * nodeWindow v0.7.1
+ * nodeWindow v0.7.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 12:28:02 CET 2012
+ * Built on Fri Jan 27 14:32:24 CET 2012
  *
  */
  
@@ -5616,12 +5644,12 @@
  
  
 /*!
- * nodeGadgets v0.7.1
+ * nodeGadgets v0.7.2
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 12:28:02 CET 2012
+ * Built on Fri Jan 27 14:32:24 CET 2012
  *
  */
  

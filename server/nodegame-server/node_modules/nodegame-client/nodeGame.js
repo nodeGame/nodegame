@@ -27,7 +27,7 @@
 			console.log(txt);
 		}
 	};
-
+	
 	// Memory related operations
 	// Will be initialized later
 	node.memory = {};
