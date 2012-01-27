@@ -189,7 +189,7 @@ function PeerReviewGame () {
 			
 			// Add timer
 			var timerOptions = {
-								event: 'CREATION_DONE',
+								timeup: 'CREATION_DONE',
 								milliseconds: this.milli
 			};
 			
@@ -257,7 +257,7 @@ function PeerReviewGame () {
 		
 		// Add timer
 		var timerOptions = {
-							event: 'SUBMISSION_DONE',
+							timeup: 'SUBMISSION_DONE',
 							milliseconds: this.milli_short
 		};
 		
@@ -298,7 +298,7 @@ function PeerReviewGame () {
 			
 			// Add timer
 			var timerOptions = {
-								event: 'EVALUATION_DONE',
+								timeup: 'EVALUATION_DONE',
 								milliseconds: this.milli_short
 			};	
 			
@@ -409,7 +409,7 @@ function PeerReviewGame () {
 				node.window.addEventButton('DONE', this.donetxt);
 				
 				this.timer.restart({
-									event: 'DONE',
+									timeup: 'DONE',
 									milliseconds: this.milli_short
 				});	
 				
@@ -428,7 +428,7 @@ function PeerReviewGame () {
 			node.window.addEventButton('DONE', this.donetxt);
 			
 			this.timer.restart({
-								event: 'DONE',
+								timeup: 'DONE',
 								milliseconds: this.milli_short
 			});
 		});

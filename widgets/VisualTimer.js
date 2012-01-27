@@ -37,39 +37,51 @@
 	
 	VisualTimer.prototype.init = function (options) {
 		var options = options || this.options;
-		if (options.hooks) {
-			if (!options.hooks instanceof Array) {
-				options.hooks = [options.hooks];
+		var that = this;
+		(function initHooks() {
+			if (options.hooks) {
+				if (!options.hooks instanceof Array) {
+					options.hooks = [options.hooks];
+				}
 			}
-			options.hooks.push(this.updateDisplay);
-		}
+			else {
+				options.hooks = [];
+			}
+			
+			options.hooks.push({hook: that.updateDisplay,
+								ctx: that
+			});
+		})();
+		
+	
 		this.gameTimer = options.gameTimer || new node.GameTimer(options);
 	};
 	
 	VisualTimer.prototype.append = function (root) {
 		this.root = root;
 		this.timerDiv = node.window.addDiv(root, this.id + '_div');
-		this.timerDiv.innerHTML = '0:0';
+		this.updateDisplay();
 		return root;	
 	};
 	
 	VisualTimer.prototype.updateDisplay = function () {
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
+			this.timerDiv.innerHTML = '0:0';
+			return;
+		}
 		var time = this.gameTimer.milliseconds - this.gameTimer.timePassed;
 		time = JSUS.parseMilliseconds(time);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];
 	};
 	
 	VisualTimer.prototype.start = function() {
-		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
-			this.timerDiv.innerHTML = '0:0';
-			return;
-		}
+		this.updateDisplay();
 		this.gameTimer.start();
 	};
 	
 	VisualTimer.prototype.restart = function(options) {
 		this.init(options);
-		this.gameTimer.start();
+		this.start();
 	};
 	
 	VisualTimer.prototype.stop = function(options) {

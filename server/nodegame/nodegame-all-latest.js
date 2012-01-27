@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 10:57:40 CET 2012
+ * Built on Fri Jan 27 12:28:02 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 10:57:40 CET 2012
+ * Built on Fri Jan 27 12:28:02 CET 2012
  *
  */
  
@@ -3757,7 +3757,7 @@
 		this.timeLeft = null;
 		this.timePassed = 0;
 		
-		this.hooks = null;
+		this.hooks = [];
 		
 		this.init(this.options);
 	};
@@ -3768,7 +3768,7 @@
 		this.timeLeft = this.milliseconds;
 		this.timePassed = 0;
 		this.update = options.update || 1000;
-		this.event = options.event || 'TIMEUP'; // event to be fire		
+		this.timeup = options.timeup || 'TIMEUP'; // event to be fire when timer is expired
 		// TODO: update and milliseconds must be multiple now
 		if (options.hooks) {
 			for (var i=0; i < options.hooks.length; i++){
@@ -3783,18 +3783,21 @@
 	 * as an event, otherwise it called as a function.
 	 */
 	GameTimer.prototype.fire = function (h) {
-		if (!h) return;
-		if (h instanceof Function) {
-			h.call(node.game);
-			return;
+		if (!h && !h.hook) return;
+		var hook = h.hook || h;
+		if (hook instanceof Function) {
+			var ctx = h.ctx || node.game;
+			hook.call(ctx);
 		}
-		node.emit(h);
+		else {
+			node.emit(hook);
+		}	
 	};
 	
 	GameTimer.prototype.start = function() {
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0){
-			node.emit(this.event);
+			node.emit(this.timeup);
 			return;
 		}
 		var that = this;
@@ -3808,16 +3811,26 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				that.fire(that.event);
+				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
 	};
 	
-	GameTimer.prototype.addHook = function (hook) {
+	/**
+	 * Add an hook to the hook list after performing conformity checks.
+	 * The first parameter hook can be a string, a function, or an object
+	 * containing an hook property.
+	 */
+	GameTimer.prototype.addHook = function (hook, ctx) {
 		if (!hook) return;
-		this.hooks.push(hook);
+		var ctx = ctx || node.game;
+		if (hook.hook) {
+			ctx = hook.ctx || ctx;
+			var hook = hook.hook;
+		}
+		this.hooks.push({hook: hook, ctx: ctx});
 	};
 	
 	GameTimer.prototype.pause = function() {
@@ -3861,6 +3874,14 @@
 			that.stop();
 		});
 		
+		node.on('DONE', function(){
+			that.pause();
+		});
+		
+		node.on('WAITING', function(){
+			that.pause();
+		});
+		
 	};
 	
 })(
@@ -3878,7 +3899,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 10:57:40 CET 2012
+ * Built on Fri Jan 27 12:28:02 CET 2012
  *
  */
  
@@ -5600,7 +5621,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 10:57:40 CET 2012
+ * Built on Fri Jan 27 12:28:02 CET 2012
  *
  */
  
@@ -7631,39 +7652,51 @@
 	
 	VisualTimer.prototype.init = function (options) {
 		var options = options || this.options;
-		if (options.hooks) {
-			if (!options.hooks instanceof Array) {
-				options.hooks = [options.hooks];
+		var that = this;
+		(function initHooks() {
+			if (options.hooks) {
+				if (!options.hooks instanceof Array) {
+					options.hooks = [options.hooks];
+				}
 			}
-			options.hooks.push(this.updateDisplay);
-		}
+			else {
+				options.hooks = [];
+			}
+			
+			options.hooks.push({hook: that.updateDisplay,
+								ctx: that
+			});
+		})();
+		
+	
 		this.gameTimer = options.gameTimer || new node.GameTimer(options);
 	};
 	
 	VisualTimer.prototype.append = function (root) {
 		this.root = root;
 		this.timerDiv = node.window.addDiv(root, this.id + '_div');
-		this.timerDiv.innerHTML = '0:0';
+		this.updateDisplay();
 		return root;	
 	};
 	
 	VisualTimer.prototype.updateDisplay = function () {
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
+			this.timerDiv.innerHTML = '0:0';
+			return;
+		}
 		var time = this.gameTimer.milliseconds - this.gameTimer.timePassed;
 		time = JSUS.parseMilliseconds(time);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];
 	};
 	
 	VisualTimer.prototype.start = function() {
-		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
-			this.timerDiv.innerHTML = '0:0';
-			return;
-		}
+		this.updateDisplay();
 		this.gameTimer.start();
 	};
 	
 	VisualTimer.prototype.restart = function(options) {
 		this.init(options);
-		this.gameTimer.start();
+		this.start();
 	};
 	
 	VisualTimer.prototype.stop = function(options) {

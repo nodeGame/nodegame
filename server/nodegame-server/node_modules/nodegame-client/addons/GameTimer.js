@@ -19,7 +19,7 @@
 		this.timeLeft = null;
 		this.timePassed = 0;
 		
-		this.hooks = null;
+		this.hooks = [];
 		
 		this.init(this.options);
 	};
@@ -30,7 +30,7 @@
 		this.timeLeft = this.milliseconds;
 		this.timePassed = 0;
 		this.update = options.update || 1000;
-		this.event = options.event || 'TIMEUP'; // event to be fire		
+		this.timeup = options.timeup || 'TIMEUP'; // event to be fire when timer is expired
 		// TODO: update and milliseconds must be multiple now
 		if (options.hooks) {
 			for (var i=0; i < options.hooks.length; i++){
@@ -45,18 +45,21 @@
 	 * as an event, otherwise it called as a function.
 	 */
 	GameTimer.prototype.fire = function (h) {
-		if (!h) return;
-		if (h instanceof Function) {
-			h.call(node.game);
-			return;
+		if (!h && !h.hook) return;
+		var hook = h.hook || h;
+		if (hook instanceof Function) {
+			var ctx = h.ctx || node.game;
+			hook.call(ctx);
 		}
-		node.emit(h);
+		else {
+			node.emit(hook);
+		}	
 	};
 	
 	GameTimer.prototype.start = function() {
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0){
-			node.emit(this.event);
+			node.emit(this.timeup);
 			return;
 		}
 		var that = this;
@@ -70,16 +73,26 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				that.fire(that.event);
+				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
 	};
 	
-	GameTimer.prototype.addHook = function (hook) {
+	/**
+	 * Add an hook to the hook list after performing conformity checks.
+	 * The first parameter hook can be a string, a function, or an object
+	 * containing an hook property.
+	 */
+	GameTimer.prototype.addHook = function (hook, ctx) {
 		if (!hook) return;
-		this.hooks.push(hook);
+		var ctx = ctx || node.game;
+		if (hook.hook) {
+			ctx = hook.ctx || ctx;
+			var hook = hook.hook;
+		}
+		this.hooks.push({hook: hook, ctx: ctx});
 	};
 	
 	GameTimer.prototype.pause = function() {
@@ -121,6 +134,14 @@
 		
 		node.on('GAME_TIMER_STOP', function() {
 			that.stop();
+		});
+		
+		node.on('DONE', function(){
+			that.pause();
+		});
+		
+		node.on('WAITING', function(){
+			that.pause();
 		});
 		
 	};
