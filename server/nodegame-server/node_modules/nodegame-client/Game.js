@@ -190,6 +190,14 @@
 			});
 			
 			node.on('DONE', function(msg) {
+				// Execute done handler before updatating state
+				var ok = true;
+				var done = that.gameLoop.getAllParams(that.gameState).done;
+				if (done) {
+					ok = done.call(that);
+				}
+				if (!ok) return;
+				
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
 				

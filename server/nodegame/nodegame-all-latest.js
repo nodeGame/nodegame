@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 16:56:20 CET 2012
+ * Built on Sa 28. Jan 12:58:42 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 16:56:20 CET 2012
+ * Built on Sa 28. Jan 12:58:42 CET 2012
  *
  */
  
@@ -3111,6 +3111,14 @@
 			});
 			
 			node.on('DONE', function(msg) {
+				// Execute done handler before updatating state
+				var ok = true;
+				var done = that.gameLoop.getAllParams(that.gameState).done;
+				if (done) {
+					ok = done.call(that);
+				}
+				if (!ok) return;
+				
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
 				
@@ -3897,7 +3905,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 16:56:20 CET 2012
+ * Built on Sa 28. Jan 12:58:42 CET 2012
  *
  */
  
@@ -4460,7 +4468,7 @@
 	 */
 	GameWindow.prototype.getElementById = function (id) {
 		var el = null;
-		if (this.frame) {
+		if (this.frame && this.frame.getElementById) {
 			el = this.frame.getElementById(id);
 		}
 		if (!el) {
@@ -4563,6 +4571,7 @@
 			w = JSUS.getNestedValue(w, this.widgets);
 			
 			if (this.checkDependencies(w)) {
+				options.id = this.generateUniqueId(w.id);
 				w = new w(options);
 			}
 			else {
@@ -4602,7 +4611,7 @@
 		var d = w.dependencies;
 		for (var i in d) {
 			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i]) {
+				if (!window[i] && !node[i] && !node.window.widgets[i]) {
 					if (!quiet) {
 						errMsg(w, i);
 					} 
@@ -4708,6 +4717,16 @@
 		return b;
 	};
 	
+	GameWindow.prototype.generateUniqueId = function (prefix) {
+		var id = '' + (prefix || Math.random() * 1000);
+		var found = this.getElementById(id);
+		
+		while (found) {
+			id = '' + prefix + '_' + Math.random() * 1000;
+			found = this.getElementById(id);
+		}
+		return id;
+	};
 	
 	/**
 	 * Expose nodeGame to the global object
@@ -5619,7 +5638,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Jan 27 16:56:20 CET 2012
+ * Built on Sa 28. Jan 12:58:43 CET 2012
  *
  */
  
@@ -6627,35 +6646,36 @@
 	
 	
 	/*
-	 * DoneButton
+	 * EventButton
 	 * 
 	 * Sends DATA msgs
 	 * 
 	 */
 	
-	exports.DoneButton	= DoneButton;
+	exports.EventButton	= EventButton;
 	
 	JSUS = node.JSUS;
 	
-	DoneButton.name = 'Done Button';
-	DoneButton.version = '0.1';
-	DoneButton.dependencies = {
+	EventButton.id = 'eventbutton';
+	EventButton.name = 'Event Button';
+	EventButton.version = '0.2';
+	EventButton.dependencies = {
 		JSUS: {}
 	};
 	
-	function DoneButton (options) {
+	function EventButton (options) {
 		this.options = options;
-		this.id = options.id || 'donebutton';
+		this.id = options.id;
 
 		
 		this.root = null;		// the parent element
-		this.text = 'Done!';
+		this.text = 'Send';
 		this.button = document.createElement('button');
 		this.func = options.exec || null;
 		this.init(this.options);
 	};
 	
-	DoneButton.prototype.init = function (options) {
+	EventButton.prototype.init = function (options) {
 		var options = options || this.options;
 		this.button.id = options.id || this.id;
 		var text = options.text || this.text;
@@ -6663,41 +6683,54 @@
 			this.button.removeChild(this.button.firstChild);
 		}
 		this.button.appendChild(document.createTextNode(text));
-		this.func = options.exec || this.func;
+		this.event = options.event || this.event;
+		this.func = options.callback || this.func;
+		var that = this;
+		if (this.event) {
+			// Emit Event only if callback is successful
+			this.button.onclick = function() {
+				var ok = true;
+				if (options.callback) ok = options.callback.call(node.game);
+				if (ok) node.emit(that.event);
+			}
+		}
+		
 		// Emit DONE only if callback is successful
 		this.button.onclick = function() {
 			var ok = true;
 			if (options.exec) ok = options.exec.call(node.game);
-			if (ok) node.emit('DONE');
+			if (ok) node.emit(that.event);
 		}
 	};
 	
-	DoneButton.prototype.append = function (root) {
+	EventButton.prototype.append = function (root) {
 		this.root = root;
 		root.appendChild(this.button);
 		return root;	
 	};
 	
-	DoneButton.prototype.updateDisplay = function () {
-		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
-			this.timerDiv.innerHTML = '0:0';
-			return;
-		}
-		var time = this.gameTimer.milliseconds - this.gameTimer.timePassed;
-		time = JSUS.parseMilliseconds(time);
-		this.timerDiv.innerHTML = time[2] + ':' + time[3];
-	};
-	
-	DoneButton.prototype.listeners = function () {
-		var that = this;
-		node.on('LOADED', function() {
+	EventButton.prototype.listeners = function () {};
 		
-			var done = node.game.gameLoop.getAllParams(node.game.gameState).done;
-			if (done) {
-				// TODO: check for other options
-				that.init({exec: done});
-			}
-		});
+	// Done Button
+
+	exports.DoneButton = DoneButton;
+	
+	DoneButton.prototype.__proto__ = EventButton.prototype;
+	DoneButton.prototype.constructor = DoneButton;
+	
+	DoneButton.id = 'donebutton';
+	DoneButton.version = '0.1';
+	DoneButton.name = 'Done Button';
+	DoneButton.dependencies = {
+		EventButton: {}
+	}
+	
+	function DoneButton (options) {
+		console.log('this is o')
+		console.log(options);
+		options.event = 'DONE';
+		options.text = options.text || 'Done!';
+		EventButton.call(this, options);
 	};
 	
 })(node.window.widgets); 

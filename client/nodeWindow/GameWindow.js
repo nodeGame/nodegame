@@ -1,7 +1,9 @@
-(function(node) {
+(function (node) {
 	/*!
 	 * GameWindow
 	 */
+	
+	var JSUS = node.JSUS;
 	
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
@@ -168,7 +170,7 @@
 	GameWindow.prototype.generateRandomRoot = function () {
 		// We assume that the BODY element always exists
 		// TODO: Check if body element does not exist and add it
-		var root = Math.floor(Math.random()*10000);
+		var root = JSUS.randomInt(0,1000);
 		return this.addElement('div', document.body, root);
 	};
 	
@@ -225,7 +227,7 @@
 	 */
 	GameWindow.prototype.getElementById = function (id) {
 		var el = null;
-		if (this.frame) {
+		if (this.frame && this.frame.getElementById) {
 			el = this.frame.getElementById(id);
 		}
 		if (!el) {
@@ -328,6 +330,7 @@
 			w = JSUS.getNestedValue(w, this.widgets);
 			
 			if (this.checkDependencies(w)) {
+				options.id = this.generateUniqueId(w.id);
 				w = new w(options);
 			}
 			else {
@@ -367,7 +370,7 @@
 		var d = w.dependencies;
 		for (var i in d) {
 			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i]) {
+				if (!window[i] && !node[i] && !node.window.widgets[i]) {
 					if (!quiet) {
 						errMsg(w, i);
 					} 
@@ -473,6 +476,16 @@
 		return b;
 	};
 	
+	GameWindow.prototype.generateUniqueId = function (prefix) {
+		var id = '' + (prefix || JSUS.randomInt(0, 1000);
+		var found = this.getElementById(id);
+		
+		while (found) {
+			id = '' + prefix + '_' + JSUS.randomInt(0, 1000);
+			found = this.getElementById(id);
+		}
+		return id;
+	};
 	
 	/**
 	 * Expose nodeGame to the global object

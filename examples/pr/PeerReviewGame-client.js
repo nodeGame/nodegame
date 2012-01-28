@@ -175,12 +175,12 @@ function PeerReviewGame () {
 			node.window.write(this.all_ex.getRoot(), historyDiv);
 			
 
-			node.window.addEventButton('CREATION_DONE', this.donetxt, creationDiv);
-			
-			node.on('CREATION_DONE', function(){
-				node.set('CF', this.cf.getAllValues());
-				node.emit('DONE');
-			});
+//			node.window.addEventButton('CREATION_DONE', this.donetxt, creationDiv);
+//			
+//			node.on('CREATION_DONE', function(){
+//				node.set('CF', this.cf.getAllValues());
+//				node.emit('DONE');
+//			});
 			
 		});
 
@@ -408,10 +408,14 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: {
-				timeup: 'CREATION_DONE',
-				milliseconds: 1000
-			}	
+//			timer: {
+//				timeup: 'CREATION_DONE',
+//				milliseconds: 1000
+//			},
+			timer: 3000,
+			done: function () {
+				node.set('CF', this.cf.getAllValues());
+			}
 		},
 		
 		2: {state: submission,

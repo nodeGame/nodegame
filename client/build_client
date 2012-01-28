@@ -70,27 +70,29 @@ addBlanks 2 $NODEGAME
 
 # Node Modules
 
-FILES[0]='node_modules/JSUS/jsus.js'
-FILES[1]='node_modules/JSUS/lib/obj.js'
-FILES[2]='node_modules/JSUS/lib/array.js'
-FILES[3]='node_modules/JSUS/lib/time.js'
-FILES[4]='node_modules/JSUS/lib/eval.js'
-FILES[5]='node_modules/JSUS/lib/dom.js'
-FILES[6]='node_modules/NDDB/nddb.js'
+FILES=(
+'node_modules/JSUS/jsus.js'
+'node_modules/JSUS/lib/obj.js'
+'node_modules/JSUS/lib/array.js'
+'node_modules/JSUS/lib/time.js'
+'node_modules/JSUS/lib/eval.js'
+'node_modules/JSUS/lib/dom.js'
+'node_modules/NDDB/nddb.js'
 # Add all the classes
-FILES[7]='EventEmitter.js'
-FILES[8]='Utils.js'
-FILES[9]='GameState.js'
-FILES[10]='PlayerList.js'
-FILES[11]='GameMsg.js'
-FILES[12]='GameLoop.js'
-FILES[13]='GameMsgGenerator.js'
-FILES[14]='GameSocketClient.js'
-FILES[15]='GameDB.js'
-FILES[16]='Game.js'
-FILES[17]='nodeGame.js'
+'EventEmitter.js'
+'Utils.js'
+'GameState.js'
+'PlayerList.js'
+'GameMsg.js'
+'GameLoop.js'
+'GameMsgGenerator.js'
+'GameSocketClient.js'
+'GameDB.js'
+'Game.js'
+'nodeGame.js'
 # Addons
-FILES[18]='addons/GameTimer.js'
+'addons/GameTimer.js'
+)
 
 for f in ${FILES[*]}
 do
