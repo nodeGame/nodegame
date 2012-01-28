@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 16:30:08 CET 2012
+ * Built on Sa 28. Jan 17:29:13 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 16:30:08 CET 2012
+ * Built on Sa 28. Jan 17:29:13 CET 2012
  *
  */
  
@@ -3925,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 16:30:08 CET 2012
+ * Built on Sa 28. Jan 17:29:13 CET 2012
  *
  */
  
@@ -4596,19 +4596,11 @@
 		return this.addDiv(root,id);
 	};
 	
-	/**
-	 * Add a widget to the browser window.
-	 * TODO: If an already existing id is provided, the existing element is deleted.
-	 */
-	GameWindow.prototype.addWidget = function (w, root, options) {
+	
+	GameWindow.prototype.getWidget = function (w_str, options) {
+		if (!w_str) return;
 		var that = this;
-		
-		function appendFieldset(root, options, w) {
-			if (!options) return root;
-			var idFieldset = options.id || w.id + '_fieldset';
-			var legend = options.legend || w.legend;
-			return that.addFieldset(root, idFieldset, legend, options.attributes);
-		};
+		var options = options || {};
 		
 		function attachListeners (options, w) {
 			if (!options || !w) return;
@@ -4623,6 +4615,46 @@
 			};
 		};
 		
+		var w = JSUS.getNestedValue(w_str, this.widgets);
+		if (!w) {
+			node.log('Widget ' + w_str + ' not found.', 'ERR');
+			return;
+		}
+		
+		if (! this.checkDependencies(w)) return false;
+		
+		options.id = this.generateUniqueId(w.id);
+		w = new w(options);
+	
+		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
+		//try {
+	
+			// nodeGame listeners
+			w.listeners();
+			// user listeners
+			attachListeners(options, w);
+//			}
+//			catch(e){
+//				throw 'Error while loading widget ' + w.name + ': ' + e;
+//			}
+		return w;
+	};
+	
+	/**
+	 * Add a widget to the browser window.
+	 */
+	GameWindow.prototype.addWidget = function (w, root, options) {
+		if (!w) return;
+		var that = this;
+		
+		function appendFieldset(root, options, w) {
+			if (!options) return root;
+			var idFieldset = options.id || w.id + '_fieldset';
+			var legend = options.legend || w.legend;
+			return that.addFieldset(root, idFieldset, legend, options.attributes);
+		};
+		
+		
 		// Init default values
 		var root = root || this.root;
 		var options = options || {};
@@ -4631,35 +4663,14 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		// In this case a dependencies check is done
-		if ('object' !== typeof w) {
-			w = JSUS.getNestedValue(w, this.widgets);
-			
-			if (this.checkDependencies(w)) {
-				options.id = this.generateUniqueId(w.id);
-				w = new w(options);
-			}
-			else {
-				return false;
-			}
-			
-		}
+		if ('object' !== typeof w) w = this.getWidget(w, options);
+		if (!w) return;	
 		
-		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
-		//try {
-			// options exists and options.fieldset exist
-			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : w.fieldset; 
-			root = appendFieldset(root, fieldsetOptions, w);
-			w.append(root);
-			// nodeGame listeners
-			w.listeners();
-			// user listeners
-			attachListeners(options, w);
-			
-//		}
-//		catch(e){
-//			throw 'Error while loading widget ' + w.name + ': ' + e;
-//		}
-		
+		// options exists and options.fieldset exist
+		var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : w.fieldset; 
+		root = appendFieldset(root, fieldsetOptions, w);
+		w.append(root);
+
 		return w;
 	};
 	
@@ -4672,18 +4683,25 @@
 			node.log(d + ' not found. ' + name + ' cannot be loaded.', 'ERR');
 		}
 		
+		var parents = [window, node, node.window.widgets, node.window];
+		
 		var d = w.dependencies;
-		for (var i in d) {
-			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i] && !node.window.widgets[i] && !node.window[i]) {
-					if (!quiet) {
-						errMsg(w, i);
-					} 
+		for (var lib in d) {
+			if (d.hasOwnProperty(lib)) {
+				var found = false;
+				for (var i=0; i<parents.length; i++) {
+					if (JSUS.getNestedValue(lib, parents[i])) {
+						var found = true;
+						break
+					}
+				}
+				if (!found) {	
+					if (!quiet) errMsg(w, lib);
 					return false;
 				}
+			
 			}
 		}
-		
 		return true;
 	};
 	// Recipients
@@ -5702,7 +5720,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 16:30:08 CET 2012
+ * Built on Sa 28. Jan 17:29:13 CET 2012
  *
  */
  
@@ -5721,6 +5739,9 @@
 	 * Expose constructor
 	 */
 	exports.ChernoffFaces = ChernoffFaces;
+	exports.ChernoffFaces.FaceVector = FaceVector;
+	exports.ChernoffFaces.FacePainter = FacePainter;
+	
 	
 	ChernoffFaces.defaults = {};
 	ChernoffFaces.defaults.canvas = {};
@@ -5734,69 +5755,73 @@
 	ChernoffFaces.dependencies = {
 		JSUS: {},
 		Table: {},
-		Canvas: {}
+		Canvas: {},
+		'Controls.Slider': {}
 	};
 	
-	function ChernoffFaces(options) {
+	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
 	
-		//this.fieldset = { id: this.id, legend: this.name};		
-
 		this.table = new Table();
-		this.root = options.root || this.table.table;
-		this.root = document.body;
+		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		
-		this.sc = null; 	// Slider Controls
+		this.sc = node.window.getWidget('Controls.Slider'); 	// Slider Controls
 		this.fp = null; 	// Face Painter
+		this.canvas = null;
 		this.dims = null;	// width and height of the canvas
 
 		this.change = 'CF_CHANGE';
 		this.features = null;
 		this.controls = null;
-	};
-	
-	ChernoffFaces.prototype.getRoot = function() {
-		return this.root;
+		
+		this.init(this.options);
 	};
 	
 	ChernoffFaces.prototype.init = function (options) {
-//		this.id = options.id || this.id;
-//		var PREF = this.id + '_';
-//		
-//		this.features = options.features;
-//		this.change = options.change || this.change;
-//		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
-//		
-//		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
-//		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
-//
-//		this.dims = {
-//				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
-//				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
-//		};
-//		
-//		var canvas = new node.window.Canvas (root, idCanvas, this.dims);
-//		this.fp = new FacePainter(canvas);		
-//		this.fp.draw(new FaceVector(this.features));
-//		
+		this.id = options.id || this.id;
+		var PREF = this.id + '_';
+		
+		this.features = options.features;
+		this.change = options.change || this.change;
+		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
+		
+		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
+		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
+
+		this.dims = {
+				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
+		};
+		
+		this.canvas = node.window.getCanvas(idCanvas, this.dims);
+		this.fp = new FacePainter(this.canvas);		
+		this.fp.draw(new FaceVector(this.features));
+		
 //		if (this.controls) {
 //			
 //			var sc_options = {
 //				id: 'cf_controls',
 //				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 //				change: this.change,
-//				fieldset: {id: idFieldset, 
-//						   legend: 'Chernoff Box',
-//						   attributes: {style: 'float:left'}
+//				fieldset: {id: this.id + '_controls_fieldest', 
+//						   legend: this.controls.legend || 'Controls'
 //				},
 //				submit: 'Send'
 //			};
 //			
-//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//			this.sc = node.window.getWidget('Controls.Slider', sc_options);
+//			
+//			this.table.add(this.sc);
 //		}
 		
+		this.table.add(this.canvas);
+		
+	};
+	
+	ChernoffFaces.prototype.getRoot = function() {
+		return this.root;
 	};
 	
 	ChernoffFaces.prototype.getHTML = function() {
@@ -5846,8 +5871,7 @@
 //		}
 
 		this.root = root;
-		//root.appendChild( = node.window.addDiv(root, this.id + '_div');
-		
+		root.appendChild(this.table.parse());
 		return root;
 		
 	};
@@ -6829,11 +6853,8 @@
 	function DynamicTable (options, data) {
 		//JSUS.extend(node.window.Table,this);
 	    Table.call(this, options, data); 
-	    
 		this.options = options;
-		this.id = options.id || 'dynamictable';
-		this.name = 'Dynamic Table';
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'
@@ -7147,7 +7168,8 @@
 	
 	function GameTable (options) {
 		this.options = options;
-		this.id = 'gametable';
+		this.id = options.id;
+		this.name = options.name || GameTable.name;
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'

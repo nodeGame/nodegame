@@ -294,19 +294,11 @@
 		return this.addDiv(root,id);
 	};
 	
-	/**
-	 * Add a widget to the browser window.
-	 * TODO: If an already existing id is provided, the existing element is deleted.
-	 */
-	GameWindow.prototype.addWidget = function (w, root, options) {
+	
+	GameWindow.prototype.getWidget = function (w_str, options) {
+		if (!w_str) return;
 		var that = this;
-		
-		function appendFieldset(root, options, w) {
-			if (!options) return root;
-			var idFieldset = options.id || w.id + '_fieldset';
-			var legend = options.legend || w.legend;
-			return that.addFieldset(root, idFieldset, legend, options.attributes);
-		};
+		var options = options || {};
 		
 		function attachListeners (options, w) {
 			if (!options || !w) return;
@@ -321,6 +313,46 @@
 			};
 		};
 		
+		var w = JSUS.getNestedValue(w_str, this.widgets);
+		if (!w) {
+			node.log('Widget ' + w_str + ' not found.', 'ERR');
+			return;
+		}
+		
+		if (! this.checkDependencies(w)) return false;
+		
+		options.id = this.generateUniqueId(w.id);
+		w = new w(options);
+	
+		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
+		//try {
+	
+			// nodeGame listeners
+			w.listeners();
+			// user listeners
+			attachListeners(options, w);
+//			}
+//			catch(e){
+//				throw 'Error while loading widget ' + w.name + ': ' + e;
+//			}
+		return w;
+	};
+	
+	/**
+	 * Add a widget to the browser window.
+	 */
+	GameWindow.prototype.addWidget = function (w, root, options) {
+		if (!w) return;
+		var that = this;
+		
+		function appendFieldset(root, options, w) {
+			if (!options) return root;
+			var idFieldset = options.id || w.id + '_fieldset';
+			var legend = options.legend || w.legend;
+			return that.addFieldset(root, idFieldset, legend, options.attributes);
+		};
+		
+		
 		// Init default values
 		var root = root || this.root;
 		var options = options || {};
@@ -329,35 +361,14 @@
 		// Check if it is a object (new gadget)
 		// If it is a string is the name of an existing gadget
 		// In this case a dependencies check is done
-		if ('object' !== typeof w) {
-			w = JSUS.getNestedValue(w, this.widgets);
-			
-			if (this.checkDependencies(w)) {
-				options.id = this.generateUniqueId(w.id);
-				w = new w(options);
-			}
-			else {
-				return false;
-			}
-			
-		}
+		if ('object' !== typeof w) w = this.getWidget(w, options);
+		if (!w) return;	
 		
-		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
-		//try {
-			// options exists and options.fieldset exist
-			var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : w.fieldset; 
-			root = appendFieldset(root, fieldsetOptions, w);
-			w.append(root);
-			// nodeGame listeners
-			w.listeners();
-			// user listeners
-			attachListeners(options, w);
-			
-//		}
-//		catch(e){
-//			throw 'Error while loading widget ' + w.name + ': ' + e;
-//		}
-		
+		// options exists and options.fieldset exist
+		var fieldsetOptions = ('undefined' !== typeof options.fieldset) ? options.fieldset : w.fieldset; 
+		root = appendFieldset(root, fieldsetOptions, w);
+		w.append(root);
+
 		return w;
 	};
 	
@@ -370,18 +381,25 @@
 			node.log(d + ' not found. ' + name + ' cannot be loaded.', 'ERR');
 		}
 		
+		var parents = [window, node, node.window.widgets, node.window];
+		
 		var d = w.dependencies;
-		for (var i in d) {
-			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i] && !node.window.widgets[i] && !node.window[i]) {
-					if (!quiet) {
-						errMsg(w, i);
-					} 
+		for (var lib in d) {
+			if (d.hasOwnProperty(lib)) {
+				var found = false;
+				for (var i=0; i<parents.length; i++) {
+					if (JSUS.getNestedValue(lib, parents[i])) {
+						var found = true;
+						break
+					}
+				}
+				if (!found) {	
+					if (!quiet) errMsg(w, lib);
 					return false;
 				}
+			
 			}
 		}
-		
 		return true;
 	};
 	// Recipients

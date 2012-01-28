@@ -21,7 +21,8 @@
 	
 	function GameTable (options) {
 		this.options = options;
-		this.id = 'gametable';
+		this.id = options.id;
+		this.name = options.name || GameTable.name;
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'

@@ -29,11 +29,8 @@
 	function DynamicTable (options, data) {
 		//JSUS.extend(node.window.Table,this);
 	    Table.call(this, options, data); 
-	    
 		this.options = options;
-		this.id = options.id || 'dynamictable';
-		this.name = 'Dynamic Table';
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'

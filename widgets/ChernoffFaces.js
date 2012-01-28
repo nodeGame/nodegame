@@ -12,6 +12,9 @@
 	 * Expose constructor
 	 */
 	exports.ChernoffFaces = ChernoffFaces;
+	exports.ChernoffFaces.FaceVector = FaceVector;
+	exports.ChernoffFaces.FacePainter = FacePainter;
+	
 	
 	ChernoffFaces.defaults = {};
 	ChernoffFaces.defaults.canvas = {};
@@ -25,69 +28,73 @@
 	ChernoffFaces.dependencies = {
 		JSUS: {},
 		Table: {},
-		Canvas: {}
+		Canvas: {},
+		'Controls.Slider': {}
 	};
 	
-	function ChernoffFaces(options) {
+	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
 	
-		//this.fieldset = { id: this.id, legend: this.name};		
-
 		this.table = new Table();
-		this.root = options.root || this.table.table;
-		this.root = document.body;
+		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		
-		this.sc = null; 	// Slider Controls
+		this.sc = node.window.getWidget('Controls.Slider'); 	// Slider Controls
 		this.fp = null; 	// Face Painter
+		this.canvas = null;
 		this.dims = null;	// width and height of the canvas
 
 		this.change = 'CF_CHANGE';
 		this.features = null;
 		this.controls = null;
-	};
-	
-	ChernoffFaces.prototype.getRoot = function() {
-		return this.root;
+		
+		this.init(this.options);
 	};
 	
 	ChernoffFaces.prototype.init = function (options) {
-//		this.id = options.id || this.id;
-//		var PREF = this.id + '_';
-//		
-//		this.features = options.features;
-//		this.change = options.change || this.change;
-//		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
-//		
-//		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
-//		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
-//
-//		this.dims = {
-//				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
-//				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
-//		};
-//		
-//		var canvas = new node.window.Canvas (root, idCanvas, this.dims);
-//		this.fp = new FacePainter(canvas);		
-//		this.fp.draw(new FaceVector(this.features));
-//		
+		this.id = options.id || this.id;
+		var PREF = this.id + '_';
+		
+		this.features = options.features;
+		this.change = options.change || this.change;
+		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
+		
+		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
+		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
+
+		this.dims = {
+				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
+		};
+		
+		this.canvas = node.window.getCanvas(idCanvas, this.dims);
+		this.fp = new FacePainter(this.canvas);		
+		this.fp.draw(new FaceVector(this.features));
+		
 //		if (this.controls) {
 //			
 //			var sc_options = {
 //				id: 'cf_controls',
 //				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 //				change: this.change,
-//				fieldset: {id: idFieldset, 
-//						   legend: 'Chernoff Box',
-//						   attributes: {style: 'float:left'}
+//				fieldset: {id: this.id + '_controls_fieldest', 
+//						   legend: this.controls.legend || 'Controls'
 //				},
 //				submit: 'Send'
 //			};
 //			
-//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//			this.sc = node.window.getWidget('Controls.Slider', sc_options);
+//			
+//			this.table.add(this.sc);
 //		}
 		
+		this.table.add(this.canvas);
+		
+	};
+	
+	ChernoffFaces.prototype.getRoot = function() {
+		return this.root;
 	};
 	
 	ChernoffFaces.prototype.getHTML = function() {
@@ -137,8 +144,7 @@
 //		}
 
 		this.root = root;
-		//root.appendChild( = node.window.addDiv(root, this.id + '_div');
-		
+		root.appendChild(this.table.parse());
 		return root;
 		
 	};
