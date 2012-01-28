@@ -9,11 +9,13 @@
 	
 	exports.ServerInfoDisplay = ServerInfoDisplay;	
 		
+	ServerInfoDisplay.id = 'serverinfodisplay';
+	ServerInfoDisplay.name = 'Server Info Display';
+	ServerInfoDisplay.version = '0.2';
+	
 	function ServerInfoDisplay (options) {	
 		this.game = node.game;
-		this.id = options.id || 'ServerInfoDisplay';
-		this.name = 'Server Info Display';
-		this.version = '0.1';
+		this.id = options.id;
 		
 		this.fieldset = { legend: 'Server Info',
 				  		  id: this.id + '_fieldset'

@@ -11,11 +11,17 @@
 	
 	exports.GameTable = GameTable;
 	
+	GameTable.id = 'gametable';
+	GameTable.name = 'Game Table';
+	GameTable.version = '0.2';
+	
+	GameTable.dependencies = {
+		JSUS: {}
+	};
+	
 	function GameTable (options) {
 		this.options = options;
-		this.id = options.id || 'gametable';
-		this.name = 'Game Table';
-		this.version = '0.1';
+		this.id = 'gametable';
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'

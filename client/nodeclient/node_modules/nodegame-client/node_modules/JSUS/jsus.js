@@ -41,6 +41,7 @@
 	    require('./lib/time');
 	    require('./lib/eval');
 	    require('./lib/dom');
+	    require('./lib/random');
 	}
 	// end node
 

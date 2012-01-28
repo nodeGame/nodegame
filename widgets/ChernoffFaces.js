@@ -16,14 +16,16 @@
 	ChernoffFaces.defaults.canvas.width = 100;
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
+	ChernoffFaces.id = 'ChernoffFaces';
+	ChernoffFaces.name = 'Chernoff Faces';
+	ChernoffFaces.version = '0.3';
+	
 	function ChernoffFaces(options) {
 		var options = options || {};
 		
 		this.game = node.game;
-		this.id = options.id || 'ChernoffFaces';
-		this.name = 'Chernoff Faces';
-		this.version = '0.3';
-		
+		this.id = options.id;
+	
 		//this.fieldset = { id: this.id, legend: this.name};
 		
 		this.bar = null;

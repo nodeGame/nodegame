@@ -82,8 +82,6 @@
 	}
 	
 	function DoneButton (options) {
-		console.log('this is o')
-		console.log(options);
 		options.event = 'DONE';
 		options.text = options.text || 'Done!';
 		EventButton.call(this, options);

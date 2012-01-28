@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 12:58:42 CET 2012
+ * Built on Sa 28. Jan 13:32:11 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 12:58:42 CET 2012
+ * Built on Sa 28. Jan 13:32:11 CET 2012
  *
  */
  
@@ -63,6 +63,7 @@
 	    require('./lib/time');
 	    require('./lib/eval');
 	    require('./lib/dom');
+	    require('./lib/random');
 	}
 	// end node
 
@@ -718,6 +719,25 @@
 //	};
 	
 	JSUS.extend(DOM);
+	
+})('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
+ 
+(function (JSUS) {
+	
+	function RANDOM(){};
+
+	RANDOM.random = function (a, b) {
+		var a = a || 0;
+		var b = b || 1;
+		return a + Math.random() * b;
+	};
+	
+	RANDOM.randomInt = function (a, b) {
+		return Math.floor(RANDOM.random(a, b) + 1);
+	};
+	
+	
+	JSUS.extend(RANDOM);
 	
 })('undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS); 
  
@@ -3905,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 12:58:42 CET 2012
+ * Built on Sa 28. Jan 13:32:11 CET 2012
  *
  */
  
@@ -4241,10 +4261,12 @@
 
 })(window.node); 
  
-(function(node) {
+(function (node) {
 	/*!
 	 * GameWindow
 	 */
+	
+	var JSUS = node.JSUS;
 	
 	var Player = node.Player;
 	var PlayerList = node.PlayerList;
@@ -4411,7 +4433,7 @@
 	GameWindow.prototype.generateRandomRoot = function () {
 		// We assume that the BODY element always exists
 		// TODO: Check if body element does not exist and add it
-		var root = Math.floor(Math.random()*10000);
+		var root = JSUS.randomInt(0,1000);
 		return this.addElement('div', document.body, root);
 	};
 	
@@ -4718,11 +4740,11 @@
 	};
 	
 	GameWindow.prototype.generateUniqueId = function (prefix) {
-		var id = '' + (prefix || Math.random() * 1000);
+		var id = '' + (prefix || JSUS.randomInt(0, 1000));
 		var found = this.getElementById(id);
 		
 		while (found) {
-			id = '' + prefix + '_' + Math.random() * 1000;
+			id = '' + prefix + '_' + JSUS.randomInt(0, 1000);
 			found = this.getElementById(id);
 		}
 		return id;
@@ -5638,7 +5660,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 12:58:43 CET 2012
+ * Built on Sa 28. Jan 13:32:12 CET 2012
  *
  */
  
@@ -5661,14 +5683,16 @@
 	ChernoffFaces.defaults.canvas.width = 100;
 	ChernoffFaces.defaults.canvas.heigth = 100;
 	
+	ChernoffFaces.id = 'ChernoffFaces';
+	ChernoffFaces.name = 'Chernoff Faces';
+	ChernoffFaces.version = '0.3';
+	
 	function ChernoffFaces(options) {
 		var options = options || {};
 		
 		this.game = node.game;
-		this.id = options.id || 'ChernoffFaces';
-		this.name = 'Chernoff Faces';
-		this.version = '0.3';
-		
+		this.id = options.id;
+	
 		//this.fieldset = { id: this.id, legend: this.name};
 		
 		this.bar = null;
@@ -6325,14 +6349,13 @@
 	exports.Controls.Slider = SliderControls;
 	exports.Controls.Radio	= RadioControls;
 	
+	Controls.id = 'controls';
+	Controls.name = 'Controls'
+	Controls.version = '0.2';
 		
 	function Controls (options) {
-		this.name = 'Controls'
-		this.version = '0.2';
-	
-
 		this.options = options;
-		this.id = options.id || this.name;
+		this.id = options.id;
 		this.root = null;
 		
 		this.listRoot = null;
@@ -6348,14 +6371,7 @@
 	};
 	
 	Controls.prototype.init = function (options) {
-		
-//		if (options.fieldset) {
-//			this.list = new node.window.List();
-//		}
-//		else {		
-//			this.list = new node.window.List(this.id);
-//		}
-		
+
 		this.hasChanged = false; // TODO: should this be inherited?
 		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
@@ -6370,16 +6386,6 @@
 	Controls.prototype.append = function (root) {
 		this.root = root;
 		var toReturn = this.listRoot;
-		
-//		if (this.options.fieldset) {
-//			var idFieldset = this.options.fieldset.id || this.id;
-//			var legend = this.options.fieldset.legend || 'Input';
-//			var attributes = this.options.fieldset.attributes || {}; 
-//			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend, attributes);
-//			// Updating root and return element
-//			root = this.fieldset;
-//			toReturn = this.fieldset;
-//		}
 		
 		root.appendChild(this.listRoot);
 		
@@ -6498,30 +6504,45 @@
 	
 	// Sub-classes
 	
+	// Slider 
+	
 	SliderControls.prototype.__proto__ = Controls.prototype;
 	SliderControls.prototype.constructor = SliderControls;
 	
+	SliderControls.id = 'slidercontrols';
+	SliderControls.name = 'Slider Controls';
+	SliderControls.version = '0.2';
+	
+	SliderControls.dependencies = {
+		Controls: {}
+	};
+	
+	
 	function SliderControls (options) {
-		Controls.call(this,options);
-		this.name = 'SliderControls'
-		this.version = '0.2';
-		this.id = options.id || this.name;
+		Controls.call(this, options);
 	};
 	
 	SliderControls.prototype.add = function (root, id, attributes) {
 		return node.window.addSlider(root, id, attributes);
 	};
 	
+	// Radio
+	
 	RadioControls.prototype.__proto__ = Controls.prototype;
 	RadioControls.prototype.constructor = RadioControls;
 	
+	RadioControls.id = 'radiocontrols';
+	RadioControls.name = 'Radio Controls'
+	RadioControls.version = '0.1.1';
+	
+	RadioControls.dependencies = {
+		Controls: {}
+	};
+	
 	function RadioControls (options) {
 		Controls.call(this,options);
-		this.name = 'RadioControls'
-		this.version = '0.1.1';
-		this.id = options.id || this.name;
 		this.groupName = ('undefined' !== typeof options.name) ? options.name : 
-																 Math.floor(Math.random(0,1)*10000); 
+																 node.window.generateUniqueId(); 
 		//alert(this.groupName);
 	};
 	
@@ -6569,13 +6590,15 @@
 	 */
 	
 	exports.DataBar	= DataBar;
+	
+	DataBar.id = 'databar';
+	DataBar.name = 'Data Bar';
+	DataBar.version = '0.3';
 		
-	function DataBar(options) {
+	function DataBar (options) {
 		
 		this.game = node.game;
-		this.id = options.id || 'databar';
-		this.name = 'Data Bar';
-		this.version = '0.2.1';
+		this.id = options.id;
 		
 		this.bar = null;
 		this.root = null;
@@ -6726,8 +6749,6 @@
 	}
 	
 	function DoneButton (options) {
-		console.log('this is o')
-		console.log(options);
 		options.event = 'DONE';
 		options.text = options.text || 'Done!';
 		EventButton.call(this, options);
@@ -6754,6 +6775,16 @@
 	DynamicTable.prototype.constructor = Table;	
 	
 	exports.DynamicTable = DynamicTable;
+	
+	DynamicTable.id = 'dynamictable';
+	DynamicTable.name = 'Dynamic Table';
+	DynamicTable.version = '0.3.1';
+	
+	DynamicTable.dependencies = {
+		Table: {},
+		JSUS: {},
+		HTMLRenderer: {}
+	};
 	
 	function DynamicTable (options, data) {
 		//JSUS.extend(node.window.Table,this);
@@ -6880,14 +6911,14 @@
 	
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
-		
+	
+	GameBoard.id = 'gboard';
+	GameBoard.name = 'GameBoard';
+	GameBoard.version = '0.3.1';
+	
 	function GameBoard (options) {
 		
-		this.game = node.game;
-		this.id = options.id || 'gboard';
-		this.name = 'GameBoard';
-		
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.board = null;
 		this.root = null;
@@ -6992,12 +7023,14 @@
 	
 	exports.GameSummary	= GameSummary;
 	
+	GameSummary.id = 'gamesummary';
+	GameSummary.name = 'Game Summary';
+	GameSummary.version = '0.3';
+	
 	function GameSummary(options) {
-		//debugger;
+		
 		this.game = node.game;
-		this.id = options.id || 'gamesummary';
-		this.name = 'Game Summary';
-		this.version = '0.2.1';
+		this.id = options.id;
 		
 		this.fieldset = null;
 		this.summaryDiv = null;
@@ -7064,11 +7097,17 @@
 	
 	exports.GameTable = GameTable;
 	
+	GameTable.id = 'gametable';
+	GameTable.name = 'Game Table';
+	GameTable.version = '0.2';
+	
+	GameTable.dependencies = {
+		JSUS: {}
+	};
+	
 	function GameTable (options) {
 		this.options = options;
-		this.id = options.id || 'gametable';
-		this.name = 'Game Table';
-		this.version = '0.1';
+		this.id = 'gametable';
 		
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'
@@ -7210,12 +7249,14 @@
 	
 	exports.MsgBar	= MsgBar;
 		
-	function MsgBar(options) {
+	MsgBar.id = 'msgbar';
+	MsgBar.name = 'Msg Bar';
+	MsgBar.version = '0.3';
+	
+	function MsgBar (options) {
 		
 		this.game = node.game;
-		this.id = options.id || 'msgbar';
-		this.name = 'Msg Bar';
-		this.version = '0.2.1';
+		this.id = options.id;
 		
 		this.recipient = null;
 	}
@@ -7279,13 +7320,14 @@
 	// TODO: Introduce rules for update: other vs self
 	
 	exports.NextPreviousState =	NextPreviousState;
+	
+	NextPreviousState.id = 'nextprevious';
+	NextPreviousState.name = 'Next,Previous State';
+	NextPreviousState.version = '0.3';
 		
 	function NextPreviousState(options) {
 		this.game = node.game;
-		this.id = options.id || 'nextprevious';
-		this.name = 'Next,Previous State';
-		this.version = '0.2.1';
-		
+		this.id = options.id;
 	}
 	
 	NextPreviousState.prototype.append = function (root, ids) {
@@ -7352,11 +7394,13 @@
 	
 	exports.ServerInfoDisplay = ServerInfoDisplay;	
 		
+	ServerInfoDisplay.id = 'serverinfodisplay';
+	ServerInfoDisplay.name = 'Server Info Display';
+	ServerInfoDisplay.version = '0.2';
+	
 	function ServerInfoDisplay (options) {	
 		this.game = node.game;
-		this.id = options.id || 'ServerInfoDisplay';
-		this.name = 'Server Info Display';
-		this.version = '0.1';
+		this.id = options.id;
 		
 		this.fieldset = { legend: 'Server Info',
 				  		  id: this.id + '_fieldset'
@@ -7435,13 +7479,13 @@
 	// TODO: Introduce rules for update: other vs self
 	
 	exports.StateBar = StateBar;	
-		
-	function StateBar(options) {
-		
-		this.game = node.game;;
-		this.id = options.id || 'statebar';
-		this.name = 'State Bar';
-		this.version = '0.2.1';
+	
+	StateBar.id = 'statebar';
+	StateBar.name = 'State Bar';
+	StateBar.version = '0.3';
+	
+	function StateBar (options) {
+		this.id = options.id;
 		
 		this.actionSel = null;
 		this.recipient = null;
@@ -7528,10 +7572,7 @@
 		var get = node.actions.GET + '.'; 
 		
 		node.onPLIST( function(msg) {
-			
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 	}; 
 })(node.window.widgets); 
@@ -7548,13 +7589,15 @@
 	 */
 	
 	exports.StateDisplay = StateDisplay;	
-		
-	function StateDisplay(options) {
+	
+	StateDisplay.id = 'statedisplay';
+	StateDisplay.name = 'State Display';
+	StateDisplay.version = '0.3.1';
+	
+	function StateDisplay (options) {
 		
 		this.game = node.game;
-		this.id = options.id || 'statedisplay';
-		this.name = 'State Display';
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.fieldset = null;
 		this.stateDiv = null;
@@ -7645,13 +7688,18 @@
 	exports.VisualState	= VisualState;
 	
 	GameState = node.GameState;
-	Utils = node.Utils;
+	JSUS = node.JSUS;
+	
+	VisualState.id = 'visualstate';
+	VisualState.name = 'Visual State';
+	VisualState.version = '0.2';
+	
+	VisualState.dependencies = {
+		JSUS: {}
+	};
 	
 	function VisualState (options) {
-		this.game = node.game;
-		this.id = options.id || 'VisualState';
-		this.name = 'Visual State';
-		this.version = '0.1';
+		this.id = options.id;
 		this.gameLoop = node.game.gameLoop;
 		
 		this.fieldset = {legend: 'State'};
@@ -7681,7 +7729,7 @@
 	VisualState.prototype.start = function() {
 		var that = this;
 		// Init Timer
-		var time = Utils.parseMilliseconds(this.milliseconds);
+		var time = JSUS.parseMilliseconds(this.milliseconds);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];
 		
 		
@@ -7697,7 +7745,7 @@
 				time = 0;
 			}
 			//console.log(time);
-			time = Utils.parseMilliseconds(time);
+			time = JSUS.parseMilliseconds(time);
 			that.timerDiv.innerHTML = time[2] + ':' + time[3];
 			
 		}, this.update);
@@ -7748,8 +7796,7 @@
 	
 	function VisualTimer (options) {
 		this.options = options;
-
-		this.id = options.id || 'visualtimer';
+		this.id = options.id;
 
 		this.gameTimer = null
 		
@@ -7861,18 +7908,16 @@
 	
 	exports.WaitScreen = WaitScreen;
 	
+	WaitScreen.id = 'waiting';
+	WaitScreen.name = 'WaitingScreen';
+	WaitScreen.version = '0.3.1';
+	
 	function WaitScreen (options) {
-		
-		this.game = node.game;
-		this.id = options.id || 'waiting';
-		this.name = 'WaitingScreen';
-		this.version = '0.3';
-		
+		this.id = options.id;
 		
 		this.text = 'Waiting for other players to be done...';
 		this.waitingDiv = null;
-		
-	}
+	};
 	
 	WaitScreen.prototype.append = function (root, id) {};
 	
@@ -7919,22 +7964,23 @@
 	
 	exports.Wall = Wall;
 	
-	var Utils = node.Utils;
+	var JSUS = node.JSUS;
 	
-	function Wall(options) {
-		this.game = node.game;
-		this.id = options.id || 'wall';
-		this.name = 'Wall';
-		this.version = '0.2.1';
-		
+	Wall.id = 'wall';
+	Wall.name = 'Wall';
+	Wall.version = '0.3';
+	
+	Wall.dependencies = {
+		JSUS: {}
+	};
+	
+	function Wall (options) {
+		this.id = options.id;		
 		this.wall = null;
-		
 		this.buffer = [];
-		
 		this.counter = 0;
 		// TODO: buffer is not read now
-		
-	}
+	};
 	
 	Wall.prototype.append = function (root, id) {
 		var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
@@ -7946,7 +7992,7 @@
 		if (document.readyState !== 'complete') {
 	        this.buffer.push(s);
 	    } else {
-	    	var mark = this.counter++ + ') ' + Utils.getTime() + ' ';
+	    	var mark = this.counter++ + ') ' + JSUS.getTime() + ' ';
 	    	this.wall.innerHTML = mark + text + "\n" + this.wall.innerHTML;
 	        this.buffer = []; // Where to place it?
 	    }  

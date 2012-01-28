@@ -10,14 +10,13 @@
 	exports.Controls.Slider = SliderControls;
 	exports.Controls.Radio	= RadioControls;
 	
+	Controls.id = 'controls';
+	Controls.name = 'Controls'
+	Controls.version = '0.2';
 		
 	function Controls (options) {
-		this.name = 'Controls'
-		this.version = '0.2';
-	
-
 		this.options = options;
-		this.id = options.id || this.name;
+		this.id = options.id;
 		this.root = null;
 		
 		this.listRoot = null;
@@ -33,14 +32,7 @@
 	};
 	
 	Controls.prototype.init = function (options) {
-		
-//		if (options.fieldset) {
-//			this.list = new node.window.List();
-//		}
-//		else {		
-//			this.list = new node.window.List(this.id);
-//		}
-		
+
 		this.hasChanged = false; // TODO: should this be inherited?
 		this.changeEvent = options.change || this.id + '_change';
 		this.list = new node.window.List(options);
@@ -55,16 +47,6 @@
 	Controls.prototype.append = function (root) {
 		this.root = root;
 		var toReturn = this.listRoot;
-		
-//		if (this.options.fieldset) {
-//			var idFieldset = this.options.fieldset.id || this.id;
-//			var legend = this.options.fieldset.legend || 'Input';
-//			var attributes = this.options.fieldset.attributes || {}; 
-//			this.fieldset = node.window.addFieldset(this.root, idFieldset, legend, attributes);
-//			// Updating root and return element
-//			root = this.fieldset;
-//			toReturn = this.fieldset;
-//		}
 		
 		root.appendChild(this.listRoot);
 		
@@ -183,30 +165,45 @@
 	
 	// Sub-classes
 	
+	// Slider 
+	
 	SliderControls.prototype.__proto__ = Controls.prototype;
 	SliderControls.prototype.constructor = SliderControls;
 	
+	SliderControls.id = 'slidercontrols';
+	SliderControls.name = 'Slider Controls';
+	SliderControls.version = '0.2';
+	
+	SliderControls.dependencies = {
+		Controls: {}
+	};
+	
+	
 	function SliderControls (options) {
-		Controls.call(this,options);
-		this.name = 'SliderControls'
-		this.version = '0.2';
-		this.id = options.id || this.name;
+		Controls.call(this, options);
 	};
 	
 	SliderControls.prototype.add = function (root, id, attributes) {
 		return node.window.addSlider(root, id, attributes);
 	};
 	
+	// Radio
+	
 	RadioControls.prototype.__proto__ = Controls.prototype;
 	RadioControls.prototype.constructor = RadioControls;
 	
+	RadioControls.id = 'radiocontrols';
+	RadioControls.name = 'Radio Controls'
+	RadioControls.version = '0.1.1';
+	
+	RadioControls.dependencies = {
+		Controls: {}
+	};
+	
 	function RadioControls (options) {
 		Controls.call(this,options);
-		this.name = 'RadioControls'
-		this.version = '0.1.1';
-		this.id = options.id || this.name;
 		this.groupName = ('undefined' !== typeof options.name) ? options.name : 
-																 Math.floor(Math.random(0,1)*10000); 
+																 node.window.generateUniqueId(); 
 		//alert(this.groupName);
 	};
 	

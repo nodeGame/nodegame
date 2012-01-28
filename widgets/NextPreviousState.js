@@ -10,13 +10,14 @@
 	// TODO: Introduce rules for update: other vs self
 	
 	exports.NextPreviousState =	NextPreviousState;
+	
+	NextPreviousState.id = 'nextprevious';
+	NextPreviousState.name = 'Next,Previous State';
+	NextPreviousState.version = '0.3';
 		
 	function NextPreviousState(options) {
 		this.game = node.game;
-		this.id = options.id || 'nextprevious';
-		this.name = 'Next,Previous State';
-		this.version = '0.2.1';
-		
+		this.id = options.id;
 	}
 	
 	NextPreviousState.prototype.append = function (root, ids) {

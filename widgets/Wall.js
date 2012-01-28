@@ -10,22 +10,23 @@
 	
 	exports.Wall = Wall;
 	
-	var Utils = node.Utils;
+	var JSUS = node.JSUS;
 	
-	function Wall(options) {
-		this.game = node.game;
-		this.id = options.id || 'wall';
-		this.name = 'Wall';
-		this.version = '0.2.1';
-		
+	Wall.id = 'wall';
+	Wall.name = 'Wall';
+	Wall.version = '0.3';
+	
+	Wall.dependencies = {
+		JSUS: {}
+	};
+	
+	function Wall (options) {
+		this.id = options.id;		
 		this.wall = null;
-		
 		this.buffer = [];
-		
 		this.counter = 0;
 		// TODO: buffer is not read now
-		
-	}
+	};
 	
 	Wall.prototype.append = function (root, id) {
 		var fieldset = node.window.addFieldset(root, this.id+'_fieldset', 'Game Log');
@@ -37,7 +38,7 @@
 		if (document.readyState !== 'complete') {
 	        this.buffer.push(s);
 	    } else {
-	    	var mark = this.counter++ + ') ' + Utils.getTime() + ' ';
+	    	var mark = this.counter++ + ') ' + JSUS.getTime() + ' ';
 	    	this.wall.innerHTML = mark + text + "\n" + this.wall.innerHTML;
 	        this.buffer = []; // Where to place it?
 	    }  

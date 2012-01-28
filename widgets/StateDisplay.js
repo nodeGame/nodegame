@@ -8,13 +8,15 @@
 	 */
 	
 	exports.StateDisplay = StateDisplay;	
-		
-	function StateDisplay(options) {
+	
+	StateDisplay.id = 'statedisplay';
+	StateDisplay.name = 'State Display';
+	StateDisplay.version = '0.3.1';
+	
+	function StateDisplay (options) {
 		
 		this.game = node.game;
-		this.id = options.id || 'statedisplay';
-		this.name = 'State Display';
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.fieldset = null;
 		this.stateDiv = null;

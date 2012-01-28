@@ -8,12 +8,14 @@
 	
 	exports.MsgBar	= MsgBar;
 		
-	function MsgBar(options) {
+	MsgBar.id = 'msgbar';
+	MsgBar.name = 'Msg Bar';
+	MsgBar.version = '0.3';
+	
+	function MsgBar (options) {
 		
 		this.game = node.game;
-		this.id = options.id || 'msgbar';
-		this.name = 'Msg Bar';
-		this.version = '0.2.1';
+		this.id = options.id;
 		
 		this.recipient = null;
 	}

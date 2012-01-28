@@ -21,8 +21,7 @@
 	
 	function VisualTimer (options) {
 		this.options = options;
-
-		this.id = options.id || 'visualtimer';
+		this.id = options.id;
 
 		this.gameTimer = null
 		

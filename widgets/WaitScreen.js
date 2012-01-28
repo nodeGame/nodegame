@@ -10,18 +10,16 @@
 	
 	exports.WaitScreen = WaitScreen;
 	
+	WaitScreen.id = 'waiting';
+	WaitScreen.name = 'WaitingScreen';
+	WaitScreen.version = '0.3.1';
+	
 	function WaitScreen (options) {
-		
-		this.game = node.game;
-		this.id = options.id || 'waiting';
-		this.name = 'WaitingScreen';
-		this.version = '0.3';
-		
+		this.id = options.id;
 		
 		this.text = 'Waiting for other players to be done...';
 		this.waitingDiv = null;
-		
-	}
+	};
 	
 	WaitScreen.prototype.append = function (root, id) {};
 	

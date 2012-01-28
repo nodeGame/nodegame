@@ -9,13 +9,13 @@
 	// TODO: Introduce rules for update: other vs self
 	
 	exports.StateBar = StateBar;	
-		
-	function StateBar(options) {
-		
-		this.game = node.game;;
-		this.id = options.id || 'statebar';
-		this.name = 'State Bar';
-		this.version = '0.2.1';
+	
+	StateBar.id = 'statebar';
+	StateBar.name = 'State Bar';
+	StateBar.version = '0.3';
+	
+	function StateBar (options) {
+		this.id = options.id;
 		
 		this.actionSel = null;
 		this.recipient = null;
@@ -102,10 +102,7 @@
 		var get = node.actions.GET + '.'; 
 		
 		node.onPLIST( function(msg) {
-			
 			node.window.populateRecipientSelector(that.recipient,msg.data);
-			// was
-			//that.game.window.populateRecipientSelector(that.recipient,msg.data);
 		}); 
 	}; 
 })(node.window.widgets);

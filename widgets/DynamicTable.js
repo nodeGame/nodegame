@@ -16,6 +16,16 @@
 	
 	exports.DynamicTable = DynamicTable;
 	
+	DynamicTable.id = 'dynamictable';
+	DynamicTable.name = 'Dynamic Table';
+	DynamicTable.version = '0.3.1';
+	
+	DynamicTable.dependencies = {
+		Table: {},
+		JSUS: {},
+		HTMLRenderer: {}
+	};
+	
 	function DynamicTable (options, data) {
 		//JSUS.extend(node.window.Table,this);
 	    Table.call(this, options, data); 

@@ -8,14 +8,14 @@
 	
 	GameState = node.GameState;
 	PlayerList = node.PlayerList;
-		
+	
+	GameBoard.id = 'gboard';
+	GameBoard.name = 'GameBoard';
+	GameBoard.version = '0.3.1';
+	
 	function GameBoard (options) {
 		
-		this.game = node.game;
-		this.id = options.id || 'gboard';
-		this.name = 'GameBoard';
-		
-		this.version = '0.3';
+		this.id = options.id;
 		
 		this.board = null;
 		this.root = null;

@@ -477,7 +477,7 @@
 	};
 	
 	GameWindow.prototype.generateUniqueId = function (prefix) {
-		var id = '' + (prefix || JSUS.randomInt(0, 1000);
+		var id = '' + (prefix || JSUS.randomInt(0, 1000));
 		var found = this.getElementById(id);
 		
 		while (found) {

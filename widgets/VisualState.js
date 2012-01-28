@@ -11,13 +11,18 @@
 	exports.VisualState	= VisualState;
 	
 	GameState = node.GameState;
-	Utils = node.Utils;
+	JSUS = node.JSUS;
+	
+	VisualState.id = 'visualstate';
+	VisualState.name = 'Visual State';
+	VisualState.version = '0.2';
+	
+	VisualState.dependencies = {
+		JSUS: {}
+	};
 	
 	function VisualState (options) {
-		this.game = node.game;
-		this.id = options.id || 'VisualState';
-		this.name = 'Visual State';
-		this.version = '0.1';
+		this.id = options.id;
 		this.gameLoop = node.game.gameLoop;
 		
 		this.fieldset = {legend: 'State'};
@@ -47,7 +52,7 @@
 	VisualState.prototype.start = function() {
 		var that = this;
 		// Init Timer
-		var time = Utils.parseMilliseconds(this.milliseconds);
+		var time = JSUS.parseMilliseconds(this.milliseconds);
 		this.timerDiv.innerHTML = time[2] + ':' + time[3];
 		
 		
@@ -63,7 +68,7 @@
 				time = 0;
 			}
 			//console.log(time);
-			time = Utils.parseMilliseconds(time);
+			time = JSUS.parseMilliseconds(time);
 			that.timerDiv.innerHTML = time[2] + ':' + time[3];
 			
 		}, this.update);

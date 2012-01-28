@@ -9,12 +9,14 @@
 	
 	exports.GameSummary	= GameSummary;
 	
+	GameSummary.id = 'gamesummary';
+	GameSummary.name = 'Game Summary';
+	GameSummary.version = '0.3';
+	
 	function GameSummary(options) {
-		//debugger;
+		
 		this.game = node.game;
-		this.id = options.id || 'gamesummary';
-		this.name = 'Game Summary';
-		this.version = '0.2.1';
+		this.id = options.id;
 		
 		this.fieldset = null;
 		this.summaryDiv = null;
