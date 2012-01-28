@@ -405,16 +405,10 @@
 	// Recipients
 	
 	GameWindow.prototype.addRecipientSelector = function (root, id) {
-	
 		var toSelector = document.createElement('select');
 		toSelector.id = id;
-	
-		root.appendChild(toSelector);
-		
+		root.appendChild(toSelector);		
 		this.addStandardRecipients(toSelector);
-		
-		//this.toSels.push(toSelector);
-		
 		return toSelector;
 	};
 	
@@ -430,24 +424,17 @@
 		opt.appendChild(document.createTextNode('SERVER'));
 		toSelector.appendChild(opt);
 		
-	
-		
 	};
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
-			return;
-		}
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) return;
 		
 		this.removeChildrenFromNode(toSelector);
 		this.addStandardRecipients(toSelector);
 		
-		
 		var opt;
 		var pl = new PlayerList({}, playerList);
-		
-		
 		try {
 			pl.forEach( function(p) {
 				opt = document.createElement('option');

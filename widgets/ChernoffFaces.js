@@ -170,12 +170,14 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		var sc_options = {
-				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
-				change: this.change
-		};
-		this.sc.init(sc_options);
-		this.sc.refresh();
+		if (this.sc.root) {
+			var sc_options = {
+					features: JSUS.mergeOnValue(FaceVector.defaults, fv),
+					change: this.change
+			};
+			this.sc.init(sc_options);
+			this.sc.refresh();
+		}
 		return true;
 	};
 	

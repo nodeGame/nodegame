@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:29:13 CET 2012
+ * Built on Sa 28. Jan 17:51:50 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:29:13 CET 2012
+ * Built on Sa 28. Jan 17:51:50 CET 2012
  *
  */
  
@@ -3925,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:29:13 CET 2012
+ * Built on Sa 28. Jan 17:51:50 CET 2012
  *
  */
  
@@ -4707,16 +4707,10 @@
 	// Recipients
 	
 	GameWindow.prototype.addRecipientSelector = function (root, id) {
-	
 		var toSelector = document.createElement('select');
 		toSelector.id = id;
-	
-		root.appendChild(toSelector);
-		
+		root.appendChild(toSelector);		
 		this.addStandardRecipients(toSelector);
-		
-		//this.toSels.push(toSelector);
-		
 		return toSelector;
 	};
 	
@@ -4732,24 +4726,17 @@
 		opt.appendChild(document.createTextNode('SERVER'));
 		toSelector.appendChild(opt);
 		
-	
-		
 	};
 	
 	GameWindow.prototype.populateRecipientSelector = function (toSelector, playerList) {
 		
-		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) {
-			return;
-		}
+		if ('object' !==  typeof playerList || 'object' !== typeof toSelector) return;
 		
 		this.removeChildrenFromNode(toSelector);
 		this.addStandardRecipients(toSelector);
 		
-		
 		var opt;
 		var pl = new PlayerList({}, playerList);
-		
-		
 		try {
 			pl.forEach( function(p) {
 				opt = document.createElement('option');
@@ -5720,7 +5707,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:29:13 CET 2012
+ * Built on Sa 28. Jan 17:51:50 CET 2012
  *
  */
  
@@ -5897,12 +5884,14 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		var sc_options = {
-				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
-				change: this.change
-		};
-		this.sc.init(sc_options);
-		this.sc.refresh();
+		if (this.sc.root) {
+			var sc_options = {
+					features: JSUS.mergeOnValue(FaceVector.defaults, fv),
+					change: this.change
+			};
+			this.sc.init(sc_options);
+			this.sc.refresh();
+		}
 		return true;
 	};
 	
