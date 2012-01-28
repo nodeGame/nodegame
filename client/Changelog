@@ -1,3 +1,13 @@
+7.3
+
+- Document methods split in get and add
+
+7.2
+
+- All widgets updated
+- EventButton and DoneButton widgets
+- GameLoop enhanced: support for done handler and timer 
+
 7.1
 
 - HTMLRenderer object renders Table and List correctly

@@ -6,6 +6,8 @@
 	 * 
 	 */
 		
+	var Table = node.window.Table;
+	
 	/**
 	 * Expose constructor
 	 */
@@ -21,39 +23,82 @@
 	ChernoffFaces.version = '0.3';
 	
 	ChernoffFaces.dependencies = {
-		JSUS: {}
+		JSUS: {},
+		Table: {},
+		Canvas: {}
 	};
 	
 	function ChernoffFaces(options) {
-		var options = options || {};
+		this.options = options;
 		this.id = options.id;
 	
-		//this.fieldset = { id: this.id, legend: this.name};
+		//this.fieldset = { id: this.id, legend: this.name};		
+
+		this.table = new Table();
+		this.root = options.root || this.table.table;
+		this.root = document.body;
+		this.root.id = this.id;
 		
-		this.bar = null;
-		this.root = null;
-		
-		this.sc = null; // Slider Controls
-		this.fp = null; // Face Painter
-		
-		this.dims = {
-					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
-					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
-		};
-		
-		this.features = options.features;
-		this.change = options.change || 'CF_CHANGE';
-		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
-		this.options = options;
+		this.sc = null; 	// Slider Controls
+		this.fp = null; 	// Face Painter
+		this.dims = null;	// width and height of the canvas
+
+		this.change = 'CF_CHANGE';
+		this.features = null;
+		this.controls = null;
 	};
 	
 	ChernoffFaces.prototype.getRoot = function() {
 		return this.root;
 	};
 	
-	ChernoffFaces.prototype.init = function(options) {
+	ChernoffFaces.prototype.init = function (options) {
+//		this.id = options.id || this.id;
 //		var PREF = this.id + '_';
-//		var ids = options.ids || {};
+//		
+//		this.features = options.features;
+//		this.change = options.change || this.change;
+//		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
+//		
+//		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
+//		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
+//
+//		this.dims = {
+//				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+//				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
+//		};
+//		
+//		var canvas = new node.window.Canvas (root, idCanvas, this.dims);
+//		this.fp = new FacePainter(canvas);		
+//		this.fp.draw(new FaceVector(this.features));
+//		
+//		if (this.controls) {
+//			
+//			var sc_options = {
+//				id: 'cf_controls',
+//				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
+//				change: this.change,
+//				fieldset: {id: idFieldset, 
+//						   legend: 'Chernoff Box',
+//						   attributes: {style: 'float:left'}
+//				},
+//				submit: 'Send'
+//			};
+//			
+//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//		}
+		
+	};
+	
+	ChernoffFaces.prototype.getHTML = function() {
+		var d = document.createElement('div');
+		this.append(d);
+		return d.innerHTML;
+	};
+	
+	ChernoffFaces.prototype.append = function (root) {
+		
+//		var PREF = this.id + '_';
 //		
 //		var idFieldset = PREF + 'fieldset'; 
 //		var idCanvas = PREF + 'canvas';
@@ -90,59 +135,10 @@
 //			
 //			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
 //		}
-//
-//		this.root = root;
-//		return root;
-		
-	};
-	
-	ChernoffFaces.prototype.getHTML = function() {
-		var d = document.createElement('div');
-		this.append(d);
-		return d.innerHTML;
-	};
-	
-	ChernoffFaces.prototype.append = function (root, ids) {
-		
-		var PREF = this.id + '_';
-		
-		var idFieldset = PREF + 'fieldset'; 
-		var idCanvas = PREF + 'canvas';
-		var idButton = PREF + 'button';
-	
-		
-		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-			if (ids.hasOwnProperty('button')) idButton = ids.button;
-		}
-		
-		
-		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-		this.fp = new FacePainter(canvas);		
-		this.fp.draw(new FaceVector(this.features));
-		
-		if (this.controls) {
-			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-			
-			var sc_options = {
-								id: 'cf_controls',
-								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-								change: this.change,
-								fieldset: {id: idFieldset, 
-										   legend: 'Chernoff Box',
-										   attributes: {style: 'float:left'}
-								},
-								//attributes: {style: 'float:left'},
-								submit: 'Send'
-			};
-			
-			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-		}
 
 		this.root = root;
+		//root.appendChild( = node.window.addDiv(root, this.id + '_div');
+		
 		return root;
 		
 	};

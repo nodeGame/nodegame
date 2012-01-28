@@ -168,10 +168,13 @@
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
-		// We assume that the BODY element always exists
-		// TODO: Check if body element does not exist and add it
-		var root = JSUS.randomInt(0,1000);
-		return this.addElement('div', document.body, root);
+		var id = 'gamewindow_' + JSUS.randomInt(0,1000);
+		var root = document.body || document.lastElementChild;
+		if (!root) {
+			this.addElement('body', document);
+			root = document.body;
+		}
+		return this.addElement('div', root, id);
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
@@ -370,7 +373,7 @@
 		var d = w.dependencies;
 		for (var i in d) {
 			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i] && !node.window.widgets[i]) {
+				if (!window[i] && !node[i] && !node.window.widgets[i] && !node.window[i]) {
 					if (!quiet) {
 						errMsg(w, i);
 					} 

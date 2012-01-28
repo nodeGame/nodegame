@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.2
+ * nodeGame-all v0.7.333
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 14:47:07 CET 2012
+ * Built on Sa 28. Jan 16:30:08 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.2
+ * nodeGame Client v0.7.333
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 14:47:07 CET 2012
+ * Built on Sa 28. Jan 16:30:08 CET 2012
  *
  */
  
@@ -3306,7 +3306,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.1';
+	node.version = '0.7.3';
 	
 	node.verbosity = 0;
 	
@@ -3920,12 +3920,12 @@
  
  
 /*!
- * nodeWindow v0.7.2
+ * nodeWindow v0.7.333
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 14:47:07 CET 2012
+ * Built on Sa 28. Jan 16:30:08 CET 2012
  *
  */
  
@@ -3946,35 +3946,88 @@
 	
 	function Document() {};
 	
-	Document.prototype.addButton = function (root, id, text, attributes) {
+	Document.prototype.getElement = function (elem, id, attributes) {
+		var e = document.createElement(elem);
+		if ('undefined' !== typeof id){
+			e.id = id;
+		}
+		this.addAttributes2Elem(e, attributes);
+		return e;
+	};
+	
+	Document.prototype.addElement = function (elem, root, id, attributes) {
+		var el = this.getElement(elem, id, attributes);
+		return root.appendChild(el);
+	};
+	
+	Document.prototype.addAttributes2Elem = function (e, a) {
+		
+		for (var key in a) {
+			if (a.hasOwnProperty(key)){
+				if (key !== 'label') {
+					e.setAttribute(key,a[key]);
+				}
+				else {
+					// If a label element is present it checks whether it is an
+					// object literal or a string.
+					// In the former case it scans the obj for additional properties
+					
+					var labelId = 'label_' + e.id;
+					var labelText = a.label;
+					
+					if (typeof(a[key]) === 'object') {
+						var labelText = a.text;
+						if (a.id) {
+							labelId = a.id; 
+						}
+					}	
+					this.addLabel(e, labelId, labelText, e.id);
+				}
+			}
+		}
+		return e;
+	};
+	
+	Document.prototype.getButton = function (id, text, attributes) {
 		var sb = document.createElement('button');
 		sb.id = id;
 		sb.appendChild(document.createTextNode(text || 'Send'));	
 		this.addAttributes2Elem(sb, attributes);
-	
-		root.appendChild(sb);
 		return sb;
 	};
 	
-	Document.prototype.addFieldset = function (root, id, legend, attributes) {
-		var f = this.addElement('fieldset', root, id, attributes);
+	Document.prototype.addButton = function (root, id, text, attributes) {
+		var b = this.getButton(id, text, attributes);
+		return root.appendChild(b);
+	};
+	
+	Document.prototype.getFieldset = function (id, legend, attributes) {
+		var f = this.getElement('fieldset', id, attributes);
 		var l = document.createElement('Legend');
 		l.appendChild(document.createTextNode(legend));	
 		f.appendChild(l);
-		root.appendChild(f);
 		return f;
 	};
 	
-	Document.prototype.addTextInput = function (root, id, attributes) {
+	Document.prototype.addFieldset = function (root, id, legend, attributes) {
+		var f = this.getFieldset(id, legend, attributes);
+		return root.appendChild(f);
+	};
+	
+	Document.prototype.getTextInput = function (id, attributes) {
 		var mt =  document.createElement('input');
 		mt.id = id;
 		mt.setAttribute('type', 'text');
 		this.addAttributes2Elem(mt, attributes);
-		root.appendChild(mt);
 		return mt;
 	};
 	
-	Document.prototype.addCanvas = function (root, id, attributes) {
+	Document.prototype.addTextInput = function (root, id, attributes) {
+		var ti = this.getTextInput(id, attributes);
+		return root.appendChild(ti);
+	};
+	
+	Document.prototype.getCanvas = function (id, attributes) {
 		var canvas = document.createElement('canvas');
 		var context = canvas.getContext('2d');
 			
@@ -3985,49 +4038,63 @@
 		
 		canvas.id = id;
 		this.addAttributes2Elem(canvas, attributes);
-		root.appendChild(canvas);
 		return canvas;
 	};
+	
+	Document.prototype.addCanvas = function (root, id, attributes) {
+		var c = this.getCanvas(id, attributes);
+		return root.appendChild(c);
+	};
 		
-	Document.prototype.addSlider = function (root, id, attributes) {
+	Document.prototype.getSlider = function (id, attributes) {
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		root.appendChild(slider);
 		this.addAttributes2Elem(slider, attributes);
 		return slider;
 	};
 	
+	Document.prototype.addSlider = function (root, id, attributes) {
+		var s = this.getSlider(id, attributes);
+		return root.appendChild(s);
+	};
 	
-	Document.prototype.addRadioButton = function (root, id, attributes) {
+	Document.prototype.getRadioButton = function (id, attributes) {
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		root.appendChild(radio);
 		this.addAttributes2Elem(radio, attributes);
 		return radio;
 	};
 	
-	Document.prototype.addJQuerySlider = function (root, id, attributes) {
-		var slider = document.createElement('div');
-		slider.id = id;
-		slider.slider(attributes);
-		root.appendChild(slider);
-		return slider;
+	Document.prototype.addRadioButton = function (root, id, attributes) {
+		var rb = this.getRadioButton(id, attributes);
+		return root.appendChild(rb);
 	};
 	
+//	Document.prototype.addJQuerySlider = function (root, id, attributes) {
+//		var slider = document.createElement('div');
+//		slider.id = id;
+//		slider.slider(attributes);
+//		root.appendChild(slider);
+//		return slider;
+//	};
 	
-	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
+	Document.prototype.getLabel = function (id, labelText, forElem, attributes) {
 		var label = document.createElement('label');
 		label.id = id;
 		label.appendChild(document.createTextNode(labelText));	
 		label.setAttribute('for', forElem);
 		this.addAttributes2Elem(label, attributes);
-		
-//		var root = node.window.getElementById(forElem);
-		root.parentNode.insertBefore(label,root);
-		
 		return label;
+	};
+	
+	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
+//		var root = node.window.getElementById(forElem);
+		var l = this.getLabel(id, labelText, forElem, attributes);
+		root.parentNode.insertBefore(l, root);
+		return l;
+
 		
 //		// Add the label immediately before if no root elem has been provided
 //		if (!root) {
@@ -4040,12 +4107,16 @@
 //		return label;
 	};
 	
+	Document.prototype.getSelect = function (id, attributes) {
+		return this.getElement('select', id, attributes);
+	};
+	
 	Document.prototype.addSelect = function (root, id, attributes) {
 		return this.addElement('select', root, id, attributes);
 	};
 	
-	Document.prototype.populateSelect = function (select,list) {
-		
+	Document.prototype.populateSelect = function (select, list) {
+		if (!select || !list) return;
 		for (var key in list) {
 			if (list.hasOwnProperty(key)) {
 				var opt = document.createElement('option');
@@ -4076,9 +4147,14 @@
 	
 	// IFRAME
 	
-	Document.prototype.addIFrame = function (root, id, attributes) {
+	Document.prototype.getIFrame = function (id, attributes) {
 		var attributes = {'name' : id}; // For Firefox
-		return this.addElement('iframe', root, id, attributes);
+		return this.getElement('iframe', id, attributes);
+	};
+	
+	Document.prototype.addIFrame = function (root, id, attributes) {
+		var ifr = this.getIFrame(id, attributes);
+		return root.appendChild(ifr);
 	};
 	
 	
@@ -4105,6 +4181,9 @@
 		return this.addElement('link', root, id, attributes);
 	};
 	
+	Document.prototype.getDiv = function (id, attributes) {
+		return this.getElement('div', id, attributes);
+	};
 	
 	Document.prototype.addDiv = function (root, id, attributes) {
 		return this.addElement('div', root, id, attributes);
@@ -4150,95 +4229,6 @@
 		return elem.setAttribute('style',style);
 	};
 	
-	// TODO: Potentially unsafe
-	// Works only with Chrome
-	Document.prototype.loadFile = function (container,file) {
-		
-		// Check for the various File API support.
-		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-		  node.log('The File APIs are not fully supported in this browser.', 'ERR');
-		  return false;
-		}
-		function onInitFs(fs) {
-		  node.log('Opened file system: ' + fs.name);
-		}
-		
-		function errorHandler(e) {
-			  var msg = '';
-	
-			  switch (e.code) {
-			    case FileError.QUOTA_EXCEEDED_ERR:
-			      msg = 'QUOTA_EXCEEDED_ERR';
-			      break;
-			    case FileError.NOT_FOUND_ERR:
-			      msg = 'NOT_FOUND_ERR';
-			      break;
-			    case FileError.SECURITY_ERR:
-			      msg = 'SECURITY_ERR';
-			      break;
-			    case FileError.INVALID_MODIFICATION_ERR:
-			      msg = 'INVALID_MODIFICATION_ERR';
-			      break;
-			    case FileError.INVALID_STATE_ERR:
-			      msg = 'INVALID_STATE_ERR';
-			      break;
-			    default:
-			      msg = 'Unknown Error';
-			      break;
-			  }
-	
-			  node.log('Error: ' + msg, 'ERR');
-		};
-		
-		// second param is 5MB, reserved space for storage
-		window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
-		
-			
-		container.innerHTML += 'DONE FS';
-		return container;
-	};
-	
-	// Util
-	
-	Document.prototype.addElement = function (elem, root, id, attributes) {
-		var e = document.createElement(elem);
-		if (id) {
-			e.id = id;
-		}
-		this.addAttributes2Elem(e, attributes);
-		
-		root.appendChild(e);
-		return e;
-	};
-	
-	Document.prototype.addAttributes2Elem = function (e, a) {
-		
-		for (var key in a) {
-			if (a.hasOwnProperty(key)){
-				if (key !== 'label') {
-					e.setAttribute(key,a[key]);
-				}
-				else {
-					// If a label element is present it checks whether it is an
-					// object literal or a string.
-					// In the former case it scans the obj for additional properties
-					
-					var labelId = 'label_' + e.id;
-					var labelText = a.label;
-					
-					if (typeof(a[key]) === 'object') {
-						var labelText = a.text;
-						if (a.id) {
-							labelId = a.id; 
-						}
-					}	
-					this.addLabel(e, labelId, labelText, e.id);
-				}
-			}
-		}
-		return e;
-	};
-	
 	Document.prototype.removeClass = function (element, className) {
 		var regexpr = '/(?:^|\s)' + className + '(?!\S)/';
 		element.className = element.className.replace( regexpr, '' );
@@ -4258,6 +4248,55 @@
 	Document.prototype.insertAfter = function (node, referenceNode) {
 		  referenceNode.insertBefore(node, referenceNode.nextSibling);
 	};
+	
+	
+	// TODO: Potentially unsafe
+	// Works only with Chrome
+//	Document.prototype.loadFile = function (container,file) {
+//		
+//		// Check for the various File API support.
+//		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+//		  node.log('The File APIs are not fully supported in this browser.', 'ERR');
+//		  return false;
+//		}
+//		function onInitFs(fs) {
+//		  node.log('Opened file system: ' + fs.name);
+//		}
+//		
+//		function errorHandler(e) {
+//			  var msg = '';
+//	
+//			  switch (e.code) {
+//			    case FileError.QUOTA_EXCEEDED_ERR:
+//			      msg = 'QUOTA_EXCEEDED_ERR';
+//			      break;
+//			    case FileError.NOT_FOUND_ERR:
+//			      msg = 'NOT_FOUND_ERR';
+//			      break;
+//			    case FileError.SECURITY_ERR:
+//			      msg = 'SECURITY_ERR';
+//			      break;
+//			    case FileError.INVALID_MODIFICATION_ERR:
+//			      msg = 'INVALID_MODIFICATION_ERR';
+//			      break;
+//			    case FileError.INVALID_STATE_ERR:
+//			      msg = 'INVALID_STATE_ERR';
+//			      break;
+//			    default:
+//			      msg = 'Unknown Error';
+//			      break;
+//			  }
+//	
+//			  node.log('Error: ' + msg, 'ERR');
+//		};
+//		
+//		// second param is 5MB, reserved space for storage
+//		window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
+//		
+//			
+//		container.innerHTML += 'DONE FS';
+//		return container;
+//	};
 
 })(window.node); 
  
@@ -4431,10 +4470,13 @@
 	};
 	
 	GameWindow.prototype.generateRandomRoot = function () {
-		// We assume that the BODY element always exists
-		// TODO: Check if body element does not exist and add it
-		var root = JSUS.randomInt(0,1000);
-		return this.addElement('div', document.body, root);
+		var id = 'gamewindow_' + JSUS.randomInt(0,1000);
+		var root = document.body || document.lastElementChild;
+		if (!root) {
+			this.addElement('body', document);
+			root = document.body;
+		}
+		return this.addElement('div', root, id);
 	};
 	
 	GameWindow.prototype.generateHeader = function () {
@@ -4633,7 +4675,7 @@
 		var d = w.dependencies;
 		for (var i in d) {
 			if (d.hasOwnProperty(i)) {
-				if (!window[i] && !node[i] && !node.window.widgets[i]) {
+				if (!window[i] && !node[i] && !node.window.widgets[i] && !node.window[i]) {
 					if (!quiet) {
 						errMsg(w, i);
 					} 
@@ -5655,12 +5697,12 @@
  
  
 /*!
- * nodeGadgets v0.7.2
+ * nodeGadgets v0.7.333
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 14:47:07 CET 2012
+ * Built on Sa 28. Jan 16:30:08 CET 2012
  *
  */
  
@@ -5673,6 +5715,8 @@
 	 * 
 	 */
 		
+	var Table = node.window.Table;
+	
 	/**
 	 * Expose constructor
 	 */
@@ -5688,41 +5732,82 @@
 	ChernoffFaces.version = '0.3';
 	
 	ChernoffFaces.dependencies = {
-		JSUS: {}
+		JSUS: {},
+		Table: {},
+		Canvas: {}
 	};
 	
 	function ChernoffFaces(options) {
-		var options = options || {};
-		
-		this.game = node.game;
+		this.options = options;
 		this.id = options.id;
 	
-		//this.fieldset = { id: this.id, legend: this.name};
+		//this.fieldset = { id: this.id, legend: this.name};		
+
+		this.table = new Table();
+		this.root = options.root || this.table.table;
+		this.root = document.body;
+		this.root.id = this.id;
 		
-		this.bar = null;
-		this.root = null;
-		
-		this.sc = null; // Slider Controls
-		this.fp = null; // Face Painter
-		
-		this.dims = {
-					width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
-					height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
-		};
-		
-		this.features = options.features;
-		this.change = options.change || 'CF_CHANGE';
-		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
-		this.options = options;
+		this.sc = null; 	// Slider Controls
+		this.fp = null; 	// Face Painter
+		this.dims = null;	// width and height of the canvas
+
+		this.change = 'CF_CHANGE';
+		this.features = null;
+		this.controls = null;
 	};
 	
 	ChernoffFaces.prototype.getRoot = function() {
 		return this.root;
 	};
 	
-	ChernoffFaces.prototype.init = function(options) {
+	ChernoffFaces.prototype.init = function (options) {
+//		this.id = options.id || this.id;
 //		var PREF = this.id + '_';
-//		var ids = options.ids || {};
+//		
+//		this.features = options.features;
+//		this.change = options.change || this.change;
+//		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
+//		
+//		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
+//		var idButton = (options.idButton) ? options.idButton : PREF + 'button';
+//
+//		this.dims = {
+//				width: (options.width) ? options.width : ChernoffFaces.defaults.canvas.width, 
+//				height:(options.height) ? options.height : ChernoffFaces.defaults.canvas.heigth
+//		};
+//		
+//		var canvas = new node.window.Canvas (root, idCanvas, this.dims);
+//		this.fp = new FacePainter(canvas);		
+//		this.fp.draw(new FaceVector(this.features));
+//		
+//		if (this.controls) {
+//			
+//			var sc_options = {
+//				id: 'cf_controls',
+//				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
+//				change: this.change,
+//				fieldset: {id: idFieldset, 
+//						   legend: 'Chernoff Box',
+//						   attributes: {style: 'float:left'}
+//				},
+//				submit: 'Send'
+//			};
+//			
+//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
+//		}
+		
+	};
+	
+	ChernoffFaces.prototype.getHTML = function() {
+		var d = document.createElement('div');
+		this.append(d);
+		return d.innerHTML;
+	};
+	
+	ChernoffFaces.prototype.append = function (root) {
+		
+//		var PREF = this.id + '_';
 //		
 //		var idFieldset = PREF + 'fieldset'; 
 //		var idCanvas = PREF + 'canvas';
@@ -5759,59 +5844,10 @@
 //			
 //			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
 //		}
-//
-//		this.root = root;
-//		return root;
-		
-	};
-	
-	ChernoffFaces.prototype.getHTML = function() {
-		var d = document.createElement('div');
-		this.append(d);
-		return d.innerHTML;
-	};
-	
-	ChernoffFaces.prototype.append = function (root, ids) {
-		
-		var PREF = this.id + '_';
-		
-		var idFieldset = PREF + 'fieldset'; 
-		var idCanvas = PREF + 'canvas';
-		var idButton = PREF + 'button';
-	
-		
-		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-		
-		if (ids !== null && ids !== undefined) {
-			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-			if (ids.hasOwnProperty('button')) idButton = ids.button;
-		}
-		
-		
-		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-		this.fp = new FacePainter(canvas);		
-		this.fp.draw(new FaceVector(this.features));
-		
-		if (this.controls) {
-			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-			
-			var sc_options = {
-								id: 'cf_controls',
-								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-								change: this.change,
-								fieldset: {id: idFieldset, 
-										   legend: 'Chernoff Box',
-										   attributes: {style: 'float:left'}
-								},
-								//attributes: {style: 'float:left'},
-								submit: 'Send'
-			};
-			
-			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-		}
 
 		this.root = root;
+		//root.appendChild( = node.window.addDiv(root, this.id + '_div');
+		
 		return root;
 		
 	};
@@ -5826,7 +5862,7 @@
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
 		var fv = new FaceVector(features);
-		this.fp.redraw(fv);
+		this.fp.redraw(fv);			
 	};
 	
 	ChernoffFaces.prototype.getAllValues = function() {
@@ -7723,47 +7759,16 @@
 		var idTimerDiv = PREF + 'div';
 		
 
-		this.stateDiv = node.window.addDiv(root,idTimerDiv);
-		this.stateDiv.innerHTML = 'Uninitialized'; //new GameState(this.game.gameState);
+		this.stateDiv = node.window.addDiv(root, idTimerDiv);
+		this.stateDiv.innerHTML = 'Uninitialized';
 		
 		return root;
 		
-	};
-	
-	VisualState.prototype.start = function() {
-		var that = this;
-		// Init Timer
-		var time = JSUS.parseMilliseconds(this.milliseconds);
-		this.timerDiv.innerHTML = time[2] + ':' + time[3];
-		
-		
-		this.timer = setInterval(function() {
-			that.timePassed = that.timePassed + that.update;
-			var time = that.milliseconds - that.timePassed;
-
-			if (time <= 0) {
-				if (that.event) {
-					node.emit(that.event);
-				}
-				clearInterval(that.timer);
-				time = 0;
-			}
-			//console.log(time);
-			time = JSUS.parseMilliseconds(time);
-			that.timerDiv.innerHTML = time[2] + ':' + time[3];
-			
-		}, this.update);
-	};
-	
-	VisualState.prototype.restart = function(options) {
-		this.init(options);
-		this.start();
 	};
 		
 	VisualState.prototype.listeners = function () {
 		var that = this;
 
-		
 		node.on('STATECHANGE', function() {
 			that.writeState(node.game.gameState);
 		}); 
