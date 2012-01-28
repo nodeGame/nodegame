@@ -12,8 +12,10 @@
 	
 	JSUS = node.JSUS;
 	
+	VisualTimer.id = 'visualtimer';
 	VisualTimer.name = 'Visual Timer';
 	VisualTimer.version = '0.3.2';
+	
 	VisualTimer.dependencies = {
 		GameTimer : {},
 		JSUS: {}

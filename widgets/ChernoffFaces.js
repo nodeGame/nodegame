@@ -20,10 +20,12 @@
 	ChernoffFaces.name = 'Chernoff Faces';
 	ChernoffFaces.version = '0.3';
 	
+	ChernoffFaces.dependencies = {
+		JSUS: {}
+	};
+	
 	function ChernoffFaces(options) {
 		var options = options || {};
-		
-		this.game = node.game;
 		this.id = options.id;
 	
 		//this.fieldset = { id: this.id, legend: this.name};
@@ -76,7 +78,7 @@
 //			
 //			var sc_options = {
 //								id: 'cf_controls',
-//								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+//								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 //								change: this.change,
 //								fieldset: {id: idFieldset, 
 //										   legend: 'Chernoff Box',
@@ -127,7 +129,7 @@
 			
 			var sc_options = {
 								id: 'cf_controls',
-								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 								change: this.change,
 								fieldset: {id: idFieldset, 
 										   legend: 'Chernoff Box',
@@ -155,7 +157,7 @@
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
 		var fv = new FaceVector(features);
-		this.fp.redraw(fv);
+		this.fp.redraw(fv);			
 	};
 	
 	ChernoffFaces.prototype.getAllValues = function() {
@@ -167,7 +169,7 @@
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
 		var sc_options = {
-				features: Utils.mergeOnValue(FaceVector.defaults, fv),
+				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
 				change: this.change
 		};
 		this.sc.init(sc_options);

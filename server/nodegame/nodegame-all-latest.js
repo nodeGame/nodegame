@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 13:32:11 CET 2012
+ * Built on Sa 28. Jan 14:47:07 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 13:32:11 CET 2012
+ * Built on Sa 28. Jan 14:47:07 CET 2012
  *
  */
  
@@ -3925,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 13:32:11 CET 2012
+ * Built on Sa 28. Jan 14:47:07 CET 2012
  *
  */
  
@@ -5660,7 +5660,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 13:32:12 CET 2012
+ * Built on Sa 28. Jan 14:47:07 CET 2012
  *
  */
  
@@ -5686,6 +5686,10 @@
 	ChernoffFaces.id = 'ChernoffFaces';
 	ChernoffFaces.name = 'Chernoff Faces';
 	ChernoffFaces.version = '0.3';
+	
+	ChernoffFaces.dependencies = {
+		JSUS: {}
+	};
 	
 	function ChernoffFaces(options) {
 		var options = options || {};
@@ -5743,7 +5747,7 @@
 //			
 //			var sc_options = {
 //								id: 'cf_controls',
-//								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+//								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 //								change: this.change,
 //								fieldset: {id: idFieldset, 
 //										   legend: 'Chernoff Box',
@@ -5794,7 +5798,7 @@
 			
 			var sc_options = {
 								id: 'cf_controls',
-								features: Utils.mergeOnValue(FaceVector.defaults, this.features),
+								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
 								change: this.change,
 								fieldset: {id: idFieldset, 
 										   legend: 'Chernoff Box',
@@ -5834,7 +5838,7 @@
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
 		var sc_options = {
-				features: Utils.mergeOnValue(FaceVector.defaults, fv),
+				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
 				change: this.change
 		};
 		this.sc.init(sc_options);
@@ -7761,7 +7765,7 @@
 
 		
 		node.on('STATECHANGE', function() {
-			that.writeState(that.game.gameState);
+			that.writeState(node.game.gameState);
 		}); 
 	};
 	
@@ -7787,8 +7791,10 @@
 	
 	JSUS = node.JSUS;
 	
+	VisualTimer.id = 'visualtimer';
 	VisualTimer.name = 'Visual Timer';
 	VisualTimer.version = '0.3.2';
+	
 	VisualTimer.dependencies = {
 		GameTimer : {},
 		JSUS: {}
@@ -7933,7 +7939,7 @@
 			}			
 		
 			that.waitingDiv.innerHTML = text || that.text;
-			that.game.pause();
+			node.game.pause();
 		});
 		
 		// It is supposed to fade away when a new state starts

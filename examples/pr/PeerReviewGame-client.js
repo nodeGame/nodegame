@@ -24,6 +24,8 @@ function PeerReviewGame () {
 		this.milli = 10000;
 		this.milli_short = 1000;
 
+		this.evas = {};
+		
 		this.all_ex = new node.window.List({ id: 'all_ex',
 											 title: 'History of previous exhibitions'
 		});
@@ -144,7 +146,6 @@ function PeerReviewGame () {
 	
 	var pregame = function() {
 		var frame = node.window.loadFrame('pregame.html');
-		
 		node.emit('DONE');
 		console.log('Pregame');
 	};
@@ -160,8 +161,8 @@ function PeerReviewGame () {
 			
 			var creationDiv = node.window.getElementById('creation');
 			var cf_options = { id: 'cf',
-								width: 300,
-								height: 300
+							   width: 300,
+							   height: 300
 			};
 			
 			this.cf = node.window.addWidget('ChernoffFaces', creationDiv, cf_options);
@@ -173,14 +174,6 @@ function PeerReviewGame () {
 			this.all_ex.reverse();
 			this.all_ex.parse();
 			node.window.write(this.all_ex.getRoot(), historyDiv);
-			
-
-//			node.window.addEventButton('CREATION_DONE', this.donetxt, creationDiv);
-//			
-//			node.on('CREATION_DONE', function(){
-//				node.set('CF', this.cf.getAllValues());
-//				node.emit('DONE');
-//			});
 			
 		});
 
@@ -235,27 +228,11 @@ function PeerReviewGame () {
 			}
 		}, 10);
 		
-		node.window.addEventButton('SUBMISSION_DONE', this.donetxt);
-		
-		
-		node.on('SUBMISSION_DONE', function(){
-			if (!this.outlet.hasChanged) {
-				this.outlet.highlight();
-				alert('You must select an outlet for your creation NOW!!');
-				this.timer.restart(timerOptions);
-			}
-			else {
-				node.emit('INPUT_DISABLE');
-				node.set('SUB', this.outlet.getAllValues());
-				node.DONE();
-			}
-		});
-		
 		console.log('Submission');
 	};	
 	
 	var evaluation = function() {
-		var evas = {};
+		
 		var evaAttr = {
 				min: 1,
 				max: 9,
@@ -285,34 +262,18 @@ function PeerReviewGame () {
 				node.window.writeln();
 				
 				// Add the slider to the container
-				evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
+				this.evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
 				
-				node.window.addEventButton('EVALUATION_DONE', this.donetxt);
+		
 				
 				// AUTOPLAY
 				node.random.exec(function(){
 					var choice = Math.random();
-					
 					node.window.getElementById(evaId).value = Math.random()*10;
-					
 					//alert(choice);
-					
 				}, 10);
 			});
-			
-			
-			
-			node.on('EVALUATION_DONE', function(){
-				
-				for (var i in evas) {
-					if (evas.hasOwnProperty(i)) {	
-						node.set('EVA', {'for': i,
-										 eva: evas[i].value
-						});
-					}
-				}
-				node.emit('DONE');
-			});
+	
 		});
 		
 		console.log('Evaluation');
@@ -369,9 +330,6 @@ function PeerReviewGame () {
 					this.all_ex.addDD(str);
 				}
 				
-
-				node.window.addEventButton('DONE', this.donetxt);
-				
 			});
 			
 		});
@@ -381,21 +339,12 @@ function PeerReviewGame () {
 		console.log('Dissemination');
 	};
 	
-	var questionnaire = function(){
-		node.window.loadFrame('postgame.html', function(){
-			
-			node.window.addEventButton('DONE', this.donetxt);
-			
-			this.timer.restart({
-								timeup: 'DONE',
-								milliseconds: this.milli_short
-			});
-		});
-		
+	var questionnaire = function() {
+		node.window.loadFrame('postgame.html');
 		console.log('Postgame');
 	};
 	
-	var endgame = function(){
+	var endgame = function() {
 		node.window.loadFrame('ended.html');
 		console.log('Game ended');
 	};
@@ -415,22 +364,40 @@ function PeerReviewGame () {
 			timer: 3000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
+				return true;
 			}
 		},
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: {
-				timeup: 'SUBMISSION_DONE',
-				milliseconds: 1000
-			}	
+			timer: 1000,
+			done: function () {
+				if (!this.outlet.hasChanged) {
+					this.outlet.highlight();
+					alert('You must select an outlet for your creation NOW!!');
+					this.timer.restart(timerOptions);
+					return false;
+				}
+				
+				node.emit('INPUT_DISABLE');
+				node.set('SUB', this.outlet.getAllValues());
+				return true;
+			}
 		},
 		
 		3: {state: evaluation,
 			name: 'Evaluation',
-			timer: {
-				timeup: 'EVALUATION_DONE',
-				milliseconds: 1000
+			timer: 1000,
+			done: function () {
+				for (var i in this.evas) {
+					if (this.evas.hasOwnProperty(i)) {	
+						node.set('EVA', {'for': i,
+										 eva: this.evas[i].value
+						});
+					}
+				}
+				this.evas = {};
+				return true;
 			}
 		},
 		

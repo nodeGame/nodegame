@@ -84,7 +84,7 @@
 
 		
 		node.on('STATECHANGE', function() {
-			that.writeState(that.game.gameState);
+			that.writeState(node.game.gameState);
 		}); 
 	};
 	

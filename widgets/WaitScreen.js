@@ -35,7 +35,7 @@
 			}			
 		
 			that.waitingDiv.innerHTML = text || that.text;
-			that.game.pause();
+			node.game.pause();
 		});
 		
 		// It is supposed to fade away when a new state starts
