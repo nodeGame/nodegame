@@ -80,7 +80,7 @@
     		}
     		return tbl.parse();
 		}
-	});
+	}, 2);
 	if (options) {
 		if (!(options instanceof Array)) {
 			options = [options];

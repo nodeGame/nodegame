@@ -102,15 +102,9 @@
 	};
 	
 	List.prototype.parse = function() {
-		console.log('Pre sort')
-		console.log(this.db);
 		this.sort();
 		var old_dt = null;
 		var old_dd = null;
-		
-		console.log('This is the list now');
-		console.log(this.db);
-		
 		
 		var appendDT = function() {
 			var node = document.createElement(this.SECOND_LEVEL);
@@ -148,9 +142,6 @@
 		
 		for (var i=0; i<this.db.length; i++) {
 			var el = this.db[i];
-			console.log('this the el');
-			console.log(el);
-			console.log(typeof el.dd);
 			if ('undefined' === typeof el.dd) {
 				var node = appendDT.call(this);
 				//console.log('just created dt');

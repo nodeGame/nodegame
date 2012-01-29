@@ -48,7 +48,7 @@
 			  return document.createTextNode(el.content);
 		  });
 		  
-		  this.renderers.push (function (el) { 
+		  this.renderers.push(function (el) { 
 			  if ('object' === typeof el.content) {
 	    		var div = document.createElement('div');
 	    		for (var key in el.content) {
@@ -62,29 +62,24 @@
 			  }
 		  });
 		 
-		  this.renderers.push (function (el) { 
+		  
+		  
+		  this.renderers.push(function (el) { 
+//			  console.log('OK cazzo');
+//			  console.log(el);
+			  if (el.content.parse && el.content.parse instanceof Function) {
+				  var html = el.content.parse();
+				  if (JSUS.isElement(html) || JSUS.isNode(html)) {
+					  return html;
+				  }
+			  }
+		  });	
+		  
+		  this.renderers.push(function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
 			  }
 		  });
-		  
-		  if (node.window.Table) {
-			  this.renderers.push (function (el) { 
-				  if (el.content instanceof node.window.Table) {
-		    		return el.content.parse();
-				  }
-			  });
-		  }
-		  
-		  if (node.window.List) {
-			  this.renderers.push (function (el) { 
-				  if (el.content instanceof node.window.List) {
-		    		return el.content.parse();
-				  }
-			  });
-		  }
-		  
-		  
 	  };
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {
@@ -104,7 +99,7 @@
 			  this.renderers.push(renderer);
 		  }
 		  else {
-			  this.renderers.splice(pos, 1, renderer);
+			  this.renderers.splice(pos, 0, renderer);
 		  }
 	  };
 	  

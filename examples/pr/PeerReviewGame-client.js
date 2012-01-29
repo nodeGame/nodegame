@@ -212,7 +212,7 @@ function PeerReviewGame () {
 							}
 		};
 		
-		this.outlet = node.window.addWidget('Controls.Radio',root,ctrl_options);
+		this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
 		
 		// AUTOPLAY
 		node.random.exec(function(){
@@ -357,11 +357,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-//			timer: {
-//				timeup: 'CREATION_DONE',
-//				milliseconds: 1000
-//			},
-			timer: 3000,
+			timer: 10000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;
@@ -370,7 +366,7 @@ function PeerReviewGame () {
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: 1000,
+			timer: 3000,
 			done: function () {
 				if (!this.outlet.hasChanged) {
 					this.outlet.highlight();

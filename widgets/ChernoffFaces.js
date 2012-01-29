@@ -35,7 +35,6 @@
 	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
-	
 		this.table = new Table();
 		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
@@ -72,22 +71,22 @@
 		this.fp = new FacePainter(this.canvas);		
 		this.fp.draw(new FaceVector(this.features));
 		
-//		if (this.controls) {
-//			
-//			var sc_options = {
-//				id: 'cf_controls',
-//				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-//				change: this.change,
-//				fieldset: {id: this.id + '_controls_fieldest', 
-//						   legend: this.controls.legend || 'Controls'
-//				},
-//				submit: 'Send'
-//			};
-//			
-//			this.sc = node.window.getWidget('Controls.Slider', sc_options);
-//			
-//			this.table.add(this.sc);
-//		}
+		var sc_options = {
+			id: 'cf_controls',
+			features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
+			change: this.change,
+			fieldset: {id: this.id + '_controls_fieldest', 
+					   legend: this.controls.legend || 'Controls'
+			},
+			submit: 'Send'
+		};
+		
+		this.sc = node.window.getWidget('Controls.Slider', sc_options);
+		
+		// Controls are always there, but may not be visible
+		if (this.controls) {
+			this.table.add(this.sc);
+		}
 		
 		this.table.add(this.canvas);
 		
@@ -144,14 +143,17 @@
 //		}
 
 		this.root = root;
-		root.appendChild(this.table.parse());
+		this.table.parse();
+		console.log('Inside Table...');
+		console.log(this.table);
+		root.appendChild(this.table.table);
 		return root;
 		
 	};
 	
 	ChernoffFaces.prototype.listeners = function () {
 		var that = this;
-		node.on(that.change, function(msg) {
+		node.on(this.change, function(msg) {
 			that.draw(that.sc.getAllValues());
 		}); 
 	};
@@ -170,14 +172,14 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		if (this.sc.root) {
-			var sc_options = {
-					features: JSUS.mergeOnValue(FaceVector.defaults, fv),
-					change: this.change
-			};
-			this.sc.init(sc_options);
-			this.sc.refresh();
-		}
+	
+		var sc_options = {
+				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
+				change: this.change
+		};
+		this.sc.init(sc_options);
+		this.sc.refresh();
+	
 		return true;
 	};
 	

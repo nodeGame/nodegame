@@ -31,6 +31,11 @@
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
+	Controls.prototype.getItem = function (id, attributes) {
+		// TODO: node.window.addTextInput
+		//return node.window.getTextInput(id, attributes);
+	};
+	
 	Controls.prototype.init = function (options) {
 
 		this.hasChanged = false; // TODO: should this be inherited?
@@ -39,7 +44,7 @@
 		this.listRoot = this.list.getRoot();
 		
 		if (!options.features) return;
-		
+		if (!this.root) this.root = this.listRoot;
 		this.features = options.features;
 		this.populate();
 	};
@@ -47,7 +52,7 @@
 	Controls.prototype.append = function (root) {
 		this.root = root;
 		var toReturn = this.listRoot;
-		
+		this.list.parse();
 		root.appendChild(this.listRoot);
 		
 		if (this.options.submit) {
@@ -69,6 +74,9 @@
 		return toReturn;
 	};
 	
+	Controls.prototype.parse = function() {
+		return this.list.parse();
+	};
 	
 	Controls.prototype.populate = function () {
 		var that = this;
@@ -83,34 +91,15 @@
 					delete attributes.id;
 				}
 				
-				var item = this.list.createItem();
-				this.listRoot.appendChild(item);
-					
-				// Add a different element according to the subclass instantiated
-				var elem = this.add(item, id, attributes);
+				var item = this.getItem(id, attributes);
+				this.list.addDT(item);
 				
 				// Fire the onChange event, if one defined
 				if (this.changeEvent) {
-					elem.onchange = function() {
+					item.onchange = function() {
 						node.emit(that.changeEvent);
 					};
 				}
-				
-				// If a label element is present it checks whether it is an
-				// object literal or a string.
-				// In the former case it scans the obj for additional properties
-//				if (attributes.label) {
-//					var labelId = 'label_' + id;
-//					var labelText = attributes.label;
-//					
-//					if (typeof(attributes.label) === 'object') {
-//						var labelText = attributes.label.text;
-//						if (attributes.label.id) {
-//							labelId = attributes.label.id; 
-//						}
-//					}	
-//					node.window.addLabel(elem, labelId, labelText, id);
-//				}
 			}
 		}
 	};
@@ -187,6 +176,10 @@
 		return node.window.addSlider(root, id, attributes);
 	};
 	
+	SliderControls.prototype.getItem = function (id, attributes) {
+		return node.window.getSlider(id, attributes);
+	};
+	
 	// Radio
 	
 	RadioControls.prototype.__proto__ = Controls.prototype;
@@ -220,6 +213,21 @@
 		}
 		//console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
+	};
+	
+	RadioControls.prototype.getItem = function (id, attributes) {
+		//console.log('ADDDING radio');
+		//console.log(attributes);
+		// add the group name if not specified
+		// TODO: is this a javascript bug?
+		if ('undefined' === typeof attributes.name) {
+//			console.log(this);
+//			console.log(this.name);
+//			console.log('MODMOD ' + this.name);
+			attributes.name = this.groupName;
+		}
+		//console.log(attributes);
+		return node.window.getRadioButton(id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls
