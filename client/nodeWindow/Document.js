@@ -19,8 +19,7 @@
 		if ('undefined' !== typeof id){
 			e.id = id;
 		}
-		this.addAttributes2Elem(e, attributes);
-		return e;
+		return this.addAttributes2Elem(e, attributes);
 	};
 	
 	Document.prototype.addElement = function (elem, root, id, attributes) {
@@ -48,20 +47,26 @@
 						if (a.id) {
 							labelId = a.id; 
 						}
-					}	
+					}
+					
+					// Create a Parent which contains element and legend
+					if (!e.parentNode) {
+						var parent = document.createElement('div');
+						parent.appendChild(e);
+					}
 					this.addLabel(e, labelId, labelText, e.id);
+					
 				}
 			}
 		}
-		return e;
+		return parent || e;
 	};
 	
 	Document.prototype.getButton = function (id, text, attributes) {
 		var sb = document.createElement('button');
 		sb.id = id;
 		sb.appendChild(document.createTextNode(text || 'Send'));	
-		this.addAttributes2Elem(sb, attributes);
-		return sb;
+		return this.addAttributes2Elem(sb, attributes);
 	};
 	
 	Document.prototype.addButton = function (root, id, text, attributes) {
@@ -86,8 +91,7 @@
 		var mt =  document.createElement('input');
 		mt.id = id;
 		mt.setAttribute('type', 'text');
-		this.addAttributes2Elem(mt, attributes);
-		return mt;
+		return this.addAttributes2Elem(mt, attributes);
 	};
 	
 	Document.prototype.addTextInput = function (root, id, attributes) {
@@ -105,8 +109,7 @@
 		}
 		
 		canvas.id = id;
-		this.addAttributes2Elem(canvas, attributes);
-		return canvas;
+		return this.addAttributes2Elem(canvas, attributes);
 	};
 	
 	Document.prototype.addCanvas = function (root, id, attributes) {
@@ -118,8 +121,7 @@
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		this.addAttributes2Elem(slider, attributes);
-		return slider;
+		return this.addAttributes2Elem(slider, attributes);
 	};
 	
 	Document.prototype.addSlider = function (root, id, attributes) {
@@ -131,8 +133,7 @@
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		this.addAttributes2Elem(radio, attributes);
-		return radio;
+		return this.addAttributes2Elem(radio, attributes);
 	};
 	
 	Document.prototype.addRadioButton = function (root, id, attributes) {
@@ -153,13 +154,16 @@
 		label.id = id;
 		label.appendChild(document.createTextNode(labelText));	
 		label.setAttribute('for', forElem);
-		this.addAttributes2Elem(label, attributes);
-		return label;
+		return this.addAttributes2Elem(label, attributes);
 	};
 	
 	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
 //		var root = node.window.getElementById(forElem);
+		
 		var l = this.getLabel(id, labelText, forElem, attributes);
+//		console.log('label');
+//		console.log(root);
+//		console.log(l);
 		root.parentNode.insertBefore(l, root);
 		return l;
 
