@@ -91,6 +91,11 @@
 					delete attributes.id;
 				}
 				
+//				if (attributes.legend) {
+//					var container = document.createElement('div');
+//					var legend = node.window.getLegend
+//				}
+				
 				var item = this.getItem(id, attributes);
 				this.list.addDT(item);
 				

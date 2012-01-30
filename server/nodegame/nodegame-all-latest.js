@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 29 14:10:08 CET 2012
+ * Built on Sun Jan 29 23:08:56 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 29 14:10:08 CET 2012
+ * Built on Sun Jan 29 23:08:56 CET 2012
  *
  */
  
@@ -3925,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 29 14:10:08 CET 2012
+ * Built on Sun Jan 29 23:08:56 CET 2012
  *
  */
  
@@ -3960,7 +3960,7 @@
 	};
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
-		
+		var parent = false;
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
 				if (key !== 'label') {
@@ -3977,7 +3977,7 @@
 					if (typeof(a[key]) === 'object') {
 						var labelText = a.text;
 						if (a.id) {
-							labelId = a.id; 
+							labelId = a.id;   
 						}
 					}
 					
@@ -3991,7 +3991,7 @@
 				}
 			}
 		}
-		return parent || e;
+		return e;// parent || e;
 	};
 	
 	Document.prototype.getButton = function (id, text, attributes) {
@@ -5697,7 +5697,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sun Jan 29 14:10:08 CET 2012
+ * Built on Sun Jan 29 23:08:56 CET 2012
  *
  */
  
@@ -5739,7 +5739,7 @@
 	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
-		this.table = new Table();
+		this.table = new Table({id: 'cf_table'});
 		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		

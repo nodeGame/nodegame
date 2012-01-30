@@ -35,7 +35,7 @@
 	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
-		this.table = new Table();
+		this.table = new Table({id: 'cf_table'});
 		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		

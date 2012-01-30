@@ -245,6 +245,8 @@ function PeerReviewGame () {
 		
 			var root = node.window.getElementById('root');
 			
+			var table = new node.window.Table();
+			
 			node.onDATA('CF', function(msg) {
 				
 				var cf_options = { id: 'cf',
@@ -254,16 +256,17 @@ function PeerReviewGame () {
 								   controls: false
 				};
 	
-				node.window.addWidget('ChernoffFaces', root, cf_options);
-				
-				 
+				var cf = node.window.getWidget('ChernoffFaces', cf_options);
 				
 				var evaId = 'eva_' + msg.data.from;
-				node.window.writeln();
 				
 				// Add the slider to the container
-				this.evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
+				var sl = node.window.addSlider(root, evaId, evaAttr);
+				console.log('this is the sl');
+				console.log(sl);
 				
+				
+				this.evas[msg.data.from] = sl; 
 		
 				
 				// AUTOPLAY
@@ -357,7 +360,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: 10000,
+			timer: 1000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;
@@ -366,7 +369,7 @@ function PeerReviewGame () {
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: 3000,
+			timer: 1000,
 			done: function () {
 				if (!this.outlet.hasChanged) {
 					this.outlet.highlight();
@@ -386,7 +389,9 @@ function PeerReviewGame () {
 			timer: 1000,
 			done: function () {
 				for (var i in this.evas) {
-					if (this.evas.hasOwnProperty(i)) {	
+					if (this.evas.hasOwnProperty(i)) {
+						console.log('Sto mandando questo...');
+						console.log(this.evas[i]);
 						node.set('EVA', {'for': i,
 										 eva: this.evas[i].value
 						});

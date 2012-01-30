@@ -16,7 +16,7 @@
 	
 	Document.prototype.getElement = function (elem, id, attributes) {
 		var e = document.createElement(elem);
-		if ('undefined' !== typeof id){
+		if ('undefined' !== typeof id) {
 			e.id = id;
 		}
 		return this.addAttributes2Elem(e, attributes);
@@ -25,10 +25,12 @@
 	Document.prototype.addElement = function (elem, root, id, attributes) {
 		var el = this.getElement(elem, id, attributes);
 		return root.appendChild(el);
+		
 	};
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
-		
+		if (!e || !a) return e;
+		var parent = false;
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
 				if (key !== 'label') {
@@ -45,9 +47,10 @@
 					if (typeof(a[key]) === 'object') {
 						var labelText = a.text;
 						if (a.id) {
-							labelId = a.id; 
-						}
+							labelId = a.id;   
+						}	
 					}
+					
 					
 					// Create a Parent which contains element and legend
 					if (!e.parentNode) {
@@ -59,7 +62,7 @@
 				}
 			}
 		}
-		return parent || e;
+		return e;// parent || e;
 	};
 	
 	Document.prototype.getButton = function (id, text, attributes) {
