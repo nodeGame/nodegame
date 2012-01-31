@@ -24,6 +24,14 @@ function PeerReviewGame () {
 		this.milli = 10000;
 		this.milli_short = 1000;
 
+		
+		this.evaAttr = {
+				min: 1,
+				max: 9,
+				step: 0.5,
+				value: 4.5
+		};
+		
 		this.evas = {};
 		
 		this.all_ex = new node.window.List({ id: 'all_ex',
@@ -123,7 +131,9 @@ function PeerReviewGame () {
 						   height: 200,
 						   features: cell.content.cf,
 						   controls: false,
+						   change: false,
 						   onclick: function() {
+							  alert('click');
 						      node.game.cf.draw(this.getAllValues());
 						   }
 				};
@@ -150,12 +160,12 @@ function PeerReviewGame () {
 		console.log('Pregame');
 	};
 	
-	var instructions = function(){
+	var instructions = function() {
 		node.window.loadFrame('instructions.html');
 		console.log('Instructions');
 	};
 	
-	var creation = function(){
+	var creation = function() {
 
 		node.window.loadFrame('creation.html', function(){
 			
@@ -212,7 +222,7 @@ function PeerReviewGame () {
 							}
 		};
 		
-		this.outlet = node.window.addWidget('Controls.Radio',root,ctrl_options);
+		this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
 		
 		// AUTOPLAY
 		node.random.exec(function(){
@@ -233,17 +243,11 @@ function PeerReviewGame () {
 	
 	var evaluation = function() {
 		
-		var evaAttr = {
-				min: 1,
-				max: 9,
-				step: 0.5,
-				value: 4.5,
-				label: 'Evaluation'
-		};
-		
 		node.window.loadFrame('evaluation.html', function() {
 		
-			var root = node.window.getElementById('root');
+			
+			var table = new node.window.Table({auto_update: true});		
+			node.window.write(table.table);
 			
 			node.onDATA('CF', function(msg) {
 				
@@ -251,23 +255,22 @@ function PeerReviewGame () {
 								   width: 300,
 								   height: 300,
 								   features: msg.data.face,
+								   change: false,
 								   controls: false
 				};
 	
-				node.window.addWidget('ChernoffFaces', root, cf_options);
-				
-				 
+				var cf = node.window.getWidget('ChernoffFaces', cf_options);
 				
 				var evaId = 'eva_' + msg.data.from;
-				node.window.writeln();
 				
 				// Add the slider to the container
-				this.evas[msg.data.from] = node.window.addSlider(root, evaId, evaAttr);
-				
+				var sl = node.window.getSlider(evaId, this.evaAttr);
+				this.evas[msg.data.from] = sl; 
 		
+				table.addColumn([cf.getCanvas(), sl])
 				
 				// AUTOPLAY
-				node.random.exec(function(){
+				node.random.exec(function() {
 					var choice = Math.random();
 					node.window.getElementById(evaId).value = Math.random()*10;
 					//alert(choice);
@@ -357,11 +360,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-//			timer: {
-//				timeup: 'CREATION_DONE',
-//				milliseconds: 1000
-//			},
-			timer: 3000,
+			timer: 10000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;
@@ -390,7 +389,7 @@ function PeerReviewGame () {
 			timer: 1000,
 			done: function () {
 				for (var i in this.evas) {
-					if (this.evas.hasOwnProperty(i)) {	
+					if (this.evas.hasOwnProperty(i)) {
 						node.set('EVA', {'for': i,
 										 eva: this.evas[i].value
 						});
@@ -403,7 +402,7 @@ function PeerReviewGame () {
 		
 		4: {state: dissemination,
 			name: 'Exhibition',
-			timer: 20000
+			timer: 1000
 		}
 	};
 

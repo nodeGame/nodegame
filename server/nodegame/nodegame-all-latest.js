@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 13:41:08 CET 2012
+ * Built on Di 31. Jan 16:50:52 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 13:41:08 CET 2012
+ * Built on Di 31. Jan 16:50:52 CET 2012
  *
  */
  
@@ -3533,6 +3533,11 @@
 			that.removeListener(event, listener);
 		});
 	};
+	
+	node.removeListener = function (event, func) {
+		return that.removeListener(event, func);
+	};
+	
 	// TODO: create conf objects
 	node.play = function (conf, game) {	
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
@@ -3925,7 +3930,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 13:41:08 CET 2012
+ * Built on Di 31. Jan 16:50:52 CET 2012
  *
  */
  
@@ -3948,41 +3953,42 @@
 	
 	Document.prototype.getElement = function (elem, id, attributes) {
 		var e = document.createElement(elem);
-		if ('undefined' !== typeof id){
+		if ('undefined' !== typeof id) {
 			e.id = id;
 		}
-		this.addAttributes2Elem(e, attributes);
-		return e;
+		return this.addAttributes2Elem(e, attributes);
 	};
 	
 	Document.prototype.addElement = function (elem, root, id, attributes) {
 		var el = this.getElement(elem, id, attributes);
 		return root.appendChild(el);
+		
 	};
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
-		
+		if (!e || !a) return e;
+		var specials = ['id', 'label', 'style'];
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
-				if (key !== 'label') {
+				if (!JSUS.in_array(key, specials)) {
 					e.setAttribute(key,a[key]);
 				}
-				else {
-//					// If a label element is present it checks whether it is an
-//					// object literal or a string.
-//					// In the former case it scans the obj for additional properties
-//					
-//					var labelId = 'label_' + e.id;
-//					var labelText = a.label;
-//					
-//					if (typeof(a[key]) === 'object') {
-//						var labelText = a.text;
-//						if (a.id) {
-//							labelId = a.id; 
-//						}
-//					}	
-//					this.addLabel(e, labelId, labelText, e.id);
+				else if (key === 'id') {
+					e.id = a[key];
 				}
+				
+				// TODO: handle special cases
+				
+//				else {
+//			
+//					// If there is no parent node, the legend cannot be created
+//					if (!e.parentNode) {
+//						node.log('Cannot add label: no parent element found', 'ERR');
+//						continue;
+//					}
+//					
+//					this.addLabel(e.parentNode, e, a[key]);
+//				}
 			}
 		}
 		return e;
@@ -3992,8 +3998,7 @@
 		var sb = document.createElement('button');
 		sb.id = id;
 		sb.appendChild(document.createTextNode(text || 'Send'));	
-		this.addAttributes2Elem(sb, attributes);
-		return sb;
+		return this.addAttributes2Elem(sb, attributes);
 	};
 	
 	Document.prototype.addButton = function (root, id, text, attributes) {
@@ -4018,8 +4023,7 @@
 		var mt =  document.createElement('input');
 		mt.id = id;
 		mt.setAttribute('type', 'text');
-		this.addAttributes2Elem(mt, attributes);
-		return mt;
+		return this.addAttributes2Elem(mt, attributes);
 	};
 	
 	Document.prototype.addTextInput = function (root, id, attributes) {
@@ -4037,8 +4041,7 @@
 		}
 		
 		canvas.id = id;
-		this.addAttributes2Elem(canvas, attributes);
-		return canvas;
+		return this.addAttributes2Elem(canvas, attributes);
 	};
 	
 	Document.prototype.addCanvas = function (root, id, attributes) {
@@ -4050,8 +4053,7 @@
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		this.addAttributes2Elem(slider, attributes);
-		return slider;
+		return this.addAttributes2Elem(slider, attributes);
 	};
 	
 	Document.prototype.addSlider = function (root, id, attributes) {
@@ -4063,8 +4065,7 @@
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		this.addAttributes2Elem(radio, attributes);
-		return radio;
+		return this.addAttributes2Elem(radio, attributes);
 	};
 	
 	Document.prototype.addRadioButton = function (root, id, attributes) {
@@ -4095,24 +4096,9 @@
 		return label;
 	};
 	
-	/**
-	 * Add label supports polymorphic parameter sets.
-	 * 
-	 */
+
 	Document.prototype.addLabel = function (root, forElem, id, labelText, attributes) {
-		if (!root || !forElem) return false;
-		
-		// If id is a conf object instead it scans the obj for additional properties
-		// labelText becomes the obj with attributes instead
-		if ('object' === typeof id) {
-			var labelText = id.text;
-			if (id.id) id = id.id; 	
-			var attributes = labelText;
-		}	
-		
-		if (!labelText) return false;
-		
-		
+		if (!root || !forElem || labelText) return false;		
 		var l = this.getLabel(forElem, id, labelText, attributes);
 		root.insertBefore(l, forElem);
 		return l;
@@ -4850,7 +4836,7 @@
 			  return document.createTextNode(el.content);
 		  });
 		  
-		  this.renderers.push (function (el) { 
+		  this.renderers.push(function (el) { 
 			  if ('object' === typeof el.content) {
 	    		var div = document.createElement('div');
 	    		for (var key in el.content) {
@@ -4864,29 +4850,22 @@
 			  }
 		  });
 		 
-		  this.renderers.push (function (el) { 
+		  
+		  
+		  this.renderers.push(function (el) { 
+			  if (el.content.parse && el.content.parse instanceof Function) {
+				  var html = el.content.parse();
+				  if (JSUS.isElement(html) || JSUS.isNode(html)) {
+					  return html;
+				  }
+			  }
+		  });	
+		  
+		  this.renderers.push(function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
 			  }
 		  });
-		  
-		  if (node.window.Table) {
-			  this.renderers.push (function (el) { 
-				  if (el.content instanceof node.window.Table) {
-		    		return el.content.parse();
-				  }
-			  });
-		  }
-		  
-		  if (node.window.List) {
-			  this.renderers.push (function (el) { 
-				  if (el.content instanceof node.window.List) {
-		    		return el.content.parse();
-				  }
-			  });
-		  }
-		  
-		  
 	  };
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {
@@ -4906,7 +4885,7 @@
 			  this.renderers.push(renderer);
 		  }
 		  else {
-			  this.renderers.splice(pos, 1, renderer);
+			  this.renderers.splice(pos, 0, renderer);
 		  }
 	  };
 	  
@@ -5149,15 +5128,9 @@
 	};
 	
 	List.prototype.parse = function() {
-		console.log('Pre sort')
-		console.log(this.db);
 		this.sort();
 		var old_dt = null;
 		var old_dd = null;
-		
-		console.log('This is the list now');
-		console.log(this.db);
-		
 		
 		var appendDT = function() {
 			var node = document.createElement(this.SECOND_LEVEL);
@@ -5195,9 +5168,6 @@
 		
 		for (var i=0; i<this.db.length; i++) {
 			var el = this.db[i];
-			console.log('this the el');
-			console.log(el);
-			console.log(typeof el.dd);
 			if ('undefined' === typeof el.dd) {
 				var node = appendDT.call(this);
 				//console.log('just created dt');
@@ -5330,7 +5300,7 @@
     		}
     		return tbl.parse();
 		}
-	});
+	}, 2);
 	if (options) {
 		if (!(options instanceof Array)) {
 			options = [options];
@@ -5702,7 +5672,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 13:41:08 CET 2012
+ * Built on Di 31. Jan 16:50:52 CET 2012
  *
  */
  
@@ -5744,8 +5714,7 @@
 	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
-	
-		this.table = new Table();
+		this.table = new Table({id: 'cf_table'});
 		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		
@@ -5755,6 +5724,11 @@
 		this.dims = null;	// width and height of the canvas
 
 		this.change = 'CF_CHANGE';
+		var that = this;
+		this.changeFunc = function () {
+			that.draw(that.sc.getAllValues());
+		};
+		
 		this.features = null;
 		this.controls = null;
 		
@@ -5762,11 +5736,11 @@
 	};
 	
 	ChernoffFaces.prototype.init = function (options) {
+		var that = this;
 		this.id = options.id || this.id;
 		var PREF = this.id + '_';
 		
 		this.features = options.features;
-		this.change = options.change || this.change;
 		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
 		
 		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
@@ -5781,89 +5755,57 @@
 		this.fp = new FacePainter(this.canvas);		
 		this.fp.draw(new FaceVector(this.features));
 		
-//		if (this.controls) {
-//			
-//			var sc_options = {
-//				id: 'cf_controls',
-//				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-//				change: this.change,
-//				fieldset: {id: this.id + '_controls_fieldest', 
-//						   legend: this.controls.legend || 'Controls'
-//				},
-//				submit: 'Send'
-//			};
-//			
-//			this.sc = node.window.getWidget('Controls.Slider', sc_options);
-//			
-//			this.table.add(this.sc);
-//		}
+		var sc_options = {
+			id: 'cf_controls',
+			features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
+			change: this.change,
+			fieldset: {id: this.id + '_controls_fieldest', 
+					   legend: this.controls.legend || 'Controls'
+			},
+			submit: 'Send'
+		};
+		
+		this.sc = node.window.getWidget('Controls.Slider', sc_options);
+		
+		// Controls are always there, but may not be visible
+		if (this.controls) {
+			this.table.add(this.sc);
+		}
+		
+		// Dealing with the onchange event
+		if ('undefined' === typeof options.change) {	
+			node.on(this.change, this.changeFunc); 
+		} else {
+			if (options.change) {
+				node.on(options.change, this.changeFunc);
+			}
+			else {
+				node.removeListener(this.change, this.changeFunc);
+			}
+			this.change = options.change;
+		}
+		
 		
 		this.table.add(this.canvas);
-		
+		this.table.parse();
+		this.root.appendChild(this.table.table);
 	};
 	
 	ChernoffFaces.prototype.getRoot = function() {
 		return this.root;
 	};
 	
-	ChernoffFaces.prototype.getHTML = function() {
-		var d = document.createElement('div');
-		this.append(d);
-		return d.innerHTML;
+	ChernoffFaces.prototype.getCanvas = function() {
+		return this.canvas;
 	};
 	
 	ChernoffFaces.prototype.append = function (root) {
-		
-//		var PREF = this.id + '_';
-//		
-//		var idFieldset = PREF + 'fieldset'; 
-//		var idCanvas = PREF + 'canvas';
-//		var idButton = PREF + 'button';
-//	
-//		
-//		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-//		
-//		if (ids !== null && ids !== undefined) {
-//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-//			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-//			if (ids.hasOwnProperty('button')) idButton = ids.button;
-//		}
-//		
-//		
-//		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-//		this.fp = new FacePainter(canvas);		
-//		this.fp.draw(new FaceVector(this.features));
-//		
-//		if (this.controls) {
-//			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-//			
-//			var sc_options = {
-//								id: 'cf_controls',
-//								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-//								change: this.change,
-//								fieldset: {id: idFieldset, 
-//										   legend: 'Chernoff Box',
-//										   attributes: {style: 'float:left'}
-//								},
-//								//attributes: {style: 'float:left'},
-//								submit: 'Send'
-//			};
-//			
-//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-//		}
-
-		this.root = root;
-		root.appendChild(this.table.parse());
-		return root;
-		
+		root.appendChild(this.root);
+		this.table.parse();
+		return this.root;
 	};
 	
-	ChernoffFaces.prototype.listeners = function () {
-		var that = this;
-		node.on(that.change, function(msg) {
-			that.draw(that.sc.getAllValues());
-		}); 
-	};
+	ChernoffFaces.prototype.listeners = function () {};
 	
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
@@ -5879,14 +5821,14 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		if (this.sc.root) {
-			var sc_options = {
-					features: JSUS.mergeOnValue(FaceVector.defaults, fv),
-					change: this.change
-			};
-			this.sc.init(sc_options);
-			this.sc.refresh();
-		}
+	
+		var sc_options = {
+				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
+				change: this.change
+		};
+		this.sc.init(sc_options);
+		this.sc.refresh();
+	
 		return true;
 	};
 	
@@ -6388,6 +6330,8 @@
 (function (exports) {
 	
 
+	// TODO: handle different events, beside onchange
+	
 	/**
 	 * Controls
 	 * 
@@ -6418,6 +6362,11 @@
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
+	Controls.prototype.getItem = function (id, attributes) {
+		// TODO: node.window.addTextInput
+		//return node.window.getTextInput(id, attributes);
+	};
+	
 	Controls.prototype.init = function (options) {
 
 		this.hasChanged = false; // TODO: should this be inherited?
@@ -6426,7 +6375,7 @@
 		this.listRoot = this.list.getRoot();
 		
 		if (!options.features) return;
-		
+		if (!this.root) this.root = this.listRoot;
 		this.features = options.features;
 		this.populate();
 	};
@@ -6434,7 +6383,7 @@
 	Controls.prototype.append = function (root) {
 		this.root = root;
 		var toReturn = this.listRoot;
-		
+		this.list.parse();
 		root.appendChild(this.listRoot);
 		
 		if (this.options.submit) {
@@ -6456,6 +6405,9 @@
 		return toReturn;
 	};
 	
+	Controls.prototype.parse = function() {
+		return this.list.parse();
+	};
 	
 	Controls.prototype.populate = function () {
 		var that = this;
@@ -6469,12 +6421,11 @@
 					var id = attributes.id;
 					delete attributes.id;
 				}
-				
-//					
+							
 				var container = document.createElement('div');
 				// Add a different element according to the subclass instantiated
 				var elem = this.add(container, id, attributes);
-				
+								
 				// Fire the onChange event, if one defined
 				if (this.changeEvent) {
 					elem.onchange = function() {
@@ -6483,7 +6434,7 @@
 				}
 				
 				if (attributes.label) {
-					node.window.addLabel(container, elem, attributes.label);
+					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				
 				// Element added to the list
@@ -6564,6 +6515,10 @@
 		return node.window.addSlider(root, id, attributes);
 	};
 	
+	SliderControls.prototype.getItem = function (id, attributes) {
+		return node.window.getSlider(id, attributes);
+	};
+	
 	// Radio
 	
 	RadioControls.prototype.__proto__ = Controls.prototype;
@@ -6597,6 +6552,21 @@
 		}
 		//console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
+	};
+	
+	RadioControls.prototype.getItem = function (id, attributes) {
+		//console.log('ADDDING radio');
+		//console.log(attributes);
+		// add the group name if not specified
+		// TODO: is this a javascript bug?
+		if ('undefined' === typeof attributes.name) {
+//			console.log(this);
+//			console.log(this.name);
+//			console.log('MODMOD ' + this.name);
+			attributes.name = this.groupName;
+		}
+		//console.log(attributes);
+		return node.window.getRadioButton(id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls
@@ -7163,7 +7133,7 @@
 		this.gtbl = new node.window.Table({
 											auto_update: true,
 											id: options.id || this.id,
-											renderers: options.renderers
+											render: options.render
 		}, node.game.memory.db);
 		
 		

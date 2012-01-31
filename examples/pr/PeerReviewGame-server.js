@@ -22,10 +22,8 @@ function Monitor_Example () {
 						   features: cell.content,
 						   controls: false
 				};
-				
-				var container = document.createElement('div');
-				var cf = node.window.addWidget('ChernoffFaces', container, cf_options);
-				return container;
+				var cf = node.window.getWidget('ChernoffFaces', cf_options);
+				return cf.getCanvas();
 			}
 		};
 		

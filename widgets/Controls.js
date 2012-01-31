@@ -1,6 +1,8 @@
 (function (exports) {
 	
 
+	// TODO: handle different events, beside onchange
+	
 	/**
 	 * Controls
 	 * 
@@ -31,6 +33,11 @@
 		//return node.window.addTextInput(root, id, attributes);
 	};
 	
+	Controls.prototype.getItem = function (id, attributes) {
+		// TODO: node.window.addTextInput
+		//return node.window.getTextInput(id, attributes);
+	};
+	
 	Controls.prototype.init = function (options) {
 
 		this.hasChanged = false; // TODO: should this be inherited?
@@ -39,7 +46,7 @@
 		this.listRoot = this.list.getRoot();
 		
 		if (!options.features) return;
-		
+		if (!this.root) this.root = this.listRoot;
 		this.features = options.features;
 		this.populate();
 	};
@@ -47,7 +54,7 @@
 	Controls.prototype.append = function (root) {
 		this.root = root;
 		var toReturn = this.listRoot;
-		
+		this.list.parse();
 		root.appendChild(this.listRoot);
 		
 		if (this.options.submit) {
@@ -69,6 +76,9 @@
 		return toReturn;
 	};
 	
+	Controls.prototype.parse = function() {
+		return this.list.parse();
+	};
 	
 	Controls.prototype.populate = function () {
 		var that = this;
@@ -82,12 +92,11 @@
 					var id = attributes.id;
 					delete attributes.id;
 				}
-				
-//					
+							
 				var container = document.createElement('div');
 				// Add a different element according to the subclass instantiated
 				var elem = this.add(container, id, attributes);
-				
+								
 				// Fire the onChange event, if one defined
 				if (this.changeEvent) {
 					elem.onchange = function() {
@@ -96,7 +105,7 @@
 				}
 				
 				if (attributes.label) {
-					node.window.addLabel(container, elem, attributes.label);
+					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				
 				// Element added to the list
@@ -177,6 +186,10 @@
 		return node.window.addSlider(root, id, attributes);
 	};
 	
+	SliderControls.prototype.getItem = function (id, attributes) {
+		return node.window.getSlider(id, attributes);
+	};
+	
 	// Radio
 	
 	RadioControls.prototype.__proto__ = Controls.prototype;
@@ -210,6 +223,21 @@
 		}
 		//console.log(attributes);
 		return node.window.addRadioButton(root, id, attributes);	
+	};
+	
+	RadioControls.prototype.getItem = function (id, attributes) {
+		//console.log('ADDDING radio');
+		//console.log(attributes);
+		// add the group name if not specified
+		// TODO: is this a javascript bug?
+		if ('undefined' === typeof attributes.name) {
+//			console.log(this);
+//			console.log(this.name);
+//			console.log('MODMOD ' + this.name);
+			attributes.name = this.groupName;
+		}
+		//console.log(attributes);
+		return node.window.getRadioButton(id, attributes);	
 	};
 	
 	// Override getAllValues for Radio Controls

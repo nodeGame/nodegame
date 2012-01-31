@@ -16,41 +16,42 @@
 	
 	Document.prototype.getElement = function (elem, id, attributes) {
 		var e = document.createElement(elem);
-		if ('undefined' !== typeof id){
+		if ('undefined' !== typeof id) {
 			e.id = id;
 		}
-		this.addAttributes2Elem(e, attributes);
-		return e;
+		return this.addAttributes2Elem(e, attributes);
 	};
 	
 	Document.prototype.addElement = function (elem, root, id, attributes) {
 		var el = this.getElement(elem, id, attributes);
 		return root.appendChild(el);
+		
 	};
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
-		
+		if (!e || !a) return e;
+		var specials = ['id', 'label', 'style'];
 		for (var key in a) {
 			if (a.hasOwnProperty(key)){
-				if (key !== 'label') {
+				if (!JSUS.in_array(key, specials)) {
 					e.setAttribute(key,a[key]);
 				}
-				else {
-//					// If a label element is present it checks whether it is an
-//					// object literal or a string.
-//					// In the former case it scans the obj for additional properties
-//					
-//					var labelId = 'label_' + e.id;
-//					var labelText = a.label;
-//					
-//					if (typeof(a[key]) === 'object') {
-//						var labelText = a.text;
-//						if (a.id) {
-//							labelId = a.id; 
-//						}
-//					}	
-//					this.addLabel(e, labelId, labelText, e.id);
+				else if (key === 'id') {
+					e.id = a[key];
 				}
+				
+				// TODO: handle special cases
+				
+//				else {
+//			
+//					// If there is no parent node, the legend cannot be created
+//					if (!e.parentNode) {
+//						node.log('Cannot add label: no parent element found', 'ERR');
+//						continue;
+//					}
+//					
+//					this.addLabel(e.parentNode, e, a[key]);
+//				}
 			}
 		}
 		return e;
@@ -60,8 +61,7 @@
 		var sb = document.createElement('button');
 		sb.id = id;
 		sb.appendChild(document.createTextNode(text || 'Send'));	
-		this.addAttributes2Elem(sb, attributes);
-		return sb;
+		return this.addAttributes2Elem(sb, attributes);
 	};
 	
 	Document.prototype.addButton = function (root, id, text, attributes) {
@@ -86,8 +86,7 @@
 		var mt =  document.createElement('input');
 		mt.id = id;
 		mt.setAttribute('type', 'text');
-		this.addAttributes2Elem(mt, attributes);
-		return mt;
+		return this.addAttributes2Elem(mt, attributes);
 	};
 	
 	Document.prototype.addTextInput = function (root, id, attributes) {
@@ -105,8 +104,7 @@
 		}
 		
 		canvas.id = id;
-		this.addAttributes2Elem(canvas, attributes);
-		return canvas;
+		return this.addAttributes2Elem(canvas, attributes);
 	};
 	
 	Document.prototype.addCanvas = function (root, id, attributes) {
@@ -118,8 +116,7 @@
 		var slider = document.createElement('input');
 		slider.id = id;
 		slider.setAttribute('type', 'range');
-		this.addAttributes2Elem(slider, attributes);
-		return slider;
+		return this.addAttributes2Elem(slider, attributes);
 	};
 	
 	Document.prototype.addSlider = function (root, id, attributes) {
@@ -131,8 +128,7 @@
 		var radio = document.createElement('input');
 		radio.id = id;
 		radio.setAttribute('type', 'radio');
-		this.addAttributes2Elem(radio, attributes);
-		return radio;
+		return this.addAttributes2Elem(radio, attributes);
 	};
 	
 	Document.prototype.addRadioButton = function (root, id, attributes) {
@@ -163,24 +159,9 @@
 		return label;
 	};
 	
-	/**
-	 * Add label supports polymorphic parameter sets.
-	 * 
-	 */
+
 	Document.prototype.addLabel = function (root, forElem, id, labelText, attributes) {
-		if (!root || !forElem) return false;
-		
-		// If id is a conf object instead it scans the obj for additional properties
-		// labelText becomes the obj with attributes instead
-		if ('object' === typeof id) {
-			var labelText = id.text;
-			if (id.id) id = id.id; 	
-			var attributes = labelText;
-		}	
-		
-		if (!labelText) return false;
-		
-		
+		if (!root || !forElem || labelText) return false;		
 		var l = this.getLabel(forElem, id, labelText, attributes);
 		root.insertBefore(l, forElem);
 		return l;

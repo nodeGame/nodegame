@@ -35,8 +35,7 @@
 	function ChernoffFaces (options) {
 		this.options = options;
 		this.id = options.id;
-	
-		this.table = new Table();
+		this.table = new Table({id: 'cf_table'});
 		this.root = options.root || document.createElement('div');
 		this.root.id = this.id;
 		
@@ -46,6 +45,11 @@
 		this.dims = null;	// width and height of the canvas
 
 		this.change = 'CF_CHANGE';
+		var that = this;
+		this.changeFunc = function () {
+			that.draw(that.sc.getAllValues());
+		};
+		
 		this.features = null;
 		this.controls = null;
 		
@@ -53,11 +57,11 @@
 	};
 	
 	ChernoffFaces.prototype.init = function (options) {
+		var that = this;
 		this.id = options.id || this.id;
 		var PREF = this.id + '_';
 		
 		this.features = options.features;
-		this.change = options.change || this.change;
 		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
 		
 		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
@@ -72,89 +76,57 @@
 		this.fp = new FacePainter(this.canvas);		
 		this.fp.draw(new FaceVector(this.features));
 		
-//		if (this.controls) {
-//			
-//			var sc_options = {
-//				id: 'cf_controls',
-//				features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-//				change: this.change,
-//				fieldset: {id: this.id + '_controls_fieldest', 
-//						   legend: this.controls.legend || 'Controls'
-//				},
-//				submit: 'Send'
-//			};
-//			
-//			this.sc = node.window.getWidget('Controls.Slider', sc_options);
-//			
-//			this.table.add(this.sc);
-//		}
+		var sc_options = {
+			id: 'cf_controls',
+			features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
+			change: this.change,
+			fieldset: {id: this.id + '_controls_fieldest', 
+					   legend: this.controls.legend || 'Controls'
+			},
+			submit: 'Send'
+		};
+		
+		this.sc = node.window.getWidget('Controls.Slider', sc_options);
+		
+		// Controls are always there, but may not be visible
+		if (this.controls) {
+			this.table.add(this.sc);
+		}
+		
+		// Dealing with the onchange event
+		if ('undefined' === typeof options.change) {	
+			node.on(this.change, this.changeFunc); 
+		} else {
+			if (options.change) {
+				node.on(options.change, this.changeFunc);
+			}
+			else {
+				node.removeListener(this.change, this.changeFunc);
+			}
+			this.change = options.change;
+		}
+		
 		
 		this.table.add(this.canvas);
-		
+		this.table.parse();
+		this.root.appendChild(this.table.table);
 	};
 	
 	ChernoffFaces.prototype.getRoot = function() {
 		return this.root;
 	};
 	
-	ChernoffFaces.prototype.getHTML = function() {
-		var d = document.createElement('div');
-		this.append(d);
-		return d.innerHTML;
+	ChernoffFaces.prototype.getCanvas = function() {
+		return this.canvas;
 	};
 	
 	ChernoffFaces.prototype.append = function (root) {
-		
-//		var PREF = this.id + '_';
-//		
-//		var idFieldset = PREF + 'fieldset'; 
-//		var idCanvas = PREF + 'canvas';
-//		var idButton = PREF + 'button';
-//	
-//		
-//		// var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-//		
-//		if (ids !== null && ids !== undefined) {
-//			if (ids.hasOwnProperty('fieldset')) idFieldset = ids.fieldset;
-//			if (ids.hasOwnProperty('canvas')) idCanvas = ids.canvas;
-//			if (ids.hasOwnProperty('button')) idButton = ids.button;
-//		}
-//		
-//		
-//		var canvas = node.window.addCanvas(root, idCanvas, this.dims);
-//		this.fp = new FacePainter(canvas);		
-//		this.fp.draw(new FaceVector(this.features));
-//		
-//		if (this.controls) {
-//			//var fieldset = node.window.addFieldset(root, , , {style: 'float:left'});
-//			
-//			var sc_options = {
-//								id: 'cf_controls',
-//								features: JSUS.mergeOnValue(FaceVector.defaults, this.features),
-//								change: this.change,
-//								fieldset: {id: idFieldset, 
-//										   legend: 'Chernoff Box',
-//										   attributes: {style: 'float:left'}
-//								},
-//								//attributes: {style: 'float:left'},
-//								submit: 'Send'
-//			};
-//			
-//			this.sc = node.window.addWidget('Controls.Slider', root, sc_options);
-//		}
-
-		this.root = root;
-		root.appendChild(this.table.parse());
-		return root;
-		
+		root.appendChild(this.root);
+		this.table.parse();
+		return this.root;
 	};
 	
-	ChernoffFaces.prototype.listeners = function () {
-		var that = this;
-		node.on(that.change, function(msg) {
-			that.draw(that.sc.getAllValues());
-		}); 
-	};
+	ChernoffFaces.prototype.listeners = function () {};
 	
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
@@ -170,14 +142,14 @@
 	ChernoffFaces.prototype.randomize = function() {
 		var fv = FaceVector.random();
 		this.fp.redraw(fv);
-		if (this.sc.root) {
-			var sc_options = {
-					features: JSUS.mergeOnValue(FaceVector.defaults, fv),
-					change: this.change
-			};
-			this.sc.init(sc_options);
-			this.sc.refresh();
-		}
+	
+		var sc_options = {
+				features: JSUS.mergeOnValue(FaceVector.defaults, fv),
+				change: this.change
+		};
+		this.sc.init(sc_options);
+		this.sc.refresh();
+	
 		return true;
 	};
 	

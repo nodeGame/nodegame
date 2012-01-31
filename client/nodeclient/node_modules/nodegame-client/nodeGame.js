@@ -233,6 +233,11 @@
 			that.removeListener(event, listener);
 		});
 	};
+	
+	node.removeListener = function (event, func) {
+		return that.removeListener(event, func);
+	};
+	
 	// TODO: create conf objects
 	node.play = function (conf, game) {	
 		if ('undefined' !== typeof conf.verbosity) node.verbosity = conf.verbosity;
