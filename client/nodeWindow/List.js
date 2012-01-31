@@ -175,13 +175,13 @@
 	
 	
 	
-	List.prototype.createItem = function(id) {
-		var item = document.createElement(this.SECOND_LEVEL);
-		if (id) {
-			item.id = id;
-		}
-		return item;
-	};
+//	List.prototype.createItem = function(id) {
+//		var item = document.createElement(this.SECOND_LEVEL);
+//		if (id) {
+//			item.id = id;
+//		}
+//		return item;
+//	};
 	
 	  // Cell Class
 	  Node.prototype = new Entity();

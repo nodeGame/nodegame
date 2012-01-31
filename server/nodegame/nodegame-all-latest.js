@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:51:50 CET 2012
+ * Built on Di 31. Jan 13:41:08 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:51:50 CET 2012
+ * Built on Di 31. Jan 13:41:08 CET 2012
  *
  */
  
@@ -3925,7 +3925,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:51:50 CET 2012
+ * Built on Di 31. Jan 13:41:08 CET 2012
  *
  */
  
@@ -3968,20 +3968,20 @@
 					e.setAttribute(key,a[key]);
 				}
 				else {
-					// If a label element is present it checks whether it is an
-					// object literal or a string.
-					// In the former case it scans the obj for additional properties
-					
-					var labelId = 'label_' + e.id;
-					var labelText = a.label;
-					
-					if (typeof(a[key]) === 'object') {
-						var labelText = a.text;
-						if (a.id) {
-							labelId = a.id; 
-						}
-					}	
-					this.addLabel(e, labelId, labelText, e.id);
+//					// If a label element is present it checks whether it is an
+//					// object literal or a string.
+//					// In the former case it scans the obj for additional properties
+//					
+//					var labelId = 'label_' + e.id;
+//					var labelText = a.label;
+//					
+//					if (typeof(a[key]) === 'object') {
+//						var labelText = a.text;
+//						if (a.id) {
+//							labelId = a.id; 
+//						}
+//					}	
+//					this.addLabel(e, labelId, labelText, e.id);
 				}
 			}
 		}
@@ -4080,31 +4080,42 @@
 //		return slider;
 //	};
 	
-	Document.prototype.getLabel = function (id, labelText, forElem, attributes) {
+	Document.prototype.getLabel = function (forElem, id, labelText, attributes) {
+		if (!forElem) return false;
 		var label = document.createElement('label');
 		label.id = id;
-		label.appendChild(document.createTextNode(labelText));	
-		label.setAttribute('for', forElem);
+		label.appendChild(document.createTextNode(labelText));
+		
+		if ('undefined' === typeof forElem.id) {
+			forElem.id = this.generateUniqueId();
+		}
+		
+		label.setAttribute('for', forElem.id);
 		this.addAttributes2Elem(label, attributes);
 		return label;
 	};
 	
-	Document.prototype.addLabel = function (root, id, labelText, forElem, attributes) {
-//		var root = node.window.getElementById(forElem);
-		var l = this.getLabel(id, labelText, forElem, attributes);
-		root.parentNode.insertBefore(l, root);
-		return l;
-
+	/**
+	 * Add label supports polymorphic parameter sets.
+	 * 
+	 */
+	Document.prototype.addLabel = function (root, forElem, id, labelText, attributes) {
+		if (!root || !forElem) return false;
 		
-//		// Add the label immediately before if no root elem has been provided
-//		if (!root) {
-//			var root = node.window.getElementById(forElem);
-//			root.insertBefore(label);
-//		}
-//		else {
-//			root.appendChild(label);
-//		}
-//		return label;
+		// If id is a conf object instead it scans the obj for additional properties
+		// labelText becomes the obj with attributes instead
+		if ('object' === typeof id) {
+			var labelText = id.text;
+			if (id.id) id = id.id; 	
+			var attributes = labelText;
+		}	
+		
+		if (!labelText) return false;
+		
+		
+		var l = this.getLabel(forElem, id, labelText, attributes);
+		root.insertBefore(l, forElem);
+		return l;
 	};
 	
 	Document.prototype.getSelect = function (id, attributes) {
@@ -4249,54 +4260,37 @@
 		  referenceNode.insertBefore(node, referenceNode.nextSibling);
 	};
 	
-	
-	// TODO: Potentially unsafe
-	// Works only with Chrome
-//	Document.prototype.loadFile = function (container,file) {
-//		
-//		// Check for the various File API support.
-//		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-//		  node.log('The File APIs are not fully supported in this browser.', 'ERR');
-//		  return false;
-//		}
-//		function onInitFs(fs) {
-//		  node.log('Opened file system: ' + fs.name);
-//		}
-//		
-//		function errorHandler(e) {
-//			  var msg = '';
-//	
-//			  switch (e.code) {
-//			    case FileError.QUOTA_EXCEEDED_ERR:
-//			      msg = 'QUOTA_EXCEEDED_ERR';
-//			      break;
-//			    case FileError.NOT_FOUND_ERR:
-//			      msg = 'NOT_FOUND_ERR';
-//			      break;
-//			    case FileError.SECURITY_ERR:
-//			      msg = 'SECURITY_ERR';
-//			      break;
-//			    case FileError.INVALID_MODIFICATION_ERR:
-//			      msg = 'INVALID_MODIFICATION_ERR';
-//			      break;
-//			    case FileError.INVALID_STATE_ERR:
-//			      msg = 'INVALID_STATE_ERR';
-//			      break;
-//			    default:
-//			      msg = 'Unknown Error';
-//			      break;
-//			  }
-//	
-//			  node.log('Error: ' + msg, 'ERR');
-//		};
-//		
-//		// second param is 5MB, reserved space for storage
-//		window.requestFileSystem(window.PERSISTENT, 5*1024*1024, onInitFs, errorHandler);
-//		
-//			
-//		container.innerHTML += 'DONE FS';
-//		return container;
-//	};
+	/**
+	 * Generate a unique id for the page (frames included).
+	 * 
+	 * TODO: now it always create big random strings, it does not actually
+	 * check if the string exists.
+	 * 
+	 */
+	Document.prototype.generateUniqueId = function (prefix) {
+		var search = [window];
+		if (window.frames) {
+			search = search.concat(window.frames);
+		}
+		
+		function scanDocuments(id) {
+			var found = true;
+			while (found) {
+				for (var i=0; i< search.length; i++) {
+					found = search[i].document.getElementById(id);
+					if (found) {
+						id = '' + id + '_' + JSUS.randomInt(0, 1000);
+						break;
+					}
+				}
+			}
+			return id;
+		};
+
+		
+		return scanDocuments(prefix + '_' + JSUS.randomInt(0, 10000000));
+		//return scanDocuments(prefix);
+	};
 
 })(window.node); 
  
@@ -4786,6 +4780,7 @@
 		return b;
 	};
 	
+	// TODO: it is not always working fine
 	GameWindow.prototype.generateUniqueId = function (prefix) {
 		var id = '' + (prefix || JSUS.randomInt(0, 1000));
 		var found = this.getElementById(id);
@@ -5227,13 +5222,13 @@
 	
 	
 	
-	List.prototype.createItem = function(id) {
-		var item = document.createElement(this.SECOND_LEVEL);
-		if (id) {
-			item.id = id;
-		}
-		return item;
-	};
+//	List.prototype.createItem = function(id) {
+//		var item = document.createElement(this.SECOND_LEVEL);
+//		if (id) {
+//			item.id = id;
+//		}
+//		return item;
+//	};
 	
 	  // Cell Class
 	  Node.prototype = new Entity();
@@ -5707,7 +5702,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Sa 28. Jan 17:51:50 CET 2012
+ * Built on Di 31. Jan 13:41:08 CET 2012
  *
  */
  
@@ -6475,11 +6470,10 @@
 					delete attributes.id;
 				}
 				
-				var item = this.list.createItem();
-				this.listRoot.appendChild(item);
-					
+//					
+				var container = document.createElement('div');
 				// Add a different element according to the subclass instantiated
-				var elem = this.add(item, id, attributes);
+				var elem = this.add(container, id, attributes);
 				
 				// Fire the onChange event, if one defined
 				if (this.changeEvent) {
@@ -6488,21 +6482,12 @@
 					};
 				}
 				
-				// If a label element is present it checks whether it is an
-				// object literal or a string.
-				// In the former case it scans the obj for additional properties
-//				if (attributes.label) {
-//					var labelId = 'label_' + id;
-//					var labelText = attributes.label;
-//					
-//					if (typeof(attributes.label) === 'object') {
-//						var labelText = attributes.label.text;
-//						if (attributes.label.id) {
-//							labelId = attributes.label.id; 
-//						}
-//					}	
-//					node.window.addLabel(elem, labelId, labelText, id);
-//				}
+				if (attributes.label) {
+					node.window.addLabel(container, elem, attributes.label);
+				}
+				
+				// Element added to the list
+				this.list.addDT(container);
 			}
 		}
 	};

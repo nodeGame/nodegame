@@ -83,11 +83,10 @@
 					delete attributes.id;
 				}
 				
-				var item = this.list.createItem();
-				this.listRoot.appendChild(item);
-					
+//					
+				var container = document.createElement('div');
 				// Add a different element according to the subclass instantiated
-				var elem = this.add(item, id, attributes);
+				var elem = this.add(container, id, attributes);
 				
 				// Fire the onChange event, if one defined
 				if (this.changeEvent) {
@@ -96,21 +95,12 @@
 					};
 				}
 				
-				// If a label element is present it checks whether it is an
-				// object literal or a string.
-				// In the former case it scans the obj for additional properties
-//				if (attributes.label) {
-//					var labelId = 'label_' + id;
-//					var labelText = attributes.label;
-//					
-//					if (typeof(attributes.label) === 'object') {
-//						var labelText = attributes.label.text;
-//						if (attributes.label.id) {
-//							labelId = attributes.label.id; 
-//						}
-//					}	
-//					node.window.addLabel(elem, labelId, labelText, id);
-//				}
+				if (attributes.label) {
+					node.window.addLabel(container, elem, attributes.label);
+				}
+				
+				// Element added to the list
+				this.list.addDT(container);
 			}
 		}
 	};
