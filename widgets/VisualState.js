@@ -12,13 +12,15 @@
 	
 	GameState = node.GameState;
 	JSUS = node.JSUS;
+	Table = node.window.Table;
 	
 	VisualState.id = 'visualstate';
 	VisualState.name = 'Visual State';
 	VisualState.version = '0.2';
 	
 	VisualState.dependencies = {
-		JSUS: {}
+		JSUS: {},
+		Table: {}
 	};
 	
 	function VisualState (options) {
@@ -28,7 +30,7 @@
 		this.fieldset = {legend: 'State'};
 		
 		this.root = null;		// the parent element
-		
+		this.table = new Table();
 		//this.init(options);
 	};
 	
@@ -39,26 +41,49 @@
 		var PREF = this.id + '_';
 		
 		var idFieldset = PREF + 'fieldset';
-		var idTimerDiv = PREF + 'div';
 		
-
-		this.stateDiv = node.window.addDiv(root, idTimerDiv);
-		this.stateDiv.innerHTML = 'Uninitialized';
+		root.appendChild(this.table.table);
 		
+		this.writeState();
 		return root;
-		
 	};
 		
 	VisualState.prototype.listeners = function () {
 		var that = this;
-
 		node.on('STATECHANGE', function() {
-			that.writeState(node.game.gameState);
+			that.writeState();
 		}); 
 	};
 	
-	VisualState.prototype.writeState = function (state) {
-		this.stateDiv.innerHTML =  this.gameLoop.getName(state);
+	VisualState.prototype.writeState = function () {
+		var state = false;
+		var pr = false;
+		var nx = false;
+		
+		var miss = '-';
+		
+		if (node.game && node.game.gameState) {
+			var state = this.gameLoop.getName(node.game.gameState) || miss;
+			var pr = this.gameLoop.getName(node.game.previous()) || miss;
+			var nx = this.gameLoop.getName(node.game.next()) || miss;
+		}
+		else {
+			var state = 'Uninitialized';
+			var pr = miss;
+			var nx = miss;
+		}
+		this.table.clear(true);
+
+		this.table.addRow(['Previous: ', pr]);
+		this.table.addRow(['Current: ', state]);
+		this.table.addRow(['Next: ', nx]);
+	
+		var t = this.table.select('y', '=', 2);
+		t.addClass('strong');
+		t.select('x','=',0).addClass('underline');
+		this.table.parse();
+		console.log(this.table.fetch());
+		
 	};
 	
 })(node.window.widgets);

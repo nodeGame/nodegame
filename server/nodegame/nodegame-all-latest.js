@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 17:28:10 CET 2012
+ * Built on Di 31. Jan 18:42:59 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 17:28:10 CET 2012
+ * Built on Di 31. Jan 18:42:59 CET 2012
  *
  */
  
@@ -3785,8 +3785,6 @@
 		
 		this.hooks = [];
 		
-		console.log('op');
-		console.log(options);
 		this.init(this.options);
 		
 		// TODO: remove into a new addon
@@ -3909,7 +3907,7 @@
 			that.pause();
 		});
 		
-		node.on('WAITING', function(){
+		node.on('WAITING...', function(){
 			that.pause();
 		});
 		
@@ -3930,7 +3928,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 17:28:10 CET 2012
+ * Built on Di 31. Jan 18:42:59 CET 2012
  *
  */
  
@@ -5327,16 +5325,20 @@
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;
-	if (c instanceof Array) c = c.join(', ');
+	if (c instanceof Array) c = c.join(' ');
 	
 	this.forEach(function (el) {
 		if (!el.className) {
 			el.className = c;
 		} 
 		else {
-			el.className += ', ' + c;
+			el.className += ' ' + c;
 		}
 	});
+	
+	if (this.auto_update) {
+		this.parse();
+	}
 	
 	return this;
   };
@@ -5359,6 +5361,10 @@
 	this.forEach(function (el) {
 		func.call(this,el,c);
 	});
+	
+	if (this.auto_update) {
+		this.parse();
+	}
 	
 	return this;
   };
@@ -5646,6 +5652,21 @@
 	  return TABLE;
   };
   
+  Table.prototype.resetPointers = function (pointers) {
+	  var pointers = pointers || {};
+	  this.pointers = {
+				x: pointers.pointerX || 0,
+				y: pointers.pointerY || 0,
+				z: pointers.pointerZ || 0
+	  };
+  };
+  
+  
+  Table.prototype.clear = function (confirm) {
+	  var result = Table.prototype.__proto__.clear.call(this, confirm);
+	  this.resetPointers();
+  };
+  
   // Cell Class
   Cell.prototype = new Entity();
   Cell.prototype.constructor = Cell;
@@ -5673,7 +5694,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 17:28:10 CET 2012
+ * Built on Di 31. Jan 18:42:59 CET 2012
  *
  */
  
@@ -7708,13 +7729,15 @@
 	
 	GameState = node.GameState;
 	JSUS = node.JSUS;
+	Table = node.window.Table;
 	
 	VisualState.id = 'visualstate';
 	VisualState.name = 'Visual State';
 	VisualState.version = '0.2';
 	
 	VisualState.dependencies = {
-		JSUS: {}
+		JSUS: {},
+		Table: {}
 	};
 	
 	function VisualState (options) {
@@ -7724,7 +7747,7 @@
 		this.fieldset = {legend: 'State'};
 		
 		this.root = null;		// the parent element
-		
+		this.table = new Table();
 		//this.init(options);
 	};
 	
@@ -7735,26 +7758,49 @@
 		var PREF = this.id + '_';
 		
 		var idFieldset = PREF + 'fieldset';
-		var idTimerDiv = PREF + 'div';
 		
-
-		this.stateDiv = node.window.addDiv(root, idTimerDiv);
-		this.stateDiv.innerHTML = 'Uninitialized';
+		root.appendChild(this.table.table);
 		
+		this.writeState();
 		return root;
-		
 	};
 		
 	VisualState.prototype.listeners = function () {
 		var that = this;
-
 		node.on('STATECHANGE', function() {
-			that.writeState(node.game.gameState);
+			that.writeState();
 		}); 
 	};
 	
-	VisualState.prototype.writeState = function (state) {
-		this.stateDiv.innerHTML =  this.gameLoop.getName(state);
+	VisualState.prototype.writeState = function () {
+		var state = false;
+		var pr = false;
+		var nx = false;
+		
+		var miss = '-';
+		
+		if (node.game && node.game.gameState) {
+			var state = this.gameLoop.getName(node.game.gameState) || miss;
+			var pr = this.gameLoop.getName(node.game.previous()) || miss;
+			var nx = this.gameLoop.getName(node.game.next()) || miss;
+		}
+		else {
+			var state = 'Uninitialized';
+			var pr = miss;
+			var nx = miss;
+		}
+		this.table.clear(true);
+
+		this.table.addRow(['Previous: ', pr]);
+		this.table.addRow(['Current: ', state]);
+		this.table.addRow(['Next: ', nx]);
+	
+		var t = this.table.select('y', '=', 2);
+		t.addClass('strong');
+		t.select('x','=',0).addClass('underline');
+		this.table.parse();
+		console.log(this.table.fetch());
+		
 	};
 	
 })(node.window.widgets); 

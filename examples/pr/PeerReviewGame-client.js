@@ -359,7 +359,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: 100000,
+			timer: 1000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;

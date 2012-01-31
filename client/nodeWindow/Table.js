@@ -106,16 +106,20 @@
   
   Table.prototype.addClass = function (c) {
 	if (!c) return;
-	if (c instanceof Array) c = c.join(', ');
+	if (c instanceof Array) c = c.join(' ');
 	
 	this.forEach(function (el) {
 		if (!el.className) {
 			el.className = c;
 		} 
 		else {
-			el.className += ', ' + c;
+			el.className += ' ' + c;
 		}
 	});
+	
+	if (this.auto_update) {
+		this.parse();
+	}
 	
 	return this;
   };
@@ -138,6 +142,10 @@
 	this.forEach(function (el) {
 		func.call(this,el,c);
 	});
+	
+	if (this.auto_update) {
+		this.parse();
+	}
 	
 	return this;
   };
@@ -423,6 +431,21 @@
 	  }
 	  
 	  return TABLE;
+  };
+  
+  Table.prototype.resetPointers = function (pointers) {
+	  var pointers = pointers || {};
+	  this.pointers = {
+				x: pointers.pointerX || 0,
+				y: pointers.pointerY || 0,
+				z: pointers.pointerZ || 0
+	  };
+  };
+  
+  
+  Table.prototype.clear = function (confirm) {
+	  var result = Table.prototype.__proto__.clear.call(this, confirm);
+	  this.resetPointers();
   };
   
   // Cell Class

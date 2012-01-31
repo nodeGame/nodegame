@@ -21,8 +21,6 @@
 		
 		this.hooks = [];
 		
-		console.log('op');
-		console.log(options);
 		this.init(this.options);
 		
 		// TODO: remove into a new addon
@@ -145,7 +143,7 @@
 			that.pause();
 		});
 		
-		node.on('WAITING', function(){
+		node.on('WAITING...', function(){
 			that.pause();
 		});
 		
