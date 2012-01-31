@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:50:52 CET 2012
+ * Built on Di 31. Jan 16:57:32 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:50:52 CET 2012
+ * Built on Di 31. Jan 16:57:32 CET 2012
  *
  */
  
@@ -3930,7 +3930,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:50:52 CET 2012
+ * Built on Di 31. Jan 16:57:32 CET 2012
  *
  */
  
@@ -4098,7 +4098,7 @@
 	
 
 	Document.prototype.addLabel = function (root, forElem, id, labelText, attributes) {
-		if (!root || !forElem || labelText) return false;		
+		if (!root || !forElem || !labelText) return false;		
 		var l = this.getLabel(forElem, id, labelText, attributes);
 		root.insertBefore(l, forElem);
 		return l;
@@ -5672,7 +5672,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:50:52 CET 2012
+ * Built on Di 31. Jan 16:57:32 CET 2012
  *
  */
  
@@ -6434,6 +6434,7 @@
 				}
 				
 				if (attributes.label) {
+					console.log('Adding label...');
 					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				

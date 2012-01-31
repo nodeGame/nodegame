@@ -105,6 +105,7 @@
 				}
 				
 				if (attributes.label) {
+					console.log('Adding label...');
 					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				

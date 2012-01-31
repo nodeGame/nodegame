@@ -161,7 +161,7 @@
 	
 
 	Document.prototype.addLabel = function (root, forElem, id, labelText, attributes) {
-		if (!root || !forElem || labelText) return false;		
+		if (!root || !forElem || !labelText) return false;		
 		var l = this.getLabel(forElem, id, labelText, attributes);
 		root.insertBefore(l, forElem);
 		return l;
