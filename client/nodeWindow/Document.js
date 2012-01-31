@@ -30,9 +30,10 @@
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
 		if (!e || !a) return e;
+		if ('object' != typeof a) return e;
 		var specials = ['id', 'label', 'style'];
 		for (var key in a) {
-			if (a.hasOwnProperty(key)){
+			if (a.hasOwnProperty(key)) {
 				if (!JSUS.in_array(key, specials)) {
 					e.setAttribute(key,a[key]);
 				}

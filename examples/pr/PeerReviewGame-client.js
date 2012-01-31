@@ -133,7 +133,6 @@ function PeerReviewGame () {
 						   controls: false,
 						   change: false,
 						   onclick: function() {
-							  alert('click');
 						      node.game.cf.draw(this.getAllValues());
 						   }
 				};
@@ -181,7 +180,7 @@ function PeerReviewGame () {
 			
 			// History of previous exhibits
 			var historyDiv = node.window.getElementById('history');
-			this.all_ex.reverse();
+			//this.all_ex.reverse();
 			this.all_ex.parse();
 			node.window.write(this.all_ex.getRoot(), historyDiv);
 			
@@ -360,7 +359,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: 10000,
+			timer: 100000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;

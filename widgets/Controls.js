@@ -25,6 +25,8 @@
 		this.fieldset = null;
 		this.submit = null;
 		
+		this.changeEvent = this.id + '_change';
+		
 		this.init(options);
 	};
 
@@ -41,7 +43,14 @@
 	Controls.prototype.init = function (options) {
 
 		this.hasChanged = false; // TODO: should this be inherited?
-		this.changeEvent = options.change || this.id + '_change';
+		if ('undefined' !== typeof options.change) {
+			if (!options.change){
+				this.changeEvent = false;
+			}
+			else {
+				this.changeEvent = options.change;
+			}
+		}
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
@@ -105,7 +114,6 @@
 				}
 				
 				if (attributes.label) {
-					console.log('Adding label...');
 					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				

@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:57:32 CET 2012
+ * Built on Di 31. Jan 17:28:10 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:57:32 CET 2012
+ * Built on Di 31. Jan 17:28:10 CET 2012
  *
  */
  
@@ -3930,7 +3930,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:57:32 CET 2012
+ * Built on Di 31. Jan 17:28:10 CET 2012
  *
  */
  
@@ -3967,9 +3967,10 @@
 	
 	Document.prototype.addAttributes2Elem = function (e, a) {
 		if (!e || !a) return e;
+		if ('object' != typeof a) return e;
 		var specials = ['id', 'label', 'style'];
 		for (var key in a) {
-			if (a.hasOwnProperty(key)){
+			if (a.hasOwnProperty(key)) {
 				if (!JSUS.in_array(key, specials)) {
 					e.setAttribute(key,a[key]);
 				}
@@ -5085,10 +5086,10 @@
 	
 	List.prototype.globalCompare = function (o1, o2) {
 		if (!o1 && !o2) return 0;
-		if (!o2) return -1;
-		if (!o1) return 1;
-		if (o1.dt < o2.dt) return 1;
-		if (o1.dt > o2.dt) return -1;
+		if (!o2) return 1;
+		if (!o1) return -1;
+		if (o1.dt < o2.dt) return -1;
+		if (o1.dt > o2.dt) return 1;
 		if (o1.dt === o2.dt) {
 			if ('undefined' === typeof o1.dd) return -1;
 			if ('undefined'=== typeof o2.dd) return 1;
@@ -5672,7 +5673,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 16:57:32 CET 2012
+ * Built on Di 31. Jan 17:28:10 CET 2012
  *
  */
  
@@ -5810,7 +5811,10 @@
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
 		var fv = new FaceVector(features);
-		this.fp.redraw(fv);			
+		this.fp.redraw(fv);
+		// Without merging wrong values are passed as attributes
+		this.sc.init({features: JSUS.mergeOnValue(FaceVector.defaults, features)});
+		this.sc.refresh();
 	};
 	
 	ChernoffFaces.prototype.getAllValues = function() {
@@ -6354,6 +6358,8 @@
 		this.fieldset = null;
 		this.submit = null;
 		
+		this.changeEvent = this.id + '_change';
+		
 		this.init(options);
 	};
 
@@ -6370,7 +6376,14 @@
 	Controls.prototype.init = function (options) {
 
 		this.hasChanged = false; // TODO: should this be inherited?
-		this.changeEvent = options.change || this.id + '_change';
+		if ('undefined' !== typeof options.change) {
+			if (!options.change){
+				this.changeEvent = false;
+			}
+			else {
+				this.changeEvent = options.change;
+			}
+		}
 		this.list = new node.window.List(options);
 		this.listRoot = this.list.getRoot();
 		
@@ -6434,7 +6447,6 @@
 				}
 				
 				if (attributes.label) {
-					console.log('Adding label...');
 					node.window.addLabel(container, elem, null, attributes.label);
 				}
 				

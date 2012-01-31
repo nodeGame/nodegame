@@ -131,7 +131,10 @@
 	ChernoffFaces.prototype.draw = function (features) {
 		if (!features) return;
 		var fv = new FaceVector(features);
-		this.fp.redraw(fv);			
+		this.fp.redraw(fv);
+		// Without merging wrong values are passed as attributes
+		this.sc.init({features: JSUS.mergeOnValue(FaceVector.defaults, features)});
+		this.sc.refresh();
 	};
 	
 	ChernoffFaces.prototype.getAllValues = function() {

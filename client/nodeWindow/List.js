@@ -59,10 +59,10 @@
 	
 	List.prototype.globalCompare = function (o1, o2) {
 		if (!o1 && !o2) return 0;
-		if (!o2) return -1;
-		if (!o1) return 1;
-		if (o1.dt < o2.dt) return 1;
-		if (o1.dt > o2.dt) return -1;
+		if (!o2) return 1;
+		if (!o1) return -1;
+		if (o1.dt < o2.dt) return -1;
+		if (o1.dt > o2.dt) return 1;
 		if (o1.dt === o2.dt) {
 			if ('undefined' === typeof o1.dd) return -1;
 			if ('undefined'=== typeof o2.dd) return 1;
