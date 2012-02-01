@@ -1,7 +1,6 @@
 (function(exports, node){
 	
 	var JSUS = node.JSUS;
-	var NDDB = node.NDDB;
 
 	var Table = node.window.Table;
 	/*!
@@ -82,7 +81,7 @@
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {
 		  if (!clear) {
-			  NDDB.log('Do you really want to clear the current HTMLRenderer obj? Please use clear(true)', 'WARN');
+			  node.log('Do you really want to clear the current HTMLRenderer obj? Please use clear(true)', 'WARN');
 			  return false;
 		  }
 		  this.renderers = [];
@@ -121,7 +120,7 @@
 			  if (out) return out;
 		  }
 		  // Safety return
-		  return cell.content;
+		  return o.content;
 	  };
 	  
 	  HTMLRenderer.prototype.size = function () {
