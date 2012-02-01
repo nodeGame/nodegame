@@ -83,13 +83,13 @@
 	  };
 
 	
-	  TriggerManager.prototype.pullTrigger = function (o) {
+	  TriggerManager.prototype.pullTriggers = function (o) {
 		if (!o) return;
 		// New criteria are fired first
 		  for (var i = this.triggers.length; i > 0; i--) {
 			  var out = this.triggers[(i-1)].call(this, o);
 			  if (out) {
-				  if (options.return === TriggerManager.first) {
+				  if (this.return === TriggerManager.first) {
 					  return out;
 				  }
 			  }

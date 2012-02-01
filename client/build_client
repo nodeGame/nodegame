@@ -93,6 +93,8 @@ FILES=(
 'nodeGame.js'
 # Addons
 'addons/GameTimer.js'
+'addons/TriggerManager.js'
+'addons/History.js'
 )
 
 for f in ${FILES[*]}

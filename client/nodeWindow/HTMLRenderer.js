@@ -2,7 +2,7 @@
 	
 	var JSUS = node.JSUS;
 
-	var Table = node.window.Table;
+	var TriggerManager = node.TriggerManager;
 	/*!
 	 * 
 	 * HTMLRenderer: renders objects to HTML according to a series
@@ -15,26 +15,19 @@
 	
 	function HTMLRenderer (options) {
 		this.options = options = options || {};
-		this.renderers = [];
+		this.tm = new TriggerManager();
 		this.init(this.options);
 	};
 	
 	HTMLRenderer.prototype.init = function(options) {
-		this.options = options || this.options;
-		this.initRender();
+		if (options) {
+			if (options.render) {
+				options.triggers = options.render;
+			}
+			this.options = options;
+		}
+		this.resetRender();
 	};
-	
-	HTMLRenderer.prototype.initRender = function() {
-	  	this.resetRender();
-		if (this.options.renderers) {
-			if (!(this.options.renderers instanceof Array)) {
-				this.options.renderers = [this.options.renderers];
-			}
-			for (var i=0; i< this.options.renderers.length; i++) {
-				this.renderers.push(this.options.renderers[i]);
-			}
-		} 
-	  };
 	
 	/**
 	   * Delete existing render functions and add two 
@@ -42,12 +35,13 @@
 	   * a HTMLRenderer of key: values.
 	   */
 	  HTMLRenderer.prototype.resetRender = function () {
-		  this.renderers = [];
-		  this.renderers.push(function(el){
+		  this.tm.clear(true);
+		  
+		  this.tm.addTrigger(function(el){
 			  return document.createTextNode(el.content);
 		  });
 		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if ('object' === typeof el.content) {
 	    		var div = document.createElement('div');
 	    		for (var key in el.content) {
@@ -60,10 +54,8 @@
 	    		return div;
 			  }
 		  });
-		 
 		  
-		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if (el.content.parse && el.content.parse instanceof Function) {
 				  var html = el.content.parse();
 				  if (JSUS.isElement(html) || JSUS.isNode(html)) {
@@ -72,7 +64,7 @@
 			  }
 		  });	
 		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
 			  }
@@ -80,51 +72,23 @@
 	  };
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {
-		  if (!clear) {
-			  node.log('Do you really want to clear the current HTMLRenderer obj? Please use clear(true)', 'WARN');
-			  return false;
-		  }
-		  this.renderers = [];
-		  return clear;
+		  return this.tm.clear(clear);
 	  };
-	
 
-	  
 	  HTMLRenderer.prototype.addRenderer = function (renderer, pos) {
-		  if (!renderer) return;
-		  if (!pos) {
-			  this.renderers.push(renderer);
-		  }
-		  else {
-			  this.renderers.splice(pos, 0, renderer);
-		  }
+		  return this.tm.addTrigger(renderer, pos);
 	  };
-	  
-	  
 	  
 	  HTMLRenderer.prototype.removeRenderer = function (renderer) {
-		for (var i=0; i< this.renderers.length; i++) {
-			if (this.renderers[i] == renderer) {
-				return this.renderers.splice(i,1);
-			}
-		}  
-		return false;
+		return this.tm.removeTrigger(renderer);
 	  };
-
 	
 	  HTMLRenderer.prototype.render = function (o) {
-		if (!o) return;
-		// New criteria are fired first
-		  for (var i = this.renderers.length; i > 0; i--) {
-			  var out = this.renderers[(i-1)].call(this, o);
-			  if (out) return out;
-		  }
-		  // Safety return
-		  return o.content;
+		return this.tm.pullTriggers(o);
 	  };
 	  
 	  HTMLRenderer.prototype.size = function () {
-		  return this.renderers.length;
+		  return this.tm.size();
 	  };
 	
 	  // Abstract HTML Entity reprentation

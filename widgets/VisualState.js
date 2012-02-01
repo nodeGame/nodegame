@@ -82,8 +82,6 @@
 		t.addClass('strong');
 		t.select('x','=',0).addClass('underline');
 		this.table.parse();
-		console.log(this.table.fetch());
-		
 	};
 	
 })(node.window.widgets);

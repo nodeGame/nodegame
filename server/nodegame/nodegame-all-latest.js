@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 18:42:59 CET 2012
+ * Built on Mi 1. Feb 12:26:24 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 18:42:59 CET 2012
+ * Built on Mi 1. Feb 12:26:24 CET 2012
  *
  */
  
@@ -782,9 +782,10 @@
 	
 	function NDDB (options, db) {				
 		// Default settings
-		this.options = null;
+		this.options = {};
 
-		this.D = {};		// The n-dimensional container for comparator functions
+		this.D = {};			// The n-dimensional container for comparator functions
+		this.nddb_pointer = 0;	// Pointer for iterating along all the elements
 		
 		if (options) {
 			this.options = options;
@@ -793,8 +794,10 @@
 			if ('undefined' !== typeof options.parentDB) {
 				this.parentDB = options.parentDB;
 			}	
+			this.nddb_pointer = options.nddb_pointer;
 		}
 		this.db = this.initDB(db);	// The actual database
+		
 
 	};
 	
@@ -1451,13 +1454,25 @@
 		});
 	};
 	
-	NDDB.prototype.get = function (nddbid) {
-		if (arguments.length === 0) return;
-		return this.select('nddbid','=',nddbid).first();
+	NDDB.prototype.get = function (pos) {
+		var pos = pos || this.nddb_pointer;
+		if (pos < 0 || pos > (this.db.length-1)) return false;
+		return this.db[pos];
+	};
+	
+	NDDB.prototype.next = function () {
+		var el = NDDB.prototype.get.call(this, ++this.nddb_pointer);
+		if (!el) this.nddb_pointer--;
+		return el;
+	};
+	
+	NDDB.prototype.previous = function () {
+		var el = NDDB.prototype.get.call(this, --this.nddb_pointer);
+		if (!el) this.nddb_pointer++;
+		return el;
 	};
 	
 })(
-		
 	'undefined' !== typeof module && 'undefined' !== typeof module.exports ? module.exports: window
   , 'undefined' != typeof JSUS ? JSUS : module.parent.exports.JSUS
 );
@@ -3918,6 +3933,224 @@
   , 'undefined' != typeof node ? node : module.parent.exports
 ); 
  
+(function(exports, node){
+	
+	/*!
+	 * 
+	 * TriggerManager: holds a collection of function called sequentially. 
+	 * this.return flag determines how the hooks are called:
+	 * 
+	 * - 'first': returns the value from the first trigger which matches the object
+	 * - 'last': returns the value from the last trigger, after all have been executed
+	 * 
+	 */
+	
+	exports.TriggerManager = TriggerManager;
+	
+	TriggerManager.first = 'first';
+	TriggerManager.last = 'last';
+	
+	function TriggerManager (options) {
+		this.options = options = options || {};
+		this.triggers = [];
+		this.return = TriggerManager.first; // options are first, last 
+		this.init(this.options);
+	};
+	
+	TriggerManager.prototype.init = function(options) {
+		this.options = options || this.options;
+		if (options.return === TriggerManager.first || options.return === TriggerManager.last) {
+			this.return = options.return;
+		}
+		this.resetTriggers();
+	};
+	
+	TriggerManager.prototype.initTriggers = function(triggers) {
+		if (triggers) {
+			if (!(triggers instanceof Array)) {
+				triggers = [triggers];
+			}
+			for (var i=0; i< triggers.length; i++) {
+				this.triggers.push(triggers[i]);
+			}
+		} 
+	  };
+	
+	/**
+	   * Delete existing render functions and add the default
+	   * ones, if any.
+	   */
+	  TriggerManager.prototype.resetTriggers = function () {
+		  this.triggers = [];
+		  this.initTriggers(this.options.triggers);
+	  };
+	  
+	  TriggerManager.prototype.clear = function (clear) {
+		  if (!clear) {
+			  node.log('Do you really want to clear the current TriggerManager obj? Please use clear(true)', 'WARN');
+			  return false;
+		  }
+		  this.triggers = [];
+		  return clear;
+	  };
+	
+
+	  
+	  TriggerManager.prototype.addTrigger = function (trigger, pos) {
+		  if (!trigger) return;
+		  if (!pos) {
+			  this.triggers.push(trigger);
+		  }
+		  else {
+			  this.triggers.splice(pos, 0, trigger);
+		  }
+	  };
+	  
+	  
+	  
+	  TriggerManager.prototype.removeTrigger = function (trigger) {
+		for (var i=0; i< this.triggers.length; i++) {
+			if (this.triggers[i] == trigger) {
+				return this.triggers.splice(i,1);
+			}
+		}  
+		return false;
+	  };
+
+	
+	  TriggerManager.prototype.pullTriggers = function (o) {
+		if (!o) return;
+		// New criteria are fired first
+		  for (var i = this.triggers.length; i > 0; i--) {
+			  var out = this.triggers[(i-1)].call(this, o);
+			  if (out) {
+				  if (this.return === TriggerManager.first) {
+					  return out;
+				  }
+			  }
+		  }
+		  // Safety return
+		  return o;
+	  };
+	  
+	  TriggerManager.prototype.size = function () {
+		  return this.triggers.length;
+	  };
+	
+
+	
+})(
+	('undefined' !== typeof node) ? node : module.parent.exports
+  , ('undefined' !== typeof node) ? node : module.parent.exports
+); 
+ 
+(function (exports, node) {
+
+//	/*
+//	 * History
+//	 * 
+//	 * Sends DATA msgs
+//	 * 
+//	 */
+//	
+//	exports.History = History;
+//	
+//	JSUS = node.JSUS;
+//	
+//	History.id = 'History';
+//	History.name = 'History';
+//	History.version = '0.1';
+//	
+//	History.dependencies = {
+//		JSUS: {},
+//		NDDB: {}
+//	};
+//	
+//	History.prototype = new NDDB();
+//	History.prototype.constructor = History;
+//	
+//	function History (options, data) {
+//		NDDB.call(this, options, data); 
+//		var options = options || {};
+//		this.options = options;
+//		
+//		this.history = [];
+//		
+//		this.init(this.options);
+//		
+//	};
+//	
+//	History.prototype.init = function (options) {
+//		
+//	};
+//	
+//	
+//	History.prototype.start = function() {
+//		// fire the event immediately if time is zero
+//		if (this.options.milliseconds === 0){
+//			node.emit(this.timeup);
+//			return;
+//		}
+//		var that = this;
+//		this.timer = setInterval(function() {
+//			that.timePassed = that.timePassed + that.update;
+//			that.timeLeft = that.milliseconds - that.timePassed;
+//			
+//			// Fire custom hooks from the latest to the first if any
+//			for (var i = that.hooks.length; i> 0; i--) {
+//				that.fire(that.hooks[(i-1)]);
+//			}
+//			// Fire Timeup Event
+//			if (that.timeLeft <= 0) {
+//				that.fire(that.timeup);
+//				that.stop();
+//			}
+//			
+//		}, this.update);
+//	};
+//	
+//	/**
+//	 * Add an hook to the hook list after performing conformity checks.
+//	 * The first parameter hook can be a string, a function, or an object
+//	 * containing an hook property.
+//	 */
+//	History.prototype.addHook = function (hook, ctx) {
+//		if (!hook) return;
+//		var ctx = ctx || node.game;
+//		if (hook.hook) {
+//			ctx = hook.ctx || ctx;
+//			var hook = hook.hook;
+//		}
+//		this.hooks.push({hook: hook, ctx: ctx});
+//	};
+//	
+//	History.prototype.pause = function() {
+//		clearInterval(this.timer);
+//	};	
+//
+//	History.prototype.resume = function() {
+//		if (this.timer) return; // timer was not paused
+//		var options = JSUS.extend({milliseconds: this.milliseconds - this.timePassed}, this.options);
+//		this.restart(options);
+//	};	
+//	
+//	History.prototype.stop = function() {
+//		clearInterval(this.timer);
+//		this.timePassed = 0;
+//		this.timeLeft = null;
+//	};	
+//	
+//	History.prototype.restart = function (options) {
+//		var options = options || this.options;
+//		this.init(options);
+//		this.start();
+//	};
+			
+})(
+	'undefined' != typeof node ? node : module.exports
+  , 'undefined' != typeof node ? node : module.parent.exports
+); 
+ 
  
  
  
@@ -3928,7 +4161,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 18:42:59 CET 2012
+ * Built on Mi 1. Feb 12:26:24 CET 2012
  *
  */
  
@@ -4788,9 +5021,8 @@
 (function(exports, node){
 	
 	var JSUS = node.JSUS;
-	var NDDB = node.NDDB;
 
-	var Table = node.window.Table;
+	var TriggerManager = node.TriggerManager;
 	/*!
 	 * 
 	 * HTMLRenderer: renders objects to HTML according to a series
@@ -4803,26 +5035,19 @@
 	
 	function HTMLRenderer (options) {
 		this.options = options = options || {};
-		this.renderers = [];
+		this.tm = new TriggerManager();
 		this.init(this.options);
 	};
 	
 	HTMLRenderer.prototype.init = function(options) {
-		this.options = options || this.options;
-		this.initRender();
+		if (options) {
+			if (options.render) {
+				options.triggers = options.render;
+			}
+			this.options = options;
+		}
+		this.resetRender();
 	};
-	
-	HTMLRenderer.prototype.initRender = function() {
-	  	this.resetRender();
-		if (this.options.renderers) {
-			if (!(this.options.renderers instanceof Array)) {
-				this.options.renderers = [this.options.renderers];
-			}
-			for (var i=0; i< this.options.renderers.length; i++) {
-				this.renderers.push(this.options.renderers[i]);
-			}
-		} 
-	  };
 	
 	/**
 	   * Delete existing render functions and add two 
@@ -4830,12 +5055,13 @@
 	   * a HTMLRenderer of key: values.
 	   */
 	  HTMLRenderer.prototype.resetRender = function () {
-		  this.renderers = [];
-		  this.renderers.push(function(el){
+		  this.tm.clear(true);
+		  
+		  this.tm.addTrigger(function(el){
 			  return document.createTextNode(el.content);
 		  });
 		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if ('object' === typeof el.content) {
 	    		var div = document.createElement('div');
 	    		for (var key in el.content) {
@@ -4848,10 +5074,8 @@
 	    		return div;
 			  }
 		  });
-		 
 		  
-		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if (el.content.parse && el.content.parse instanceof Function) {
 				  var html = el.content.parse();
 				  if (JSUS.isElement(html) || JSUS.isNode(html)) {
@@ -4860,7 +5084,7 @@
 			  }
 		  });	
 		  
-		  this.renderers.push(function (el) { 
+		  this.tm.addTrigger(function (el) { 
 			  if (JSUS.isElement(el.content) || JSUS.isNode(el.content)) {
 	    		return el.content;
 			  }
@@ -4868,51 +5092,23 @@
 	  };
 	  
 	  HTMLRenderer.prototype.clear = function (clear) {
-		  if (!clear) {
-			  NDDB.log('Do you really want to clear the current HTMLRenderer obj? Please use clear(true)', 'WARN');
-			  return false;
-		  }
-		  this.renderers = [];
-		  return clear;
+		  return this.tm.clear(clear);
 	  };
-	
 
-	  
 	  HTMLRenderer.prototype.addRenderer = function (renderer, pos) {
-		  if (!renderer) return;
-		  if (!pos) {
-			  this.renderers.push(renderer);
-		  }
-		  else {
-			  this.renderers.splice(pos, 0, renderer);
-		  }
+		  return this.tm.addTrigger(renderer, pos);
 	  };
-	  
-	  
 	  
 	  HTMLRenderer.prototype.removeRenderer = function (renderer) {
-		for (var i=0; i< this.renderers.length; i++) {
-			if (this.renderers[i] == renderer) {
-				return this.renderers.splice(i,1);
-			}
-		}  
-		return false;
+		return this.tm.removeTrigger(renderer);
 	  };
-
 	
 	  HTMLRenderer.prototype.render = function (o) {
-		if (!o) return;
-		// New criteria are fired first
-		  for (var i = this.renderers.length; i > 0; i--) {
-			  var out = this.renderers[(i-1)].call(this, o);
-			  if (out) return out;
-		  }
-		  // Safety return
-		  return cell.content;
+		return this.tm.pullTriggers(o);
 	  };
 	  
 	  HTMLRenderer.prototype.size = function () {
-		  return this.renderers.length;
+		  return this.tm.size();
 	  };
 	
 	  // Abstract HTML Entity reprentation
@@ -5079,7 +5275,9 @@
 			this.DL.appendChild(document.createTextNode(options.title));
 		}
 		
-		this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
+		// was
+		//this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
+		this.htmlRenderer = new HTMLRenderer({render: options.render});
 	  };
 	
 	List.prototype.globalCompare = function (o1, o2) {
@@ -5694,7 +5892,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 31. Jan 18:42:59 CET 2012
+ * Built on Mi 1. Feb 12:26:24 CET 2012
  *
  */
  
@@ -7799,8 +7997,6 @@
 		t.addClass('strong');
 		t.select('x','=',0).addClass('underline');
 		this.table.parse();
-		console.log(this.table.fetch());
-		
 	};
 	
 })(node.window.widgets); 

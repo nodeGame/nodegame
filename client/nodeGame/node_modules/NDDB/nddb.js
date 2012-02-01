@@ -39,9 +39,10 @@
 	
 	function NDDB (options, db) {				
 		// Default settings
-		this.options = null;
+		this.options = {};
 
-		this.D = {};		// The n-dimensional container for comparator functions
+		this.D = {};			// The n-dimensional container for comparator functions
+		this.nddb_pointer = 0;	// Pointer for iterating along all the elements
 		
 		if (options) {
 			this.options = options;
@@ -50,9 +51,10 @@
 			if ('undefined' !== typeof options.parentDB) {
 				this.parentDB = options.parentDB;
 			}	
+			this.nddb_pointer = options.nddb_pointer;
 		}
 		this.db = this.initDB(db);	// The actual database
-		this.nddb_pointer = options.nddb_pointer || 0;
+		
 
 	};
 	
