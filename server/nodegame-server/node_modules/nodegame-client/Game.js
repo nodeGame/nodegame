@@ -203,7 +203,7 @@
 				
 				if (this.auto_wait) {
 					if (node.window) {
-						node.emit('WAITING...');
+						//node.emit('WAITING...');
 					}
 				}
 			});
@@ -260,14 +260,6 @@
 		if (!gs) return false;
 		return this.updateState(gs);
 	};
-
-	
-//	Game.prototype.is = function(is) {
-//		//node.log('IS ' + is);
-//		this.gameState.is = is;
-//		// TODO Check whether we should do it here or no
-//		// this.publishState();
-//	};
 	
 	Game.prototype.publishState = function() {
 		//node.log('Publishing ' + this.gameState, 'DEBUG');

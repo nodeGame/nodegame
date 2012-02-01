@@ -38,6 +38,8 @@ function PeerReviewGame () {
 											 title: 'History of previous exhibitions'
 		});
 		
+		this.personal_history = node.window.getWidget('NDDBBrowser', 'ph');
+		
 		// DTABLE
 //		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
 //		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
@@ -133,7 +135,8 @@ function PeerReviewGame () {
 						   controls: false,
 						   change: false,
 						   onclick: function() {
-						      node.game.cf.draw(this.getAllValues());
+								//node.game.personal_history.add(node.game.cf.getAllValues());
+								node.game.cf.draw(this.getAllValues());
 						   }
 				};
 				
@@ -166,9 +169,13 @@ function PeerReviewGame () {
 	
 	var creation = function() {
 
-		node.window.loadFrame('creation.html', function(){
+		node.window.loadFrame('creation.html', function() {
 			
 			var creationDiv = node.window.getElementById('creation');
+			this.personal_history.append(creationDiv);
+			
+			//node.emit('INPUT_ENABLE');
+			
 			var cf_options = { id: 'cf',
 							   width: 300,
 							   height: 300
@@ -183,6 +190,16 @@ function PeerReviewGame () {
 			//this.all_ex.reverse();
 			this.all_ex.parse();
 			node.window.write(this.all_ex.getRoot(), historyDiv);
+			
+			// Adding to history
+			node.on(this.cf.change, function(){
+				this.personal_history.add(this.cf.getAllValues());
+			});
+			
+			// Pulling back from history
+			node.on(this.personal_history.id + '_GOT', function (face){
+				node.game.cf.draw(face);
+			});
 			
 		});
 
@@ -359,7 +376,7 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: 1000,
+			timer: 100000,
 			done: function () {
 				node.set('CF', this.cf.getAllValues());
 				return true;
@@ -368,12 +385,12 @@ function PeerReviewGame () {
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: 1000,
+			timer: 10000,
 			done: function () {
 				if (!this.outlet.hasChanged) {
 					this.outlet.highlight();
 					alert('You must select an outlet for your creation NOW!!');
-					this.timer.restart(timerOptions);
+					this.timer.restart({timer: 5000});
 					return false;
 				}
 				

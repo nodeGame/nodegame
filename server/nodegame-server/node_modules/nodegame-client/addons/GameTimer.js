@@ -143,9 +143,10 @@
 			that.pause();
 		});
 		
-		node.on('WAITING...', function(){
-			that.pause();
-		});
+		// TODO: check what is right behavior for this
+//		node.on('WAITING...', function(){
+//			that.pause();
+//		});
 		
 	};
 	

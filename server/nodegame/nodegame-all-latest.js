@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 12:26:24 CET 2012
+ * Built on Mi 1. Feb 18:52:50 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 12:26:24 CET 2012
+ * Built on Mi 1. Feb 18:52:50 CET 2012
  *
  */
  
@@ -3159,7 +3159,7 @@
 				
 				if (this.auto_wait) {
 					if (node.window) {
-						node.emit('WAITING...');
+						//node.emit('WAITING...');
 					}
 				}
 			});
@@ -3216,14 +3216,6 @@
 		if (!gs) return false;
 		return this.updateState(gs);
 	};
-
-	
-//	Game.prototype.is = function(is) {
-//		//node.log('IS ' + is);
-//		this.gameState.is = is;
-//		// TODO Check whether we should do it here or no
-//		// this.publishState();
-//	};
 	
 	Game.prototype.publishState = function() {
 		//node.log('Publishing ' + this.gameState, 'DEBUG');
@@ -3922,9 +3914,10 @@
 			that.pause();
 		});
 		
-		node.on('WAITING...', function(){
-			that.pause();
-		});
+		// TODO: check what is right behavior for this
+//		node.on('WAITING...', function(){
+//			that.pause();
+//		});
 		
 	};
 	
@@ -3959,8 +3952,8 @@
 	
 	TriggerManager.prototype.init = function(options) {
 		this.options = options || this.options;
-		if (options.return === TriggerManager.first || options.return === TriggerManager.last) {
-			this.return = options.return;
+		if (this.options.return === TriggerManager.first || this.options.return === TriggerManager.last) {
+			this.return = this.options.return || this.return;
 		}
 		this.resetTriggers();
 	};
@@ -4004,8 +3997,8 @@
 		  else {
 			  this.triggers.splice(pos, 0, trigger);
 		  }
+		  return true;
 	  };
-	  
 	  
 	  
 	  TriggerManager.prototype.removeTrigger = function (trigger) {
@@ -4044,113 +4037,6 @@
   , ('undefined' !== typeof node) ? node : module.parent.exports
 ); 
  
-(function (exports, node) {
-
-//	/*
-//	 * History
-//	 * 
-//	 * Sends DATA msgs
-//	 * 
-//	 */
-//	
-//	exports.History = History;
-//	
-//	JSUS = node.JSUS;
-//	
-//	History.id = 'History';
-//	History.name = 'History';
-//	History.version = '0.1';
-//	
-//	History.dependencies = {
-//		JSUS: {},
-//		NDDB: {}
-//	};
-//	
-//	History.prototype = new NDDB();
-//	History.prototype.constructor = History;
-//	
-//	function History (options, data) {
-//		NDDB.call(this, options, data); 
-//		var options = options || {};
-//		this.options = options;
-//		
-//		this.history = [];
-//		
-//		this.init(this.options);
-//		
-//	};
-//	
-//	History.prototype.init = function (options) {
-//		
-//	};
-//	
-//	
-//	History.prototype.start = function() {
-//		// fire the event immediately if time is zero
-//		if (this.options.milliseconds === 0){
-//			node.emit(this.timeup);
-//			return;
-//		}
-//		var that = this;
-//		this.timer = setInterval(function() {
-//			that.timePassed = that.timePassed + that.update;
-//			that.timeLeft = that.milliseconds - that.timePassed;
-//			
-//			// Fire custom hooks from the latest to the first if any
-//			for (var i = that.hooks.length; i> 0; i--) {
-//				that.fire(that.hooks[(i-1)]);
-//			}
-//			// Fire Timeup Event
-//			if (that.timeLeft <= 0) {
-//				that.fire(that.timeup);
-//				that.stop();
-//			}
-//			
-//		}, this.update);
-//	};
-//	
-//	/**
-//	 * Add an hook to the hook list after performing conformity checks.
-//	 * The first parameter hook can be a string, a function, or an object
-//	 * containing an hook property.
-//	 */
-//	History.prototype.addHook = function (hook, ctx) {
-//		if (!hook) return;
-//		var ctx = ctx || node.game;
-//		if (hook.hook) {
-//			ctx = hook.ctx || ctx;
-//			var hook = hook.hook;
-//		}
-//		this.hooks.push({hook: hook, ctx: ctx});
-//	};
-//	
-//	History.prototype.pause = function() {
-//		clearInterval(this.timer);
-//	};	
-//
-//	History.prototype.resume = function() {
-//		if (this.timer) return; // timer was not paused
-//		var options = JSUS.extend({milliseconds: this.milliseconds - this.timePassed}, this.options);
-//		this.restart(options);
-//	};	
-//	
-//	History.prototype.stop = function() {
-//		clearInterval(this.timer);
-//		this.timePassed = 0;
-//		this.timeLeft = null;
-//	};	
-//	
-//	History.prototype.restart = function (options) {
-//		var options = options || this.options;
-//		this.init(options);
-//		this.start();
-//	};
-			
-})(
-	'undefined' != typeof node ? node : module.exports
-  , 'undefined' != typeof node ? node : module.parent.exports
-); 
- 
  
  
  
@@ -4161,7 +4047,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 12:26:24 CET 2012
+ * Built on Mi 1. Feb 18:52:50 CET 2012
  *
  */
  
@@ -4828,6 +4714,9 @@
 		};
 		
 		var w = JSUS.getNestedValue(w_str, this.widgets);
+		
+		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
+		
 		if (!w) {
 			node.log('Widget ' + w_str + ' not found.', 'ERR');
 			return;
@@ -4838,7 +4727,7 @@
 		options.id = this.generateUniqueId(w.id);
 		w = new w(options);
 	
-		node.log('nodeWindow: registering gadget ' + w.name + ' v.' +  w.version);
+		
 		//try {
 	
 			// nodeGame listeners
@@ -5892,7 +5781,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 12:26:24 CET 2012
+ * Built on Mi 1. Feb 18:52:50 CET 2012
  *
  */
  
@@ -6906,99 +6795,6 @@
  
  
 (function (exports) {
-	
-	
-	/*
-	 * EventButton
-	 * 
-	 * Sends DATA msgs
-	 * 
-	 */
-	
-	exports.EventButton	= EventButton;
-	
-	JSUS = node.JSUS;
-	
-	EventButton.id = 'eventbutton';
-	EventButton.name = 'Event Button';
-	EventButton.version = '0.2';
-	EventButton.dependencies = {
-		JSUS: {}
-	};
-	
-	function EventButton (options) {
-		this.options = options;
-		this.id = options.id;
-
-		
-		this.root = null;		// the parent element
-		this.text = 'Send';
-		this.button = document.createElement('button');
-		this.func = options.exec || null;
-		this.init(this.options);
-	};
-	
-	EventButton.prototype.init = function (options) {
-		var options = options || this.options;
-		this.button.id = options.id || this.id;
-		var text = options.text || this.text;
-		while (this.button.hasChildNodes()) {
-			this.button.removeChild(this.button.firstChild);
-		}
-		this.button.appendChild(document.createTextNode(text));
-		this.event = options.event || this.event;
-		this.func = options.callback || this.func;
-		var that = this;
-		if (this.event) {
-			// Emit Event only if callback is successful
-			this.button.onclick = function() {
-				var ok = true;
-				if (options.callback) ok = options.callback.call(node.game);
-				if (ok) node.emit(that.event);
-			}
-		}
-		
-		// Emit DONE only if callback is successful
-		this.button.onclick = function() {
-			var ok = true;
-			if (options.exec) ok = options.exec.call(node.game);
-			if (ok) node.emit(that.event);
-		}
-	};
-	
-	EventButton.prototype.append = function (root) {
-		this.root = root;
-		root.appendChild(this.button);
-		return root;	
-	};
-	
-	EventButton.prototype.listeners = function () {};
-		
-	// Done Button
-
-	exports.DoneButton = DoneButton;
-	
-	DoneButton.prototype.__proto__ = EventButton.prototype;
-	DoneButton.prototype.constructor = DoneButton;
-	
-	DoneButton.id = 'donebutton';
-	DoneButton.version = '0.1';
-	DoneButton.name = 'Done Button';
-	DoneButton.dependencies = {
-		EventButton: {}
-	}
-	
-	function DoneButton (options) {
-		options.event = 'DONE';
-		options.text = options.text || 'Done!';
-		EventButton.call(this, options);
-	};
-	
-})(node.window.widgets); 
- 
- 
- 
-(function (exports) {
 
 	var GameState = node.GameState;
 	var PlayerList = node.PlayerList;
@@ -7134,6 +6930,104 @@
 	
 	DynamicTable.prototype.listeners = function () {}; 
 
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+	
+	
+	/*
+	 * EventButton
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
+	
+	exports.EventButton	= EventButton;
+	
+	JSUS = node.JSUS;
+	
+	EventButton.id = 'eventbutton';
+	EventButton.name = 'Event Button';
+	EventButton.version = '0.2';
+	EventButton.dependencies = {
+		JSUS: {}
+	};
+	
+	function EventButton (options) {
+		this.options = options;
+		this.id = options.id;
+
+		this.root = null;		// the parent element
+		this.text = 'Send';
+		this.button = document.createElement('button');
+		this.callback = null;
+		this.init(this.options);
+	};
+	
+	EventButton.prototype.init = function (options) {
+		var options = options || this.options;
+		this.button.id = options.id || this.id;
+		var text = options.text || this.text;
+		while (this.button.hasChildNodes()) {
+			this.button.removeChild(this.button.firstChild);
+		}
+		this.button.appendChild(document.createTextNode(text));
+		this.event = options.event || this.event;
+		this.callback = options.callback || this.callback;
+		var that = this;
+		if (this.event) {
+			// Emit Event only if callback is successful
+			this.button.onclick = function() {
+				var ok = true;
+				if (this.callback){
+					ok = options.callback.call(node.game);
+					console.log(this.callback.toString());
+					console.log('callback exec')
+					console.log('ok');
+					console.log(ok);
+				}
+				if (ok) node.emit(that.event);
+			}
+		}
+		
+//		// Emit DONE only if callback is successful
+//		this.button.onclick = function() {
+//			var ok = true;
+//			if (options.exec) ok = options.exec.call(node.game);
+//			if (ok) node.emit(that.event);
+//		}
+	};
+	
+	EventButton.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.button);
+		return root;	
+	};
+	
+	EventButton.prototype.listeners = function () {};
+		
+	// Done Button
+
+	exports.DoneButton = DoneButton;
+	
+	DoneButton.prototype.__proto__ = EventButton.prototype;
+	DoneButton.prototype.constructor = DoneButton;
+	
+	DoneButton.id = 'donebutton';
+	DoneButton.version = '0.1';
+	DoneButton.name = 'Done Button';
+	DoneButton.dependencies = {
+		EventButton: {}
+	}
+	
+	function DoneButton (options) {
+		options.event = 'DONE';
+		options.text = options.text || 'Done!';
+		EventButton.call(this, options);
+	};
+	
 })(node.window.widgets); 
  
  
@@ -7542,6 +7436,123 @@
 		
 		}); 
 	};
+})(node.window.widgets); 
+ 
+ 
+ 
+(function (exports) {
+
+	/*
+	 * NDDBBrowser
+	 * 
+	 * Sends DATA msgs
+	 * 
+	 */
+	
+	exports.NDDBBrowser = NDDBBrowser;
+	
+	JSUS = node.JSUS;
+	NDDB = node.NDDB;
+	TriggerManager = node.TriggerManager;
+	
+	NDDBBrowser.id = 'NDDBBrowser';
+	NDDBBrowser.name = 'NDDBBrowser';
+	NDDBBrowser.version = '0.1';
+	
+	NDDBBrowser.dependencies = {
+		JSUS: {},
+		NDDB: {},
+		TriggerManager: {}
+	};
+	
+	function NDDBBrowser (options) {
+		var options = options || {};
+		this.options = options;
+		this.id = options.id;
+		this.nddb = null;
+		this.commandsDiv = document.createElement('div');
+		this.init(this.options);
+	};
+	
+	NDDBBrowser.prototype.init = function (options) {
+		
+		function addButtons() {
+			var id = this.id;
+			node.window.addEventButton(id + '_GO_TO_FIRST', '<<', this.commandsDiv, 'go_to_first');
+			node.window.addEventButton(id + '_GO_TO_PREVIOUS', '<', this.commandsDiv, 'go_to_previous');
+			node.window.addEventButton(id + '_GO_TO_NEXT', '>', this.commandsDiv, 'go_to_next');
+			node.window.addEventButton(id + '_GO_TO_LAST', '>>', this.commandsDiv, 'go_to_last');
+		};
+		addButtons.call(this);
+		this.tm = new TriggerManager();
+		this.tm.init(options.triggers);
+		this.nddb = options.nddb || new NDDB();
+	};
+	
+	NDDBBrowser.prototype.append = function (root) {
+		this.root = root;
+		root.appendChild(this.commandsDiv);
+		return root;
+	};
+	
+	NDDBBrowser.prototype.getRoot = function (root) {
+		return this.commandsDiv;
+	};
+	
+	NDDBBrowser.prototype.add = function (o) {
+		return this.nddb.insert(o);
+	};
+	
+	NDDBBrowser.prototype.sort = function (key) {
+		return this.nddb.sort(key);
+	};
+	
+	NDDBBrowser.prototype.addTrigger = function (trigger) {
+		return this.tm.addTrigger(trigger);
+	};
+	
+	NDDBBrowser.prototype.removeTrigger = function (trigger) {
+		return this.tm.removeTrigger(trigger);
+	};
+	
+	NDDBBrowser.prototype.resetTriggers = function () {
+		return this.tm.resetTriggers();
+	};
+	
+	NDDBBrowser.prototype.listeners = function() {
+		var that = this;
+		var id = this.id;
+		
+		node.on(id + '_GO_TO_FIRST', function() {
+			var el = that.tm.pullTriggers(that.nddb.first());
+			console.log('first');
+			console.log(el);
+			node.emit(id + '_GOT', el);
+		});
+		
+		node.on(id + '_GO_TO_PREVIOUS', function() {
+			var el = that.tm.pullTriggers(that.nddb.previous());
+			console.log('previous');
+			console.log(el);
+			node.emit(id + '_GOT', el);
+		});
+		
+		node.on(id + '_GO_TO_NEXT', function() {
+			var el = that.tm.pullTriggers(that.nddb.next());
+			console.log('next');
+			console.log(el);
+			node.emit(id + '_GOT', el);
+		});
+
+		node.on(id + '_GO_TO_LAST', function() {
+			var el = that.tm.pullTriggers(that.nddb.last());
+			console.log('last');
+			console.log(el);
+			node.emit(id + '_GOT', el);
+		});
+	};
+	
+	
 })(node.window.widgets); 
  
  

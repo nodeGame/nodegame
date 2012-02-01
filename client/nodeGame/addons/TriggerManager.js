@@ -24,8 +24,8 @@
 	
 	TriggerManager.prototype.init = function(options) {
 		this.options = options || this.options;
-		if (options.return === TriggerManager.first || options.return === TriggerManager.last) {
-			this.return = options.return;
+		if (this.options.return === TriggerManager.first || this.options.return === TriggerManager.last) {
+			this.return = this.options.return || this.return;
 		}
 		this.resetTriggers();
 	};
@@ -69,8 +69,8 @@
 		  else {
 			  this.triggers.splice(pos, 0, trigger);
 		  }
+		  return true;
 	  };
-	  
 	  
 	  
 	  TriggerManager.prototype.removeTrigger = function (trigger) {

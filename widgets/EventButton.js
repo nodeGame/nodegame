@@ -23,11 +23,10 @@
 		this.options = options;
 		this.id = options.id;
 
-		
 		this.root = null;		// the parent element
 		this.text = 'Send';
 		this.button = document.createElement('button');
-		this.func = options.exec || null;
+		this.callback = null;
 		this.init(this.options);
 	};
 	
@@ -40,23 +39,29 @@
 		}
 		this.button.appendChild(document.createTextNode(text));
 		this.event = options.event || this.event;
-		this.func = options.callback || this.func;
+		this.callback = options.callback || this.callback;
 		var that = this;
 		if (this.event) {
 			// Emit Event only if callback is successful
 			this.button.onclick = function() {
 				var ok = true;
-				if (options.callback) ok = options.callback.call(node.game);
+				if (this.callback){
+					ok = options.callback.call(node.game);
+					console.log(this.callback.toString());
+					console.log('callback exec')
+					console.log('ok');
+					console.log(ok);
+				}
 				if (ok) node.emit(that.event);
 			}
 		}
 		
-		// Emit DONE only if callback is successful
-		this.button.onclick = function() {
-			var ok = true;
-			if (options.exec) ok = options.exec.call(node.game);
-			if (ok) node.emit(that.event);
-		}
+//		// Emit DONE only if callback is successful
+//		this.button.onclick = function() {
+//			var ok = true;
+//			if (options.exec) ok = options.exec.call(node.game);
+//			if (ok) node.emit(that.event);
+//		}
 	};
 	
 	EventButton.prototype.append = function (root) {
