@@ -248,7 +248,7 @@ for (var i=0;i<clients.length;i++) {
 //console.log(o.prototype);
 
 
-var pl = new PlayerList({}, nddb.db);
+//var pl = new PlayerList({}, nddb.db);
 //pl.add({id:124123523423});
 
 //var v = pl.fetch();
@@ -264,7 +264,7 @@ var pl = new PlayerList({}, nddb.db);
 //console.log(pl.fetch());
 
 
-var nddb2 = JSUS.JSUS.clone(nddb.db);
+//var nddb2 = JSUS.JSUS.clone(nddb.db);
 
 
 //console.log('TESTING DIFF and INTERSECT');
@@ -274,20 +274,34 @@ var nddb2 = JSUS.JSUS.clone(nddb.db);
 //console.log(b.size());
 
 
-console.log(nddb.get(2).nddbid);
-console.log(pl.get(2));
+//console.log(nddb.get(2).nddbid);
+//console.log(pl.get(2));
+//
+//var o = pl.select('count','=',1);
+//
+//var v = pl.fetch();
+//for (var i=0; i < v.length; i++) {
+//	console.log(v[i].nddbid);
+//}
+//var v = nddb.fetch();
+//for (var i=0; i < v.length; i++) {
+//	console.log(v[i].nddbid);
+//}
 
-var o = pl.select('count','=',1);
-
-var v = pl.fetch();
-for (var i=0; i < v.length; i++) {
-	console.log(v[i].nddbid);
+var g = nddb.get();
+while (g) {
+	console.log(g);
+	console.log('N');
+	g = nddb.next();
 }
-var v = nddb.fetch();
-for (var i=0; i < v.length; i++) {
-	console.log(v[i].nddbid);
+
+console.log(nddb.nddb_pointer);
+console.log(nddb.size());
+
+
+g = nddb.previous();
+while (g) {
+	console.log(g);
+	console.log('P');
+	g = nddb.previous();
 }
-
-
-
-
