@@ -293,7 +293,9 @@
 	Document.prototype.removeClass = function (el, c) {
 		if (!el || !c) return;
 		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
-		el.className = el.className.replace( regexpr, '' );
+		var o = el.className = el.className.replace( regexpr, '' );
+		console.log('removing class');
+		console.log(o);
 		return el;
 	};
 

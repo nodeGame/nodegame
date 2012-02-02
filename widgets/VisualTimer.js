@@ -108,6 +108,7 @@
 		
 			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
 			if (timer) {
+				that.timerDiv.className = '';
 				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
 				if (!options.timeup) {
 					options.timeup = 'DONE';
@@ -117,6 +118,10 @@
 				that.start();
 			}
 		});
+		
+		node.on('DONE', function(){
+			that.timerDiv.className = 'strike';
+		})
 	};
 	
 })(node.window.widgets);

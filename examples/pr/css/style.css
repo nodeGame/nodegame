@@ -100,3 +100,6 @@ dl#all_ex dd {
   text-decoration: underline;
 }
 
+.strike {
+	text-decoration: line-through;
+}

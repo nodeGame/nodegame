@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 09:48:18 CET 2012
+ * Built on Thu Feb 2 09:56:41 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 09:48:18 CET 2012
+ * Built on Thu Feb 2 09:56:41 CET 2012
  *
  */
  
@@ -4047,7 +4047,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 09:48:18 CET 2012
+ * Built on Thu Feb 2 09:56:41 CET 2012
  *
  */
  
@@ -4347,7 +4347,9 @@
 	Document.prototype.removeClass = function (el, c) {
 		if (!el || !c) return;
 		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
-		el.className = el.className.replace( regexpr, '' );
+		var o = el.className = el.className.replace( regexpr, '' );
+		console.log('removing class');
+		console.log(o);
 		return el;
 	};
 
@@ -5788,7 +5790,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 09:48:18 CET 2012
+ * Built on Thu Feb 2 09:56:41 CET 2012
  *
  */
  
@@ -8131,6 +8133,8 @@
 		
 			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
 			if (timer) {
+				node.window.removeClass(that.timerDiv, 'strike');
+				that.timerDiv.className = '';
 				var options = ('number' === typeof timer) ? {milliseconds: timer} : timer;
 				if (!options.timeup) {
 					options.timeup = 'DONE';
@@ -8140,6 +8144,10 @@
 				that.start();
 			}
 		});
+		
+		node.on('DONE', function(){
+			that.timerDiv.className = 'strike';
+		})
 	};
 	
 })(node.window.widgets); 
