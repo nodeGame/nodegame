@@ -189,12 +189,12 @@
 //				}
 			});
 			
-			node.on('DONE', function(msg) {
+			node.on('DONE', function(p1, p2, p3) {
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
 				if (done) {
-					ok = done.call(that);
+					ok = done.call(that, p1, p2, p3);
 				}
 				if (!ok) return;
 				
@@ -301,7 +301,16 @@
 		
 		var gameState = state || this.next();
 		if (gameState) {
+			
 			var func = this.gameLoop.getFunction(gameState);
+			
+			// Experimental: node.window should load the func as well
+//			if (node.window) {
+//				var frame = this.gameLoop.getAllParams(gameState).frame;
+//				node.window.loadFrame(frame);
+//			}
+			
+			
 			
 			if (func) {
 				gameState.is = GameState.iss.LOADING;

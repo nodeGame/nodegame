@@ -155,14 +155,17 @@
 				//node.log(all[i]);
 				
 				// If op is defined do that
-				var state = op;
-				
 				// Otherwise toggle
-				if (!state) {
-					state = all[i].disabled ? false : true;
-				}
+				state = ('undefined' !== typeof op) ? op 
+													: all[i].disabled ? false 
+																	  : true;
 				
-				all[i].disabled = state;
+				if (state) {
+					all[i].disabled = state;
+				}
+				else {
+					all[i].removeAttribute('disabled');
+				}
 			}
 		}
 	};
@@ -244,6 +247,7 @@
 	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
+		if (!url) return;
  		
  		this.state = GameState.iss.LOADING;
  		this.areLoading++; // keep track of nested call to loadFrame
@@ -259,6 +263,19 @@
 	
 		// Then update the frame location
 		window.frames[frame].location = url;
+		// Adding a reference to nodeGame also in the iframe
+		window.frames[frame].window.node = node;
+		console.log('the frame just as it is');
+		console.log(window.frames[frame]);
+		// Experimental
+//		if (url === 'blank') {
+//			window.frames[frame].src = this.getBlankPage();
+//			window.frames[frame].location = '';
+//		}
+//		else {
+//			window.frames[frame].location = url;
+//		}
+		
  						
  	};
  	
@@ -479,7 +496,6 @@
 			var root = root || this.frame.body;
 			root = root.lastElementChild || root;
 		}
-		
 		var b = this.addButton(root, id, text, attributes);
 		b.onclick = function () {
 			node.emit(event);

@@ -5,7 +5,7 @@
 <iframe name='culo' id='culo'>
   <html>
   <body>
-   <div id="macho">
+   <div id="macho" onclick="function(){alert('click')};" style="background:blue;">
    	sadadfa
    </div>
 	 <div>
@@ -24,56 +24,58 @@
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
  -->
 <script>
-window.onload = function(){
+window.onload = function() {
 
-
- function Ah (prefix) {
-    var search = [window];
-    if (window.frames) {
-      search = search.concat(window.frames);
-    }
+a = 'culo';
+	
+	
+//  function Ah (prefix) {
+//     var search = [window];
+//     if (window.frames) {
+//       search = search.concat(window.frames);
+//     }
     
-    function scanDocuments(id) {
-      var found = true;
-      while (found) {
-        for (var i=0; i< search.length; i++) {
-          var document = search[i].document;
-          var oDoc = search[i].contentWindow || search[i].contentDocument;
-					console.log(oDoc);
-          if (oDoc && oDoc.document) {
-            var document = oDoc.document;
-            console.log('ah!');
-          }
-          console.log(document);
-          found = document.getElementById(id);
-          if (found) {
-            id = '' + id + '_' + JSUS.randomInt(0, 1000);
-            break;
-          }
-        }
-      }
-      return id;
-    };
+//     function scanDocuments(id) {
+//       var found = true;
+//       while (found) {
+//         for (var i=0; i< search.length; i++) {
+//           var document = search[i].document;
+//           var oDoc = search[i].contentWindow || search[i].contentDocument;
+// 					console.log(oDoc);
+//           if (oDoc && oDoc.document) {
+//             var document = oDoc.document;
+//             console.log('ah!');
+//           }
+//           console.log(document);
+//           found = document.getElementById(id);
+//           if (found) {
+//             id = '' + id + '_' + JSUS.randomInt(0, 1000);
+//             break;
+//           }
+//         }
+//       }
+//       return id;
+//     };
 
-    return scanDocuments(prefix);
-  };
+//     return scanDocuments(prefix);
+//   };
 	
 	
-	function getFrameWindow(frameId) {
-  var frame = document.getElementById(frameId);
-  var result = null;
-  if (frame.contentDocument) {
-    // For NS6
-    result = frame.contentDocument.window || frame.contentDocument.defaultView; 
-  } else if (frame.contentWindow) {
-    // For IE5.5 and IE6
-    result = frame.contentWindow;
-  } else if (frame.document) {
-    // For IE5
-    result = frame.document.window;
-  }
-  return result;
-}
+// 	function getFrameWindow(frameId) {
+//   var frame = document.getElementById(frameId);
+//   var result = null;
+//   if (frame.contentDocument) {
+//    For NS6
+//     result = frame.contentDocument.window || frame.contentDocument.defaultView; 
+//   } else if (frame.contentWindow) {
+//    For IE5.5 and IE6
+//     result = frame.contentWindow;
+//   } else if (frame.document) {
+//    For IE5
+//     result = frame.document.window;
+//   }
+//   return result;
+// }
 
 //var w = window.frames['culo'];
 //var t = window.frames['culo'].frameElement.innerHTML;

@@ -83,30 +83,31 @@
 		
 		node.on(id + '_GO_TO_FIRST', function() {
 			var el = that.tm.pullTriggers(that.nddb.first());
+			if (el) node.emit(id + '_GOT', el);
 			console.log('first');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 		
 		node.on(id + '_GO_TO_PREVIOUS', function() {
 			var el = that.tm.pullTriggers(that.nddb.previous());
+			if (el) node.emit(id + '_GOT', el); 
 			console.log('previous');
 			console.log(el);
-			node.emit(id + '_GOT', el);
+			
 		});
 		
 		node.on(id + '_GO_TO_NEXT', function() {
 			var el = that.tm.pullTriggers(that.nddb.next());
+			if (el) node.emit(id + '_GOT', el); 
 			console.log('next');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 
 		node.on(id + '_GO_TO_LAST', function() {
 			var el = that.tm.pullTriggers(that.nddb.last());
+			if (el) node.emit(id + '_GOT', el);
 			console.log('last');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 	};
 	

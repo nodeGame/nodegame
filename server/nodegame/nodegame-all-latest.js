@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 10:02:25 CET 2012
+ * Built on Thu Feb 2 14:30:14 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 10:02:25 CET 2012
+ * Built on Thu Feb 2 14:30:14 CET 2012
  *
  */
  
@@ -1244,16 +1244,7 @@
 	NDDB.prototype.fetchKeyValues = function (key) {
 		return this.fetch(key, 'KEY_VALUES');
 	};
-		
-	NDDB.prototype.first = function (key) {
-		return this.fetch(key)[0];
-	};
-	
-	NDDB.prototype.last = function (key) {
-		var db = this.fetch(key);
-		return (db.length > 0) ? db[db.length-1] : undefined;
-	};
-	
+			
 	NDDB.prototype.limit = function (limit) {
 		if (limit === 0) return this.create();
 		var db = (limit > 0) ? this.db.slice(0, limit) :
@@ -1460,15 +1451,37 @@
 		return this.db[pos];
 	};
 	
+	NDDB.prototype.first = function (key) {
+		var db = this.fetch(key);
+		if (db.length > 0) {
+			this.nddb_pointer = db[0].nddbid;
+			console.log('Pointer ' + this.nddb_pointer);
+			return db[0];
+		}
+		return undefined;
+	};
+	
+	NDDB.prototype.last = function (key) {
+		var db = this.fetch(key);
+		if (db.length > 0) {
+			this.nddb_pointer = db[db.length-1].nddbid;
+			console.log('Pointer ' + this.nddb_pointer);
+			return db[db.length-1];
+		}
+		return undefined;
+	};
+	
 	NDDB.prototype.next = function () {
 		var el = NDDB.prototype.get.call(this, ++this.nddb_pointer);
 		if (!el) this.nddb_pointer--;
+		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
 	NDDB.prototype.previous = function () {
 		var el = NDDB.prototype.get.call(this, --this.nddb_pointer);
 		if (!el) this.nddb_pointer++;
+		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
@@ -3145,12 +3158,12 @@
 //				}
 			});
 			
-			node.on('DONE', function(msg) {
+			node.on('DONE', function(p1, p2, p3) {
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
 				if (done) {
-					ok = done.call(that);
+					ok = done.call(that, p1, p2, p3);
 				}
 				if (!ok) return;
 				
@@ -3257,7 +3270,16 @@
 		
 		var gameState = state || this.next();
 		if (gameState) {
+			
 			var func = this.gameLoop.getFunction(gameState);
+			
+			// Experimental: node.window should load the func as well
+//			if (node.window) {
+//				var frame = this.gameLoop.getAllParams(gameState).frame;
+//				node.window.loadFrame(frame);
+//			}
+			
+			
 			
 			if (func) {
 				gameState.is = GameState.iss.LOADING;
@@ -4047,7 +4069,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 10:02:25 CET 2012
+ * Built on Thu Feb 2 14:30:14 CET 2012
  *
  */
  
@@ -4410,6 +4432,12 @@
 		return scanDocuments(prefix + '_' + JSUS.randomInt(0, 10000000));
 		//return scanDocuments(prefix);
 	};
+	
+	Document.prototype.getBlankPage = function() {
+		var html = document.createElement('html');
+		html.appendChild(document.createElement('body'));
+		return html;
+	};
 
 })(window.node); 
  
@@ -4570,14 +4598,17 @@
 				//node.log(all[i]);
 				
 				// If op is defined do that
-				var state = op;
-				
 				// Otherwise toggle
-				if (!state) {
-					state = all[i].disabled ? false : true;
-				}
+				state = ('undefined' !== typeof op) ? op 
+													: all[i].disabled ? false 
+																	  : true;
 				
-				all[i].disabled = state;
+				if (state) {
+					all[i].disabled = state;
+				}
+				else {
+					all[i].removeAttribute('disabled');
+				}
 			}
 		}
 	};
@@ -4659,6 +4690,7 @@
 	};
 	
 	GameWindow.prototype.load = GameWindow.prototype.loadFrame = function (url, func, frame) {
+		if (!url) return;
  		
  		this.state = GameState.iss.LOADING;
  		this.areLoading++; // keep track of nested call to loadFrame
@@ -4674,6 +4706,19 @@
 	
 		// Then update the frame location
 		window.frames[frame].location = url;
+		// Adding a reference to nodeGame also in the iframe
+		window.frames[frame].window.node = node;
+		console.log('the frame just as it is');
+		console.log(window.frames[frame]);
+		// Experimental
+//		if (url === 'blank') {
+//			window.frames[frame].src = this.getBlankPage();
+//			window.frames[frame].location = '';
+//		}
+//		else {
+//			window.frames[frame].location = url;
+//		}
+		
  						
  	};
  	
@@ -4894,7 +4939,6 @@
 			var root = root || this.frame.body;
 			root = root.lastElementChild || root;
 		}
-		
 		var b = this.addButton(root, id, text, attributes);
 		b.onclick = function () {
 			node.emit(event);
@@ -5153,7 +5197,8 @@
 		this.DL = null;
 		this.auto_update = this.options.auto_update || false;
 		this.htmlRenderer = null; 
-	    
+	    this.lifo = false;
+		
 	    this.init(this.options);
 	  };
 	  
@@ -5170,6 +5215,34 @@
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update
 																		: this.auto_update;
 	    
+		var lifo = this.lifo = ('undefined' !== typeof options.lifo) ? options.lifo : this.lifo;
+		
+		this.globalCompare = function (o1, o2) {
+			if (!o1 && !o2) return 0;
+			if (!o2) return 1;
+			if (!o1) return -1;
+
+			// FIFO
+			if (!lifo) {
+				if (o1.dt < o2.dt) return -1;
+				if (o1.dt > o2.dt) return 1;
+			}
+			else {
+				if (o1.dt < o2.dt) return 1;
+				if (o1.dt > o2.dt) return -1;
+			}
+			if (o1.dt === o2.dt) {
+				if ('undefined' === typeof o1.dd) return -1;
+				if ('undefined'=== typeof o2.dd) return 1;
+				if (o1.dd < o2.dd) return -1;
+				if (o1.dd > o2.dd) return 1;
+				if (o1.nddbid < o2.nddbid) return 1;
+				if (o1.nddbid > o2.nddbid) return -1;
+			}
+			return 0;
+		}; 
+	    
+		
 		this.DL = options.list || document.createElement(this.FIRST_LEVEL);
 		this.DL.id = options.id || this.id;
 		if (options.className) {
@@ -5183,23 +5256,6 @@
 		//this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
 		this.htmlRenderer = new HTMLRenderer({render: options.render});
 	  };
-	
-	List.prototype.globalCompare = function (o1, o2) {
-		if (!o1 && !o2) return 0;
-		if (!o2) return 1;
-		if (!o1) return -1;
-		if (o1.dt < o2.dt) return -1;
-		if (o1.dt > o2.dt) return 1;
-		if (o1.dt === o2.dt) {
-			if ('undefined' === typeof o1.dd) return -1;
-			if ('undefined'=== typeof o2.dd) return 1;
-			if (o1.dd < o2.dd) return -1;
-			if (o1.dd > o2.dd) return 1;
-			if (o1.nddbid < o2.nddbid) return 1;
-			if (o1.nddbid > o2.nddbid) return -1;
-		}
-		return 0;
-	}; 
 	
 	List.prototype._add = function (node) {
 		if (!node) return;
@@ -5790,7 +5846,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 10:02:25 CET 2012
+ * Built on Thu Feb 2 14:30:14 CET 2012
  *
  */
  
@@ -7534,30 +7590,31 @@
 		
 		node.on(id + '_GO_TO_FIRST', function() {
 			var el = that.tm.pullTriggers(that.nddb.first());
+			if (el) node.emit(id + '_GOT', el);
 			console.log('first');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 		
 		node.on(id + '_GO_TO_PREVIOUS', function() {
 			var el = that.tm.pullTriggers(that.nddb.previous());
+			if (el) node.emit(id + '_GOT', el); 
 			console.log('previous');
 			console.log(el);
-			node.emit(id + '_GOT', el);
+			
 		});
 		
 		node.on(id + '_GO_TO_NEXT', function() {
 			var el = that.tm.pullTriggers(that.nddb.next());
+			if (el) node.emit(id + '_GOT', el); 
 			console.log('next');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 
 		node.on(id + '_GO_TO_LAST', function() {
 			var el = that.tm.pullTriggers(that.nddb.last());
+			if (el) node.emit(id + '_GOT', el);
 			console.log('last');
 			console.log(el);
-			node.emit(id + '_GOT', el);
 		});
 	};
 	

@@ -16,7 +16,7 @@ function PeerReviewGame () {
 		this.header = document.getElementById('gn_header');
 		this.vs = node.window.addWidget('VisualState', this.header);
 		this.timer = node.window.addWidget('VisualTimer', this.header);
-		this.timer = node.window.addWidget('DoneButton', this.header);
+		this.doneb = node.window.addWidget('DoneButton', this.header);
 		this.sd = node.window.addWidget('StateDisplay', this.header);
 		this.outlet = null;
 		this.exs = ['A','B','C'];
@@ -35,8 +35,11 @@ function PeerReviewGame () {
 		this.evas = {};
 		
 		this.all_ex = new node.window.List({ id: 'all_ex',
-											 title: 'History of previous exhibitions'
+											 title: 'History of previous exhibitions',
+											 lifo: true
 		});
+		
+		
 		
 		this.personal_history = node.window.getWidget('NDDBBrowser', 'ph');
 		
@@ -135,7 +138,7 @@ function PeerReviewGame () {
 						   controls: false,
 						   change: false,
 						   onclick: function() {
-								//node.game.personal_history.add(node.game.cf.getAllValues());
+								node.game.personal_history.add(node.game.cf.getAllValues());
 								node.game.cf.draw(this.getAllValues());
 						   }
 				};
@@ -170,7 +173,7 @@ function PeerReviewGame () {
 	var creation = function() {
 
 		node.window.loadFrame('creation.html', function() {
-			
+	
 			var creationDiv = node.window.getElementById('creation');
 			this.personal_history.append(creationDiv);
 			
@@ -187,17 +190,19 @@ function PeerReviewGame () {
 			
 			// History of previous exhibits
 			var historyDiv = node.window.getElementById('history');
-			//this.all_ex.reverse();
+
 			this.all_ex.parse();
 			node.window.write(this.all_ex.getRoot(), historyDiv);
 			
 			// Adding to history
-			node.on(this.cf.change, function(){
+			node.on(this.cf.change, function() {
+				console.log('adding..!')
 				this.personal_history.add(this.cf.getAllValues());
 			});
 			
 			// Pulling back from history
-			node.on(this.personal_history.id + '_GOT', function (face){
+			node.on(this.personal_history.id + '_GOT', function (face) {
+				console.log('drawing..')
 				node.game.cf.draw(face);
 			});
 			
@@ -207,52 +212,57 @@ function PeerReviewGame () {
 	};
 	
 	var submission = function() {
-		var root = node.window.getElementById('creation');
 		
-		node.emit('INPUT_DISABLE');
+		node.emit('HIDE', 'waiting_sub');
+		node.emit('SHOW', 'active_sub');
 		
-		var ctrl_options = { id: 'exhib',
-							 name: 'exhib',
-							 fieldset: {
-										legend: 'Exhibitions'
-							 },
-							 //change: 'SUBMISSION_DONE',
-							 //fieldset: false,
-							 submit: false,
-//							 submit: {
-//								 		value: 'Submit'
-//							 },
-							 features: {
-										ex_A: { 
-											value: 'A',
-											label: 'A'
-										},
-										ex_B: { 
-												value: 'B',
-												label: 'B'
-										},
-										ex_C: { 
-												value: 'C',
-												label: 'C'
-										}
-							}
-		};
-		
-		this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
-		
-		// AUTOPLAY
-		node.random.exec(function(){
-			var choice = Math.random();
-			if (choice < 0.33) {
-				node.window.getElementById('ex_A').click();
-			}
-			else if (choice < 0.66) {
-				node.window.getElementById('ex_B').click();
-			}
-			else {
-				node.window.getElementById('ex_C').click();
-			}
-		}, 10);
+//		node.window.loadFrame('postgame.html', function() {
+//			
+//			var root = node.window.getElementById('root');
+//			console.log('Found');
+//			console.log(root);
+	
+			
+			//node.emit('INPUT_DISABLE');
+//			
+//			var ctrl_options = { id: 'exhib',
+//								 name: 'exhib',
+//								 fieldset: {
+//											legend: 'Exhibitions'
+//								 },
+//								 submit: false,
+//								 features: {
+//											ex_A: { 
+//												value: 'A',
+//												label: 'A'
+//											},
+//											ex_B: { 
+//													value: 'B',
+//													label: 'B'
+//											},
+//											ex_C: { 
+//													value: 'C',
+//													label: 'C'
+//											}
+//								}
+//			};
+//			
+//			this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
+			
+			// AUTOPLAY
+//			node.random.exec(function(){
+//				var choice = Math.random();
+//				if (choice < 0.33) {
+//					node.window.getElementById('ex_A').click();
+//				}
+//				else if (choice < 0.66) {
+//					node.window.getElementById('ex_B').click();
+//				}
+//				else {
+//					node.window.getElementById('ex_C').click();
+//				}
+//			}, 10);
+//		});
 		
 		console.log('Submission');
 	};	
@@ -386,18 +396,28 @@ function PeerReviewGame () {
 		2: {state: submission,
 			name: 'Submission',
 			timer: 10000,
-			done: function () {
-				if (!this.outlet.hasChanged) {
-					this.outlet.highlight();
+//			frame: 'postgame.html',
+			done: function (ex) {
+				if (!JSUS.in_array(ex, ['A','B','C'])) {
 					alert('You must select an outlet for your creation NOW!!');
 					this.timer.restart({timer: 5000});
 					return false;
 				}
-				
-				node.emit('INPUT_DISABLE');
-				node.set('SUB', this.outlet.getAllValues());
+				node.set('SUB', ex);
 				return true;
 			}
+//			done: function () {
+//				if (!this.outlet.hasChanged) {
+//					this.outlet.highlight();
+//					alert('You must select an outlet for your creation NOW!!');
+//					this.timer.restart({timer: 5000});
+//					return false;
+//				}
+//				
+//				//node.emit('INPUT_DISABLE');
+//				node.set('SUB', this.outlet.getAllValues());
+//				return true;
+//			}
 		},
 		
 		3: {state: evaluation,

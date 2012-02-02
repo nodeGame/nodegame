@@ -28,7 +28,8 @@
 		this.DL = null;
 		this.auto_update = this.options.auto_update || false;
 		this.htmlRenderer = null; 
-	    
+	    this.lifo = false;
+		
 	    this.init(this.options);
 	  };
 	  
@@ -45,6 +46,34 @@
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update
 																		: this.auto_update;
 	    
+		var lifo = this.lifo = ('undefined' !== typeof options.lifo) ? options.lifo : this.lifo;
+		
+		this.globalCompare = function (o1, o2) {
+			if (!o1 && !o2) return 0;
+			if (!o2) return 1;
+			if (!o1) return -1;
+
+			// FIFO
+			if (!lifo) {
+				if (o1.dt < o2.dt) return -1;
+				if (o1.dt > o2.dt) return 1;
+			}
+			else {
+				if (o1.dt < o2.dt) return 1;
+				if (o1.dt > o2.dt) return -1;
+			}
+			if (o1.dt === o2.dt) {
+				if ('undefined' === typeof o1.dd) return -1;
+				if ('undefined'=== typeof o2.dd) return 1;
+				if (o1.dd < o2.dd) return -1;
+				if (o1.dd > o2.dd) return 1;
+				if (o1.nddbid < o2.nddbid) return 1;
+				if (o1.nddbid > o2.nddbid) return -1;
+			}
+			return 0;
+		}; 
+	    
+		
 		this.DL = options.list || document.createElement(this.FIRST_LEVEL);
 		this.DL.id = options.id || this.id;
 		if (options.className) {
@@ -58,23 +87,6 @@
 		//this.htmlRenderer = new HTMLRenderer({renderers: options.renderer});
 		this.htmlRenderer = new HTMLRenderer({render: options.render});
 	  };
-	
-	List.prototype.globalCompare = function (o1, o2) {
-		if (!o1 && !o2) return 0;
-		if (!o2) return 1;
-		if (!o1) return -1;
-		if (o1.dt < o2.dt) return -1;
-		if (o1.dt > o2.dt) return 1;
-		if (o1.dt === o2.dt) {
-			if ('undefined' === typeof o1.dd) return -1;
-			if ('undefined'=== typeof o2.dd) return 1;
-			if (o1.dd < o2.dd) return -1;
-			if (o1.dd > o2.dd) return 1;
-			if (o1.nddbid < o2.nddbid) return 1;
-			if (o1.nddbid > o2.nddbid) return -1;
-		}
-		return 0;
-	}; 
 	
 	List.prototype._add = function (node) {
 		if (!node) return;

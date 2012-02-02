@@ -501,16 +501,7 @@
 	NDDB.prototype.fetchKeyValues = function (key) {
 		return this.fetch(key, 'KEY_VALUES');
 	};
-		
-	NDDB.prototype.first = function (key) {
-		return this.fetch(key)[0];
-	};
-	
-	NDDB.prototype.last = function (key) {
-		var db = this.fetch(key);
-		return (db.length > 0) ? db[db.length-1] : undefined;
-	};
-	
+			
 	NDDB.prototype.limit = function (limit) {
 		if (limit === 0) return this.create();
 		var db = (limit > 0) ? this.db.slice(0, limit) :
@@ -717,15 +708,37 @@
 		return this.db[pos];
 	};
 	
+	NDDB.prototype.first = function (key) {
+		var db = this.fetch(key);
+		if (db.length > 0) {
+			this.nddb_pointer = db[0].nddbid;
+			console.log('Pointer ' + this.nddb_pointer);
+			return db[0];
+		}
+		return undefined;
+	};
+	
+	NDDB.prototype.last = function (key) {
+		var db = this.fetch(key);
+		if (db.length > 0) {
+			this.nddb_pointer = db[db.length-1].nddbid;
+			console.log('Pointer ' + this.nddb_pointer);
+			return db[db.length-1];
+		}
+		return undefined;
+	};
+	
 	NDDB.prototype.next = function () {
 		var el = NDDB.prototype.get.call(this, ++this.nddb_pointer);
 		if (!el) this.nddb_pointer--;
+		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
 	NDDB.prototype.previous = function () {
 		var el = NDDB.prototype.get.call(this, --this.nddb_pointer);
 		if (!el) this.nddb_pointer++;
+		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	

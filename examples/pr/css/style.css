@@ -92,6 +92,18 @@ dl#all_ex dd {
 	font-weight: normal;
 }
 
+table#create_sub_his {
+  border: 1px solid #CCC;
+  vertical-align: top;
+}
+
+table#create_sub_his td{
+  border: 1px solid #CCC;
+  vertical-align: top;
+}
+
+/* General nodeGame */
+
 .strong {
 	font-weight: bold;
 }

@@ -356,5 +356,11 @@
 		return scanDocuments(prefix + '_' + JSUS.randomInt(0, 10000000));
 		//return scanDocuments(prefix);
 	};
+	
+	Document.prototype.getBlankPage = function() {
+		var html = document.createElement('html');
+		html.appendChild(document.createElement('body'));
+		return html;
+	};
 
 })(window.node);
