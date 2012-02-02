@@ -203,7 +203,7 @@
 				
 				if (this.auto_wait) {
 					if (node.window) {
-						//node.emit('WAITING...');
+						node.emit('WAITING...');
 					}
 				}
 			});
