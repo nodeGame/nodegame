@@ -107,14 +107,8 @@
   Table.prototype.addClass = function (c) {
 	if (!c) return;
 	if (c instanceof Array) c = c.join(' ');
-	
 	this.forEach(function (el) {
-		if (!el.className) {
-			el.className = c;
-		} 
-		else {
-			el.className += ' ' + c;
-		}
+		node.window.addClass(el, c);
 	});
 	
 	if (this.auto_update) {

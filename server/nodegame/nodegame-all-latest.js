@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 18:52:50 CET 2012
+ * Built on Thu Feb 2 09:48:18 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 18:52:50 CET 2012
+ * Built on Thu Feb 2 09:48:18 CET 2012
  *
  */
  
@@ -4047,7 +4047,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 18:52:50 CET 2012
+ * Built on Thu Feb 2 09:48:18 CET 2012
  *
  */
  
@@ -4344,11 +4344,24 @@
 		return elem.setAttribute('style',style);
 	};
 	
-	Document.prototype.removeClass = function (element, className) {
-		var regexpr = '/(?:^|\s)' + className + '(?!\S)/';
-		element.className = element.className.replace( regexpr, '' );
+	Document.prototype.removeClass = function (el, c) {
+		if (!el || !c) return;
+		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
+		el.className = el.className.replace( regexpr, '' );
+		return el;
 	};
 
+	Document.prototype.addClass = function (el, c) {
+		if (!el || !c) return;
+		if (c instanceof Array) c = c.join(' ');
+		if ('undefined' === typeof el.className) {
+			el.className = c;
+		} 
+		else {
+			el.className += ' ' + c;
+		}
+		return el;
+	  };
 	
 	Document.prototype.removeChildrenFromNode = function (e) {
 		
@@ -5413,14 +5426,8 @@
   Table.prototype.addClass = function (c) {
 	if (!c) return;
 	if (c instanceof Array) c = c.join(' ');
-	
 	this.forEach(function (el) {
-		if (!el.className) {
-			el.className = c;
-		} 
-		else {
-			el.className += ' ' + c;
-		}
+		node.window.addClass(el, c);
 	});
 	
 	if (this.auto_update) {
@@ -5781,7 +5788,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Mi 1. Feb 18:52:50 CET 2012
+ * Built on Thu Feb 2 09:48:18 CET 2012
  *
  */
  

@@ -290,11 +290,24 @@
 		return elem.setAttribute('style',style);
 	};
 	
-	Document.prototype.removeClass = function (element, className) {
-		var regexpr = '/(?:^|\s)' + className + '(?!\S)/';
-		element.className = element.className.replace( regexpr, '' );
+	Document.prototype.removeClass = function (el, c) {
+		if (!el || !c) return;
+		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
+		el.className = el.className.replace( regexpr, '' );
+		return el;
 	};
 
+	Document.prototype.addClass = function (el, c) {
+		if (!el || !c) return;
+		if (c instanceof Array) c = c.join(' ');
+		if ('undefined' === typeof el.className) {
+			el.className = c;
+		} 
+		else {
+			el.className += ' ' + c;
+		}
+		return el;
+	  };
 	
 	Document.prototype.removeChildrenFromNode = function (e) {
 		
