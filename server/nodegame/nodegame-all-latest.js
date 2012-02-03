@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 14:30:14 CET 2012
+ * Built on Fri Feb 3 11:07:01 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 14:30:14 CET 2012
+ * Built on Fri Feb 3 11:07:01 CET 2012
  *
  */
  
@@ -781,22 +781,26 @@
 	 */
 	
 	function NDDB (options, db) {				
-		// Default settings
-		this.options = {};
-
+		var options = options || {};
+		
 		this.D = {};			// The n-dimensional container for comparator functions
 		this.nddb_pointer = 0;	// Pointer for iterating along all the elements
 		
-		if (options) {
-			this.options = options;
-			NDDB.log = options.log || NDDB.log;
-			this.D = options.D || this.D;
-			if ('undefined' !== typeof options.parentDB) {
-				this.parentDB = options.parentDB;
-			}	
-			this.nddb_pointer = options.nddb_pointer;
-		}
+		this.options = options;
+		NDDB.log = options.log || NDDB.log;
+		this.D = options.D || this.D;
+		if ('undefined' !== typeof options.parentDB) {
+			this.parentDB = options.parentDB;
+		}	
+		this.nddb_pointer = options.nddb_pointer;
+		this.auto_update_pointer = ('undefined' !== typeof options.auto_update_pointer) ?
+										options.auto_update_pointer
+									:	false;
+		
+		this.tags = options.tags || {};
+		
 		this.db = this.initDB(db);	// The actual database
+		
 		
 
 	};
@@ -916,6 +920,10 @@
 	
 	NDDB.prototype.insert = function (o) {
 		this.db.push(this.masquerade(o));
+		if (this.auto_update_pointer) {
+			this.nddb_pointer = this.db.length-1;
+			console.log('Pointer ' + this.nddb_pointer);
+		}
 	};
 	
 	// Sorting Operation
@@ -1483,6 +1491,20 @@
 		if (!el) this.nddb_pointer++;
 		console.log('Pointer ' + this.nddb_pointer);
 		return el;
+	};
+	
+	NDDB.prototype.tag = function (tag, idx) {
+		if ('undefined' === typeof tag) {
+			NDDB.log('Cannot register empty tag.', 'ERR');
+			return;
+		}
+		var idx = idx || this.nddb_pointer;
+		this.tags[tag] = idx;
+	};
+	
+	NDDB.prototype.resolveTag = function (tag) {
+		if (!tag) return false;
+		return this.tags[tag];
 	};
 	
 })(
@@ -4069,7 +4091,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 14:30:14 CET 2012
+ * Built on Fri Feb 3 11:07:01 CET 2012
  *
  */
  
@@ -4784,7 +4806,10 @@
 		
 		if (! this.checkDependencies(w)) return false;
 		
-		options.id = this.generateUniqueId(w.id);
+		var id = ('undefined' !== typeof options.id) ? options.id : w.id; 
+		options.id = this.generateUniqueId(id);
+		
+		
 		w = new w(options);
 	
 		
@@ -4934,6 +4959,10 @@
 	
 	
 	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
+		console.log(event);
+		console.log(text);
+		console.log(root);
+		console.log(id);
 		if (!event) return;
 		if (!root) {
 			var root = root || this.frame.body;
@@ -5846,7 +5875,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Thu Feb 2 14:30:14 CET 2012
+ * Built on Fri Feb 3 11:07:01 CET 2012
  *
  */
  
@@ -7520,7 +7549,7 @@
 	NDDB = node.NDDB;
 	TriggerManager = node.TriggerManager;
 	
-	NDDBBrowser.id = 'NDDBBrowser';
+	NDDBBrowser.id = 'nddbbrowser';
 	NDDBBrowser.name = 'NDDBBrowser';
 	NDDBBrowser.version = '0.1';
 	
@@ -7531,11 +7560,11 @@
 	};
 	
 	function NDDBBrowser (options) {
-		var options = options || {};
 		this.options = options;
 		this.id = options.id;
 		this.nddb = null;
 		this.commandsDiv = document.createElement('div');
+		this.info = null;
 		this.init(this.options);
 	};
 	
@@ -7547,11 +7576,20 @@
 			node.window.addEventButton(id + '_GO_TO_PREVIOUS', '<', this.commandsDiv, 'go_to_previous');
 			node.window.addEventButton(id + '_GO_TO_NEXT', '>', this.commandsDiv, 'go_to_next');
 			node.window.addEventButton(id + '_GO_TO_LAST', '>>', this.commandsDiv, 'go_to_last');
+			node.window.addBreak(this.commandsDiv);
 		};
+		function addInfoBar() {
+			var span = this.commandsDiv.appendChild(document.createElement('span'));
+			return span;
+		}
+		
+		
 		addButtons.call(this);
+		this.info = addInfoBar.call(this);
+		
 		this.tm = new TriggerManager();
 		this.tm.init(options.triggers);
-		this.nddb = options.nddb || new NDDB();
+		this.nddb = options.nddb || new NDDB({auto_update_pointer: true});
 	};
 	
 	NDDBBrowser.prototype.append = function (root) {
@@ -7588,34 +7626,45 @@
 		var that = this;
 		var id = this.id;
 		
+		function notification (el, text) {
+			if (el) {
+				node.emit(id + '_GOT', el);
+				this.writeInfo((this.nddb.nddb_pointer + 1) + '/' + this.nddb.size());
+			}
+			else {
+				this.writeInfo('No element found');
+			}
+		};
+		
 		node.on(id + '_GO_TO_FIRST', function() {
 			var el = that.tm.pullTriggers(that.nddb.first());
-			if (el) node.emit(id + '_GOT', el);
-			console.log('first');
-			console.log(el);
+			notification.call(that, el);
 		});
 		
 		node.on(id + '_GO_TO_PREVIOUS', function() {
 			var el = that.tm.pullTriggers(that.nddb.previous());
-			if (el) node.emit(id + '_GOT', el); 
-			console.log('previous');
-			console.log(el);
-			
+			notification.call(that, el);
 		});
 		
 		node.on(id + '_GO_TO_NEXT', function() {
 			var el = that.tm.pullTriggers(that.nddb.next());
-			if (el) node.emit(id + '_GOT', el); 
-			console.log('next');
-			console.log(el);
+			notification.call(that, el);
 		});
 
 		node.on(id + '_GO_TO_LAST', function() {
 			var el = that.tm.pullTriggers(that.nddb.last());
-			if (el) node.emit(id + '_GOT', el);
-			console.log('last');
-			console.log(el);
+			notification.call(that, el);
+			
 		});
+	};
+	
+	NDDBBrowser.prototype.writeInfo = function (text) {
+		if (this.infoTimeout) clearTimeout(this.infoTimeout);
+		this.info.innerHTML = text;
+		var that = this;
+		this.infoTimeout = setTimeout(function(){
+			that.info.innerHTML = '';
+		}, 2000);
 	};
 	
 	

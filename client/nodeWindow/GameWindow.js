@@ -341,7 +341,10 @@
 		
 		if (! this.checkDependencies(w)) return false;
 		
-		options.id = this.generateUniqueId(w.id);
+		var id = ('undefined' !== typeof options.id) ? options.id : w.id; 
+		options.id = this.generateUniqueId(id);
+		
+		
 		w = new w(options);
 	
 		
@@ -491,6 +494,10 @@
 	
 	
 	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
+		console.log(event);
+		console.log(text);
+		console.log(root);
+		console.log(id);
 		if (!event) return;
 		if (!root) {
 			var root = root || this.frame.body;

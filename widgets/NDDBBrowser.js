@@ -13,7 +13,7 @@
 	NDDB = node.NDDB;
 	TriggerManager = node.TriggerManager;
 	
-	NDDBBrowser.id = 'NDDBBrowser';
+	NDDBBrowser.id = 'nddbbrowser';
 	NDDBBrowser.name = 'NDDBBrowser';
 	NDDBBrowser.version = '0.1';
 	
@@ -24,11 +24,11 @@
 	};
 	
 	function NDDBBrowser (options) {
-		var options = options || {};
 		this.options = options;
 		this.id = options.id;
 		this.nddb = null;
 		this.commandsDiv = document.createElement('div');
+		this.info = null;
 		this.init(this.options);
 	};
 	
@@ -40,11 +40,20 @@
 			node.window.addEventButton(id + '_GO_TO_PREVIOUS', '<', this.commandsDiv, 'go_to_previous');
 			node.window.addEventButton(id + '_GO_TO_NEXT', '>', this.commandsDiv, 'go_to_next');
 			node.window.addEventButton(id + '_GO_TO_LAST', '>>', this.commandsDiv, 'go_to_last');
+			node.window.addBreak(this.commandsDiv);
 		};
+		function addInfoBar() {
+			var span = this.commandsDiv.appendChild(document.createElement('span'));
+			return span;
+		}
+		
+		
 		addButtons.call(this);
+		this.info = addInfoBar.call(this);
+		
 		this.tm = new TriggerManager();
 		this.tm.init(options.triggers);
-		this.nddb = options.nddb || new NDDB();
+		this.nddb = options.nddb || new NDDB({auto_update_pointer: true});
 	};
 	
 	NDDBBrowser.prototype.append = function (root) {
@@ -81,34 +90,45 @@
 		var that = this;
 		var id = this.id;
 		
+		function notification (el, text) {
+			if (el) {
+				node.emit(id + '_GOT', el);
+				this.writeInfo((this.nddb.nddb_pointer + 1) + '/' + this.nddb.size());
+			}
+			else {
+				this.writeInfo('No element found');
+			}
+		};
+		
 		node.on(id + '_GO_TO_FIRST', function() {
 			var el = that.tm.pullTriggers(that.nddb.first());
-			if (el) node.emit(id + '_GOT', el);
-			console.log('first');
-			console.log(el);
+			notification.call(that, el);
 		});
 		
 		node.on(id + '_GO_TO_PREVIOUS', function() {
 			var el = that.tm.pullTriggers(that.nddb.previous());
-			if (el) node.emit(id + '_GOT', el); 
-			console.log('previous');
-			console.log(el);
-			
+			notification.call(that, el);
 		});
 		
 		node.on(id + '_GO_TO_NEXT', function() {
 			var el = that.tm.pullTriggers(that.nddb.next());
-			if (el) node.emit(id + '_GOT', el); 
-			console.log('next');
-			console.log(el);
+			notification.call(that, el);
 		});
 
 		node.on(id + '_GO_TO_LAST', function() {
 			var el = that.tm.pullTriggers(that.nddb.last());
-			if (el) node.emit(id + '_GOT', el);
-			console.log('last');
-			console.log(el);
+			notification.call(that, el);
+			
 		});
+	};
+	
+	NDDBBrowser.prototype.writeInfo = function (text) {
+		if (this.infoTimeout) clearTimeout(this.infoTimeout);
+		this.info.innerHTML = text;
+		var that = this;
+		this.infoTimeout = setTimeout(function(){
+			that.info.innerHTML = '';
+		}, 2000);
 	};
 	
 	

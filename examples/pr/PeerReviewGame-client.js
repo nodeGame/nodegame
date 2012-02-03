@@ -39,9 +39,7 @@ function PeerReviewGame () {
 											 lifo: true
 		});
 		
-		
-		
-		this.personal_history = node.window.getWidget('NDDBBrowser', 'ph');
+		this.personal_history = null;
 		
 		// DTABLE
 //		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
@@ -138,8 +136,9 @@ function PeerReviewGame () {
 						   controls: false,
 						   change: false,
 						   onclick: function() {
-								node.game.personal_history.add(node.game.cf.getAllValues());
-								node.game.cf.draw(this.getAllValues());
+							   var f = this.getAllValues();
+								node.game.personal_history.add(f);
+								node.game.cf.draw(f);
 						   }
 				};
 				
@@ -175,7 +174,7 @@ function PeerReviewGame () {
 		node.window.loadFrame('creation.html', function() {
 	
 			var creationDiv = node.window.getElementById('creation');
-			this.personal_history.append(creationDiv);
+			this.personal_history = node.window.addWidget('NDDBBrowser', creationDiv, {id: 'ph'});
 			
 			//node.emit('INPUT_ENABLE');
 			
@@ -187,6 +186,7 @@ function PeerReviewGame () {
 			this.cf = node.window.addWidget('ChernoffFaces', creationDiv, cf_options);
 			// AUTOPLAY
 			this.cf.randomize();
+			this.personal_history.add(this.cf.getAllValues());
 			
 			// History of previous exhibits
 			var historyDiv = node.window.getElementById('history');
@@ -196,13 +196,11 @@ function PeerReviewGame () {
 			
 			// Adding to history
 			node.on(this.cf.change, function() {
-				console.log('adding..!')
 				this.personal_history.add(this.cf.getAllValues());
 			});
 			
 			// Pulling back from history
 			node.on(this.personal_history.id + '_GOT', function (face) {
-				console.log('drawing..')
 				node.game.cf.draw(face);
 			});
 			
@@ -250,18 +248,18 @@ function PeerReviewGame () {
 //			this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
 			
 			// AUTOPLAY
-//			node.random.exec(function(){
-//				var choice = Math.random();
-//				if (choice < 0.33) {
-//					node.window.getElementById('ex_A').click();
-//				}
-//				else if (choice < 0.66) {
-//					node.window.getElementById('ex_B').click();
-//				}
-//				else {
-//					node.window.getElementById('ex_C').click();
-//				}
-//			}, 10);
+			node.random.exec(function(){
+				var choice = Math.random();
+				if (choice < 0.33) {
+					node.window.getElementById('ex_A').click();
+				}
+				else if (choice < 0.66) {
+					node.window.getElementById('ex_B').click();
+				}
+				else {
+					node.window.getElementById('ex_C').click();
+				}
+			}, 100);
 //		});
 		
 		console.log('Submission');

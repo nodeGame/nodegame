@@ -38,28 +38,31 @@
 	 */
 	
 	function NDDB (options, db) {				
-		// Default settings
-		this.options = {};
-
+		var options = options || {};
+		
 		this.D = {};			// The n-dimensional container for comparator functions
 		this.nddb_pointer = 0;	// Pointer for iterating along all the elements
 		
-		if (options) {
-			this.options = options;
-			NDDB.log = options.log || NDDB.log;
-			this.D = options.D || this.D;
-			if ('undefined' !== typeof options.parentDB) {
-				this.parentDB = options.parentDB;
-			}	
-			this.nddb_pointer = options.nddb_pointer;
-		}
+		this.options = options;
+		NDDB.log = options.log || NDDB.log;
+		this.D = options.D || this.D;
+		if ('undefined' !== typeof options.parentDB) {
+			this.parentDB = options.parentDB;
+		}	
+		this.nddb_pointer = options.nddb_pointer;
+		this.auto_update_pointer = ('undefined' !== typeof options.auto_update_pointer) ?
+										options.auto_update_pointer
+									:	false;
+		
+		this.tags = options.tags || {};
+		
 		this.db = this.initDB(db);	// The actual database
+		
 		
 
 	};
 	
 	NDDB.prototype.globalCompare = function(o1, o2) {
-		console.log('NDDB COMPARE');
 		if (!o1 && !o2) return 0;
 		if (!o1) return -1;
 		if (!o2) return 1;	
@@ -173,6 +176,9 @@
 	
 	NDDB.prototype.insert = function (o) {
 		this.db.push(this.masquerade(o));
+		if (this.auto_update_pointer) {
+			this.nddb_pointer = this.db.length-1;
+		}
 	};
 	
 	// Sorting Operation
@@ -712,7 +718,6 @@
 		var db = this.fetch(key);
 		if (db.length > 0) {
 			this.nddb_pointer = db[0].nddbid;
-			console.log('Pointer ' + this.nddb_pointer);
 			return db[0];
 		}
 		return undefined;
@@ -722,7 +727,6 @@
 		var db = this.fetch(key);
 		if (db.length > 0) {
 			this.nddb_pointer = db[db.length-1].nddbid;
-			console.log('Pointer ' + this.nddb_pointer);
 			return db[db.length-1];
 		}
 		return undefined;
@@ -731,15 +735,27 @@
 	NDDB.prototype.next = function () {
 		var el = NDDB.prototype.get.call(this, ++this.nddb_pointer);
 		if (!el) this.nddb_pointer--;
-		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
 	NDDB.prototype.previous = function () {
 		var el = NDDB.prototype.get.call(this, --this.nddb_pointer);
 		if (!el) this.nddb_pointer++;
-		console.log('Pointer ' + this.nddb_pointer);
 		return el;
+	};
+	
+	NDDB.prototype.tag = function (tag, idx) {
+		if ('undefined' === typeof tag) {
+			NDDB.log('Cannot register empty tag.', 'ERR');
+			return;
+		}
+		var idx = idx || this.nddb_pointer;
+		this.tags[tag] = idx;
+	};
+	
+	NDDB.prototype.resolveTag = function (tag) {
+		if (!tag) return false;
+		return this.tags[tag];
 	};
 	
 })(
