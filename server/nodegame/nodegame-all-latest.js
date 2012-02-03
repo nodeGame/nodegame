@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.333
+ * nodeGame-all v0.7.3.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:07:01 CET 2012
+ * Built on Fri Feb 3 11:28:41 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.333
+ * nodeGame Client v0.7.3.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:07:01 CET 2012
+ * Built on Fri Feb 3 11:28:41 CET 2012
  *
  */
  
@@ -806,7 +806,6 @@
 	};
 	
 	NDDB.prototype.globalCompare = function(o1, o2) {
-		console.log('NDDB COMPARE');
 		if (!o1 && !o2) return 0;
 		if (!o1) return -1;
 		if (!o2) return 1;	
@@ -922,7 +921,6 @@
 		this.db.push(this.masquerade(o));
 		if (this.auto_update_pointer) {
 			this.nddb_pointer = this.db.length-1;
-			console.log('Pointer ' + this.nddb_pointer);
 		}
 	};
 	
@@ -1463,7 +1461,6 @@
 		var db = this.fetch(key);
 		if (db.length > 0) {
 			this.nddb_pointer = db[0].nddbid;
-			console.log('Pointer ' + this.nddb_pointer);
 			return db[0];
 		}
 		return undefined;
@@ -1473,7 +1470,6 @@
 		var db = this.fetch(key);
 		if (db.length > 0) {
 			this.nddb_pointer = db[db.length-1].nddbid;
-			console.log('Pointer ' + this.nddb_pointer);
 			return db[db.length-1];
 		}
 		return undefined;
@@ -1482,14 +1478,12 @@
 	NDDB.prototype.next = function () {
 		var el = NDDB.prototype.get.call(this, ++this.nddb_pointer);
 		if (!el) this.nddb_pointer--;
-		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
 	NDDB.prototype.previous = function () {
 		var el = NDDB.prototype.get.call(this, --this.nddb_pointer);
 		if (!el) this.nddb_pointer++;
-		console.log('Pointer ' + this.nddb_pointer);
 		return el;
 	};
 	
@@ -4086,12 +4080,12 @@
  
  
 /*!
- * nodeWindow v0.7.333
+ * nodeWindow v0.7.3.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:07:01 CET 2012
+ * Built on Fri Feb 3 11:28:41 CET 2012
  *
  */
  
@@ -5870,12 +5864,12 @@
  
  
 /*!
- * nodeGadgets v0.7.333
+ * nodeGadgets v0.7.3.5
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:07:01 CET 2012
+ * Built on Fri Feb 3 11:28:41 CET 2012
  *
  */
  
