@@ -61,7 +61,8 @@
 		this.id = options.id || this.id;
 		var PREF = this.id + '_';
 		
-		this.features = options.features;
+		this.features = options.features || this.features || FaceVector.random();
+		
 		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
 		
 		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';

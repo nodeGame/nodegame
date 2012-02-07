@@ -41,7 +41,7 @@ function PeerReviewGame () {
 		
 		this.personal_history = null;
 		
-		this.last_cf = {};
+		this.last_cf = null;
 		
 		// DTABLE
 //		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
@@ -217,53 +217,20 @@ function PeerReviewGame () {
 		node.emit('HIDE', 'waiting_sub');
 		node.emit('SHOW', 'active_sub');
 		
-//		node.window.loadFrame('postgame.html', function() {
-//			
-//			var root = node.window.getElementById('root');
-//			console.log('Found');
-//			console.log(root);
-	
-			
-			//node.emit('INPUT_DISABLE');
-//			
-//			var ctrl_options = { id: 'exhib',
-//								 name: 'exhib',
-//								 fieldset: {
-//											legend: 'Exhibitions'
-//								 },
-//								 submit: false,
-//								 features: {
-//											ex_A: { 
-//												value: 'A',
-//												label: 'A'
-//											},
-//											ex_B: { 
-//													value: 'B',
-//													label: 'B'
-//											},
-//											ex_C: { 
-//													value: 'C',
-//													label: 'C'
-//											}
-//								}
-//			};
-//			
-//			this.outlet = node.window.addWidget('Controls.Radio',root, ctrl_options);
-			
-			// AUTOPLAY
-			node.random.exec(function(){
-				var choice = Math.random();
-				if (choice < 0.33) {
-					node.window.getElementById('ex_A').click();
-				}
-				else if (choice < 0.66) {
-					node.window.getElementById('ex_B').click();
-				}
-				else {
-					node.window.getElementById('ex_C').click();
-				}
-			}, 100);
-//		});
+		// AUTOPLAY
+		node.random.exec(function(){
+			var choice = Math.random();
+			if (choice < 0.33) {
+				node.window.getElementById('ex_A').click();
+			}
+			else if (choice < 0.66) {
+				node.window.getElementById('ex_B').click();
+			}
+			else {
+				node.window.getElementById('ex_C').click();
+			}
+		}, 500);
+
 		
 		console.log('Submission');
 	};	
@@ -387,25 +354,30 @@ function PeerReviewGame () {
 		
 		1: {state: creation,
 			name: 'Creation',
-			timer: 100000,
+			timer: 1000000,
 			done: function () {
+				console.log('executing crea done');
 				node.set('CF', this.cf.getAllValues());
+				this.last_cf = this.cf.getAllValues();
 				return true;
 			}
 		},
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: 10000,
+			timer: 1000,
 //			frame: 'postgame.html',
 			done: function (ex) {
+				console.log('executing sub done');
 				if (!JSUS.in_array(ex, ['A','B','C'])) {
 					alert('You must select an outlet for your creation NOW!!');
 					this.timer.restart({timer: 5000});
 					return false;
 				}
-				node.set('SUB', ex);
-				return true;
+				else {
+					node.set('SUB', ex);
+					return true;
+				}
 			}
 //			done: function () {
 //				if (!this.outlet.hasChanged) {
@@ -425,6 +397,7 @@ function PeerReviewGame () {
 			name: 'Evaluation',
 			timer: 1000,
 			done: function () {
+				console.log('executing eva done');
 				for (var i in this.evas) {
 					if (this.evas.hasOwnProperty(i)) {
 						node.set('EVA', {'for': i,

@@ -190,14 +190,20 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
+				
+				console.log('DONE was fired...really?')
+				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
 				if (done) {
+					console.log('calling done handler');
 					ok = done.call(that, p1, p2, p3);
 				}
-				if (!ok) return;
-				
+				if (!ok){
+					console.log('DONE not OK');
+					return;
+				}
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
 				
@@ -208,7 +214,7 @@
 				}
 			});
 			
-			node.on('WAIT', function(msg) {
+			node.on('PAUSE', function(msg) {
 				that.gameState.paused = true;
 				that.publishState();
 			});
@@ -273,7 +279,7 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState, 'DEBUG');
+		node.log('New State = ' + new GameState(this.gameState), 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {

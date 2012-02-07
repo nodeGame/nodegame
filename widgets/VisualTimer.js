@@ -75,7 +75,7 @@
 	};
 	
 	VisualTimer.prototype.updateDisplay = function () {
-		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0) {
 			this.timerDiv.innerHTML = '0:0';
 			return;
 		}
@@ -105,7 +105,6 @@
 	VisualTimer.prototype.listeners = function () {
 		var that = this;
 		node.on('LOADED', function() {
-		
 			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
 			if (timer) {
 				that.timerDiv.className = '';

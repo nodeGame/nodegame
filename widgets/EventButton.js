@@ -47,10 +47,6 @@
 				var ok = true;
 				if (this.callback){
 					ok = options.callback.call(node.game);
-					console.log(this.callback.toString());
-					console.log('callback exec')
-					console.log('ok');
-					console.log(ok);
 				}
 				if (ok) node.emit(that.event);
 			}

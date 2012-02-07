@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:28:41 CET 2012
+ * Built on Di 7. Feb 17:59:52 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:28:41 CET 2012
+ * Built on Di 7. Feb 17:59:52 CET 2012
  *
  */
  
@@ -1554,7 +1554,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        //console.log('Fired ' + event.type);
+	        console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -1953,7 +1953,9 @@
 	};
 	
 	PlayerList.prototype.checkState = function (gameState, strict) {
+		console.log('Checking State in PL');
 		if (this.isStateDone(gameState,strict)) {
+			console.log('STATEDone')
 			node.emit('STATEDONE');
 		}
 	};
@@ -3175,14 +3177,20 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
+				
+				console.log('DONE was fired...really?')
+				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
 				if (done) {
+					console.log('calling done handler');
 					ok = done.call(that, p1, p2, p3);
 				}
-				if (!ok) return;
-				
+				if (!ok){
+					console.log('DONE not OK');
+					return;
+				}
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
 				
@@ -3193,7 +3201,7 @@
 				}
 			});
 			
-			node.on('WAIT', function(msg) {
+			node.on('PAUSE', function(msg) {
 				that.gameState.paused = true;
 				that.publishState();
 			});
@@ -3258,7 +3266,7 @@
 		
 		node.emit('STATECHANGE');
 		
-		node.log('New State = ' + this.gameState, 'DEBUG');
+		node.log('New State = ' + new GameState(this.gameState), 'DEBUG');
 	};
 	
 	Game.prototype.updateState = function(state) {
@@ -3850,6 +3858,8 @@
 			}
 		}
 		
+		console.log('GameTimer.init');
+		console.log(options);
 	};
 	
 	/**
@@ -3864,18 +3874,25 @@
 			hook.call(ctx);
 		}
 		else {
+			console.log('-->Really Firing it');
 			node.emit(hook);
 		}	
 	};
 	
 	GameTimer.prototype.start = function() {
+		console.log('timer start');
+		console.log(this.options);
+		console.log(this.update);
+		console.log(this.update);
+		
 		// fire the event immediately if time is zero
-		if (this.options.milliseconds === 0){
+		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
 			return;
 		}
 		var that = this;
 		this.timer = setInterval(function() {
+			console.log('Interval set');
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
 			
@@ -3885,11 +3902,14 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
+				console.log('---------------Firing TIMEUP')
 				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
+		
+		console.log('Alles klar');
 	};
 	
 	/**
@@ -3908,6 +3928,7 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
+		console.log('Clearing Interval... pause')
 		clearInterval(this.timer);
 	};	
 
@@ -3918,6 +3939,7 @@
 	};	
 	
 	GameTimer.prototype.stop = function() {
+		console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
 		this.timeLeft = null;
@@ -4085,7 +4107,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:28:41 CET 2012
+ * Built on Di 7. Feb 17:59:52 CET 2012
  *
  */
  
@@ -4953,10 +4975,6 @@
 	
 	
 	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
-		console.log(event);
-		console.log(text);
-		console.log(root);
-		console.log(id);
 		if (!event) return;
 		if (!root) {
 			var root = root || this.frame.body;
@@ -5869,7 +5887,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Fri Feb 3 11:28:41 CET 2012
+ * Built on Di 7. Feb 17:59:52 CET 2012
  *
  */
  
@@ -5937,7 +5955,8 @@
 		this.id = options.id || this.id;
 		var PREF = this.id + '_';
 		
-		this.features = options.features;
+		this.features = options.features || this.features || FaceVector.random();
+		
 		this.controls = ('undefined' !== typeof options.controls) ?  options.controls : true;
 		
 		var idCanvas = (options.idCanvas) ? options.idCanvas : PREF + 'canvas';
@@ -7071,10 +7090,6 @@
 				var ok = true;
 				if (this.callback){
 					ok = options.callback.call(node.game);
-					console.log(this.callback.toString());
-					console.log('callback exec')
-					console.log('ok');
-					console.log(ok);
 				}
 				if (ok) node.emit(that.event);
 			}
@@ -8200,7 +8215,7 @@
 	};
 	
 	VisualTimer.prototype.updateDisplay = function () {
-		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0){
+		if (!this.gameTimer.milliseconds || this.gameTimer.milliseconds === 0) {
 			this.timerDiv.innerHTML = '0:0';
 			return;
 		}
@@ -8230,7 +8245,6 @@
 	VisualTimer.prototype.listeners = function () {
 		var that = this;
 		node.on('LOADED', function() {
-		
 			var timer = node.game.gameLoop.getAllParams(node.game.gameState).timer;
 			if (timer) {
 				that.timerDiv.className = '';

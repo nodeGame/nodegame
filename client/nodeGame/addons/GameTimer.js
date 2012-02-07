@@ -41,6 +41,8 @@
 			}
 		}
 		
+		console.log('GameTimer.init');
+		console.log(options);
 	};
 	
 	/**
@@ -55,18 +57,25 @@
 			hook.call(ctx);
 		}
 		else {
+			console.log('-->Really Firing it');
 			node.emit(hook);
 		}	
 	};
 	
 	GameTimer.prototype.start = function() {
+		console.log('timer start');
+		console.log(this.options);
+		console.log(this.update);
+		console.log(this.update);
+		
 		// fire the event immediately if time is zero
-		if (this.options.milliseconds === 0){
+		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
 			return;
 		}
 		var that = this;
 		this.timer = setInterval(function() {
+			console.log('Interval set');
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
 			
@@ -76,11 +85,14 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
+				console.log('---------------Firing TIMEUP')
 				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
+		
+		console.log('Alles klar');
 	};
 	
 	/**
@@ -99,6 +111,7 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
+		console.log('Clearing Interval... pause')
 		clearInterval(this.timer);
 	};	
 
@@ -109,6 +122,7 @@
 	};	
 	
 	GameTimer.prototype.stop = function() {
+		console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
 		this.timeLeft = null;

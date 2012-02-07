@@ -494,10 +494,6 @@
 	
 	
 	GameWindow.prototype.addEventButton = function (event, text, root, id, attributes) {
-		console.log(event);
-		console.log(text);
-		console.log(root);
-		console.log(id);
 		if (!event) return;
 		if (!root) {
 			var root = root || this.frame.body;
