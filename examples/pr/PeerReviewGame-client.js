@@ -41,6 +41,8 @@ function PeerReviewGame () {
 		
 		this.personal_history = null;
 		
+		this.last_cf = {};
+		
 		// DTABLE
 //		this.dtable = node.window.addWidget('DynamicTable', document.body, {replace: true});
 //		this.dtable.setLeft(['Mean', 'N. of shows', 'Money Won']);
@@ -180,12 +182,13 @@ function PeerReviewGame () {
 			
 			var cf_options = { id: 'cf',
 							   width: 300,
-							   height: 300
+							   height: 300,
+							   features: this.last_cf
 			};
 			
 			this.cf = node.window.addWidget('ChernoffFaces', creationDiv, cf_options);
 			// AUTOPLAY
-			this.cf.randomize();
+			//this.cf.randomize();
 			this.personal_history.add(this.cf.getAllValues());
 			
 			// History of previous exhibits
