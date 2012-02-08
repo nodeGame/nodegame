@@ -116,7 +116,7 @@
 			
 			// SAY
 			
-			node.on( OUT + say + 'HI', function(){
+			node.on( OUT + say + 'HI', function() {
 				// Upon establishing a successful connection with the server
 				// Enter the first state
 				if (that.auto_step) {
@@ -190,20 +190,11 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
-				
-				console.log('DONE was fired...really?')
-				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
-				if (done) {
-					console.log('calling done handler');
-					ok = done.call(that, p1, p2, p3);
-				}
-				if (!ok){
-					console.log('DONE not OK');
-					return;
-				}
+				if (done) ok = done.call(that, p1, p2, p3);
+				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
 				that.publishState();
 				
@@ -219,8 +210,9 @@
 				that.publishState();
 			});
 			
-			node.on('WINDOW_LOADED', function(){
+			node.on('WINDOW_LOADED', function() {
 				if (that.isGameReady()) {
+					node.emit('BEFORE_LOADING');
 					node.emit('LOADED');
 				}
 			});
@@ -231,7 +223,7 @@
 				}
 			});
 			
-			node.on('LOADED', function(){
+			node.on('LOADED', function() {
 				that.gameState.is =  GameState.iss.PLAYING;
 				//node.log('STTTEEEP ' + that.gameState.state, 'DEBUG');		
 				that.gsc.clearBuffer();
@@ -286,10 +278,11 @@
 		
 		node.log('New state is going to be ' + new GameState(state));
 		
-		if (this.step(state) !== false){
+		if (this.step(state) !== false) {
 			this.paused = false;
 			this.gameState.is =  GameState.iss.LOADED;
 			if (this.isGameReady()) {
+				node.emit('BEFORE_LOADING');
 				node.emit('LOADED');
 			}
 		}		
@@ -348,8 +341,7 @@
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
-		if (node.window) {
-			
+		if (node.window) {	
 			// node.log('WindowState is ' + node.window.state, 'DEBUG');
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}

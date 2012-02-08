@@ -40,9 +40,6 @@
 				this.addHook(options.hooks[i]);
 			}
 		}
-		
-		console.log('GameTimer.init');
-		console.log(options);
 	};
 	
 	/**
@@ -57,16 +54,11 @@
 			hook.call(ctx);
 		}
 		else {
-			console.log('-->Really Firing it');
 			node.emit(hook);
 		}	
 	};
 	
 	GameTimer.prototype.start = function() {
-		console.log('timer start');
-		console.log(this.options);
-		console.log(this.update);
-		console.log(this.update);
 		
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0) {
@@ -75,24 +67,20 @@
 		}
 		var that = this;
 		this.timer = setInterval(function() {
-			console.log('Interval set');
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
 			
 			// Fire custom hooks from the latest to the first if any
-			for (var i = that.hooks.length; i> 0; i--) {
+			for (var i = that.hooks.length; i > 0; i--) {
 				that.fire(that.hooks[(i-1)]);
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				console.log('---------------Firing TIMEUP')
 				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
-		
-		console.log('Alles klar');
 	};
 	
 	/**

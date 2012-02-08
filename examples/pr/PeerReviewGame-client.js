@@ -229,7 +229,7 @@ function PeerReviewGame () {
 			else {
 				node.window.getElementById('ex_C').click();
 			}
-		}, 500);
+		}, 1200);
 
 		
 		console.log('Submission');
@@ -365,7 +365,7 @@ function PeerReviewGame () {
 		
 		2: {state: submission,
 			name: 'Submission',
-			timer: 1000,
+			timer: 1200,
 //			frame: 'postgame.html',
 			done: function (ex) {
 				console.log('executing sub done');
@@ -395,7 +395,7 @@ function PeerReviewGame () {
 		
 		3: {state: evaluation,
 			name: 'Evaluation',
-			timer: 1000,
+			timer: 1200,
 			done: function () {
 				console.log('executing eva done');
 				for (var i in this.evas) {
