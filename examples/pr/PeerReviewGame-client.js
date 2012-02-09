@@ -230,7 +230,7 @@ function PeerReviewGame () {
 			else {
 				node.window.getElementById('ex_C').click();
 			}
-		}, 1200);
+		}, 300);
 
 		
 		console.log('Submission');
@@ -269,7 +269,7 @@ function PeerReviewGame () {
 					var choice = Math.random();
 					node.window.getElementById(evaId).value = Math.random()*10;
 					//alert(choice);
-				}, 10);
+				}, 200);
 			});
 			
 			//node.emit('DONE');
@@ -358,7 +358,7 @@ function PeerReviewGame () {
 		
 		1: {name: 'Creation',
 			state: creation,
-			timer: 2000,
+			timer: 1000,
 			done: function () {
 				console.log('executing crea done');
 				node.set('CF', this.cf.getAllValues());
@@ -369,7 +369,7 @@ function PeerReviewGame () {
 		
 		2: {name: 'Submission',
 			state: submission,
-			timer: 1500,
+			timer: 1000,
 //			frame: 'postgame.html',
 			done: function (ex) {
 				console.log('executing sub done');
@@ -387,7 +387,7 @@ function PeerReviewGame () {
 		
 		3: {name: 'Evaluation',
 			state: evaluation,
-			timer: 1500,
+			timer: 1000,
 			done: function () {
 				console.log('executing eva done');
 				for (var i in this.evas) {

@@ -39,7 +39,7 @@
 		});
 		
 		// It is supposed to fade away when a new state starts
-		node.on('STATECHANGE', function(text) {
+		node.on('LOADED', function(text) {
 			if (that.waitingDiv) {
 				
 				if (that.waitingDiv.style.display == ''){

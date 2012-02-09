@@ -198,23 +198,13 @@
 				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
 				
-				// We need to save the current state
-				// because if auto_wait is implemented,
-				// there is the chance to call waiting on
-				// the next state, that in the meantime
-				// has already been loaded
-				var curState = node.game.gameState;
-				that.publishState();
-				
 				if (this.auto_wait) {
 					if (node.window) {
-						// Call waiting only if we haven't updated state yet
-						if (GameState.compare(curState, that.gameState) === 0) {
-							node.emit('WAITING...');
-						}
+						node.emit('WAITING...');
 					}
 				}
 				
+				that.publishState();
 				
 			});
 			

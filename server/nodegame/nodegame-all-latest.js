@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 15:33:43 CET 2012
+ * Built on Do 9. Feb 16:15:08 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 15:33:43 CET 2012
+ * Built on Do 9. Feb 16:15:08 CET 2012
  *
  */
  
@@ -3183,23 +3183,13 @@
 				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
 				
-				// We need to save the current state
-				// because if auto_wait is implemented,
-				// there is the chance to call waiting on
-				// the next state, that in the meantime
-				// has already been loaded
-				var curState = node.game.gameState;
-				that.publishState();
-				
 				if (this.auto_wait) {
 					if (node.window) {
-						// Call waiting only if we haven't updated state yet
-						if (GameState.compare(curState, that.gameState) === 0) {
-							node.emit('WAITING...');
-						}
+						node.emit('WAITING...');
 					}
 				}
 				
+				that.publishState();
 				
 			});
 			
@@ -4099,7 +4089,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 15:33:43 CET 2012
+ * Built on Do 9. Feb 16:15:08 CET 2012
  *
  */
  
@@ -5873,7 +5863,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 15:33:43 CET 2012
+ * Built on Do 9. Feb 16:15:08 CET 2012
  *
  */
  
@@ -8292,7 +8282,7 @@
 		});
 		
 		// It is supposed to fade away when a new state starts
-		node.on('STATECHANGE', function(text) {
+		node.on('LOADED', function(text) {
 			if (that.waitingDiv) {
 				
 				if (that.waitingDiv.style.display == ''){
