@@ -71,7 +71,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//node.log('Debuffered ' + msg);
+			//console.log('Debuffered ' + msg);
 		}
 	
 	};

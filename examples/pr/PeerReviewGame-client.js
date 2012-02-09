@@ -187,8 +187,7 @@ function PeerReviewGame () {
 			};
 			
 			this.cf = node.window.addWidget('ChernoffFaces', creationDiv, cf_options);
-			// AUTOPLAY
-			//this.cf.randomize();
+		
 			this.personal_history.add(this.cf.getAllValues());
 			
 			// History of previous exhibits
@@ -206,6 +205,8 @@ function PeerReviewGame () {
 			node.on(this.personal_history.id + '_GOT', function (face) {
 				node.game.cf.draw(face);
 			});
+			
+			//node.emit('DONE');
 			
 		});
 
@@ -270,6 +271,8 @@ function PeerReviewGame () {
 					//alert(choice);
 				}, 10);
 			});
+			
+			//node.emit('DONE');
 	
 		});
 		
@@ -328,7 +331,7 @@ function PeerReviewGame () {
 				}
 				
 			});
-			
+			//node.emit('DONE');
 		});
 		
 		
@@ -338,6 +341,7 @@ function PeerReviewGame () {
 	
 	var questionnaire = function() {
 		node.window.loadFrame('postgame.html');
+		//node.emit('DONE');
 		console.log('Postgame');
 	};
 	
@@ -352,9 +356,9 @@ function PeerReviewGame () {
 	
 	var gameloop = { // The different, subsequent phases in each round
 		
-		1: {state: creation,
-			name: 'Creation',
-			timer: 1000000,
+		1: {name: 'Creation',
+			state: creation,
+			timer: 2000,
 			done: function () {
 				console.log('executing crea done');
 				node.set('CF', this.cf.getAllValues());
@@ -363,9 +367,9 @@ function PeerReviewGame () {
 			}
 		},
 		
-		2: {state: submission,
-			name: 'Submission',
-			timer: 1200,
+		2: {name: 'Submission',
+			state: submission,
+			timer: 1500,
 //			frame: 'postgame.html',
 			done: function (ex) {
 				console.log('executing sub done');
@@ -379,23 +383,11 @@ function PeerReviewGame () {
 					return true;
 				}
 			}
-//			done: function () {
-//				if (!this.outlet.hasChanged) {
-//					this.outlet.highlight();
-//					alert('You must select an outlet for your creation NOW!!');
-//					this.timer.restart({timer: 5000});
-//					return false;
-//				}
-//				
-//				//node.emit('INPUT_DISABLE');
-//				node.set('SUB', this.outlet.getAllValues());
-//				return true;
-//			}
 		},
 		
-		3: {state: evaluation,
-			name: 'Evaluation',
-			timer: 1200,
+		3: {name: 'Evaluation',
+			state: evaluation,
+			timer: 1500,
 			done: function () {
 				console.log('executing eva done');
 				for (var i in this.evas) {
@@ -428,7 +420,7 @@ function PeerReviewGame () {
 			
 			2: {state: 	instructions,
 				name: 	'Instructions',
-				timer:  1000
+				timer:  1200
 			},
 				
 			3: {rounds:	10, 
@@ -438,7 +430,7 @@ function PeerReviewGame () {
 			
 			4: {state:	questionnaire,
 				name: 	'Questionnaire',
-				timer: 	1000
+				timer: 	1200
 			},
 				
 			5: {state:	endgame,

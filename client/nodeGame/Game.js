@@ -193,16 +193,29 @@
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
+				
 				if (done) ok = done.call(that, p1, p2, p3);
 				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
+				
+				// We need to save the current state
+				// because if auto_wait is implemented,
+				// there is the chance to call waiting on
+				// the next state, that in the meantime
+				// has already been loaded
+				var curState = node.game.gameState;
 				that.publishState();
 				
 				if (this.auto_wait) {
 					if (node.window) {
-						node.emit('WAITING...');
+						// Call waiting only if we haven't updated state yet
+						if (GameState.compare(curState, that.gameState) === 0) {
+							node.emit('WAITING...');
+						}
 					}
 				}
+				
+				
 			});
 			
 			node.on('PAUSE', function(msg) {
@@ -225,8 +238,11 @@
 			
 			node.on('LOADED', function() {
 				that.gameState.is =  GameState.iss.PLAYING;
-				//node.log('STTTEEEP ' + that.gameState.state, 'DEBUG');		
+				//TODO: the number of messages to emit to inform other players
+				// about its own state should be controlled. Observer is 0 
+				//that.publishState();
 				that.gsc.clearBuffer();
+				
 			});
 			
 		}();

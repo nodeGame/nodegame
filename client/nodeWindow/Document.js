@@ -192,10 +192,6 @@
 		if (!root) return;
 		if (!text) return;
 		var content = (!JSUS.isNode(text) || !JSUS.isElement(text)) ? document.createTextNode(text) : text;
-		node.log('ROOT');
-		node.log(root);
-		node.log('TEXT');
-		node.log(content);
 		root.appendChild(content);
 		return content;
 	};
@@ -294,8 +290,6 @@
 		if (!el || !c) return;
 		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
 		var o = el.className = el.className.replace( regexpr, '' );
-		console.log('removing class');
-		console.log(o);
 		return el;
 	};
 

@@ -55,8 +55,6 @@
 	GameBoard.prototype.updateBoard = function (pl) {
 		var that = this;
 		that.board.innerHTML = 'Updating...';
-
-		//node.log(pl);
 		
 		if (pl.size() !== 0) {
 			that.board.innerHTML = '';
@@ -64,7 +62,7 @@
 				//node.log(p);
 				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
-				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
+				var pState = '(' +  p.state.round + ') ' + p.state.state + '.' + p.state.step; 
 				pState += ' ';
 				
 				switch (p.state.is) {

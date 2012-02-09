@@ -77,6 +77,7 @@ GameMsgManager.prototype.send = function(gameMsg) {
 	if (to === 'ALL') {
 		if (rel) {
 			this.node.channel.json.send(msg);
+			console.log('Sending msg');
 		} 
 		else {
 //			var v =  this.node.channel;

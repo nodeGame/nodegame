@@ -209,9 +209,7 @@
 	};
 	
 	PlayerList.prototype.checkState = function (gameState, strict) {
-		console.log('Checking State in PL');
-		if (this.isStateDone(gameState,strict)) {
-			console.log('STATEDone')
+		if (this.isStateDone(gameState, strict)) {
 			node.emit('STATEDONE');
 		}
 	};

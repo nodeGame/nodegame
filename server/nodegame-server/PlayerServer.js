@@ -65,8 +65,12 @@ PlayerServer.prototype.attachCustomListeners = function() {
 			// Do we need this?
 			that.pl.updatePlayerState(msg.from,msg.data);
 
-			
+			// TODO: if it is not send, the observer does not get informed
+			// about change of state.
+			// but a client get back its own msg too
 			that.gmm.send(msg);
+			// Should be:
+			//that.gmm.broadcast(msg)
 			
 			// This fucks things
 			that.gmm.forward(msg);

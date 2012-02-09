@@ -41,7 +41,7 @@
 	}
 	
 	GameState.prototype.toString = function () {
-		var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
+		var out = '(' + this.round + ') ' + this.state + '.' + this.step + '_' + this.is;
 		
 		if (this.paused) {
 			out += ' (P)';
@@ -77,7 +77,7 @@
 	};
 	
 	GameState.stringify = function (gs) {
-		return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
+		return '(' + gs.round + ') ' + gs.state + '.' + gs.step + '_' + gs.is;
 	}; 
 
 })('undefined' != typeof node ? node : module.exports);

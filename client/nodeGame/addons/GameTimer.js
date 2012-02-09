@@ -59,7 +59,6 @@
 	};
 	
 	GameTimer.prototype.start = function() {
-		
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
@@ -69,7 +68,6 @@
 		this.timer = setInterval(function() {
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
-			
 			// Fire custom hooks from the latest to the first if any
 			for (var i = that.hooks.length; i > 0; i--) {
 				that.fire(that.hooks[(i-1)]);
@@ -99,7 +97,7 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
-		console.log('Clearing Interval... pause')
+		//console.log('Clearing Interval... pause')
 		clearInterval(this.timer);
 	};	
 
@@ -110,7 +108,7 @@
 	};	
 	
 	GameTimer.prototype.stop = function() {
-		console.log('Clearing Interval... stop')
+		//console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
 		this.timeLeft = null;

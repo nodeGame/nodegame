@@ -265,8 +265,8 @@
 		window.frames[frame].location = url;
 		// Adding a reference to nodeGame also in the iframe
 		window.frames[frame].window.node = node;
-		console.log('the frame just as it is');
-		console.log(window.frames[frame]);
+//		console.log('the frame just as it is');
+//		console.log(window.frames[frame]);
 		// Experimental
 //		if (url === 'blank') {
 //			window.frames[frame].src = this.getBlankPage();
@@ -290,7 +290,7 @@
     	}
 			
 		this.areLoading--;
-		//node.log('ARE LOADING: ' + that.areLoading);
+		//console.log('ARE LOADING: ' + this.areLoading);
 		if (this.areLoading === 0) {
 			this.state = GameState.iss.LOADED;
 			node.emit('WINDOW_LOADED');

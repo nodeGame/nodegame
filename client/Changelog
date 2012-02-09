@@ -1,3 +1,8 @@
+7.3.6
+
+- Fixed bug with auto_wait
+- Modified the string representation of the GameState
+
 7.3.5
 
 - NDDB tags added

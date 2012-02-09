@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.3.5
+ * nodeGame-all v0.7.3.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 7. Feb 17:59:52 CET 2012
+ * Built on Do 9. Feb 15:33:43 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.3.5
+ * nodeGame Client v0.7.3.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 7. Feb 17:59:52 CET 2012
+ * Built on Do 9. Feb 15:33:43 CET 2012
  *
  */
  
@@ -1554,7 +1554,7 @@
 	            throw new Error("Event object missing 'type' property.");
 	        }
 	    	// Debug
-	        console.log('Fired ' + event.type);
+	        //console.log('Fired ' + event.type);
 	        
 	        
 	        //Global Listeners
@@ -1701,7 +1701,7 @@
 	}
 	
 	GameState.prototype.toString = function () {
-		var out = this.state + '.' + this.step + ':' + this.round + '_' + this.is;
+		var out = '(' + this.round + ') ' + this.state + '.' + this.step + '_' + this.is;
 		
 		if (this.paused) {
 			out += ' (P)';
@@ -1737,7 +1737,7 @@
 	};
 	
 	GameState.stringify = function (gs) {
-		return gs.state + '.' + gs.step + ':' + gs.round + '_' + gs.is;
+		return '(' + gs.round + ') ' + gs.state + '.' + gs.step + '_' + gs.is;
 	}; 
 
 })('undefined' != typeof node ? node : module.exports); 
@@ -1953,9 +1953,7 @@
 	};
 	
 	PlayerList.prototype.checkState = function (gameState, strict) {
-		console.log('Checking State in PL');
-		if (this.isStateDone(gameState,strict)) {
-			console.log('STATEDone')
+		if (this.isStateDone(gameState, strict)) {
 			node.emit('STATEDONE');
 		}
 	};
@@ -2713,7 +2711,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//node.log('Debuffered ' + msg);
+			//console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -3103,7 +3101,7 @@
 			
 			// SAY
 			
-			node.on( OUT + say + 'HI', function(){
+			node.on( OUT + say + 'HI', function() {
 				// Upon establishing a successful connection with the server
 				// Enter the first state
 				if (that.auto_step) {
@@ -3177,28 +3175,32 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
-				
-				console.log('DONE was fired...really?')
-				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
-				if (done) {
-					console.log('calling done handler');
-					ok = done.call(that, p1, p2, p3);
-				}
-				if (!ok){
-					console.log('DONE not OK');
-					return;
-				}
+				
+				if (done) ok = done.call(that, p1, p2, p3);
+				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
+				
+				// We need to save the current state
+				// because if auto_wait is implemented,
+				// there is the chance to call waiting on
+				// the next state, that in the meantime
+				// has already been loaded
+				var curState = node.game.gameState;
 				that.publishState();
 				
 				if (this.auto_wait) {
 					if (node.window) {
-						node.emit('WAITING...');
+						// Call waiting only if we haven't updated state yet
+						if (GameState.compare(curState, that.gameState) === 0) {
+							node.emit('WAITING...');
+						}
 					}
 				}
+				
+				
 			});
 			
 			node.on('PAUSE', function(msg) {
@@ -3206,8 +3208,9 @@
 				that.publishState();
 			});
 			
-			node.on('WINDOW_LOADED', function(){
+			node.on('WINDOW_LOADED', function() {
 				if (that.isGameReady()) {
+					node.emit('BEFORE_LOADING');
 					node.emit('LOADED');
 				}
 			});
@@ -3218,10 +3221,13 @@
 				}
 			});
 			
-			node.on('LOADED', function(){
+			node.on('LOADED', function() {
 				that.gameState.is =  GameState.iss.PLAYING;
-				//node.log('STTTEEEP ' + that.gameState.state, 'DEBUG');		
+				//TODO: the number of messages to emit to inform other players
+				// about its own state should be controlled. Observer is 0 
+				//that.publishState();
 				that.gsc.clearBuffer();
+				
 			});
 			
 		}();
@@ -3273,10 +3279,11 @@
 		
 		node.log('New state is going to be ' + new GameState(state));
 		
-		if (this.step(state) !== false){
+		if (this.step(state) !== false) {
 			this.paused = false;
 			this.gameState.is =  GameState.iss.LOADED;
 			if (this.isGameReady()) {
+				node.emit('BEFORE_LOADING');
 				node.emit('LOADED');
 			}
 		}		
@@ -3335,8 +3342,7 @@
 		if (this.gameState.is < GameState.iss.LOADED) return false;
 		
 		// Check if there is a gameWindow obj and whether it is loading
-		if (node.window) {
-			
+		if (node.window) {	
 			// node.log('WindowState is ' + node.window.state, 'DEBUG');
 			return (node.window.state >= GameState.iss.LOADED) ? true : false;
 		}
@@ -3359,7 +3365,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.3';
+	node.version = '0.7.3.6';
 	
 	node.verbosity = 0;
 	
@@ -3857,9 +3863,6 @@
 				this.addHook(options.hooks[i]);
 			}
 		}
-		
-		console.log('GameTimer.init');
-		console.log(options);
 	};
 	
 	/**
@@ -3874,17 +3877,11 @@
 			hook.call(ctx);
 		}
 		else {
-			console.log('-->Really Firing it');
 			node.emit(hook);
 		}	
 	};
 	
 	GameTimer.prototype.start = function() {
-		console.log('timer start');
-		console.log(this.options);
-		console.log(this.update);
-		console.log(this.update);
-		
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
@@ -3892,24 +3889,19 @@
 		}
 		var that = this;
 		this.timer = setInterval(function() {
-			console.log('Interval set');
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
-			
 			// Fire custom hooks from the latest to the first if any
-			for (var i = that.hooks.length; i> 0; i--) {
+			for (var i = that.hooks.length; i > 0; i--) {
 				that.fire(that.hooks[(i-1)]);
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				console.log('---------------Firing TIMEUP')
 				that.fire(that.timeup);
 				that.stop();
 			}
 			
 		}, this.update);
-		
-		console.log('Alles klar');
 	};
 	
 	/**
@@ -3928,7 +3920,7 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
-		console.log('Clearing Interval... pause')
+		//console.log('Clearing Interval... pause')
 		clearInterval(this.timer);
 	};	
 
@@ -3939,7 +3931,7 @@
 	};	
 	
 	GameTimer.prototype.stop = function() {
-		console.log('Clearing Interval... stop')
+		//console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
 		this.timeLeft = null;
@@ -4102,12 +4094,12 @@
  
  
 /*!
- * nodeWindow v0.7.3.5
+ * nodeWindow v0.7.3.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 7. Feb 17:59:52 CET 2012
+ * Built on Do 9. Feb 15:33:43 CET 2012
  *
  */
  
@@ -4306,10 +4298,6 @@
 		if (!root) return;
 		if (!text) return;
 		var content = (!JSUS.isNode(text) || !JSUS.isElement(text)) ? document.createTextNode(text) : text;
-		node.log('ROOT');
-		node.log(root);
-		node.log('TEXT');
-		node.log(content);
 		root.appendChild(content);
 		return content;
 	};
@@ -4408,8 +4396,6 @@
 		if (!el || !c) return;
 		var regexpr = '/(?:^|\s)' + c + '(?!\S)/';
 		var o = el.className = el.className.replace( regexpr, '' );
-		console.log('removing class');
-		console.log(o);
 		return el;
 	};
 
@@ -4746,8 +4732,8 @@
 		window.frames[frame].location = url;
 		// Adding a reference to nodeGame also in the iframe
 		window.frames[frame].window.node = node;
-		console.log('the frame just as it is');
-		console.log(window.frames[frame]);
+//		console.log('the frame just as it is');
+//		console.log(window.frames[frame]);
 		// Experimental
 //		if (url === 'blank') {
 //			window.frames[frame].src = this.getBlankPage();
@@ -4771,7 +4757,7 @@
     	}
 			
 		this.areLoading--;
-		//node.log('ARE LOADING: ' + that.areLoading);
+		//console.log('ARE LOADING: ' + this.areLoading);
 		if (this.areLoading === 0) {
 			this.state = GameState.iss.LOADED;
 			node.emit('WINDOW_LOADED');
@@ -5882,12 +5868,12 @@
  
  
 /*!
- * nodeGadgets v0.7.3.5
+ * nodeGadgets v0.7.3.6
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 7. Feb 17:59:52 CET 2012
+ * Built on Do 9. Feb 15:33:43 CET 2012
  *
  */
  
@@ -7192,8 +7178,6 @@
 	GameBoard.prototype.updateBoard = function (pl) {
 		var that = this;
 		that.board.innerHTML = 'Updating...';
-
-		//node.log(pl);
 		
 		if (pl.size() !== 0) {
 			that.board.innerHTML = '';
@@ -7201,7 +7185,7 @@
 				//node.log(p);
 				var line = '[' + p.id + "|" + p.name + "]> \t"; 
 				
-				var pState = p.state.state + '.' + p.state.step + ':' + p.state.round; 
+				var pState = '(' +  p.state.round + ') ' + p.state.state + '.' + p.state.step; 
 				pState += ' ';
 				
 				switch (p.state.is) {
