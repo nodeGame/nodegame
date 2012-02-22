@@ -25,10 +25,10 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
   $ node server.js
   
   # Open 2 different browser instances with the pr-example
-  $ open localhost:8080/examples/pr/index.html
+  $ open FILE_PATH_TO_REPO/examples/pr/index.htm
   
   # (optional) Monitor the game via the browser
-  $ open localhost:8080/examples/pr/monitorgame.html
+  $ open FILE_PATH_TO_REPO/examples/pr/monitorgame.html
   
   # Start the game
   $ cd client/nodeclient
