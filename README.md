@@ -17,6 +17,7 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
   $ npm install
   
   # Make a clean build of nodeGame
+  $ cd client/
   $ ./build
   
   # Start the management server
