@@ -6,7 +6,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.3.6';
+	node.version = '0.7.3.7';
 	
 	node.verbosity = 0;
 	

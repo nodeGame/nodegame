@@ -89,16 +89,16 @@
 		this.gameTimer.start();
 	};
 	
-	VisualTimer.prototype.restart = function(options) {
+	VisualTimer.prototype.restart = function (options) {
 		this.init(options);
 		this.start();
 	};
 	
-	VisualTimer.prototype.stop = function(options) {
+	VisualTimer.prototype.stop = function (options) {
 		this.gameTimer.stop();
 	};
 	
-	VisualTimer.prototype.resume = function(options) {
+	VisualTimer.prototype.resume = function (options) {
 		this.gameTimer.resume();
 	};
 		
@@ -118,9 +118,11 @@
 			}
 		});
 		
-		node.on('DONE', function(){
+		node.on('DONE', function() {
+			// TODO: This should be enabled again
+			//that.gameTimer.stop();
 			that.timerDiv.className = 'strike';
-		})
+		});
 	};
 	
 })(node.window.widgets);

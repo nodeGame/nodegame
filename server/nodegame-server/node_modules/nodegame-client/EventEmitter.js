@@ -51,7 +51,8 @@
 	        //Global Listeners
 	        if (this._listeners[event.type] instanceof Array) {
 	            var listeners = this._listeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++){
+	            for (var i=0, len=listeners.length; i < len; i++) {
+	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
 	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
@@ -60,6 +61,7 @@
 	        if (this._localListeners[event.type] instanceof Array) {
 	            var listeners = this._localListeners[event.type];
 	            for (var i=0, len=listeners.length; i < len; i++) {
+	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
 	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }

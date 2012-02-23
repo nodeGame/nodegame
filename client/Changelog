@@ -1,5 +1,9 @@
 7.3.6
 
+- Mitigated bug with timer. More work to be done
+
+7.3.6
+
 - Fixed bug with auto_wait
 - Modified the string representation of the GameState
 

@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.3.6
+ * nodeGame-all v0.7.3.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 21. Feb 09:44:22 CET 2012
+ * Built on Do 23. Feb 16:30:58 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.3.6
+ * nodeGame Client v0.7.3.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 21. Feb 09:44:22 CET 2012
+ * Built on Do 23. Feb 16:30:59 CET 2012
  *
  */
  
@@ -1560,7 +1560,8 @@
 	        //Global Listeners
 	        if (this._listeners[event.type] instanceof Array) {
 	            var listeners = this._listeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++){
+	            for (var i=0, len=listeners.length; i < len; i++) {
+	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
 	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
@@ -1569,6 +1570,7 @@
 	        if (this._localListeners[event.type] instanceof Array) {
 	            var listeners = this._localListeners[event.type];
 	            for (var i=0, len=listeners.length; i < len; i++) {
+	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
 	            	listeners[i].call(this.game, p1, p2, p3);
 	            }
 	        }
@@ -2711,7 +2713,7 @@
 		for (var i=0; i < nelem; i++) {
 			var msg = this.buffer.shift();
 			node.emit(msg.toInEvent(), msg);
-			//console.log('Debuffered ' + msg);
+			console.log('Debuffered ' + msg);
 		}
 	
 	};
@@ -3175,6 +3177,7 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
+				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
@@ -3182,6 +3185,10 @@
 				if (done) ok = done.call(that, p1, p2, p3);
 				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
+				
+				// Call all the functions that want to do 
+				// something before changing state
+				node.emit('BEFORE_DONE');
 				
 				if (this.auto_wait) {
 					if (node.window) {
@@ -3355,7 +3362,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.3.6';
+	node.version = '0.7.3.7';
 	
 	node.verbosity = 0;
 	
@@ -3824,6 +3831,12 @@
 	
 	JSUS = node.JSUS;
 	
+	GameTimer.STOPPED = -2
+	GameTimer.PAUSED = -1;
+	GameTimer.UNITIALIZED = 0;
+	GameTimer.LOADING = 1;
+	GameTimer.RUNNING = 2;
+	
 	function GameTimer (options) {
 		var options = options || {};
 		this.options = options;
@@ -3833,14 +3846,15 @@
 		this.timePassed = 0;
 		
 		this.hooks = [];
-		
 		this.init(this.options);
+		
 		
 		// TODO: remove into a new addon
 		this.listeners();
 	};
 	
 	GameTimer.prototype.init = function (options) {
+		this.status = GameTimer.UNITIALIZED;
 		if (this.timer) clearInterval(this.timer);
 		this.milliseconds = options.milliseconds || 0;
 		this.timeLeft = this.milliseconds;
@@ -3872,13 +3886,17 @@
 	};
 	
 	GameTimer.prototype.start = function() {
+		this.status = GameTimer.LOADING;
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
 			return;
 		}
+		//console.log('Interval about to start');
 		var that = this;
 		this.timer = setInterval(function() {
+			that.status = GameTimer.RUNNING;
+			//console.log('INTERVAL CALLED' + that.timeLeft);
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
 			// Fire custom hooks from the latest to the first if any
@@ -3887,8 +3905,10 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				that.fire(that.timeup);
+				// First stop the timer and then call the timeup
 				that.stop();
+				that.fire(that.timeup);
+				//console.log('fired timeup and stopping: ' + that.timeup);
 			}
 			
 		}, this.update);
@@ -3910,17 +3930,23 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
-		//console.log('Clearing Interval... pause')
-		clearInterval(this.timer);
+		if (this.status > 0) {
+			this.status = GameTimer.PAUSED;
+			//console.log('Clearing Interval... pause')
+			clearInterval(this.timer);
+		}
 	};	
 
 	GameTimer.prototype.resume = function() {
-		if (this.timer) return; // timer was not paused
+		if (this.status !== GameTimer.PAUSED) return; // timer was not paused
 		var options = JSUS.extend({milliseconds: this.milliseconds - this.timePassed}, this.options);
 		this.restart(options);
 	};	
 	
 	GameTimer.prototype.stop = function() {
+		if (this.status === GameTimer.UNITIALIZED) return;
+		if (this.status === GameTimer.STOPPED) return;
+		this.status = GameTimer.STOPPED;
 		//console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
@@ -3952,9 +3978,10 @@
 //			that.stop();
 //		});
 		
-		node.on('DONE', function(){
-			that.pause();
-		});
+//		node.on('DONE', function(){
+//			console.log('TIMER PAUSED');
+//			that.pause();
+//		});
 		
 		// TODO: check what is right behavior for this
 //		node.on('WAITING...', function(){
@@ -4084,12 +4111,12 @@
  
  
 /*!
- * nodeWindow v0.7.3.6
+ * nodeWindow v0.7.3.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 21. Feb 09:44:22 CET 2012
+ * Built on Do 23. Feb 16:30:59 CET 2012
  *
  */
  
@@ -5858,12 +5885,12 @@
  
  
 /*!
- * nodeGadgets v0.7.3.6
+ * nodeGadgets v0.7.3.7
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Di 21. Feb 09:44:22 CET 2012
+ * Built on Do 23. Feb 16:30:59 CET 2012
  *
  */
  
@@ -8204,16 +8231,16 @@
 		this.gameTimer.start();
 	};
 	
-	VisualTimer.prototype.restart = function(options) {
+	VisualTimer.prototype.restart = function (options) {
 		this.init(options);
 		this.start();
 	};
 	
-	VisualTimer.prototype.stop = function(options) {
+	VisualTimer.prototype.stop = function (options) {
 		this.gameTimer.stop();
 	};
 	
-	VisualTimer.prototype.resume = function(options) {
+	VisualTimer.prototype.resume = function (options) {
 		this.gameTimer.resume();
 	};
 		
@@ -8233,9 +8260,11 @@
 			}
 		});
 		
-		node.on('DONE', function(){
+		node.on('DONE', function() {
+			// TODO: This should be enabled again
+			//that.gameTimer.stop();
 			that.timerDiv.className = 'strike';
-		})
+		});
 	};
 	
 })(node.window.widgets); 

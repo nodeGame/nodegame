@@ -11,6 +11,12 @@
 	
 	JSUS = node.JSUS;
 	
+	GameTimer.STOPPED = -2
+	GameTimer.PAUSED = -1;
+	GameTimer.UNITIALIZED = 0;
+	GameTimer.LOADING = 1;
+	GameTimer.RUNNING = 2;
+	
 	function GameTimer (options) {
 		var options = options || {};
 		this.options = options;
@@ -20,14 +26,15 @@
 		this.timePassed = 0;
 		
 		this.hooks = [];
-		
 		this.init(this.options);
+		
 		
 		// TODO: remove into a new addon
 		this.listeners();
 	};
 	
 	GameTimer.prototype.init = function (options) {
+		this.status = GameTimer.UNITIALIZED;
 		if (this.timer) clearInterval(this.timer);
 		this.milliseconds = options.milliseconds || 0;
 		this.timeLeft = this.milliseconds;
@@ -59,13 +66,17 @@
 	};
 	
 	GameTimer.prototype.start = function() {
+		this.status = GameTimer.LOADING;
 		// fire the event immediately if time is zero
 		if (this.options.milliseconds === 0) {
 			node.emit(this.timeup);
 			return;
 		}
+		//console.log('Interval about to start');
 		var that = this;
 		this.timer = setInterval(function() {
+			that.status = GameTimer.RUNNING;
+			//console.log('INTERVAL CALLED' + that.timeLeft);
 			that.timePassed = that.timePassed + that.update;
 			that.timeLeft = that.milliseconds - that.timePassed;
 			// Fire custom hooks from the latest to the first if any
@@ -74,8 +85,10 @@
 			}
 			// Fire Timeup Event
 			if (that.timeLeft <= 0) {
-				that.fire(that.timeup);
+				// First stop the timer and then call the timeup
 				that.stop();
+				that.fire(that.timeup);
+				//console.log('fired timeup and stopping: ' + that.timeup);
 			}
 			
 		}, this.update);
@@ -97,17 +110,23 @@
 	};
 	
 	GameTimer.prototype.pause = function() {
-		//console.log('Clearing Interval... pause')
-		clearInterval(this.timer);
+		if (this.status > 0) {
+			this.status = GameTimer.PAUSED;
+			//console.log('Clearing Interval... pause')
+			clearInterval(this.timer);
+		}
 	};	
 
 	GameTimer.prototype.resume = function() {
-		if (this.timer) return; // timer was not paused
+		if (this.status !== GameTimer.PAUSED) return; // timer was not paused
 		var options = JSUS.extend({milliseconds: this.milliseconds - this.timePassed}, this.options);
 		this.restart(options);
 	};	
 	
 	GameTimer.prototype.stop = function() {
+		if (this.status === GameTimer.UNITIALIZED) return;
+		if (this.status === GameTimer.STOPPED) return;
+		this.status = GameTimer.STOPPED;
 		//console.log('Clearing Interval... stop')
 		clearInterval(this.timer);
 		this.timePassed = 0;
@@ -139,9 +158,10 @@
 //			that.stop();
 //		});
 		
-		node.on('DONE', function(){
-			that.pause();
-		});
+//		node.on('DONE', function(){
+//			console.log('TIMER PAUSED');
+//			that.pause();
+//		});
 		
 		// TODO: check what is right behavior for this
 //		node.on('WAITING...', function(){

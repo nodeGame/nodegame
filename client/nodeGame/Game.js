@@ -190,6 +190,7 @@
 			});
 			
 			node.on('DONE', function(p1, p2, p3) {
+				
 				// Execute done handler before updatating state
 				var ok = true;
 				var done = that.gameLoop.getAllParams(that.gameState).done;
@@ -197,6 +198,10 @@
 				if (done) ok = done.call(that, p1, p2, p3);
 				if (!ok) return;
 				that.gameState.is = GameState.iss.DONE;
+				
+				// Call all the functions that want to do 
+				// something before changing state
+				node.emit('BEFORE_DONE');
 				
 				if (this.auto_wait) {
 					if (node.window) {
