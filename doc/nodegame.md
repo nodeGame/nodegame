@@ -1,20 +1,11 @@
-nodeGame Documentation
-======================
-Stefano Balietti <sbalietti@ethz.ch>
-v0.4.5, Aug 2011
+# nodeGame Documentation
 
-// Web page meta data.  
-:keywords:    nodeGame,node.js,websockets,HTML5,experiments,games,javascript
-:description: nodeGame is a free, open source javascript library implementing communication for game-like applications in browser.
+~~~
+nodeGame is a free, open source javascript library implementing communication for game-like applications in browser.
+~~~
 
-.{revdate}: nodeGame {revnumber} Released
-************************************************************************
-**+nodeGame+** is under active development and so is this user guide. Please always refer to the latest version of nodeGame.
 
-'Stefano Balietti'
-************************************************************************
-
-Introduction
+## Introduction
 ------------
 
 +*nodeGame*+ is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
@@ -34,14 +25,12 @@ Features
 - much more... 
 
 
-Technology
-----------
+## Technology
 
 **+nodeGame+** is 100% javascript code. It is built upon
   http://nodejs.org[node.js] and http://socket.io[socket.io].
 
-Targeted audience
------------------
+## Targeted audience
 
 **+nodeGame+** is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
 
@@ -51,21 +40,20 @@ Targeted audience
 If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
 
 [[section-example]]
-Examples
---------
+## Examples
 
-How to run the server
-~~~~~~~~~~~~~~~~~~~~~
 
-You need to have http://nodejs.org[node.js] installed in your system.
+### How to run the server
 
-Get the latest server module from https://github.com/shakty/nodeGame/[github].
+- You need to have [node.js](http://nodejs.org) installed in your system.
 
-Copy the server directory in a folder of your choice.
+- Get the latest nodeGame module from [github](https://github.com/shakty/nodeGame/).
 
-Create a launcher file in the same directory, or use the predefined one **+server.js+**.
+- Copy the server directory in a folder of your choice.
 
-A minimal launcher configuration file would look like <<server-launcher-example, the launcher in the example>>
+- Create a launcher file in the same directory, or use the predefined one **+server.js+**.
+
+- A minimal launcher configuration file would look like <<server-launcher-example, the launcher in the example>>
 
 [[server-launcher-example]] 
 .nodeServer launcher file
@@ -74,15 +62,15 @@ var ServerNode = require('./nodegame-server');
 
 var options = { 
 		name: "nodeGame Server",
-		port: 8004
+		port: 8080
 };
 
 var sn = new ServerNode(options);
 
 sn.addChannel({
-		name: 'example',
-	  	player: '/gameexample'
-		admin: '/gameexample/admin',
+		name: 'Ultimatum Game',
+		player: 'ultimatum/'         // End point for users 
+		admin: 'ultimatum/admin/',   // End point for administrator
 });
 ---------------------------
 
@@ -102,8 +90,7 @@ If you want to make sure that your server stays always up you can read this grea
 
 - http://blog.nodejitsu.com/keep-a-nodejs-server-up-with-forever
 
-How to write a client
-~~~~~~~~~~~~~~~~~~~~~
+### How to write a client
 
 The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the +*nodeGame*+ client library is for now available in javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
 
@@ -112,17 +99,17 @@ The server architecture is very flexible, and a client can be written mostly in 
 <!doctype html>
 <title>nodeClient Example</title>
 <body>
-<script src="http://localhost:8004/socket.io/socket.io.js"></script> 
-<script src="http://localhost:8004/nodegame.js" charset="utf-8"></script>
-<script src="GameExample.js" charset="utf-8"></script>
+<script src="http://localhost:8080/socket.io/socket.io.js"></script> 
+<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+<script src="Ultimatum.js" charset="utf-8"></script>
 
 <script>
   window.onload = function(){
     var conf = {
       name: 'Player_1',
-      url: 'http://localhost:8004/gameexample'
+      url: 'http://localhost:8080/ultimatum/'
     };
-    node.play(conf, new GameExample());
+    node.play(conf, new Ultimatum());
   }
 </script>
 </body>
@@ -131,21 +118,21 @@ The server architecture is very flexible, and a client can be written mostly in 
 
 .nodeGame client in Node.js
 ----------------------------
-var GameExample = require(gameexample');
-var nodegame = require('nodegame-client');
+var GameExample = require(ultimatum'); // path/to/ultimatum
+var nodegame = require('nodegame-client'); //path/to/nodegame-client
 
 var conf = {
   name: 'Player_1',
-  url: 'http://localhost:8004/gameexample'
+  url: 'http://localhost:8080/ultimatum/'
 };
-nodegame.play(conf, new GameExample());
+nodegame.play(conf, new Ultimatum());
 ----------------------------
 
 As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the **+play+** method.
 
 
-How to write a game
-~~~~~~~~~~~~~~~~~~~
+### How to write a game
+
 
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
 
