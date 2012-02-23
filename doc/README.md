@@ -1,9 +1,5 @@
 # nodeGame Documentation
 
-~~~
-nodeGame is a free, open source javascript library implementing communication for game-like applications in browser.
-~~~
-
 ## Disclaimer to this documentation
 
 nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
@@ -12,8 +8,8 @@ nodeGame is under active development and new features are constantly added. We d
 
 **nodeGame** is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
 
-Features
-~~~~~~~~~
+### Features
+
 - Synchronous and Asynchronous games 
 - Keep track of the state of the players
 - Start/Pause/Resume games
@@ -23,7 +19,7 @@ Features
 - Statistics 
 - Output Formatting
 - Mailing
-- Easy to customize. See <<section-example,example>> 
+- Easy to customize. See [section-example][example]
 - much more... 
 
 
@@ -40,7 +36,7 @@ Features
 
 If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
 
-[[section-example]]
+section-example
 ## Examples
 
 
