@@ -39,6 +39,22 @@
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 	
+	    /**
+	     * Expose JSU
+	     *
+	     * @api public
+	     */
+	
+	    node.JSUS = require('JSUS').JSUS;
+		
+		/**
+	     * Expose NDDB
+	     *
+	     * @api public
+	     */
+	  	
+	    node.NDDB = require('NDDB').NDDB;
+		
 		/**
 	     * Expose Socket.io-client
 	     *
@@ -55,13 +71,7 @@
 	
 	    node.EventEmitter = require('./EventEmitter').EventEmitter;
 	    
-	    /**
-	     * Expose JSU
-	     *
-	     * @api public
-	     */
-	
-	    node.JSUS = require('JSUS').JSUS;
+
 		
 	    /**
 	     * Expose Utils
@@ -128,15 +138,7 @@
 	     */
 	
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
-	    
 	
-	    /**
-	     * Expose NDDB
-	     *
-	     * @api public
-	     */
-	  	
-	    node.NDDB = require('NDDB').NDDB;
 	    
 	    /**
 	     * Expose GameStorage
