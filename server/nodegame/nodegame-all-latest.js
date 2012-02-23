@@ -4,7 +4,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 16:15:08 CET 2012
+ * Built on Di 21. Feb 09:44:22 CET 2012
  *
  */
  
@@ -15,7 +15,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 16:15:08 CET 2012
+ * Built on Di 21. Feb 09:44:22 CET 2012
  *
  */
  
@@ -4089,7 +4089,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 16:15:08 CET 2012
+ * Built on Di 21. Feb 09:44:22 CET 2012
  *
  */
  
@@ -5863,7 +5863,7 @@
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 9. Feb 16:15:08 CET 2012
+ * Built on Di 21. Feb 09:44:22 CET 2012
  *
  */
  
@@ -6910,7 +6910,7 @@
 	    Table.call(this, options, data); 
 		this.options = options;
 		this.id = options.id;
-		
+		this.name = options.name || 'Dynamic Table';
 		this.fieldset = { legend: this.name,
 				  		  id: this.id + '_fieldset'
 		};
@@ -6922,6 +6922,7 @@
 	
 	DynamicTable.prototype.init = function (options) {
 		this.options = options;
+		this.name = options.name || this.name;
 		this.auto_update = ('undefined' !== typeof options.auto_update) ? options.auto_update : true;
 		this.replace = options.replace || false;
 		this.htmlRenderer = new HTMLRenderer({renderers: options.renderers});
