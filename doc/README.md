@@ -4,11 +4,14 @@
 nodeGame is a free, open source javascript library implementing communication for game-like applications in browser.
 ~~~
 
+## Disclaimer to this documentation
+
+nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
 ## Introduction
 ------------
 
-+*nodeGame*+ is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
+**nodeGame** is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
 
 Features
 ~~~~~~~~~
@@ -27,15 +30,15 @@ Features
 
 ## Technology
 
-**+nodeGame+** is 100% javascript code. It is built upon
+**nodeGame** is 100% javascript code. It is built upon
   http://nodejs.org[node.js] and http://socket.io[socket.io].
 
 ## Targeted audience
 
-**+nodeGame+** is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
+**nodeGame** is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
 
-- link:http://www.w3schools.com/js/[A beginner tutorial]
-- link:http://www.amazon.com/JavaScript-Good-Parts-Douglas-Crockford/dp/0596517742[An advanced (not free) book]
+- [A beginner tutorial](http://www.w3schools.com/js/)
+- [An advanced (not free) book](http://www.amazon.com/JavaScript-Good-Parts-Douglas-Crockford/dp/0596517742)
 
 If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
 
@@ -51,40 +54,38 @@ If you are familiar enough with javascript you can proceeds to the next section,
 
 - Copy the server directory in a folder of your choice.
 
-- Create a launcher file in the same directory, or use the predefined one **+server.js+**.
+- Create a launcher file in the same directory, or use the predefined one **server.js**.
 
 - A minimal launcher configuration file would look like <<server-launcher-example, the launcher in the example>>
 
 [[server-launcher-example]] 
 .nodeServer launcher file
----------------------------
-var ServerNode = require('./nodegame-server');
 
-var options = { 
+    var ServerNode = require('./nodegame-server');
+
+    var options = { 
 		name: "nodeGame Server",
 		port: 8080
-};
+    };
 
-var sn = new ServerNode(options);
+    var sn = new ServerNode(options);
 
-sn.addChannel({
+    sn.addChannel({
 		name: 'Ultimatum Game',
 		player: 'ultimatum/'         // End point for users 
 		admin: 'ultimatum/admin/',   // End point for administrator
-});
----------------------------
+    });
+
 
 The above snippet of code can be easily explained:
 
-- the **+require+** directive import the nodegame-server module;
-- a **+ServerNode+** object with a given name is created listening on port 8004  
+- the **require** directive import the nodegame-server module;
+- a **ServerNode** object with a given name is created listening on port 8004  
 - a _channel_ is added to the server; a channel is just specific address which can be bound to a specific game.
 
-Save the above file as +*server.js*+, and run the server with command: 
+Save the above file as **server.js**, and run the server with command: 
 
------
-node server.js
------
+    node server.js
 
 If you want to make sure that your server stays always up you can read this great tutorial:
 
@@ -94,41 +95,40 @@ If you want to make sure that your server stays always up you can read this grea
 
 The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the +*nodeGame*+ client library is for now available in javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
 
-.nodeGame client in a browser
-----------------------------
-<!doctype html>
-<title>nodeClient Example</title>
-<body>
-<script src="http://localhost:8080/socket.io/socket.io.js"></script> 
-<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
-<script src="Ultimatum.js" charset="utf-8"></script>
+#### nodeGame client in a browser
 
-<script>
-  window.onload = function(){
+    <!doctype html>
+    <title>nodeClient Example</title>
+    <body>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script> 
+    <script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+    <script src="Ultimatum.js" charset="utf-8"></script>
+
+    <script>
+      window.onload = function(){
+        var conf = {
+          name: 'Player_1',
+          url: 'http://localhost:8080/ultimatum/'
+        };
+        node.play(conf, new Ultimatum());
+      }
+   </script>
+   </body>
+
+
+#### nodeGame client in Node.js
+
+    var GameExample = require(ultimatum'); // path/to/ultimatum
+    var nodegame = require('nodegame-client'); //path/to/nodegame-client
+
     var conf = {
       name: 'Player_1',
       url: 'http://localhost:8080/ultimatum/'
     };
-    node.play(conf, new Ultimatum());
-  }
-</script>
-</body>
-----------------------------
+    nodegame.play(conf, new Ultimatum());
 
 
-.nodeGame client in Node.js
-----------------------------
-var GameExample = require(ultimatum'); // path/to/ultimatum
-var nodegame = require('nodegame-client'); //path/to/nodegame-client
-
-var conf = {
-  name: 'Player_1',
-  url: 'http://localhost:8080/ultimatum/'
-};
-nodegame.play(conf, new Ultimatum());
-----------------------------
-
-As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the **+play+** method.
+As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the **play** method.
 
 
 ### How to write a game
@@ -136,71 +136,66 @@ As you could see, both files are rather similar, and the main difference concern
 
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
 
-.Game Example
-[width="40%"]
-|=======
-|State A (Instructions) | Step 1		| x1 round
-|State B (Game)		| Step 1, Step2, Step3	| x 10 rounds
-|State C (Debrief)	| Step 1  	 	| x 1 round
-|=======
 
-Game Messages
-^^^^^^^^^^^^^
+| State   | State name   | Steps                | Repetitions |
+| ------- | ------------ | -------------------- | ----------- |
+| State A | Instructions | Step 1		        | x1 round    |
+| State B | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
+| State C | Debrief	     | Step 1  	 	        | x1 round    |
+
+It is possible to associate other properties to each game state, however they may depends on the additianal modules installed with nodeGame. Common extensions are the **timer**, or **done** properties, explained later.
+
+#### Game Messages
 
 Games are played exchanging messages between players. All messages pass through the server, which routes them to the correct receiver. Whenever a message is received an event is raised informing that such a event has just event. Writing a game reduces to emitting and catching the events you are interested in.
 
-.What are events?
-NOTE: An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, +*nodeGame*+ adds some extra ones more targeted for a gaming environment. 
+##### What are events?
+
+An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, **nodeGame** adds some extra ones more targeted for a gaming environment. 
 
 
-.How to emit and catch events?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+##### How to emit and catch events?
 
-After importing the **+nodeGame-client+** library, the **+node+** object is available in your programming environment. 
 
-[width="90%"]
-|=======
-|node.on('EVENT_A', function)	| Execute function whenever 'EVENT' happens
-|node.emit('EVENT_B', param1, param2, param3) 	| Emit an event of
-type 'EVENT_B' locally  
-|node.fire('EVENT_B', param1, param2, param3)	| Same as emit, but deprecated
-|=======
+After importing the **nodeGame-client** library, the **node** object is available in your programming environment. 
 
-It is important to understand that the +*emit*+ method 
+
+| node.on('EVENT_A', function)	| Execute function whenever 'EVENT' happens |
+| node.emit('EVENT_B', param1, param2, param3) 	| Emit an event of type 'EVENT_B' locally |
+| node.say()  | ... |
+| node.get()  | ... |
+| node.show() | Not yet implemented |
+
+
+It is important to understand that the **emit** method 
 
 
 Each message belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
 
-[width="90%"]
-|=======
-|HI	| Establish the connection between server and clients
-|STATE 	| Communicate or set the state of the game 
-|PLIST 	| Communicate or set the list of players 
-|DATA	| Pass over some data 
-|TXT	| Pass over a text message
-|BYE	| Terminate the connection between server and client (TO BE DONE)
-|=======
+
+| Type   | Meaning |
+| ------ | --------------------------------------------------- |
+| HI	 | Establish the connection between server and clients |
+| STATE  | Communicate or set the state of the game |
+| PLIST  | Communicate or set the list of players |
+| DATA	 | Pass over some data |
+| TXT	 | Pass over a text message |
+| DONE   | Communicate that a player has terminated a stage of the game |
+| BYE	 | Terminate the connection between server and client (TO BE DONE) |
 
 All the message, with the sole exceptions of HI and BYE messages, also have the following properties:
 
-[width="90%"]
-|=======
-|Direction	| Outgoing or Incoming
-|Target 	| Set / Get / Say 
-|=======
 
+Direction Outgoing or Incoming 
 
+| Target 	| Meaning      | 
+| --------- | ------------ |
+| SAY       | ... |
+| SET       | ... |
+| GET       | ... |
 
+## nodeGame TODO
 
-
-
-
-
-
-
-
-TODO
-----
 
 There is still a long list of things which are planned for future development.
 
@@ -211,3 +206,13 @@ There is still a long list of things which are planned for future development.
 5. Facilitating the exporting of results
 6. Storing the state of the game locally to resume upon reconnection.
 
+
+## License
+
+Copyright (C) 2012 Stefano Balietti
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
