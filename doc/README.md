@@ -1,7 +1,7 @@
 # nodeGame Documentation
 
-version 5.0.0
-status: incomplete
+- version 5.0.0
+- status: incomplete
 
 ## Disclaimer to this documentation
 
