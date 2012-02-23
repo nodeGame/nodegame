@@ -19,7 +19,7 @@ nodeGame is under active development and new features are constantly added. We d
 - Statistics 
 - Output Formatting
 - Mailing
-- Easy to customize. See [section-example][example]
+- Easy to customize. 
 - much more... 
 
 
@@ -36,7 +36,6 @@ nodeGame is under active development and new features are constantly added. We d
 
 If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
 
-section-example
 ## Examples
 
 
@@ -52,8 +51,8 @@ section-example
 
 - A minimal launcher configuration file would look like <<server-launcher-example, the launcher in the example>>
 
-[[server-launcher-example]] 
-.nodeServer launcher file
+
+#### nodeServer launcher file
 
     var ServerNode = require('./nodegame-server');
 
@@ -127,6 +126,8 @@ As you could see, both files are rather similar, and the main difference concern
 
 ### How to write a game
 
+Section still under construction...
+
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
 
 
@@ -153,13 +154,11 @@ An event is literally something that has happened. It can really be anything, e.
 After importing the **nodeGame-client** library, the **node** object is available in your programming environment. 
 
 
-
-
 | node.emit('EVENT', p1, p2, p3) | Generic hook for emitting an event locally.                                 |
 | node.set('EVENT', p1, p2, p3)  | A specific piece of information is send out to the players or to the server |
 | node.say('EVENT', p1, p2, p3)  | An generic piece of information is send out to the players or to the server |
 | node.get('EVENT', callback)    | Request something to the server, and then executes the callback.            |
-| ode.show()                     | Automatically pops up an HTML node in the player's screnn. **Not yet implemented** |
+| node.show()                    | Automatically pops up an HTML node in the player's screnn. **Not yet implemented** |
 | node.on('EVENT', function)	 | Execute function whenever 'EVENT' is triggered                              |
 
 
