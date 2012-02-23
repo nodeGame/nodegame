@@ -38,7 +38,7 @@ nodeGame is under active development and new features are constantly added. We d
 
 If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
 
-## Examples {examples}
+## Examples ## {#examples}
 
 
 ### How to run the server
