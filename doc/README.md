@@ -153,7 +153,7 @@ An event is literally something that has happened. It can really be anything, e.
 ##### How to emit and catch events?
 
 
-After importing the **nodeGame-client** library, the **node** object is available in your programming environment. 
+After importing the **nodeGame-client** library, the **node** object is available in your programming environment, with the following built-in methods.
 
 
 | **Method**                     | **Meaning** |
@@ -166,10 +166,10 @@ After importing the **nodeGame-client** library, the **node** object is availabl
 | node.on('EVENT', function)	 | Execute function whenever 'EVENT' is triggered                              |
 
 
-It is important to understand that the **emit** method ...TODO.
+It is important to understand that the **emit** method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
 
 
-Each message belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
+Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
 
 
 | Type   | Meaning |
@@ -182,16 +182,7 @@ Each message belongs to a certain category, which can specified by the users. So
 | DONE   | Communicate that a player has terminated a stage of the game |
 | BYE	 | Terminate the connection between server and client (TO BE DONE) |
 
-All the message, with the sole exceptions of HI and BYE messages, also have the following properties:
 
-
-Direction Outgoing or Incoming 
-
-| Target 	| Meaning      | 
-| --------- | ------------ |
-| SAY       | ... |
-| SET       | ... |
-| GET       | ... |
 
 ## nodeGame TODO
 
