@@ -1,14 +1,15 @@
 # nodeGame Documentation
 
+version 5.0.0
 
 ## Disclaimer to this documentation
 
-nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
+`nodeGame` is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
 
 ## Introduction
 
-**nodeGame** is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
+`nodeGame` is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
 
 ### Features
 
@@ -27,11 +28,11 @@ nodeGame is under active development and new features are constantly added. We d
 
 ## Technology
 
-**nodeGame** is 100% javascript code. It is built upon [node.js](http://nodejs.org) and  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
+`nodeGame` is 100% javascript code. It is built upon [node.js](http://nodejs.org) and  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
 
 ## Targeted audience
 
-**nodeGame** is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
+`nodeGame` is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
 
 - [A beginner tutorial](http://www.w3schools.com/js/)
 - [An advanced (not free) book](http://www.amazon.com/JavaScript-Good-Parts-Douglas-Crockford/dp/0596517742)
@@ -49,7 +50,7 @@ If you are familiar enough with javascript you can proceeds to the next section,
 
 - Copy the server directory in a folder of your choice.
 
-- Create a launcher file in the same directory, or use the predefined one **server.js**.
+- Create a launcher file in the same directory, or use the predefined one `server.js`.
 
 - A minimal launcher configuration file would look like the following example:
 
@@ -74,11 +75,11 @@ If you are familiar enough with javascript you can proceeds to the next section,
 
 The above snippet of code can be easily explained:
 
-- the **require** directive import the nodegame-server module;
-- a **ServerNode** object with a given name is created listening on port 8004  
+- the `require` directive import the nodegame-server module;
+- a `ServerNode` object with a given name is created listening on port 8004  
 - a _channel_ is added to the server; a channel is just specific address which can be bound to a specific game.
 
-Save the above file as **server.js**, and run the server with command: 
+Save the above file as `server.js`, and run the server with command: 
 
     node server.js
 
@@ -88,7 +89,7 @@ If you want to make sure that your server stays always up you can read this grea
 
 ### How to write a client
 
-The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the +*nodeGame*+ client library is for now available in javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
+The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the `nodeGame` client library is for now available in javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
 
 #### nodeGame client in a browser
 
@@ -123,7 +124,7 @@ The server architecture is very flexible, and a client can be written mostly in 
     nodegame.play(conf, new Ultimatum());
 
 
-As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the **play** method.
+As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the `play` method.
 
 
 ### How to write a game
@@ -139,7 +140,7 @@ A game consist in a set of states, steps and rounds. For each step it is possibl
 | **State B** | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
 | **State C** | Debrief	     | Step 1  	 	        | x1 round    |
 
-It is possible to associate other properties to each game state, however they may depends on the additianal modules installed with nodeGame. Common extensions are the **timer**, or **done** properties, explained later.
+It is possible to associate other properties to each game state, however they may depends on the additianal modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
 
 #### Game Messages
 
@@ -147,13 +148,13 @@ Games are played exchanging messages between players. All messages pass through 
 
 ##### What are events?
 
-An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, **nodeGame** adds some extra ones more targeted for a gaming environment. 
+An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, `nodeGame` adds some extra ones more targeted for a gaming environment. 
 
 
 ##### How to emit and catch events?
 
 
-After importing the **nodeGame-client** library, the **node** object is available in your programming environment, with the following built-in methods.
+After importing the `nodeGame-client` library, the `node` object is available in your programming environment, with the following built-in methods.
 
 
 | **Method**                     | **Meaning** |
@@ -166,7 +167,7 @@ After importing the **nodeGame-client** library, the **node** object is availabl
 | node.on('EVENT', function)	 | Execute function whenever 'EVENT' is triggered                              |
 
 
-It is important to understand that the **emit** method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
+It is important to understand that the `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
 
 
 Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
@@ -180,7 +181,7 @@ Each message which is sent belongs to a certain category, which can specified by
 | DATA	 | Pass over some data |
 | TXT	 | Pass over a text message |
 | DONE   | Communicate that a player has terminated a stage of the game |
-| BYE	 | Terminate the connection between server and client (TO BE DONE) |
+| BYE	 | Terminate the connection between server and client **Not yet implemented** |
 
 
 
