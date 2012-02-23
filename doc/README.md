@@ -1,9 +1,10 @@
 # nodeGame Documentation
 
 ~~~
- Disclaimer to this documentation
+Disclaimer to this documentation
 
 nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
+~~~
 
 ## Introduction
 
