@@ -51,7 +51,7 @@ If you are familiar enough with javascript you can proceeds to the next section,
 
 - Create a launcher file in the same directory, or use the predefined one **server.js**.
 
-- A minimal launcher configuration file would look like <<server-launcher-example, the launcher in the example>>
+- A minimal launcher configuration file would look like the following example:
 
 
 #### nodeServer launcher file
@@ -156,7 +156,7 @@ An event is literally something that has happened. It can really be anything, e.
 After importing the **nodeGame-client** library, the **node** object is available in your programming environment. 
 
 
-| Method                         | Meaning |
+| **Method**                     | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
 | node.emit('EVENT', p1, p2, p3) | Generic hook for emitting an event locally.                                 |
 | node.set('EVENT', p1, p2, p3)  | A specific piece of information is send out to the players or to the server |
