@@ -9,7 +9,6 @@ nodeGame is a free, open source javascript library implementing communication fo
 nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
 ## Introduction
-------------
 
 **nodeGame** is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
 
@@ -30,8 +29,7 @@ Features
 
 ## Technology
 
-**nodeGame** is 100% javascript code. It is built upon
-  http://nodejs.org[node.js] and http://socket.io[socket.io].
+**nodeGame** is 100% javascript code. It is built upon [node.js](http://nodejs.org) and  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
 
 ## Targeted audience
 
@@ -133,15 +131,14 @@ As you could see, both files are rather similar, and the main difference concern
 
 ### How to write a game
 
-
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
 
 
-| State   | State name   | Steps                | Repetitions |
-| ------- | ------------ | -------------------- | ----------- |
-| State A | Instructions | Step 1		        | x1 round    |
-| State B | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
-| State C | Debrief	     | Step 1  	 	        | x1 round    |
+| State       | State name   | Steps                | Repetitions |
+| ----------- | ------------ | -------------------- | ----------- |
+| **State A** | Instructions | Step 1		        | x1 round    |
+| **State B** | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
+| **State C** | Debrief	     | Step 1  	 	        | x1 round    |
 
 It is possible to associate other properties to each game state, however they may depends on the additianal modules installed with nodeGame. Common extensions are the **timer**, or **done** properties, explained later.
 
@@ -160,14 +157,17 @@ An event is literally something that has happened. It can really be anything, e.
 After importing the **nodeGame-client** library, the **node** object is available in your programming environment. 
 
 
-| node.on('EVENT_A', function)	| Execute function whenever 'EVENT' happens |
-| node.emit('EVENT_B', param1, param2, param3) 	| Emit an event of type 'EVENT_B' locally |
-| node.say()  | ... |
-| node.get()  | ... |
-| node.show() | Not yet implemented |
 
 
-It is important to understand that the **emit** method 
+| node.emit('EVENT', p1, p2, p3) | Generic hook for emitting an event locally.                                 |
+| node.set('EVENT', p1, p2, p3)  | A specific piece of information is send out to the players or to the server |
+| node.say('EVENT', p1, p2, p3)  | An generic piece of information is send out to the players or to the server |
+| node.get('EVENT', callback)    | Request something to the server, and then executes the callback.            |
+| ode.show()                     | Automatically pops up an HTML node in the player's screnn. **Not yet implemented** |
+| node.on('EVENT', function)	 | Execute function whenever 'EVENT' is triggered                              |
+
+
+It is important to understand that the **emit** method ...TODO.
 
 
 Each message belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
