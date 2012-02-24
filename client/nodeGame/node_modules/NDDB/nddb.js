@@ -1,32 +1,21 @@
 (function (exports, JSUS) {
 	
 	/**
+	 * NDDB provides a simple, lightweight NO-SQL object database 
+	 * for node.js and the browser.
 	 * 
-	 * NDDB provides a simple, lightweight NO-SQL database for nodeGame.
+	 * It depends on JSUS.
 	 * 
-	 * Selecting methods returning a this.create obj (can be concatenated):
-	 * 
-	 * 		- filter 			-> execute callback
-	 * 		- select			-> evaluate string
-	 * 		- get				-> evaluate an obj
-	 * 		- sort 				->
-	 * 		- reverse			->
-	 * 		
-	 * Return an array of GameBits or their values:
-	 * 
-	 * 		- fetch
-	 * 
-	 * TODO: update and delete methods
+	 * Update must be performed manually after a selection.
+	 * See README.md for help.
 	 * 
 	 */
 	
-	/**
-	 * Expose constructors
-	 */
+	// Expose constructors
 	exports.NDDB = NDDB;
 	
 	// NDDB version
-	NDDB.version = 0.2;
+	NDDB.version = 0.4;
 	
 	// Stdout redirect
 	NDDB.log = console.log;
@@ -57,14 +46,14 @@
 		this.auto_sort =  ('undefined' !== typeof options.auto_sort) ? options.auto_sort
 																	 : false;
 		
-		this.tags = options.tags || {};
-		
-		this.db = this.initDB(db);	// The actual database
-		
-		
-
+		this.tags = options.tags || {};	
+		this.db = this.import(db);	// The actual database
 	};
 	
+	/**
+	 * Default function used for sorting
+	 * 
+	 */
 	NDDB.prototype.globalCompare = function(o1, o2) {
 		if (!o1 && !o2) return 0;
 		if (!o1) return -1;
@@ -74,14 +63,19 @@
 		return 0;
 	};
 
-	// TODO: Do we need this?
-	// Can we set a length attribute
-	// Count?
+	/**
+	 * Returns the size of the database
+	 */
 	NDDB.prototype.size = function() {
 		return this.db.length 
 	};
 	
-	NDDB.prototype.masquerade = function (o, db) {
+	/**
+	 * Adds a special id into the __proto__ object of the object
+	 * 
+	 * @api private
+	 */
+	NDDB.prototype._masquerade = function (o, db) {
 		if (!o) return false;
 		// TODO: check this
 		if (o.__proto__.nddbid) return o;
@@ -91,15 +85,54 @@
 		return o;
 	};
 
-	NDDB.prototype.initDB = function (db) {
+	
+	NDDB.prototype._masqueradeDB = function (db) {
 		if (!db) return [];
 		var out = [];
 		for (var i = 0; i < db.length; i++) {
-			out[i] = this.masquerade(db[i], out);
+			out[i] = this._masquerade(db[i], out);
 		}
 		return out;
 	};
 	
+	/**
+	 * Performs automatic updates according to 
+	 * current configuration.
+	 * 
+	 * @api private
+	 */
+	NDDB.prototype._autoUpdate = function () {
+		if (this.auto_update_pointer) {
+			this.nddb_pointer = this.db.length-1;
+		}
+		if (this.auto_sort) {
+			this.sort();
+		}
+	}
+	
+	/**
+	 * Imports a whole array into the current database
+	 * 
+	 */
+	NDDB.prototype.import = function (db) {
+		if (!db) return [];
+		this.db = this.db.concat(this._masqueradeDB(db));
+		this._autoUpdate();
+	};
+	
+	/**
+	 * Inserts an object into the current database
+	 * 
+	 */
+	NDDB.prototype.insert = function (o) {
+		if (!o) return;
+		this.db.push(this._masquerade(o));
+		this._autoUpdate();
+	};
+	
+	/**
+	 * 
+	 */
 	NDDB.prototype.create = function (db) {
 		var options = this.cloneSettings();
 		options.parentDB = this.db;
@@ -194,17 +227,6 @@
 			out.push(func.apply(this, arguments));
 		}
 		return out;
-	};
-
-	
-	NDDB.prototype.insert = function (o) {
-		this.db.push(this.masquerade(o));
-		if (this.auto_update_pointer) {
-			this.nddb_pointer = this.db.length-1;
-		}
-		if (this.auto_sort) {
-			this.sort();
-		}
 	};
 	
 	// Sorting Operation
