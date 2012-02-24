@@ -54,6 +54,9 @@
 										options.auto_update_pointer
 									:	false;
 		
+		this.auto_sort =  ('undefined' !== typeof options.auto_sort) ? options.auto_sort
+																	 : false;
+		
 		this.tags = options.tags || {};
 		
 		this.db = this.initDB(db);	// The actual database
@@ -198,6 +201,9 @@
 		this.db.push(this.masquerade(o));
 		if (this.auto_update_pointer) {
 			this.nddb_pointer = this.db.length-1;
+		}
+		if (this.auto_sort) {
+			this.sort();
 		}
 	};
 	

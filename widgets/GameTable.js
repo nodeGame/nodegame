@@ -79,7 +79,7 @@
 	GameTable.prototype.listeners = function () {
 		var that = this;
 		
-		node.onPLIST(function(msg) {
+		node.onPLIST(function(msg) {	
 			if (msg.data.length == 0) return;
 			
 			//var diff = JSUS.arrayDiff(msg.data,that.plist.db);
