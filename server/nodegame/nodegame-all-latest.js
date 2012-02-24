@@ -1,21 +1,21 @@
 /*!
- * nodeGame-all v0.7.3.7
+ * nodeGame-all v0.7.4.0
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 23. Feb 16:30:58 CET 2012
+ * Built on Fr 24. Feb 17:06:50 CET 2012
  *
  */
  
  
 /*!
- * nodeGame Client v0.7.3.7
+ * nodeGame Client v0.7.4.0
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 23. Feb 16:30:59 CET 2012
+ * Built on Fr 24. Feb 17:06:50 CET 2012
  *
  */
  
@@ -143,12 +143,18 @@
 	
 	
 	
-	OBJ._obj2Array = function(obj, keyed) {
+	OBJ._obj2Array = function(obj, keyed, level, cur_level) {
+		if (level) {
+			var cur_level = ('undefined' !== typeof cur_level) ? cur_level : 1;
+			if (cur_level > level) return [obj];
+			cur_level = cur_level + 1;
+		}
+		
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
 	    	   if ( 'object' === typeof obj[key] ) {
-					result = result.concat(OBJ._obj2Array(obj[key],keyed));
+					result = result.concat(OBJ._obj2Array(obj[key], keyed, level, cur_level));
 				}
 				else {
 					if (keyed) result.push(key);
@@ -156,20 +162,28 @@
 				}
 	    	   
 	       }
-	    }
-	  
+	    }	    
 	    return result;
 	};
 	
-	OBJ.obj2Array = function (obj) {
-	    return OBJ._obj2Array(obj);
+	/**
+	 * Recursively put the values of the properties of an object into 
+	 * an array and returns it. The level of recursion can be set with the 
+	 * parameter level, by default recursion has no limit. That means that
+	 * the whole object gets totally unfolded into an array.
+	 */
+	OBJ.obj2Array = function (obj, level) {
+	    return OBJ._obj2Array(obj, false, level);
 	};
 	
 	/**
-	 * Creates an array containing all keys and values of the obj.
+	 * Creates an array containing all keys and values of an object and 
+	 * returns it.
+	 * 
+	 * @see OBJ.obj2Array 
 	 */
-	OBJ.obj2KeyedArray = function (obj) {
-	    return OBJ._obj2Array(obj,true);
+	OBJ.obj2KeyedArray = function (obj, level) {
+	    return OBJ._obj2Array(obj, true, level);
 	};
 	
 	OBJ.objGetAllKeys = function (obj) {
@@ -797,6 +811,9 @@
 										options.auto_update_pointer
 									:	false;
 		
+		this.auto_sort =  ('undefined' !== typeof options.auto_sort) ? options.auto_sort
+																	 : false;
+		
 		this.tags = options.tags || {};
 		
 		this.db = this.initDB(db);	// The actual database
@@ -902,16 +919,36 @@
 		};	
 	};
 	
-	NDDB.prototype.forEach = function (func, params) {
-		for (var i=0; i< this.db.length; i++) {
-			func.call(this, this.db[i], params);
+	/**
+	 * Applies a callback function to each element in the db.
+	 * 
+	 * It accepts a variable number of input arguments, but the first one 
+	 * must be a valid callback, and all the following are passed as parameters
+	 * to the callback
+	 */
+	NDDB.prototype.forEach = function () {
+		if (arguments.length === 0) return;
+		var func = arguments[0];	
+		for (var i=0; i < this.db.length; i++) {
+			arguments[0] = this.db[i];
+			func.apply(this, arguments);
 		}
 	};
 	
-	NDDB.prototype.map = function (func, params) {
+	/**
+	 * Applies a callback function to each element in the db, store
+	 * the results in an array and returns it.
+	 * 
+	 * @see NDDB.prototype.forEach
+	 * 
+	 */
+	NDDB.prototype.map = function () {
+		if (arguments.length === 0) return;
+		var func = arguments[0];
 		var out = [];
-		for (var i=0; i< this.db.length; i++) {
-			out.push(func.call(this, this.db[i], params));
+		for (var i=0; i < this.db.length; i++) {
+			arguments[0] = this.db[i];
+			out.push(func.apply(this, arguments));
 		}
 		return out;
 	};
@@ -921,6 +958,9 @@
 		this.db.push(this.masquerade(o));
 		if (this.auto_update_pointer) {
 			this.nddb_pointer = this.db.length-1;
+		}
+		if (this.auto_sort) {
+			this.sort();
 		}
 	};
 	
@@ -1507,141 +1547,163 @@
 );
  
  
-(function (exports) {
+(function (exports, node, NDDB, JSUS) {	
+
+	// node is empty now
+	
 	
    /**
     * Expose constructor.
     */
 	exports.EventEmitter = EventEmitter;
 	
+	
 	//var parser = exports.parser = {};
 		 
 	function EventEmitter() {
-	    this._listeners = {};
-	    this._localListeners = {};
-	}
+	    this._listeners = new NDDB({auto_sort: true});
+	    this._listeners.globalCompare = function (l1, l2) {
+	    	if (l1.priority > l2.priority) return 1;
+	    	if (l1.priority < l2.priority) return -1;
+	    	return 0;
+	    };
+	};
 	
 	EventEmitter.prototype = {
 	
 	    constructor: EventEmitter,
 		
+	    
+	    
 	    addListener: function (type, listener) {
-	    	 if (typeof this._listeners[type] == "undefined"){
-	             this._listeners[type] = [];
-	         }
-	         //console.log('Added Listener: ' + type + ' ' + listener);
-	         this._listeners[type].push(listener);
+		
+			// if type is an object we assume a Listener obj was passed
+	        var l = ('object' === typeof type) ? type : {listener: listener,
+	        					  	 					 event: type
+	        };
+	        
+			this._listeners.insert(new Listener(l));
 	    },
 	    
 	    addLocalListener: function (type, listener) {
-	    	if (typeof this._localListeners[type] == "undefined"){
-	            this._localListeners[type] = [];
-	        }
-	
-	        this._localListeners[type].push(listener);
+	    	this.addListener(type, listener);
 	    },
 	
-	    emit: function(event, p1, p2, p3) { // Up to 3 parameters
+	    // TODO: accept any number of parameters
+	    emit: function (event, p1, p2, p3) { // Up to three params
+	    	if (arguments.length === 0) return;
+
+	    	// TODO: this is too slow...
 	    	
-	    	if (typeof event == "string") {
-	            event = { type: event };
-	        }
-	        if (!event.target){
-	            event.target = this;
-	        }
-	        
-	        if (!event.type){  //falsy
-	            throw new Error("Event object missing 'type' property.");
-	        }
+//	    	if (arguments.length !== 1) {
+//	    		// TODO: this operation could be slow. Can we avoid it?
+//	    		arguments = JSUS.obj2Array(arguments,1);
+//	    		var event = arguments.shift();
+//	    	}
+//	    	else {
+//	    		var event = arguments[0];
+//	    		var arguments = [];
+//	    	}
+	    	
 	    	// Debug
-	        //console.log('Fired ' + event.type);
-	        
+	        //console.log('Fired ' + event);
+	    	
+	        this._listeners.forEach(function(l) {
+	        	if (l.event === event) {
+	        		// Executes the listeners only if it is still valid
+		    		// Sometimes, when messages are buffered for example, 
+		    		// events created in one state are fired during another
+		    		// and in some situations that is a problem
+	        		if (l.state && l.state !== node.game.gameState) {
+	    				if (l.ttl !== -1) {
+	    					if (node.game.gameLoop.diff(l.state) > l.ttl) {
+	    						return;
+	    					}
+	    				}
+	    			}
+		    		var target = l.target || node.game;
+		    		l.listener.call(target, p1, p2, p3);
+	        	}
+	        });
 	        
 	        //Global Listeners
-	        if (this._listeners[event.type] instanceof Array) {
-	            var listeners = this._listeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++) {
-	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
-	            	listeners[i].call(this.game, p1, p2, p3);
-	            }
-	        }
-	        
-	        // Local Listeners
-	        if (this._localListeners[event.type] instanceof Array) {
-	            var listeners = this._localListeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++) {
-	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
-	            	listeners[i].call(this.game, p1, p2, p3);
-	            }
-	        }
+//	        if (this._listeners[event.type] instanceof Array) {
+//	            var listeners = this._listeners[event.type];
+//	            for (var i=0, len=listeners.length; i < len; i++) {
+//	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
+//	            	listeners[i].call(this.game, p1, p2, p3);
+//	            }
+//	        }
+//	        
+//	        // Local Listeners
+//	        if (this._localListeners[event.type] instanceof Array) {
+//	            var listeners = this._localListeners[event.type];
+//	            for (var i=0, len=listeners.length; i < len; i++) {
+//	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
+//	            	listeners[i].call(this.game, p1, p2, p3);
+//	            }
+//	        }
 	       
 	    },
 	
-	    removeListener: function(type, listener) {
-	
-	    	function removeFromList(type, listener, list) {
-		    	//console.log('Trying to remove ' + type + ' ' + listener);
-		    	
-		        if (list[type] instanceof Array) {
-		        	if (!listener) {
-		        		delete list[type];
-		        		//console.log('Removed listener ' + type);
-		        		return true;
-		        	}
-		        	
-		            var listeners = list[type];
-		            var len=listeners.length;
-		            for (var i=0; i < len; i++) {
-		            	//console.log(listeners[i]);
-		            	
-		                if (listeners[i] == listener) {
-		                    listeners.splice(i, 1);
-		                    //console.log('Removed listener ' + type + ' ' + listener);
-		                    return true;
-		                }
-		            }
-		        }
-		        
-		        return false; // no listener removed
-	    	}
-	    	
-	    	var r1 = removeFromList(type, listener, this._listeners);
-	    	var r2 = removeFromList(type, listener, this._localListeners);
-
-	    	return r1 || r2;
-	    },
+	    removeListener: function(event, listener) {
+			if ('undefined' === typeof type) return;
+		
+			var listeners = this._listeners.select('event', '=', event);
+			if (listeners.size() === 0) return false;
+			// remove all the listeners associated with 
+			// the event if not listener is specified
+			if (!listener) listeners.clear(true); 
+				
+			listeners = listeners.select('listener', '=', listener);
+			if (listeners.size() === 0) return false;
+			listeners.clear(true);	
+		},
 	    
 	    clearLocalListeners: function() {
-	    	//console.log('Cleaning Local Listeners');
-	    	for (var key in this._localListeners) {
-	    		if (this._localListeners.hasOwnProperty(key)) {
-	    			this.removeListener(key, this._localListeners[key]);
-	    		}
-	    	}
-	    	
-	    	this._localListeners = {};
+	    	this._listeners.select('state', '=', node.state()).clear(true);
 	    },
 	    
 	    // Debug
 	    printAllListeners: function() {
-	    	console.log('nodeGame:\tPRINTING ALL LISTENERS');
-		    
-	    	for (var i in this._listeners){
-		    	if (this._listeners.hasOwnProperty(i)){
-		    		console.log(i + ' ' + i.length);
-		    	}
-		    }
-	    	
-	    	for (var i in this._localListeners){
-		    	if (this._listeners.hasOwnProperty(i)){
-		    		console.log(i + ' ' + i.length);
-		    	}
-		    }
-	        
+	    	node.log('PRINTING ALL LISTENERS');
+	    	this._listeners.forEach(function(l){
+	    		console.log(i);
+	    	});
 	    }
 	};
+	
+	function Listener (o) {
+		var o = o || {};
+		
+		// event name
+		this.event = o.event; 					
+		
+		// callback function
+		this.listener = o.listener; 			
+		
+		// events with higher priority are executed first
+		this.priority = o.priority || 0; 	
+		
+		// the state in which the listener is
+		// allowed to be executed
+		this.state = o.state || node.game.gameState || undefined; 	
+		
+		// for how many extra steps is the event 
+		// still valid. -1 = always valid
+		this.ttl = ('undefined' !== typeof o.ttl) ? o.ttl : -1; 
+		
+		// function will be called with
+		// target as 'this'		
+		this.target = o.target || undefined;	
+	};
 
-})('object' === typeof module ? module.exports : (window.node = {}));
+})(
+	'object' === typeof module ? module.exports : (window.node = {})
+  , 'object' === typeof module ? module.parent.exports : node			
+  , 'undefined' !== typeof NDDB ? NDDB : module.parent.exports.NDDB
+  , 'undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS
+);
  
  
 (function (exports, node) {
@@ -2412,19 +2474,39 @@
 		return out;
 	};
 	
+	/**
+	 * Returns the ordinal position of a state in the game loop. 
+	 * All steps and rounds in between are counted.
+	 * 
+	 */
 	GameLoop.prototype.indexOf = function (state) {
 		if (!state) return -1;
+		return this.diff(state, new GameState())
+	};
+	
+	/**
+	 * Returns the difference in number of steps between two states in the
+	 * current game loop. If the second state is not passed, the current game 
+	 * state is assumed. All steps and rounds in between are counted.
+	 * 
+	 */
+	GameLoop.prototype.diff = function (state1, state2) {
+		if (!state1) return false;
+		// TODO: if node.game is not initialized yet?
+		var state2 = (state2) ? state2 : node.game.gameState;
+		
 		var idx = 0;
-		var search = new GameState();
-		while (search) {
-			if (GameState.compare(search,state) === 0){
+		while (state2) {
+			if (GameState.compare(state1, state) === 0){
 				return idx;
 			}
-			search = this.next(search);
+			state2 = this.next(search);
 			idx++;
 		}
 		return -1;
 	};
+	
+	
 
 })(
 	'undefined' != typeof node ? node : module.exports
@@ -3362,7 +3444,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.3.7';
+	node.version = '0.7.4.0';
 	
 	node.verbosity = 0;
 	
@@ -3388,6 +3470,9 @@
 	// Will be initialized later
 	node.memory = {};
 	
+	// It will be overwritten later
+	node.game = {};
+	
 	// Load the auxiliary library if available in the browser
 	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
 	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
@@ -3395,6 +3480,22 @@
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 	
+	    /**
+	     * Expose JSU
+	     *
+	     * @api public
+	     */
+	
+	    node.JSUS = require('JSUS').JSUS;
+		
+		/**
+	     * Expose NDDB
+	     *
+	     * @api public
+	     */
+	  	
+	    node.NDDB = require('NDDB').NDDB;
+		
 		/**
 	     * Expose Socket.io-client
 	     *
@@ -3411,13 +3512,7 @@
 	
 	    node.EventEmitter = require('./EventEmitter').EventEmitter;
 	    
-	    /**
-	     * Expose JSU
-	     *
-	     * @api public
-	     */
-	
-	    node.JSUS = require('JSUS').JSUS;
+
 		
 	    /**
 	     * Expose Utils
@@ -3484,15 +3579,7 @@
 	     */
 	
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
-	    
 	
-	    /**
-	     * Expose NDDB
-	     *
-	     * @api public
-	     */
-	  	
-	    node.NDDB = require('NDDB').NDDB;
 	    
 	    /**
 	     * Expose GameStorage
@@ -3517,7 +3604,6 @@
 	  }
 	  // end node
 		
-	
 	var EventEmitter = node.EventEmitter;
 	var GameSocketClient = node.GameSocketClient;
 	var GameState = node.GameState;
@@ -3549,20 +3635,14 @@
 		this.gsc = null;
 		this.game = null;
 	};
-	
-	
-//	node.memory.get = function (reverse) {
-//		return node.game.dump(reverse);
-//	}
-//
-//	node.memory.getValues = function(reverse) {
-//		return node.game.memory.getValues(reverse);
-//	}
-	
+		
 	/**
 	 * Creating an object
 	 */
 	var that = node.node = new nodeGame();
+	
+	// TODO: Check: is this the best place do it?
+    node.node._listeners.set('state', GameState.compare);
 	
 	node.state = function() {
 		return (that.game) ? node.node.game.gameState : false;
@@ -3669,7 +3749,7 @@
 	node.set = function (key, value) {
 		// TODO: parameter to say who will get the msg
 		that.emit('out.set.DATA', value, null, key);
-	}
+	};
 	
 	
 	node.get = function (key, func) {
@@ -4111,12 +4191,12 @@
  
  
 /*!
- * nodeWindow v0.7.3.7
+ * nodeWindow v0.7.4.0
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 23. Feb 16:30:59 CET 2012
+ * Built on Fr 24. Feb 17:06:50 CET 2012
  *
  */
  
@@ -5885,12 +5965,12 @@
  
  
 /*!
- * nodeGadgets v0.7.3.7
+ * nodeGadgets v0.7.4.0
  * http://nodegame.org
  *
  * Copyright 2011, Stefano Balietti
  *
- * Built on Do 23. Feb 16:30:59 CET 2012
+ * Built on Fr 24. Feb 17:06:50 CET 2012
  *
  */
  
@@ -7401,7 +7481,7 @@
 	GameTable.prototype.listeners = function () {
 		var that = this;
 		
-		node.onPLIST(function(msg) {
+		node.onPLIST(function(msg) {	
 			if (msg.data.length == 0) return;
 			
 			//var diff = JSUS.arrayDiff(msg.data,that.plist.db);

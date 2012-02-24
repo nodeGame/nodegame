@@ -6,7 +6,7 @@
 	
 	var node = exports;
 
-	node.version = '0.7.3.7';
+	node.version = '0.7.4.0';
 	
 	node.verbosity = 0;
 	
@@ -32,6 +32,9 @@
 	// Will be initialized later
 	node.memory = {};
 	
+	// It will be overwritten later
+	node.game = {};
+	
 	// Load the auxiliary library if available in the browser
 	if ('undefined' !== typeof JSUS) node.JSUS = JSUS;
 	if ('undefined' !== typeof NDDB) node.NDDB = NDDB; 
@@ -39,6 +42,22 @@
 	// if node
 	if ('object' === typeof module && 'function' === typeof require) {
 	
+	    /**
+	     * Expose JSU
+	     *
+	     * @api public
+	     */
+	
+	    node.JSUS = require('JSUS').JSUS;
+		
+		/**
+	     * Expose NDDB
+	     *
+	     * @api public
+	     */
+	  	
+	    node.NDDB = require('NDDB').NDDB;
+		
 		/**
 	     * Expose Socket.io-client
 	     *
@@ -55,13 +74,7 @@
 	
 	    node.EventEmitter = require('./EventEmitter').EventEmitter;
 	    
-	    /**
-	     * Expose JSU
-	     *
-	     * @api public
-	     */
-	
-	    node.JSUS = require('JSUS').JSUS;
+
 		
 	    /**
 	     * Expose Utils
@@ -128,15 +141,7 @@
 	     */
 	
 	    node.GameSocketClient = require('./GameSocketClient').GameSocketClient;
-	    
 	
-	    /**
-	     * Expose NDDB
-	     *
-	     * @api public
-	     */
-	  	
-	    node.NDDB = require('NDDB').NDDB;
 	    
 	    /**
 	     * Expose GameStorage
@@ -161,7 +166,6 @@
 	  }
 	  // end node
 		
-	
 	var EventEmitter = node.EventEmitter;
 	var GameSocketClient = node.GameSocketClient;
 	var GameState = node.GameState;
@@ -193,20 +197,14 @@
 		this.gsc = null;
 		this.game = null;
 	};
-	
-	
-//	node.memory.get = function (reverse) {
-//		return node.game.dump(reverse);
-//	}
-//
-//	node.memory.getValues = function(reverse) {
-//		return node.game.memory.getValues(reverse);
-//	}
-	
+		
 	/**
 	 * Creating an object
 	 */
 	var that = node.node = new nodeGame();
+	
+	// TODO: Check: is this the best place do it?
+    node.node._listeners.set('state', GameState.compare);
 	
 	node.state = function() {
 		return (that.game) ? node.node.game.gameState : false;
@@ -313,7 +311,7 @@
 	node.set = function (key, value) {
 		// TODO: parameter to say who will get the msg
 		that.emit('out.set.DATA', value, null, key);
-	}
+	};
 	
 	
 	node.get = function (key, func) {
