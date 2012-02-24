@@ -75,14 +75,7 @@
 	OBJ._obj2Array = function(obj, keyed, level, cur_level) {
 		if (level) {
 			var cur_level = ('undefined' !== typeof cur_level) ? cur_level : 1;
-//			console.log('Cur Lev');
-//			console.log(cur_level);
-//			console.log('Lev');
-//			console.log(level);
-			if (cur_level > level){
-				//console.log('Recursion terminated');
-				return [obj];
-			}
+			if (cur_level > level) return [obj];
 			cur_level = cur_level + 1;
 		}
 		
