@@ -159,16 +159,36 @@
 		};	
 	};
 	
-	NDDB.prototype.forEach = function (func, params) {
-		for (var i=0; i< this.db.length; i++) {
-			func.call(this, this.db[i], params);
+	/**
+	 * Applies a callback function to each element in the db.
+	 * 
+	 * It accepts a variable number of input arguments, but the first one 
+	 * must be a valid callback, and all the following are passed as parameters
+	 * to the callback
+	 */
+	NDDB.prototype.forEach = function () {
+		if (arguments.length === 0) return;
+		var func = arguments[0];	
+		for (var i=0; i < this.db.length; i++) {
+			arguments[0] = this.db[i];
+			func.apply(this, arguments);
 		}
 	};
 	
-	NDDB.prototype.map = function (func, params) {
+	/**
+	 * Applies a callback function to each element in the db, store
+	 * the results in an array and returns it.
+	 * 
+	 * @see NDDB.prototype.forEach
+	 * 
+	 */
+	NDDB.prototype.map = function () {
+		if (arguments.length === 0) return;
+		var func = arguments[0];
 		var out = [];
-		for (var i=0; i< this.db.length; i++) {
-			out.push(func.call(this, this.db[i], params));
+		for (var i=0; i < this.db.length; i++) {
+			arguments[0] = this.db[i];
+			out.push(func.apply(this, arguments));
 		}
 		return out;
 	};
