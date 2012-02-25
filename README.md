@@ -9,19 +9,26 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
       # Install the Node.js Server
       $ git clone git://github.com/joyent/node.git
       $ cd node/
-      $ git checkout v0.6.12
+      $ git checkout v0.6.11
       $ ./configure
       $ sudo make
       $ sudo make install
   
+      # Clone nodeGame
+      $ cd /into/the/place/where/you/put/project/folders
+      $ git clone git://github.com/shakty/nodeGame.git
+      $ cd nodeGame/
+  
       # Install Dependencies
+      $ cd client/nodeGame/
       $ npm install
   
       # Make a clean build of nodeGame
-      $ cd client/
+      $ cd ..
       $ ./build
   
       # Start the management server
+      $ cd ..
       $ cd server/
       $ node server.js
   
