@@ -72,12 +72,18 @@
 	
 	
 	
-	OBJ._obj2Array = function(obj, keyed) {
+	OBJ._obj2Array = function(obj, keyed, level, cur_level) {
+		if (level) {
+			var cur_level = ('undefined' !== typeof cur_level) ? cur_level : 1;
+			if (cur_level > level) return [obj];
+			cur_level = cur_level + 1;
+		}
+		
 	    var result = [];
 	    for (var key in obj) {
 	       if (obj.hasOwnProperty(key)) {
 	    	   if ( 'object' === typeof obj[key] ) {
-					result = result.concat(OBJ._obj2Array(obj[key],keyed));
+					result = result.concat(OBJ._obj2Array(obj[key], keyed, level, cur_level));
 				}
 				else {
 					if (keyed) result.push(key);
@@ -85,20 +91,28 @@
 				}
 	    	   
 	       }
-	    }
-	  
+	    }	    
 	    return result;
 	};
 	
-	OBJ.obj2Array = function (obj) {
-	    return OBJ._obj2Array(obj);
+	/**
+	 * Recursively put the values of the properties of an object into 
+	 * an array and returns it. The level of recursion can be set with the 
+	 * parameter level, by default recursion has no limit. That means that
+	 * the whole object gets totally unfolded into an array.
+	 */
+	OBJ.obj2Array = function (obj, level) {
+	    return OBJ._obj2Array(obj, false, level);
 	};
 	
 	/**
-	 * Creates an array containing all keys and values of the obj.
+	 * Creates an array containing all keys and values of an object and 
+	 * returns it.
+	 * 
+	 * @see OBJ.obj2Array 
 	 */
-	OBJ.obj2KeyedArray = function (obj) {
-	    return OBJ._obj2Array(obj,true);
+	OBJ.obj2KeyedArray = function (obj, level) {
+	    return OBJ._obj2Array(obj, true, level);
 	};
 	
 	OBJ.objGetAllKeys = function (obj) {

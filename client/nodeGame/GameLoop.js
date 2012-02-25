@@ -231,19 +231,39 @@
 		return out;
 	};
 	
+	/**
+	 * Returns the ordinal position of a state in the game loop. 
+	 * All steps and rounds in between are counted.
+	 * 
+	 */
 	GameLoop.prototype.indexOf = function (state) {
 		if (!state) return -1;
+		return this.diff(state, new GameState())
+	};
+	
+	/**
+	 * Returns the difference in number of steps between two states in the
+	 * current game loop. If the second state is not passed, the current game 
+	 * state is assumed. All steps and rounds in between are counted.
+	 * 
+	 */
+	GameLoop.prototype.diff = function (state1, state2) {
+		if (!state1) return false;
+		// TODO: if node.game is not initialized yet?
+		var state2 = (state2) ? state2 : node.game.gameState;
+		
 		var idx = 0;
-		var search = new GameState();
-		while (search) {
-			if (GameState.compare(search,state) === 0){
+		while (state2) {
+			if (GameState.compare(state1, state) === 0){
 				return idx;
 			}
-			search = this.next(search);
+			state2 = this.next(search);
 			idx++;
 		}
 		return -1;
 	};
+	
+	
 
 })(
 	'undefined' != typeof node ? node : module.exports

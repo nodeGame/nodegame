@@ -1,135 +1,157 @@
-(function (exports) {
+(function (exports, node, NDDB, JSUS) {	
+
+	// node is empty now
+	
 	
    /**
     * Expose constructor.
     */
 	exports.EventEmitter = EventEmitter;
 	
+	
 	//var parser = exports.parser = {};
 		 
 	function EventEmitter() {
-	    this._listeners = {};
-	    this._localListeners = {};
-	}
+	    this._listeners = new NDDB({auto_sort: true});
+	    this._listeners.globalCompare = function (l1, l2) {
+	    	if (l1.priority > l2.priority) return 1;
+	    	if (l1.priority < l2.priority) return -1;
+	    	return 0;
+	    };
+	};
 	
 	EventEmitter.prototype = {
 	
 	    constructor: EventEmitter,
 		
+	    
+	    
 	    addListener: function (type, listener) {
-	    	 if (typeof this._listeners[type] == "undefined"){
-	             this._listeners[type] = [];
-	         }
-	         //console.log('Added Listener: ' + type + ' ' + listener);
-	         this._listeners[type].push(listener);
+		
+			// if type is an object we assume a Listener obj was passed
+	        var l = ('object' === typeof type) ? type : {listener: listener,
+	        					  	 					 event: type
+	        };
+	        
+			this._listeners.insert(new Listener(l));
 	    },
 	    
 	    addLocalListener: function (type, listener) {
-	    	if (typeof this._localListeners[type] == "undefined"){
-	            this._localListeners[type] = [];
-	        }
-	
-	        this._localListeners[type].push(listener);
+	    	this.addListener(type, listener);
 	    },
 	
-	    emit: function(event, p1, p2, p3) { // Up to 3 parameters
+	    // TODO: accept any number of parameters
+	    emit: function (event, p1, p2, p3) { // Up to three params
+	    	if (arguments.length === 0) return;
+
+	    	// TODO: this is too slow...
 	    	
-	    	if (typeof event == "string") {
-	            event = { type: event };
-	        }
-	        if (!event.target){
-	            event.target = this;
-	        }
-	        
-	        if (!event.type){  //falsy
-	            throw new Error("Event object missing 'type' property.");
-	        }
+//	    	if (arguments.length !== 1) {
+//	    		// TODO: this operation could be slow. Can we avoid it?
+//	    		arguments = JSUS.obj2Array(arguments,1);
+//	    		var event = arguments.shift();
+//	    	}
+//	    	else {
+//	    		var event = arguments[0];
+//	    		var arguments = [];
+//	    	}
+	    	
 	    	// Debug
-	        //console.log('Fired ' + event.type);
-	        
+	        //console.log('Fired ' + event);
+	    	
+	        this._listeners.forEach(function(l) {
+	        	if (l.event === event) {
+	        		// Executes the listeners only if it is still valid
+		    		// Sometimes, when messages are buffered for example, 
+		    		// events created in one state are fired during another
+		    		// and in some situations that is a problem
+	        		if (l.state && l.state !== node.game.gameState) {
+	    				if (l.ttl !== -1) {
+	    					if (node.game.gameLoop.diff(l.state) > l.ttl) {
+	    						return;
+	    					}
+	    				}
+	    			}
+		    		var target = l.target || node.game;
+		    		l.listener.call(target, p1, p2, p3);
+	        	}
+	        });
 	        
 	        //Global Listeners
-	        if (this._listeners[event.type] instanceof Array) {
-	            var listeners = this._listeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++) {
-	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
-	            	listeners[i].call(this.game, p1, p2, p3);
-	            }
-	        }
-	        
-	        // Local Listeners
-	        if (this._localListeners[event.type] instanceof Array) {
-	            var listeners = this._localListeners[event.type];
-	            for (var i=0, len=listeners.length; i < len; i++) {
-	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
-	            	listeners[i].call(this.game, p1, p2, p3);
-	            }
-	        }
+//	        if (this._listeners[event.type] instanceof Array) {
+//	            var listeners = this._listeners[event.type];
+//	            for (var i=0, len=listeners.length; i < len; i++) {
+//	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
+//	            	listeners[i].call(this.game, p1, p2, p3);
+//	            }
+//	        }
+//	        
+//	        // Local Listeners
+//	        if (this._localListeners[event.type] instanceof Array) {
+//	            var listeners = this._localListeners[event.type];
+//	            for (var i=0, len=listeners.length; i < len; i++) {
+//	            	//console.log('Event: ' +  event.type + ' '+ listeners[i].toString());
+//	            	listeners[i].call(this.game, p1, p2, p3);
+//	            }
+//	        }
 	       
 	    },
 	
-	    removeListener: function(type, listener) {
-	
-	    	function removeFromList(type, listener, list) {
-		    	//console.log('Trying to remove ' + type + ' ' + listener);
-		    	
-		        if (list[type] instanceof Array) {
-		        	if (!listener) {
-		        		delete list[type];
-		        		//console.log('Removed listener ' + type);
-		        		return true;
-		        	}
-		        	
-		            var listeners = list[type];
-		            var len=listeners.length;
-		            for (var i=0; i < len; i++) {
-		            	//console.log(listeners[i]);
-		            	
-		                if (listeners[i] == listener) {
-		                    listeners.splice(i, 1);
-		                    //console.log('Removed listener ' + type + ' ' + listener);
-		                    return true;
-		                }
-		            }
-		        }
-		        
-		        return false; // no listener removed
-	    	}
-	    	
-	    	var r1 = removeFromList(type, listener, this._listeners);
-	    	var r2 = removeFromList(type, listener, this._localListeners);
-
-	    	return r1 || r2;
-	    },
+	    removeListener: function(event, listener) {
+			if ('undefined' === typeof type) return;
+		
+			var listeners = this._listeners.select('event', '=', event);
+			if (listeners.size() === 0) return false;
+			// remove all the listeners associated with 
+			// the event if not listener is specified
+			if (!listener) listeners.clear(true); 
+				
+			listeners = listeners.select('listener', '=', listener);
+			if (listeners.size() === 0) return false;
+			listeners.clear(true);	
+		},
 	    
 	    clearLocalListeners: function() {
-	    	//console.log('Cleaning Local Listeners');
-	    	for (var key in this._localListeners) {
-	    		if (this._localListeners.hasOwnProperty(key)) {
-	    			this.removeListener(key, this._localListeners[key]);
-	    		}
-	    	}
-	    	
-	    	this._localListeners = {};
+	    	this._listeners.select('state', '=', node.state()).clear(true);
 	    },
 	    
 	    // Debug
 	    printAllListeners: function() {
-	    	console.log('nodeGame:\tPRINTING ALL LISTENERS');
-		    
-	    	for (var i in this._listeners){
-		    	if (this._listeners.hasOwnProperty(i)){
-		    		console.log(i + ' ' + i.length);
-		    	}
-		    }
-	    	
-	    	for (var i in this._localListeners){
-		    	if (this._listeners.hasOwnProperty(i)){
-		    		console.log(i + ' ' + i.length);
-		    	}
-		    }
-	        
+	    	node.log('PRINTING ALL LISTENERS');
+	    	this._listeners.forEach(function(l){
+	    		console.log(i);
+	    	});
 	    }
 	};
+	
+	function Listener (o) {
+		var o = o || {};
+		
+		// event name
+		this.event = o.event; 					
+		
+		// callback function
+		this.listener = o.listener; 			
+		
+		// events with higher priority are executed first
+		this.priority = o.priority || 0; 	
+		
+		// the state in which the listener is
+		// allowed to be executed
+		this.state = o.state || node.game.gameState || undefined; 	
+		
+		// for how many extra steps is the event 
+		// still valid. -1 = always valid
+		this.ttl = ('undefined' !== typeof o.ttl) ? o.ttl : -1; 
+		
+		// function will be called with
+		// target as 'this'		
+		this.target = o.target || undefined;	
+	};
 
-})('object' === typeof module ? module.exports : (window.node = {}));
+})(
+	'object' === typeof module ? module.exports : (window.node = {})
+  , 'object' === typeof module ? module.parent.exports : node			
+  , 'undefined' !== typeof NDDB ? NDDB : module.parent.exports.NDDB
+  , 'undefined' !== typeof JSUS ? JSUS : module.parent.exports.JSUS
+);
