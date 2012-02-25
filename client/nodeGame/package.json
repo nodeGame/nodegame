@@ -14,7 +14,9 @@
       , "url": "https://github.com/Shakty/nodegame.git"
     }
   , "dependencies": {
-      "socket.io-client": "0.8.5"
+      "socket.io-client": "0.8.5",
+      "JSUS": "0.1.0",
+      "ya-csv": "0.1.8"
     }
   , "engines": { "node": ">= 0.4.0" }
 }
