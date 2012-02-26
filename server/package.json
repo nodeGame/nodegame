@@ -1,10 +1,8 @@
 {
-    "name": "nodegame-server"
-  , "description": "nodeGame server for the browser and node.js"
-  , "version": "0.4.2"
-  , "main" : "./ServerNode.js"
+    "name": "server"
+  , "version": "0.1.0"
+  , "main" : "server.js"
   , "homepage": "http://nodegame.org"
-  , "keywords": ["game", "multiplayers", "experiments", "socket.io", "node", "websockets"]
   , "author": "Stefano Balietti <futur.dorko@gmail.com>"
   , "contributors": [
         { "name": "Stefano Balietti", "email": "futur.dorko@gmail.com" }
@@ -14,9 +12,10 @@
       , "url": "https://github.com/Shakty/nodegame.git"
     }
   , "dependencies": {
-      "socket.io": "0.8.7"
-  ,   "nodemailer": "0.1.18"
-  ,   "nodegame-client": ">= 0.1.0"
+      "nodegame-server": ">= 0.1.0"
     }
   , "engines": { "node": ">= 0.4.0" }
+  , "licenses": [
+    { "type": "MIT" }
+  ]
 }
