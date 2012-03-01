@@ -167,8 +167,8 @@ for (var i=0;i<clients.length;i++) {
 //v = nddb.fetch('value.r');
 //console.log(v);
 //
-//v = nddb.sum('value.r'); 
-//console.log(v);
+v = nddb.sum('value.r'); 
+console.log(v);
 
 
 //var v = nddb.sort('x');
@@ -306,14 +306,14 @@ for (var i=0;i<clients.length;i++) {
 //	g = nddb.previous();
 //}
 
-var culo = 'CULO';
-
-var o = function(a){
-	var oo = nddb.map(function(el){
-		return [el,a];
-	}, a);
-	console.log(oo);
-}(culo);
+//var culo = 'CULO';
+//
+//var o = function(a){
+//	var oo = nddb.map(function(el){
+//		return [el,a];
+//	}, a);
+//	console.log(oo);
+//}(culo);
 
 
 
