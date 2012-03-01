@@ -167,8 +167,8 @@ for (var i=0;i<clients.length;i++) {
 //v = nddb.fetch('value.r');
 //console.log(v);
 //
-//v = nddb.sum('value.r'); 
-//console.log(v);
+v = nddb.sum('value.r'); 
+console.log(v);
 
 
 //var v = nddb.sort('x');
@@ -288,20 +288,33 @@ for (var i=0;i<clients.length;i++) {
 //	console.log(v[i].nddbid);
 //}
 
-var g = nddb.get();
-while (g) {
-	console.log(g);
-	console.log('N');
-	g = nddb.next();
-}
+//var g = nddb.get();
+//while (g) {
+//	console.log(g);
+//	console.log('N');
+//	g = nddb.next();
+//}
+//
+//console.log(nddb.nddb_pointer);
+//console.log(nddb.size());
+//
+//
+//g = nddb.previous();
+//while (g) {
+//	console.log(g);
+//	console.log('P');
+//	g = nddb.previous();
+//}
 
-console.log(nddb.nddb_pointer);
-console.log(nddb.size());
+//var culo = 'CULO';
+//
+//var o = function(a){
+//	var oo = nddb.map(function(el){
+//		return [el,a];
+//	}, a);
+//	console.log(oo);
+//}(culo);
 
 
-g = nddb.previous();
-while (g) {
-	console.log(g);
-	console.log('P');
-	g = nddb.previous();
-}
+
+

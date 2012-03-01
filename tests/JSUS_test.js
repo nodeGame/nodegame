@@ -9,7 +9,12 @@ var c = [1, 'b', 3, 'd', 5, 'g'];
 
 
 
-var a = [{a:1},{a:1},{b:1},{c:2},{c: 'b'},{h:{c:1}},6];
+var a = [{a:1},{a:1},{b:1},{c:2},{c: 'b'}, {h: {c:1,
+											    b: {a:1,
+													b: {a:1,
+														b: {a:2}
+}}}}];
+
 var b = ['a','b',{a:1},'d','e','g'];
 //var c = [1, 'b', 3, 'd', 5, 'g'];
 //
@@ -28,8 +33,8 @@ var test = [];
 //
 //console.log(test);
 
-console.log(JSUS.arrayDiff(a,b));
-console.log(JSUS.arrayIntersect(a,b));
+//console.log(JSUS.arrayDiff(a,b));
+//console.log(JSUS.arrayIntersect(a,b));
 
 
 
@@ -95,3 +100,24 @@ console.log(JSUS.arrayIntersect(a,b));
 //
 //var v = JSUS.getNestedValue('a.r.t', o);
 //console.log(v);
+
+var a = {a:{a:1},
+		 b:{a:1},
+		 c:{b:1},
+		 d:{c:2},
+		 e:{c:'b'}, 
+		 f:{h: {c:1,
+			 	b: {a:1,
+			 		b: {a:1,
+			 			b: {a:2}
+}}}}};
+
+for (var i=1;i<7;i++){
+	var v = JSUS.obj2Array(a);
+	console.log(v);
+}
+
+for (var i=1;i<7;i++){
+	var v = JSUS.obj2KeyedArray(a);
+	console.log(v);
+}
