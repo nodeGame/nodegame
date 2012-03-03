@@ -45,6 +45,10 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
 
 See doc folder for now.
 
+## Contribute
+
+Any help is always appreciated, however please keep the our default [Code Conventions](http://javascript.crockford.com/code.html) in mind.
+
 ## License
 
 Copyright (C) 2012 Stefano Balietti
