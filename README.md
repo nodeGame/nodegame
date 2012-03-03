@@ -20,20 +20,13 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
       $ cd nodeGame/
   
       # Install Dependencies
-      $ cd client/nodeGame/
+      $ cd server/
       $ npm install (be aware of http://goo.gl/T8m9d)
   
-      # Make a clean build of nodeGame
-      $ cd ..
-      $ ./build
+      # Make a clean build of the nodeGame scripts for the client
+      $ node makefile.js
   
       # Start the management server
-      $ cd ..
-      $ cd server/nodegame-server/
-      $ npm install (be aware of http://goo.gl/T8m9d)
-      $ cd node_modules/nodegame-client/
-      $ npm install
-      $ cd ../../../
       $ node server.js
   
       # Open 2 different browser instances with the pr-example
