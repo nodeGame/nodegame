@@ -3,7 +3,7 @@ var smoosh = require('smoosh');
 
 // Configurations for file smooshing.
 var config = {
-    VERSION : "0.0.1",
+    // VERSION : "0.0.1",
     
     // Use JSHINT to spot code irregularities.
     JSHINT_OPTS: {
