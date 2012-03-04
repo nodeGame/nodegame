@@ -1,3 +1,5 @@
+.settings
+server/nodegame/*
 *~
 .project
 server/lib/*

@@ -17,9 +17,36 @@ var config = {
         
         "nodegame": [
         
-            // nodegame-window
-            "./node_modules/nodegame-window/Canvas.js",
+            // JSUS
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/jsus.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/array.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/dom.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/eval.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/obj.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/random.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/time.js",
+            
+            // NDDB
+            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/NDDB/nddb.js",
+            
+            // nodegame-client
+            "./node_modules/nodegame-server/node_modules/nodegame-client/EventEmitter.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/Utils.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameState.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/PlayerList.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameMsg.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameLoop.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameMsgGenerator.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameSocketClient.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/GameDB.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/Game.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/nodeGame.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/addons/GameTimer.js",
+            "./node_modules/nodegame-server/node_modules/nodegame-client/addons/TriggerManager.js",
+
+	    // nodegame-window
             "./node_modules/nodegame-window/GameWindow.js",
+            "./node_modules/nodegame-window/Canvas.js",
             "./node_modules/nodegame-window/HTMLRenderer.js",
             "./node_modules/nodegame-window/List.js",
             "./node_modules/nodegame-window/Table.js",
@@ -44,32 +71,6 @@ var config = {
             "./node_modules/nodegame-widgets/WaitScreen.js",
             "./node_modules/nodegame-widgets/Wall.js",
             
-            // nodegame-client
-            "./node_modules/nodegame-server/node_modules/nodegame-client/EventEmitter.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/Game.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameDB.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameLoop.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameMsg.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameMsgGenerator.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameSocketClient.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/GameState.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/nodeGame.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/PlayerList.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/Utils.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/addons/GameTimer.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/addons/TriggerManager.js",
-            
-            // JSUS
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/jsus.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/array.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/dom.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/eval.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/obj.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/random.js",
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/lib/time.js",
-            
-            // NDDB
-            "./node_modules/nodegame-server/node_modules/nodegame-client/node_modules/NDDB/nddb.js",
         ],
     }
 };
