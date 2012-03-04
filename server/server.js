@@ -29,13 +29,13 @@ var options = {
 var sn = new ServerNode(options);
 
 sn.addChannel({
-    name: '2',
-    admin: 'ultimatum2/admin',
-    player: 'ultimatum2'
+    name: 'Ultimatum',
+    admin: 'ultimatum/admin',
+    player: 'ultimatum'
 });
 
-sn.addChannel({
-    name: 'pr',
-    admin: 'pr/admin',
-    player: 'pr'
-});
+//sn.addChannel({
+//    name: 'pr',
+//    admin: 'pr/admin',
+//    player: 'pr'
+//});

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<title>Monitor Screen for Ultimatum Game</title>
+<link href="css/gs.css" rel="stylesheet" type="text/css" />
+<body>
+  <div id="root"></div> 
+<script src="http://localhost:8080/socket.io/socket.io.js"></script>
+<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+<script src="Monitor_Ultimatum.js" charset="utf-8"></script>
+
+<script>
+    window.onload = function(){
+   
+    var conf = {
+      name: "P_" + Math.floor(Math.random()*100),
+      url: "http://localhost:8080/ultimatum/admin",
+      verbosity: 0
+    };
+      
+    node.play(conf, new Monitor_Ultimatum());
+    
+  }
+</script>
+</body>

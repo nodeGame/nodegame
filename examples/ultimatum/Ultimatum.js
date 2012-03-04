@@ -1,8 +1,8 @@
 function Ultimatum () {
 	
 	this.name = 'Ultimatum Game';
-	this.description = 'Ultimatum Descr';
-	this.version = '0.2';
+	this.description = 'Two players split the pot. The receiver of the offer can accept or reject.';
+	this.version = '0.3';
 	
 	this.automatic_step = false;
 	
@@ -14,12 +14,12 @@ function Ultimatum () {
 	
 	this.init = function() {	
 		node.window.setup('PLAYER');
-		//node.random.emit('DONE');
 	};
 	
 	
 	var pregame = function() {
 		node.window.loadFrame('pregame.html');
+		node.DONE();
 		console.log('Pregame');
 	};
 	
@@ -27,112 +27,88 @@ function Ultimatum () {
 		var that = this;
 		
 		node.window.loadFrame('instructions.html', function() {
-	
 			var b = node.window.getElementById('read');
-		
 			b.onclick = function() {
-				node.DONE('Done for now...');
-				node.emit('WAIT');
+				node.DONE();
 			};
 		});
-		
-		
 		console.log('Instructions');
 	};
 		
-	var ultimatum = function(){
+	var ultimatum = function () {
 		var that = this;		
-		node.window.loadFrame('solo.html', function(){
+		node.window.loadFrame('solo.html', function () {
 			
-			node.onDATA (function(msg){
-						
-				if (msg.data === 'BIDDER') {
+			
+			node.on('BIDDER', function (msg) {
+				
+				node.set('ROLE','BIDDER');
+				node.window.loadFrame('bidder.html', function () {
+
+					var root = node.window.getElementById('root');
+					var b = node.window.getElementById('submitOffer');
 					
-					node.set('ROLE','BIDDER');
+					b.onclick = function() {
+						var offer = node.window.getElementById('offer');
+						// Store the value in memory
+						node.set('offer', offer.value);
+						node.say('DATA','OFFER', that.other,offer.value);
+						node.window.write(root,' Your offer: ' +  offer.value);
+					};
 					
-					node.window.loadFrame('bidder.html', function() {
-	
-						var root = node.window.getElementById('root');
-						var b = node.window.getElementById('submitOffer');
-						
-						b.onclick = function() {
-							var offer = node.window.getElementById('offer');
-							// Store the value in memory
-							node.set('offer', offer.value);
-							node.say('DATA','OFFER', that.other,offer.value);
-							node.window.write(root,' Your offer: ' +  offer.value);
-						};
-							
-						node.onDATA (function(msg) {
-							
-							if (msg.data === 'ACCEPT') {
-								node.window.write(root, 'Your offer was accepted');
-								node.DONE();
-							}
-							
-							if (msg.data === 'REJECT') {
-								node.window.write(root, 'Your offer was rejected');
-								node.DONE();
-							}
-						});
-						
-					});
-					
-				}
-				else if (msg.data === 'RESPONDENT') {
-					
-					node.set('ROLE','RESPONDENT');
-					
-					node.window.loadFrame('resp.html', function(){
-					
-						node.onDATA( function(msg) {
-							
-							if (msg.data === 'OFFER') {			
-								var offered = node.window.getElementById('offered');
-								node.window.write(offered, 'You received an offer of ' + msg.text);
-								offered.style.display = '';
-							}
-							
-						});
-						
-						
-						var accept = node.window.getElementById('accept');
-						var reject = node.window.getElementById('reject');
-						
-						
-						accept.onclick = function() {
-							node.set('response','ACCEPT');
-							node.say('DATA', 'ACCEPT', that.other);
+					node.on('ACCEPT', function (msg) {
+							node.window.write(root, 'Your offer was accepted');
 							node.DONE();
-						};
-						
-						reject.onclick = function() {
-							node.set('response','REJECT');
-							node.say('DATA', 'REJECT', that.other);
-							node.DONE();
-						};
-						
 					});
-				
-				}
-				
-				else if (msg.data === 'OTHER') {
-					that.other = msg.text;
-				}
-				
-				else if (msg.data === 'SOLO') {
-					console.log('solodone');
-					node.DONE();
-				}
-				
-				else {
-					console.log(msg.data);
-				}
+						
+					node.on('REJECT', function (msg) {
+						node.window.write(root, 'Your offer was rejected');
+						node.DONE();
+					});
+				});
 			});
-		});
+				
+			node.on('RESPONDENT', function (msg) {
+				
+				node.set('ROLE','RESPONDENT');
+				node.window.loadFrame('resp.html', function(){
+				
+				node.on('OFFER', function (msg) {			
+					var offered = node.window.getElementById('offered');
+					node.window.write(offered, 'You received an offer of ' + msg.text);
+					offered.style.display = '';
+				
+					var accept = node.window.getElementById('accept');
+					var reject = node.window.getElementById('reject');
+					
+					accept.onclick = function() {
+						node.set('response','ACCEPT');
+						node.say('DATA', 'ACCEPT', that.other);
+						node.DONE();
+					};
+					
+					reject.onclick = function() {
+						node.set('response','REJECT');
+						node.say('DATA', 'REJECT', that.other);
+						node.DONE();
+					};
+				});
+			});
+				
+				
+			node.on('OTHER', function (msg) {
+				that.other = msg.text;
+			});
 			
+			node.on('SOLO', function() {
+				console.log('solodone');
+				node.DONE();
+			});
+				
+		});
 	
-		console.log('Game1');
+			console.log('Ultimatum');
+		});
 	};
 	
 	var postgame = function(){
@@ -147,35 +123,28 @@ function Ultimatum () {
 		console.log('Game ended');
 	};
 	
-	// Assigning Functions to Loops
+	// Creating the game loop
 	
-	var pregameloop = {
-		1: pregame
-	};
-	
-	var instructionsloop = {
-		1: instructions
-	};
-	
-	var gameloop = { // The different, subsequent phases in each round
-		1: ultimatum
-	};
-	
-	var postgameloop = {
-		1: postgame
-	};
-	
-	var endgameloop = {
-		1: endgame
-	};
-	
-	
-	// LOOPS
 	this.loops = {
-			1: {loop:pregameloop},
-			2: {loop:instructionsloop},
-			3: {rounds:10, loop:gameloop}, // rounds is governed by the server, if not automatic_step is set
-			4: {loop:postgameloop},
-			5: {loop:endgameloop}
-		};	
-}
+		1: {state: pregame,
+			name: 'Game will start soon'
+		},
+		
+		2: {state: instructions,
+			name: 'Instructions'
+		},
+		
+		3: {rounds: 10, 
+			state:  ultimatum,
+			name: 'Ultimatum Game'
+		}, 
+		
+		4: {state: postgame,
+			name: 'Questionnaire'
+		},
+		
+		5: {state: endgame,
+			name: 'Thank you!'
+		}
+	};	
+};
