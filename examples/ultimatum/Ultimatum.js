@@ -4,7 +4,11 @@ function Ultimatum () {
 	this.description = 'Two players split the pot. The receiver of the offer can accept or reject.';
 	this.version = '0.3';
 	
-	this.automatic_step = false;
+	// Wait for a STATE message from the server
+	// to go to next state
+	this.auto_step = false; 
+	this.auto_wait = true;
+	
 	
 	this.minPlayers = 2;
 	this.maxPlayers = 10;
@@ -71,28 +75,28 @@ function Ultimatum () {
 			node.on('RESPONDENT', function (msg) {
 				
 				node.set('ROLE','RESPONDENT');
-				node.window.loadFrame('resp.html', function(){
-				
-				node.on('OFFER', function (msg) {			
-					var offered = node.window.getElementById('offered');
-					node.window.write(offered, 'You received an offer of ' + msg.text);
-					offered.style.display = '';
-				
-					var accept = node.window.getElementById('accept');
-					var reject = node.window.getElementById('reject');
+				node.window.loadFrame('resp.html', function () {
 					
-					accept.onclick = function() {
-						node.set('response','ACCEPT');
-						node.say('DATA', 'ACCEPT', that.other);
-						node.DONE();
-					};
+					node.on('OFFER', function (msg) {			
+						var offered = node.window.getElementById('offered');
+						node.window.write(offered, 'You received an offer of ' + msg.text);
+						offered.style.display = '';
 					
-					reject.onclick = function() {
-						node.set('response','REJECT');
-						node.say('DATA', 'REJECT', that.other);
-						node.DONE();
-					};
-				});
+						var accept = node.window.getElementById('accept');
+						var reject = node.window.getElementById('reject');
+						
+						accept.onclick = function() {
+							node.set('response','ACCEPT');
+							node.say('DATA', 'ACCEPT', that.other);
+							node.DONE();
+						};
+						
+						reject.onclick = function() {
+							node.set('response','REJECT');
+							node.say('DATA', 'REJECT', that.other);
+							node.DONE();
+						};
+					});
 			});
 				
 				
