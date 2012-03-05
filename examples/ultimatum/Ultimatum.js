@@ -44,7 +44,7 @@ function Ultimatum () {
 		node.window.loadFrame('solo.html', function () {
 			
 			
-			node.on('BIDDER', function (msg) {
+			node.onDATA('BIDDER', function (msg) {
 				
 				node.set('ROLE','BIDDER');
 				node.window.loadFrame('bidder.html', function () {
@@ -56,30 +56,30 @@ function Ultimatum () {
 						var offer = node.window.getElementById('offer');
 						// Store the value in memory
 						node.set('offer', offer.value);
-						node.say('DATA','OFFER', that.other,offer.value);
-						node.window.write(root,' Your offer: ' +  offer.value);
+						node.say(offer.value, 'OFFER', that.other);
+						node.window.write(' Your offer: ' +  offer.value);
 					};
 					
-					node.on('ACCEPT', function (msg) {
-							node.window.write(root, 'Your offer was accepted');
+					node.onDATA('ACCEPT', function (msg) {
+							node.window.write('Your offer was accepted');
 							node.DONE();
 					});
 						
-					node.on('REJECT', function (msg) {
-						node.window.write(root, 'Your offer was rejected');
+					node.onDATA('REJECT', function (msg) {
+						node.window.write('Your offer was rejected');
 						node.DONE();
 					});
 				});
 			});
 				
-			node.on('RESPONDENT', function (msg) {
+			node.onDATA('RESPONDENT', function (msg) {
 				
 				node.set('ROLE','RESPONDENT');
 				node.window.loadFrame('resp.html', function () {
 					
-					node.on('OFFER', function (msg) {			
+					node.onDATA('OFFER', function (msg) {			
 						var offered = node.window.getElementById('offered');
-						node.window.write(offered, 'You received an offer of ' + msg.text);
+						node.window.write('You received an offer of ' + msg.text, offered);
 						offered.style.display = '';
 					
 						var accept = node.window.getElementById('accept');
@@ -100,11 +100,11 @@ function Ultimatum () {
 			});
 				
 				
-			node.on('OTHER', function (msg) {
-				that.other = msg.text;
+			node.onDATA('OTHER', function (msg) {
+				that.other = msg.data;
 			});
 			
-			node.on('SOLO', function() {
+			node.onDATA('SOLO', function() {
 				console.log('solodone');
 				node.DONE();
 			});

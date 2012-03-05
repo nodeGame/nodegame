@@ -1,4 +1,4 @@
-var nodegame = require('../../server/node_modules/nodegame-server/node_modules/nodegame-client');
+var nodegame = require('../node_modules/nodegame-server/node_modules/nodegame-client');
 module.exports.nodegame = nodegame;
 
 var Ultimatum = require('ultimatum');

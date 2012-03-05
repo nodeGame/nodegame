@@ -1,4 +1,4 @@
-var node = require('nodegame-client');
+var node = require('../node_modules/nodegame-server/node_modules/nodegame-client');
 module.exports.node = node;
 
 var Pr = require('peerreview');
