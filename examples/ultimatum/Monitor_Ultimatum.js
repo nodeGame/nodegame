@@ -7,7 +7,8 @@ function Monitor_Ultimatum () {
 	this.minPlayers = 2;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = false;
+	this.auto_step = false;
+	this.observer = true;
 	
 	this.init = function() {
 		node.window.setup('MONITOR');

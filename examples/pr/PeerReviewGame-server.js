@@ -5,7 +5,11 @@ function Monitor_Example () {
 	this.version = '0.3';
 	
 	this.observer = true;	
+	
+	// TODO: Check auto_step = false
 	this.automatic_step = false;
+	
+	
 //	this.minPlayers = 2;
 //	this.maxPlayers = 10;
 	

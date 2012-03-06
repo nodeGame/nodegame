@@ -35,18 +35,25 @@ function Ultimatum () {
 			b.onclick = function() {
 				node.DONE();
 			};
+			
+			// Autoplay
+			node.DONE();
 		});
 		console.log('Instructions');
 	};
 		
 	var ultimatum = function () {
+		
 		var that = this;		
 		node.window.loadFrame('solo.html', function () {
 			
 			
 			node.onDATA('BIDDER', function (msg) {
 				
-				node.set('ROLE','BIDDER');
+				that.other = msg.data.other;
+				console.log('OTHER ' + msg.data.other);
+				
+				node.set('ROLE', 'BIDDER');
 				node.window.loadFrame('bidder.html', function () {
 
 					var root = node.window.getElementById('root');
@@ -73,13 +80,13 @@ function Ultimatum () {
 			});
 				
 			node.onDATA('RESPONDENT', function (msg) {
-				
-				node.set('ROLE','RESPONDENT');
+				that.other = msg.data.other;
+				node.set('ROLE', 'RESPONDENT');
 				node.window.loadFrame('resp.html', function () {
 					
 					node.onDATA('OFFER', function (msg) {			
 						var offered = node.window.getElementById('offered');
-						node.window.write('You received an offer of ' + msg.text, offered);
+						node.window.write('You received an offer of ' + msg.data, offered);
 						offered.style.display = '';
 					
 						var accept = node.window.getElementById('accept');
@@ -87,21 +94,16 @@ function Ultimatum () {
 						
 						accept.onclick = function() {
 							node.set('response','ACCEPT');
-							node.say('DATA', 'ACCEPT', that.other);
+							node.say('ACCEPT', 'ACCEPT', that.other);
 							node.DONE();
 						};
 						
 						reject.onclick = function() {
 							node.set('response','REJECT');
-							node.say('DATA', 'REJECT', that.other);
+							node.say('REJECT', 'REJECT', that.other);
 							node.DONE();
 						};
 					});
-			});
-				
-				
-			node.onDATA('OTHER', function (msg) {
-				that.other = msg.data;
 			});
 			
 			node.onDATA('SOLO', function() {
