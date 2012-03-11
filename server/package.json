@@ -13,9 +13,7 @@
     }
   , "dependencies": {
       "nodegame-server": ">= 0.1.0",
-      "smoosh": "0.3.2",
-      "nodegame-window": ">= 0.1.0",
-      "nodegame-widgets": ">= 0.1.0"
+      "smoosh": "0.3.2"
     }
   , "engines": { "node": ">= 0.4.0" }
   , "licenses": [
