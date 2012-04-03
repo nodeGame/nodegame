@@ -15,3 +15,4 @@ jquery
 client/nodeclient/exit.csv
 *.csv
 *.swp
+.DS_Store
