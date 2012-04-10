@@ -2,7 +2,7 @@ function Ultimatum(){
     this.name = 'Ultimatum Game';
     this.description = 'Two players split the pot. The receiver of the offer can accept or reject.';
     this.version = '0.3';
-    
+
     // Wait for a STATE message from the server
     // to go to next state
     this.auto_step = false; 
@@ -36,15 +36,14 @@ function Ultimatum(){
             templateName: 'StateDisplay'
         });
         stateDisplay.appendTo('#root');
-        
+
         // Update StateDisplay bindings.
         setTimeout(function(){
-            Game.player.set('name', 'this is a new player name');
-            Game.player.set('id', 'this is the new player id');
-            Game.player.set('state', 'this is the new player state');
-        }, 6000);
+            Game.player.set('name', window.node.game.player.name);
+            Game.player.set('id', window.node.game.player.id);
+            Game.player.set('state', new GameState(window.node.game.gameState).toString());
+        }, 2000);
         
-        console.log(node.game.gameState);
         
         //// SOCKET.IO -------------
         // var chat = io.connect('http://localhost/chat')
