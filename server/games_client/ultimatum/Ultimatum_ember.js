@@ -1,5 +1,83 @@
 function Ultimatum(){
     this.name = 'Ultimatum Game';
+    this.description = 'Two players split the pot. The receiver of the offer can accept or reject.';
+    this.version = '0.3';
+    
+    // Wait for a STATE message from the server
+    // to go to next state
+    this.auto_step = false; 
+    this.auto_wait = true;
+    
+    this.minPlayers = 2;
+    this.maxPlayers = 10;
+    
+    this.BIDDER = 1;
+    this.RESPONDENT = 0;
+    
+    // Initialize the Views and create the Bindings.
+    this.init = function(){
+        window.Game = Ember.Application.create();
+        
+        // Create the bindings.
+        Game.player = Ember.Object.create({
+            name: 'Empty Player Name',
+            id: 'Empty Player ID',
+            state: 'Empty Player State'
+        });
+        
+        // Create the view for VisualState.
+        
+        // Create the view for VisualTimer.
+        
+        // Create the view for the DoneButton.
+        
+        // Create the view for the StateDisplay.
+        var stateDisplay = Ember.View.create({
+            templateName: 'StateDisplay'
+        });
+        stateDisplay.appendTo('#root');
+        
+        // Update StateDisplay bindings.
+        setTimeout(function(){
+            Game.player.set('name', 'this is a new player name');
+            Game.player.set('id', 'this is the new player id');
+            Game.player.set('state', 'this is the new player state');
+        }, 6000);
+        
+        console.log(node.game.gameState);
+        
+        //// SOCKET.IO -------------
+        // var chat = io.connect('http://localhost/chat')
+        //     , news = io.connect('http://localhost/news');
+        // 
+        //   chat.on('connect', function () {
+        //     chat.emit('hi!');
+        //   });
+        // 
+        //   news.on('news', function () {
+        //     news.emit('woot');
+        //   });
+        
+        // node.window.setup('PLAYER');
+        
+        
+        // Visual State
+        
+        //         this.header  = this.generateHeader();
+        //      var mainframe   = this.addIFrame(this.root,'mainframe');
+        //      
+        // node.game.vs     = this.addWidget('VisualState', this.header);
+        // node.game.timer = this.addWidget('VisualTimer', this.header);
+        // node.game.doneb = this.addWidget('DoneButton', this.header);
+        // node.game.sd     = this.addWidget('StateDisplay', this.header);
+        // 
+        // this.addWidget('WaitScreen');
+        //      
+        // // Add default CSS
+        // if (node.conf.host) {
+        //  this.addCSS(document.body, node.conf.host + '/player.css');
+        // }
+    };
     
 };
 
