@@ -3,7 +3,25 @@
 <title>Ultimatum Game</title>
 
 <script type="text/x-handlebars" data-template-name="VisualState">
-Foobar
+<fieldset id="visualstate_fieldset">
+  <legend>State</legend>
+  <table id="table_906">
+    <tbody>
+      <tr>
+        <td>Previous: </td>
+        <td>{{Game.state.previous}}</td>
+      </tr>
+      <tr>
+        <td class="null strong underline">Current: </td>
+        <td class="null strong">{{Game.state.current}}</td>
+      </tr>
+      <tr>
+        <td>Next: </td>
+        <td>{{Game.state.next}}</td>
+      </tr>
+    </tbody>
+  </table>
+</fieldset>
 </script>
 
 <script type="text/x-handlebars" data-template-name="StateDisplay">

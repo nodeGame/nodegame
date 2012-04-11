@@ -24,8 +24,18 @@ function Ultimatum(){
             id: 'Empty Player ID',
             state: 'Empty Player State'
         });
+
+        Game.state = Ember.Object.create({
+            previous: '-',
+            current: '-',
+            next: '-'
+        });
         
         // Create the view for VisualState.
+        var visualState = Ember.View.create({
+            templateName: 'VisualState'
+        });
+        visualState.appendTo('#root');
         
         // Create the view for VisualTimer.
         
@@ -36,6 +46,14 @@ function Ultimatum(){
             templateName: 'StateDisplay'
         });
         stateDisplay.appendTo('#root');
+
+        // Update VisualState bindings.
+        setTimeout(function(){
+            var miss = '-';
+            Game.state.set('previous', window.node.game.gameLoop.getName(window.node.game.gameState) || miss);
+            Game.state.set('current', window.node.game.gameLoop.getName(window.node.game.previous()) || miss);
+            Game.state.set('next', window.node.game.gameLoop.getName(window.node.game.next()) || miss);
+        }, 2000);
 
         // Update StateDisplay bindings.
         setTimeout(function(){
@@ -59,8 +77,8 @@ function Ultimatum(){
         
         // node.window.setup('PLAYER');
         
+
         
-        // Visual State
         
         //         this.header  = this.generateHeader();
         //      var mainframe   = this.addIFrame(this.root,'mainframe');
@@ -76,7 +94,48 @@ function Ultimatum(){
         // if (node.conf.host) {
         //  this.addCSS(document.body, node.conf.host + '/player.css');
         // }
+ 
     };
+
+    var pregame = function(){
+
+    };
+
+    var instructions = function(){
+
+    };
+
+    var ultimatum = function(){
+
+    };
+
+    var postgame = function(){
+
+    };
+
+    var endgame = function(){
+
+    };
+
+    // Creating the game loop 
+    this.loops = {
+        1: {state: pregame,
+            name: 'Game will start soon'
+        },
+        2: {state: instructions,
+            name: 'Instructions'
+        },     
+        3: {rounds: 10, 
+            state:  ultimatum,
+            name: 'Ultimatum Game'
+        }, 
+        4: {state: postgame,
+            name: 'Questionnaire'
+        },
+        5: {state: endgame,
+            name: 'Thank you!'
+        }
+    }; 
     
 };
 
