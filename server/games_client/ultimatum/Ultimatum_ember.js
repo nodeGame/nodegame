@@ -31,6 +31,10 @@ function Ultimatum(){
             next: '-'
         });
         
+        Game.timer = Ember.Object.create({
+            time: '0:0'
+        });
+
         // Create the view for VisualState.
         var visualState = Ember.View.create({
             templateName: 'VisualState'
@@ -38,7 +42,11 @@ function Ultimatum(){
         visualState.appendTo('#root');
         
         // Create the view for VisualTimer.
-        
+        var visualTimer = Ember.View.create({
+            templateName: 'VisualTimer'
+        });
+        visualState.appendTo('#root');
+
         // Create the view for the DoneButton.
         
         // Create the view for the StateDisplay.
@@ -53,6 +61,11 @@ function Ultimatum(){
             Game.state.set('previous', window.node.game.gameLoop.getName(window.node.game.gameState) || miss);
             Game.state.set('current', window.node.game.gameLoop.getName(window.node.game.previous()) || miss);
             Game.state.set('next', window.node.game.gameLoop.getName(window.node.game.next()) || miss);
+        }, 2000);
+
+        // Update VisualTimer bindings.
+        setTimeout(function(){
+            
         }, 2000);
 
         // Update StateDisplay bindings.
@@ -78,7 +91,7 @@ function Ultimatum(){
         // node.window.setup('PLAYER');
         
 
-        
+
         
         //         this.header  = this.generateHeader();
         //      var mainframe   = this.addIFrame(this.root,'mainframe');
