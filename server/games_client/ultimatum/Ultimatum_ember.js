@@ -13,9 +13,12 @@ function Ultimatum(){
     
     this.BIDDER = 1;
     this.RESPONDENT = 0;
+
+    var node;
     
     // Initialize the Views and create the Bindings.
     this.init = function(){
+
         window.Game = Ember.Application.create();
         
         // Create the bindings.
@@ -35,25 +38,39 @@ function Ultimatum(){
             time: '0:0'
         });
 
+
         // Create the view for VisualState.
         var visualState = Ember.View.create({
             templateName: 'VisualState'
         });
         visualState.appendTo('#root');
         
+
         // Create the view for VisualTimer.
         var visualTimer = Ember.View.create({
             templateName: 'VisualTimer'
         });
-        visualState.appendTo('#root');
+        visualTimer.appendTo('#root');
+
 
         // Create the view for the DoneButton.
+        var doneButton = Ember.View.create({
+            templateName: 'DoneButton'
+        });
+        doneButton.appendTo('#root');
         
+
         // Create the view for the StateDisplay.
         var stateDisplay = Ember.View.create({
             templateName: 'StateDisplay'
         });
         stateDisplay.appendTo('#root');
+
+
+        // capture node
+        setTimeout(function(){
+            node = window.node;
+        }, 2000);
 
         // Update VisualState bindings.
         setTimeout(function(){
@@ -61,19 +78,19 @@ function Ultimatum(){
             Game.state.set('previous', window.node.game.gameLoop.getName(window.node.game.gameState) || miss);
             Game.state.set('current', window.node.game.gameLoop.getName(window.node.game.previous()) || miss);
             Game.state.set('next', window.node.game.gameLoop.getName(window.node.game.next()) || miss);
-        }, 2000);
+        }, 4000);
 
         // Update VisualTimer bindings.
-        setTimeout(function(){
+        // setTimeout(function(){
             
-        }, 2000);
+        // }, 4000);
 
         // Update StateDisplay bindings.
         setTimeout(function(){
             Game.player.set('name', window.node.game.player.name);
             Game.player.set('id', window.node.game.player.id);
             Game.player.set('state', new GameState(window.node.game.gameState).toString());
-        }, 2000);
+        }, 4000);
         
         
         //// SOCKET.IO -------------
