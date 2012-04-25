@@ -24,54 +24,22 @@ var Fake_Ultimatum_Player = function() {
 	this.RESPONDENT = 0;
 	
 	this.init = function() {	        
-        // console.log('client init');
+        console.log('client init');
 	};
 	
 	var pregame = function() {
 		
+		//console.log(node.node._listeners.count());
+		//console.log(node.node._listeners.D.state.toString());
 
-		console.log(node.node._listeners.count());
-		
-//		node.onDATA('CULO', function(msg) {
-//			//
-//		});
-		
-//		console.log(node.node._listeners.select('state', '=', node.state()).count());
-		
-		console.log(node.node._listeners.D.state.toString());
-		
-		
-//		console.log(node.node._listeners.count());
-//		console.log(node.node._listeners.fetchValues());
-//		
-//		
-//		node.node.clearLocalListeners();
-//		console.log(node.node._listeners.count());
-//		
-//		
-//		
-//		node.node.removeListener('in.say.DATA');
-//		console.log(node.node._listeners.count());
-//		
-//		console.log(node.node._listeners.select('event', '=', 'in.say.DATA').count());
-//		
-//		console.log(node.node._listeners.select('state', '=', node.state()).count());
-//		
-//		var gg = node.node._listeners.groupBy('state');
-		//console.log(gg);
-		
-		
-//		for (var i in gg) {
-//			console.log(gg[i]);
-//		}
-		
-		//console.log(node.node._listeners.fetch());
-		
         //node.DONE();
 		console.log('Pregame');
 	};
 	
 	var instructions = function(){	
+		
+		console.log(node.node._listeners.count());
+		
 		node.DONE();	        
 		console.log('Instructions');
 	};
@@ -80,7 +48,14 @@ var Fake_Ultimatum_Player = function() {
 		
 		var that = this;
 		
+		console.log(node.state());
+		
 		node.onDATA('BIDDER', function(msg){
+			
+			console.log(node.state());
+			console.log(msg)
+			console.log('RECEIVED BIDDER');
+			
 		    that.other = msg.data.other;
 		    console.log('OTHER ' + msg.data.other);
 		    
@@ -90,22 +65,28 @@ var Fake_Ultimatum_Player = function() {
 				var offered = Math.floor(1+Math.random()*100);
 				node.set('offer', offered);
 				node.say('DATA','OFFER', that.other,offered);
-			}, 10000);
+			}, 20000);
 		    
 		    node.onDATA('ACCEPT', function(msg){
+				console.log(node.node._listeners.count());
 		        console.log('Your offer was accepted');
-		        node.random.emit('DONE', 10000);
+		        node.random.emit('DONE', 20000);
 		    });
 		    
 		    node.onDATA('REJECT', function(msg){
-		        console.log('Your offer was rejected');
-		        node.random.emit('DONE', 10000);
+				console.log(node.node._listeners.count());
+		    	console.log('Your offer was rejected');
+		        node.random.emit('DONE', 20000);
 		    });
-		    
 		});
 		
 		node.onDATA('RESPONDENT', function(msg){
-		    that.other = msg.data.other;
+		    
+
+			console.log(node.state());
+			console.log('RECEIVED RESPONDENT');
+			
+			that.other = msg.data.other;
 		    node.set('ROLE', 'RESPONDENT');
 		    
 		    node.onDATA('OFFER', function(msg) {
@@ -115,25 +96,30 @@ var Fake_Ultimatum_Player = function() {
                 if (accept) {
                     node.set('response', 'ACCEPT');
                     node.say('ACCEPT', 'ACCEPT', that.other);
-                    node.random.emit('DONE', 10000);
+                    node.random.emit('DONE', 20000);
                 } else {
                     node.set('response', 'REJECT');
                     node.say('REJECT', 'REJECT', that.other);
-                    node.random.emit('DONE', 10000);
+                    node.random.emit('DONE', 20000);
                 }
 		    });
 		});
 		
 		node.onDATA('SOLO', function () {
+			
+
+			console.log(node.state());
+			console.log('RECEIVED SOLO');
+			
             console.log('solodone');
-            node.random.emit('DONE', 10000);
+            node.random.emit('DONE', 20000);
         });
 	
 		console.log('Ultimatum');
 	};
 	
 	var postgame = function () {
-	    node.random.emit('DONE', 10000);
+	    node.random.emit('DONE', 20000);
 		console.log('Postgame');
 	};
 	

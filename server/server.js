@@ -1,4 +1,4 @@
-/**
+/*
  * Start File for nodeGame server with conf.
  */
 
@@ -7,7 +7,7 @@ var ServerNode = require('nodegame-server');
 var options = {
     name: "nodeGame Server",
     port: 8080,
-    verbosity: 0,
+    verbosity: 10,
     dumpsys: false,
     dumpmsg: true,
     mail: false,
