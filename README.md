@@ -26,7 +26,7 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
       # Start the management server
       $ node server.js
   
-      # Open 2 different browser instances with the pr-example
+      # Open 2 different browser instances with the ultimatum game example
       $ open FILE_PATH_TO_REPO/games_client/ultimatum/index.htm
   
       # (optional) Monitor the game via the browser
