@@ -4,6 +4,17 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
 
 ---
 
+## Trying nodeGame on heroku
+
+      # Clone the repository
+      $ git clone git://github.com/shakty/nodeGame.git
+
+      $ cd nodeGame
+      $ git remote add heroku git@heroku.com:your-repo.git
+      $ git push heroku master
+
+      $ open https://your-repo.herokuapp.com
+
 ## Setup (Dev-Env for Unix Systems)
 
       # Install the Node.js Server
