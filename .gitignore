@@ -16,3 +16,5 @@ client/nodeclient/exit.csv
 *.csv
 *.swp
 .DS_Store
+npm-debug.log
+server/games_client/PR
