@@ -1,2 +1,8 @@
 .DS_Store
 node_modules/
+
+nodegame_clients/pr.js
+nodegame_clients/node_modules/peerreview/
+games_client/pr.js
+games_client/pr/
+pr_server.js

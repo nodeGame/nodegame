@@ -1,20 +1,20 @@
-var Utils = require('../client/nodeGame/Utils.js');
+var Utils = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/Utils.js');
 module.exports.Utils = Utils.Utils;
-var JSUS = require('../client/nodeGame/node_modules/JSUS/jsus.js');
+var JSUS = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/jsus.js');
 module.exports.JSUS = JSUS.JSUS;
 
-var GameState = require('../client/nodeGame/GameState.js');
+var GameState = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/GameState.js');
 module.exports.GameState = GameState.GameState;
 var GameState = GameState.GameState;
 
-var GameBit = require('../client/nodeGame/GameDB.js').GameBit;
+var GameBit = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/GameDB.js').GameBit;
 
-var NDDB = require('../client/nodeGame/node_modules/NDDB/nddb.js').NDDB;
+var NDDB = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/node_modules/NDDB/nddb.js').NDDB;
 module.exports.NDDB = NDDB;
 
 module.exports.Utils = JSUS.JSUS;
 
-var PlayerList = require('../client/nodeGame/PlayerList.js').PlayerList;
+var PlayerList = require('../server/node_modules/nodegame-server/node_modules/nodegame-client/PlayerList.js').PlayerList;
 
 var log = function (txt, level) {
 	var level = level || 'INFO';
@@ -72,10 +72,10 @@ for (var i=0;i<clients.length;i++) {
 //out = nddb.sort('value');
 //console.log(out.toString());
 
-//console.log('Select Key');
-//out = nddb.select('key','=','x');
-//console.log(out.toString());
-//
+console.log('Select Key');
+out = nddb.select('key','=','x');
+console.log(out.toString());
+
 //console.log('Select !Key');
 //out = nddb.select('key','!=','x');
 //console.log(out.toString());
@@ -167,8 +167,8 @@ for (var i=0;i<clients.length;i++) {
 //v = nddb.fetch('value.r');
 //console.log(v);
 //
-v = nddb.sum('value.r'); 
-console.log(v);
+//v = nddb.sum('value.r'); 
+//console.log(v);
 
 
 //var v = nddb.sort('x');

@@ -12,7 +12,7 @@
       , "url": "https://github.com/Shakty/nodegame.git"
     }
   , "dependencies": {
-      "nodegame-server": ">= 0.1.0",
+      "nodegame-server": ">= 0.1.15",
       "smoosh": "0.3.2"
     }
   , "engines": { "node": ">= 0.4.0" }
