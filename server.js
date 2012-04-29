@@ -11,9 +11,10 @@ var options = {
     dumpsys: false,
     dumpmsg: true,
     mail: false,
-    io: { 
+    io: {
         set: {
-            transports: ['websocket'],
+            'transports': ['xhr-polling'],
+            'polling duration': 10,
             'log level': -1
         }
     },
