@@ -19,3 +19,4 @@ client/nodeclient/exit.csv
 .DS_Store
 npm-debug.log
 server/games_client/PR
+server/games_client/TEST
