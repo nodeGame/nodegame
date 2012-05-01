@@ -51,8 +51,8 @@
 <body>
 <div id="root"></div>
 
-<script src="http://localhost:8080/socket.io/socket.io.js"></script> 
-<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame.js" charset="utf-8"></script>
 
 <script src="jquery-1.7.2.min.js"></script>
 <script src="ember-0.9.6.min.js" charset='utf-8'></script>
@@ -89,7 +89,7 @@
   $(document).ready(function(){
     var conf = {
       name: "P_" + Math.floor(Math.random()*100),
-      url: "http://localhost:8080/ultimatum",
+      url: "/ultimatum",
       verbosity: 10,
       io: {
         reconnect: false
