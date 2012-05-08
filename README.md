@@ -4,56 +4,86 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
 
 ---
 
-## Trying this nodeGame instance on heroku
+## Setup nodeGame on Windows 7
 
-      # Clone the repository
-      $ git clone git://github.com/shakty/nodeGame.git
-      $ cd nodeGame
+Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
 
-      # Install the heroku CLI tools & create an account
-      $ open https://toolbelt.heroku.com/
-      $ heroku create your-app-name --stack cedar
+    # cd into the directory where you want the repo to reside
+    $ cd Desktop
+      
+    # clone the repo
+    $ git clone git://github.com/shakty/nodeGame.git
+      
+    # update the dependencies
+    $ cd nodeGame
+    $ npm install
+      
+    # start the server
+    $ node server.js
+      
+    # Open 2 different browser instances with the ultimatum game example
+    $ open http://localhost:8080/ultimatum/index.html
+     
+    # (optional) Monitor the game via the browser
+    $ open http://localhost:8080/ultimatum/monitorgame.html
+  
+    # Start the game
+    $ cd nodegame_clients
+    $ node ultimatum.js
+  
+    # Game runs through, go back to your previously opened 2 browser instances.
+      
 
-      $ git remote add heroku git@heroku.com:your-app-name.git
-      $ git push heroku master
+## Deploy nodeGame on heroku
 
-      $ open https://your-app-name.herokuapp.com
+    # Clone the repository
+    $ git clone git://github.com/shakty/nodeGame.git
+    $ cd nodeGame
+
+    # Install the heroku CLI tools & create an account
+    $ open https://toolbelt.heroku.com/
+    $ heroku create your-app-name --stack cedar
+
+    $ git remote add heroku git@heroku.com:your-app-name.git
+    $ git push heroku master
+
+    $ open https://your-app-name.herokuapp.com
 
 ## Setup (Dev-Env for Unix Systems)
 
-      # Install the Node.js Server
-      $ git clone git://github.com/joyent/node.git
-      $ cd node/
-      $ git checkout v0.6.11
-      $ ./configure
-      $ sudo make
-      $ sudo make install
+    # Install the Node.js Server
+    $ git clone git://github.com/joyent/node.git
+    $ cd node/
+    $ git checkout v0.6.11
+    $ ./configure
+    $ sudo make
+    $ sudo make install
 
-      # Install the heroku toolbelt
-      $ open https://toolbelt.herokuapp.com/
+    # Install the heroku toolbelt
+    $ open https://toolbelt.herokuapp.com/
   
-      # Clone nodeGame
-      $ cd /into/the/place/where/you/put/project/folders
-      $ git clone git://github.com/shakty/nodeGame.git
-      $ cd nodeGame/
+    # Clone nodeGame
+    $ cd /into/the/place/where/you/put/project/folders
+    $ git clone git://github.com/shakty/nodeGame.git
+    $ cd nodeGame/
   
-      # Install Dependencies
-      $ npm install (be aware of http://goo.gl/T8m9d)
+    # Install Dependencies
+    $ npm install (be aware of http://goo.gl/T8m9d)
   
-      # Start the management server
-      $ node server.js
+    # Start the management server
+    $ node server.js
   
-      # Open 2 different browser instances with the ultimatum game example
-      $ open http://localhost:8080/ultimatum/index.html
+    # Open 2 different browser instances with the ultimatum game example
+    $ open http://localhost:8080/ultimatum/index.html
   
-      # (optional) Monitor the game via the browser
-      $ open http://localhost:8080/ultimatum/monitorgame.html
+    # (optional) Monitor the game via the browser
+    $ open http://localhost:8080/ultimatum/monitorgame.html
   
-      # Start the game
-      $ cd nodegame_clients/
-      $ node ultimatum.js
+    # Start the game
+    $ cd nodegame_clients/
+    $ node ultimatum.js
   
-      # Game runs through, go back to your previously opened 2 browser instances.
+    # Game runs through, go back to your previously opened 2 browser instances.
 
 ## Example
 
