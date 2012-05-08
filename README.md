@@ -10,7 +10,8 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
       $ git clone git://github.com/shakty/nodeGame.git
       $ cd nodeGame
 
-      # Install the heroku CLI tools
+      # Install the heroku CLI tools & create an account
+      $ open https://toolbelt.heroku.com/
       $ heroku create your-app-name --stack cedar
 
       $ git remote add heroku git@heroku.com:your-app-name.git
@@ -40,19 +41,19 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
       $ npm install (be aware of http://goo.gl/T8m9d)
   
       # Start the management server
-      $ foreman start
+      $ node server.js
   
       # Open 2 different browser instances with the ultimatum game example
-      $ open http://localhost:5000/ultimatum/index.html
+      $ open http://localhost:8080/ultimatum/index.html
   
       # (optional) Monitor the game via the browser
-      $ open http://localhost:5000/ultimatum/monitorgame.html
+      $ open http://localhost:8080/ultimatum/monitorgame.html
   
       # Start the game
       $ cd nodegame_clients/
       $ node ultimatum.js
   
-      # Game runs through (might not be too obvious)
+      # Game runs through, go back to your previously opened 2 browser instances.
 
 ## Example
 
