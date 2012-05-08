@@ -13,8 +13,8 @@ var options = {
     mail: false,
     io: {
         set: {
-            // 'transports': ['xhr-polling'],
-            // 'polling duration': 10,
+            'transports': ['xhr-polling'],
+            'polling duration': 10,
             'log level': -1
         }
     },
