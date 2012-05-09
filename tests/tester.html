@@ -1,122 +1,66 @@
 <!doctype html>
+<!-- JQUERY UI STARTS -->
+<link type="text/css" href="http://localhost:8080/javascripts/jqueryui/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="Stylesheet" />
+<script src="http://localhost:8080/javascripts/jqueryui/js/jquery-1.7.2.min.js" charset="utf-8"></script>
+<script src="http://localhost:8080/javascripts/jqueryui/js/jquery-ui-1.8.19.custom.min.js" charset="utf-8"></script>
+<!-- JQUERY UI ENDS -->
+
+<!--  Ember.js Starts 
+<script type="text/javascript" charset="utf-8" source="ember-0.9.7.1.min.js"></script>
+  Ember.js ends up -->
+
+
+
+<script type="text/x-handlebars">
+  The President of the United States is {{MyApp.president.fullName}}.
+</script>
+
+<script type="text/x-handlebars">
+  The President of the United States is {{MyApp.president.fullName}}.
+</script>
+<script>
+	window.onload = function(){
+	MyApp = {};
+	MyApp.president = Ember.Object.create({
+		  name: "Barack Obama"
+		});
+	
+		MyApp.country = Ember.Object.create({
+		  // Ending a property with 'Binding' tells Ember to
+		  // create a binding to the presidentName property.
+		  presidentNameBinding: 'MyApp.president.name'
+		});
+	
+		// Later, after Ember has resolved bindings...
+		MyApp.country.get('presidentName');
+		// "Barack Obama"
+	}
+</script>
+
+
+
+<!-- nodeGame starts -->
+
+<!-- nodeGame ends -->
+
 <body>
 <h2>Chernoff Faces Test</h2>
 <div id="root"></div>
-<iframe name='culo' id='culo'>
-  <html>
-  <body>
-   <div id="macho" onclick="function(){alert('click')};" style="background:blue;">
-   	sadadfa
-   </div>
-	 <div>
-	 </div>
-  </body>
-  </html>
+
+<!-- 
+<iframe name='culo' id='culo' src="iframe.html" width="500px" height="500px">
 </iframe>
-<script src="http://localhost:8080/socket.io/socket.io.js"></script> 
-<script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+ -->
+ 
 <!--  
-
-
-
 <script type="text/javascript" charset="utf-8" source="../client/nodeGame/node_modules/JSUS/jsus.js"></script>
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/node_modules/NDDB/nddb.js"></script>
 <script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
  -->
 <script>
 window.onload = function() {
-
-a = 'culo';
 	
 	
-//  function Ah (prefix) {
-//     var search = [window];
-//     if (window.frames) {
-//       search = search.concat(window.frames);
-//     }
-    
-//     function scanDocuments(id) {
-//       var found = true;
-//       while (found) {
-//         for (var i=0; i< search.length; i++) {
-//           var document = search[i].document;
-//           var oDoc = search[i].contentWindow || search[i].contentDocument;
-// 					console.log(oDoc);
-//           if (oDoc && oDoc.document) {
-//             var document = oDoc.document;
-//             console.log('ah!');
-//           }
-//           console.log(document);
-//           found = document.getElementById(id);
-//           if (found) {
-//             id = '' + id + '_' + JSUS.randomInt(0, 1000);
-//             break;
-//           }
-//         }
-//       }
-//       return id;
-//     };
-
-//     return scanDocuments(prefix);
-//   };
-	
-	
-// 	function getFrameWindow(frameId) {
-//   var frame = document.getElementById(frameId);
-//   var result = null;
-//   if (frame.contentDocument) {
-//    For NS6
-//     result = frame.contentDocument.window || frame.contentDocument.defaultView; 
-//   } else if (frame.contentWindow) {
-//    For IE5.5 and IE6
-//     result = frame.contentWindow;
-//   } else if (frame.document) {
-//    For IE5
-//     result = frame.document.window;
-//   }
-//   return result;
-// }
-
-//var w = window.frames['culo'];
-//var t = window.frames['culo'].frameElement.innerHTML;
-//var o = JSON.parse(t);
-
-//console.dir(window.frames['culo'].frameElement.childNodes);
-//
-//document.body.appendChild(window.frames['culo'].frameElement.childNodes[0]);
-//
-//
-//tempDiv = document.createElement('div');
-//tempDiv.style = 'border: 3px solid black';
-//tempDiv.innerHTML = window.frames['culo'].frameElement.childNodes[0];
-//document.body.appendChild(tempDiv);
-//
-//var u = document.getElementById('macho');
-//
-//console.log(u);
-
-//var D = new node.window.Document();
-//var a = D.generateUniqueId('macho');
-//console.log(a);
-
-//	// Create the Client
-//      
-//    var conf = {
-//      name: "P_" + Math.floor(Math.random()*100),
-//      url: "http://localhost:8080/pr"
-//    };
-//
-//    node.play(conf, {});
-//	
-//	var root = node.window.getElementById('root');
-//	var cf_options = { 
-//	                   id: 'cf',
-//						         width: 500,
-//						         height: 500
-//	};
-//	
-//	
-//	this.cf = node.window.addWidget('ChernoffFaces', root, cf_options);
 
 }
 </script>

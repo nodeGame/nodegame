@@ -1,6 +1,7 @@
 .project
 .settings
 
+tests/
 server
 examples/test/*
 stuff/f

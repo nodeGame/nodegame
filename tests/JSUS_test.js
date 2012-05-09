@@ -1,4 +1,4 @@
-var JSUS = require('../client/nodeGame/node_modules/JSUS/jsus.js').JSUS;
+var JSUS = require('../node_modules/nodegame-server/node_modules/nodegame-client/node_modules/JSUS/jsus.js').JSUS;
 
 var a = [1,2,3,4,5,6];
 var b = ['a','b','c','d','e','g'];
@@ -95,11 +95,11 @@ var test = [];
 //bb.a();
 
 
-//var o = JSUS.setNestedValue('a.b.c', 'cacca', {});
-//console.log(o);
-//
-//var v = JSUS.getNestedValue('a.r.t', o);
-//console.log(v);
+var o = JSUS.setNestedValue('a.b.c', 'cacca', {});
+console.log(o);
+
+var v = JSUS.getNestedValue('a.r.t', o);
+console.log(v);
 
 var a = {a:{a:1},
 		 b:{a:1},
@@ -118,6 +118,6 @@ for (var i=1;i<7;i++){
 }
 
 for (var i=1;i<7;i++){
-	var v = JSUS.obj2KeyedArray(a);
+	var v = JSUS.clone(a);
 	console.log(v);
 }

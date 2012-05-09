@@ -189,12 +189,13 @@ Each message which is sent belongs to a certain category, which can specified by
 
 There is still a long list of things which are planned for future development.
 
-1. Distribute nodeGame as a standard package on npm
-2. Create a custom nodeGame package manager for games and widgets only (ngpm)
-3. Games can directly passed as an object in the server
-4. Implementing a vast amount of games from the literature.
-5. Facilitating the exporting of results
-6. Storing the state of the game locally to resume upon reconnection.
+
+1. Games can directly passed as an object in the server.
+2. Better export of results.
+3. Storing the state of the game locally and resume it upon reconnection.
+4. Implementing a variety of standard games.
+5. Create a custom nodeGame package manager for games and widgets only (ngpm).
+6. Implement a large battery of tests.
 
 
 ## License
