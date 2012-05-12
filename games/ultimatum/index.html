@@ -1,11 +1,18 @@
 <!doctype html>
 <title>Ultimatum Game</title>
-<body>
-<div id="root"></div>
+
+<!-- Loading  nodeGame libraries and CSS -->
 <script src="/socket.io/socket.io.js"></script> 
 <script src="/javascripts/nodegame.js" charset="utf-8"></script>
 <link rel='stylesheet' href='/stylesheets/player.css'></link>
-<script src="Ultimatum.js" charset="utf-8"></script>
+<!-- end -->
+
+<!-- Loading the Ultimatum game -->
+<script src="./Ultimatum.js" charset="utf-8"></script>
+<!-- end -->
+
+<body>
+<div id="root"></div>
 <script>
   window.onload = function () {
 	

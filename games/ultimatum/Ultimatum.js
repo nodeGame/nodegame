@@ -22,22 +22,18 @@ function Ultimatum () {
 	
 	
 	var pregame = function() {
-		node.window.loadFrame('pregame.html');
-		node.DONE();
+		node.window.loadFrame('html/pregame.html');
 		console.log('Pregame');
 	};
 	
 	var instructions = function(){	
 		var that = this;
 		
-		node.window.loadFrame('instructions.html', function() {
+		node.window.loadFrame('html/instructions.html', function() {
 			var b = node.window.getElementById('read');
 			b.onclick = function() {
 				node.DONE();
 			};
-			
-			// Autoplay
-			node.DONE();
 		});
 		console.log('Instructions');
 	};
@@ -45,7 +41,7 @@ function Ultimatum () {
 	var ultimatum = function () {
 		
 		var that = this;		
-		node.window.loadFrame('solo.html', function () {
+		node.window.loadFrame('html/solo.html', function () {
 			
 			
 			node.onDATA('BIDDER', function (msg) {
@@ -54,7 +50,7 @@ function Ultimatum () {
 				console.log('OTHER ' + msg.data.other);
 				
 				node.set('ROLE', 'BIDDER');
-				node.window.loadFrame('bidder.html', function () {
+				node.window.loadFrame('html/bidder.html', function () {
 
 					var root = node.window.getElementById('root');
 					var b = node.window.getElementById('submitOffer');
@@ -82,7 +78,7 @@ function Ultimatum () {
 			node.onDATA('RESPONDENT', function (msg) {
 				that.other = msg.data.other;
 				node.set('ROLE', 'RESPONDENT');
-				node.window.loadFrame('resp.html', function () {
+				node.window.loadFrame('html/resp.html', function () {
 					
 					node.onDATA('OFFER', function (msg) {			
 						var offered = node.window.getElementById('offered');
@@ -118,14 +114,14 @@ function Ultimatum () {
 	};
 	
 	var postgame = function(){
-		node.window.loadFrame('postgame.html', function(){
+		node.window.loadFrame('html/postgame.html', function(){
 			node.random.emit('DONE');
 		});
 		console.log('Postgame');
 	};
 	
 	var endgame = function(){
-		node.window.loadFrame('ended.html');
+		node.window.loadFrame('html/ended.html');
 		console.log('Game ended');
 	};
 	
