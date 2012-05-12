@@ -28,7 +28,7 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ open http://localhost:8080/ultimatum/monitorgame.html
   
     # Start the game
-    $ cd nodegame_clients
+    $ cd games/ultimatum/server/
     $ node ultimatum.js
   
     # Game runs through, go back to your previously opened 2 browser instances.
@@ -80,7 +80,7 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ open http://localhost:8080/ultimatum/monitorgame.html
   
     # Start the game
-    $ cd nodegame_clients/
+    $ cd games/ultimatum/server/
     $ node ultimatum.js
   
     # Game runs through, go back to your previously opened 2 browser instances.
