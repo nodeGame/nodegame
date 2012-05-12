@@ -1,4 +1,4 @@
-function Monitor_Ultimatum () {
+function Ultimatum_monitor () {
 	
 	this.name = 'Monitor screen for Ultimatum Game';
 	this.description = 'No Description';

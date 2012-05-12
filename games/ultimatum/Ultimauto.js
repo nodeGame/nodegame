@@ -1,140 +1,170 @@
-var nodegame = require('../node_modules/nodegame-server/node_modules/nodegame-client');
-module.exports.nodegame = nodegame;
-
-// var node = module.parent.exports.nodegame;
-var node = nodegame;
-var JSUS = node.JSUS;
-
-var Fake_Ultimatum_Player = function() {
+function Ultimauto () {
 	
-	this.name = 'Ultimatum Game';
+	this.name = 'Automatic Ultimatum Game';
 	this.description = 'Two players split the pot. The receiver of the offer can accept or reject.';
-	this.version = '0.3';
+	this.version = '0.2';
 	
-	// Wait for a STATE message from the server
-	// to go to next state
-	this.auto_step = false; 
+	this.auto_step = false;
 	this.auto_wait = true;
-	
 	
 	this.minPlayers = 2;
 	this.maxPlayers = 10;
-	
-	this.BIDDER = 1;
-	this.RESPONDENT = 0;
-	
-	this.init = function() {	        
-        console.log('client init');
+
+	this.init = function() {
+		this.BIDDER = 1;
+		this.RESPONDENT = 0;
+		node.window.setup('PLAYER');
 	};
 	
+	
 	var pregame = function() {
-		
-		//console.log(node.node._listeners.count());
-		//console.log(node.node._listeners.D.state.toString());
-
-        //node.DONE();
+		node.window.loadFrame('html/pregame.html');
 		console.log('Pregame');
 	};
 	
 	var instructions = function(){	
+		var that = this;
 		
-		//console.log(node.node._listeners.count());
+		node.window.loadFrame('html/instructions.html', function() {
+	
+			var b = node.window.getElementById('read');
 		
-		node.DONE();	        
+			b.onclick = function() {
+				node.DONE();
+			};
+			
+			//////////////////////////////////////////////
+			// nodeGame hint:
+			//
+			// Emit an event randomly in a time interval 
+			// from 0 to 2000 milliseconds
+			//
+			//////////////////////////////////////////////
+			node.random.emit('DONE',2000);
+		});
+		
+		
 		console.log('Instructions');
 	};
 		
-	var ultimatum = function () {
+	var ultimatum = function(){
+		var that = this;		
 		
-		var that = this;
-		
-		//console.log(node.state());
-		
-		node.onDATA('BIDDER', function(msg){
-
-			// DEBUG
-			//console.log(node.state());
-			//console.log(msg)
-			//console.log('RECEIVED BIDDER');
-			//console.log(msg.id);
+		//node.window.loadFrame('solo.html');
+		node.window.loadFrame('html/solo.html', function(){
 			
-			that.other = msg.data.other;
-		    console.log('OTHER ' + msg.data.other);
-		    
-		    
-		    node.random.emit('DONE', 2000);
-		    
-		    node.set('ROLE', 'BIDDER');
-		    
-		    node.random.exec(function() {
-				var offered = Math.floor(1+Math.random()*100);
-				node.set('offer', offered);
-				node.say('DATA','OFFER', that.other,offered);
-			}, 2000);
-		    
-		    node.onDATA('ACCEPT', function(msg){
-				//console.log(node.node._listeners.count());
-		        console.log('Your offer was accepted');
-		        node.random.emit('DONE', 2000);
-		    });
-		    
-		    node.onDATA('REJECT', function(msg){
-				//console.log(node.node._listeners.count());
-		    	console.log('Your offer was rejected');
-		        node.random.emit('DONE', 2000);
-		    });
-		   
-		});
-		
-		node.onDATA('RESPONDENT', function(msg){
-		    
-			// DEBUG
-			//console.log(node.state());
-			//console.log('RECEIVED RESPONDENT');
-			//console.log(msg.id);
+			node.onDATA ('BIDDER', function(msg){
+				that.other = msg.data.other;
+				console.log('OTHER ' + msg.data.other);
+				
+				node.set('ROLE','BIDDER');
+				node.window.loadFrame('html/bidder.html', function() {
 
-			that.other = msg.data.other;
-		    node.set('ROLE', 'RESPONDENT');
-		    
-		    //node.onDATA('OFFER', function(msg) {
-		    
-		    node.on('in.say.DATA', function(msg) {
-		    	
-		    	if (msg.text === 'OFFER') {
-		    
-			    	var accept = Math.round(Math.random());                
-	                
-	                if (accept) {
-	                    node.set('response', 'ACCEPT');
-	                    node.say('ACCEPT', 'ACCEPT', that.other);
-	                    node.random.emit('DONE', 2000);
-	                } else {
-	                    node.set('response', 'REJECT');
-	                    node.say('REJECT', 'REJECT', that.other);
-	                    node.random.emit('DONE', 2000);
-	                }
-		    	}
-		    });
-		});
-		
-		node.onDATA('SOLO', function () {
-
-			console.log(node.state());
-			console.log('RECEIVED SOLO');
+					var root = node.window.getElementById('root');
+					var b = node.window.getElementById('submitOffer');
+					
+					//////////////////////////////////////////////
+					// nodeGame hint:
+					//
+					// Execute a function randomly
+					// in a time interval between 0 and 1 second
+					//
+					//////////////////////////////////////////////					
+					node.random.exec(function() {
+						var offered = Math.floor(1+Math.random()*100);
+						node.set('offer', offered);
+						node.say('DATA','OFFER', that.other,offered);
+						node.window.write(root,' Your offer: ' +  offered);
+					}, 4000);
+					
+					
+					b.onclick = function() {
+						var offer = node.window.getElementById('offer');
+						// Store the value in memory
+						node.set('offer', offer.value);
+						node.say('DATA','OFFER', that.other,offer.value);
+						node.window.write(root,' Your offer: ' +  offer.value);
+					};
+						
+					node.onDATA ('ACCEPT', function(msg) {
+						node.window.write(root, 'Your offer was accepted');
+						node.DONE();
+					});
+						
+					node.onDATA('REJECT', function (msg) {
+						node.window.write('Your offer was rejected');
+						node.DONE();
+					});
+					
+				});
+				
+			});
 			
-            console.log('solodone');
-            node.random.emit('DONE', 2000);
-        });
+			node.onDATA('RESPONDENT', function (msg) {
+				that.other = msg.data.other;
+				console.log('OTHER ' + msg.data.other);
+				
+				node.set('ROLE','RESPONDENT');
+				node.window.loadFrame('html/resp.html', function(){
+				
+					node.onDATA('OFFER', function(msg) {
+						
+						var accept = node.window.getElementById('accept');
+						var reject = node.window.getElementById('reject');
+					
+						var offered = node.window.getElementById('offered');
+						node.window.write(offered, 'You received an offer of ' + msg.text);
+						offered.style.display = '';
+					
+						node.random.exec(function(){
+							var accepted = Math.round(Math.random());
+							
+							if (accepted) {
+								accept.click();
+							}
+							else {
+								reject.click();
+							}
+							
+						}, 3000);
+						
+					});
+							
+					accept.onclick = function() {
+						node.set('response','ACCEPT');
+						node.say('DATA', 'ACCEPT', that.other);
+						node.DONE();
+					};
+					
+					reject.onclick = function() {
+						node.set('response','REJECT');
+						node.say('DATA', 'REJECT', that.other);
+						node.DONE();
+					};
+					
+				});
+			
+			});
+			
+			node.onDATA('SOLO', function() {
+				node.DONE();
+			});
+				
+		});
+			
 	
-		console.log('Ultimatum');
+		console.log('Game');
 	};
 	
-	var postgame = function () {
-	    node.random.emit('DONE', 2000);
+	var postgame = function(){
+		node.window.loadFrame('html/postgame.html', function(){
+			node.random.emit('DONE', 2000);
+		});
 		console.log('Postgame');
 	};
 	
-	var endgame = function () {
+	var endgame = function(){
+		node.window.loadFrame('html/ended.html');
 		console.log('Game ended');
 	};
 	
@@ -161,14 +191,5 @@ var Fake_Ultimatum_Player = function() {
 		5: {state: endgame,
 			name: 'Thank you!'
 		}
-	};
-
+	};	
 }
-
-var conf = {
-    name: "P_" + Math.floor(Math.random()*100),
-	url: "http://localhost:8080/ultimatum",
-    //verbosity: 10
-};
-
-nodegame.play(conf, new Fake_Ultimatum_Player());

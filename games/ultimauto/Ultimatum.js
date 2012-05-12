@@ -156,7 +156,7 @@ function Ultimatum () {
 		});
 			
 	
-		console.log('Game1');
+		console.log('Game');
 	};
 	
 	var postgame = function(){

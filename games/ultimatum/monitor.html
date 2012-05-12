@@ -4,7 +4,8 @@
   <div id="root"></div> 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/nodegame.js" charset="utf-8"></script>
-<script src="Monitor_Ultimatum.js" charset="utf-8"></script>
+<script src="./Ultimatum_monitor.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/monitor.css'></link>
 
 <script>
     window.onload = function(){
@@ -18,7 +19,7 @@
       } 
     };
       
-    node.play(conf, new Monitor_Ultimatum());
+    node.play(conf, new Ultimatum_monitor());
     
   }
 </script>
