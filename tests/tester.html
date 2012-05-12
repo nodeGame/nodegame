@@ -1,42 +1,9 @@
 <!doctype html>
 <!-- JQUERY UI STARTS -->
-<link type="text/css" href="http://localhost:8080/javascripts/jqueryui/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="Stylesheet" />
-<script src="http://localhost:8080/javascripts/jqueryui/js/jquery-1.7.2.min.js" charset="utf-8"></script>
-<script src="http://localhost:8080/javascripts/jqueryui/js/jquery-ui-1.8.19.custom.min.js" charset="utf-8"></script>
+<link type="text/css" href="lib/jqueryui/css/ui-lightness/jquery-ui-1.8.20.custom.css" rel="Stylesheet" />
+<script src="./lib/jqueryui/js/jquery-1.7.2.min.js" charset="utf-8"></script>
+<script src="./lib/jqueryui/js/jquery-ui-1.8.20.custom.min.js" charset="utf-8"></script>
 <!-- JQUERY UI ENDS -->
-
-<!--  Ember.js Starts 
-<script type="text/javascript" charset="utf-8" source="ember-0.9.7.1.min.js"></script>
-  Ember.js ends up -->
-
-
-
-<script type="text/x-handlebars">
-  The President of the United States is {{MyApp.president.fullName}}.
-</script>
-
-<script type="text/x-handlebars">
-  The President of the United States is {{MyApp.president.fullName}}.
-</script>
-<script>
-	window.onload = function(){
-	MyApp = {};
-	MyApp.president = Ember.Object.create({
-		  name: "Barack Obama"
-		});
-	
-		MyApp.country = Ember.Object.create({
-		  // Ending a property with 'Binding' tells Ember to
-		  // create a binding to the presidentName property.
-		  presidentNameBinding: 'MyApp.president.name'
-		});
-	
-		// Later, after Ember has resolved bindings...
-		MyApp.country.get('presidentName');
-		// "Barack Obama"
-	}
-</script>
-
 
 
 <!-- nodeGame starts -->
@@ -47,21 +14,26 @@
 <h2>Chernoff Faces Test</h2>
 <div id="root"></div>
 
-<!-- 
 <iframe name='culo' id='culo' src="iframe.html" width="500px" height="500px">
 </iframe>
- -->
  
-<!--  
-<script type="text/javascript" charset="utf-8" source="../client/nodeGame/node_modules/JSUS/jsus.js"></script>
-<script type="text/javascript" charset="utf-8" source="../client/nodeWindow/node_modules/NDDB/nddb.js"></script>
-<script type="text/javascript" charset="utf-8" source="../client/nodeWindow/Table.js"></script> 
- -->
 <script>
 window.onload = function() {
 	
+	  $(function() {
+	        $( "#slider", frames['culo'].document).slider({
+	          value:100,
+	          min: 0,
+	          max: 500,
+	          step: 50,
+	          slide: function( event, ui ) {
+	            $( "#amount", frames['culo'].document ).val( "$" + ui.value, frames['culo'].document );
+	          }
+	        });
+	        $( "#amount", frames['culo'].document ).val( "$" + $( "#slider", frames['culo'].document ).slider( "value" ) );
+	      });
 	
-
+	
 }
 </script>
 </body>
