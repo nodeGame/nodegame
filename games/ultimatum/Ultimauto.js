@@ -73,7 +73,7 @@ function Ultimauto () {
 					node.random.exec(function() {
 						var offered = Math.floor(1+Math.random()*100);
 						node.set('offer', offered);
-						node.say('DATA','OFFER', that.other,offered);
+						node.say(offered, 'OFFER', that.other);
 						node.window.write(' Your offer: ' +  offered, root);
 					}, 4000);
 					
@@ -113,7 +113,7 @@ function Ultimauto () {
 						var reject = node.window.getElementById('reject');
 					
 						var offered = node.window.getElementById('offered');
-						node.window.write('You received an offer of ' + msg.text, offered);
+						node.window.write('You received an offer of ' + msg.data, offered);
 						offered.style.display = '';
 					
 						node.random.exec(function(){

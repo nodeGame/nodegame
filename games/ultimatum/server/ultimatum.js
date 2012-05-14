@@ -81,7 +81,7 @@ function Ultimatum () {
 	};
 	
 	var endgame = function () {
-		node.memory.dump('./exit.csv', true);		
+		node.memory.dump('./results.csv', true);		
 		console.log('Game ended');
 	};
 	
