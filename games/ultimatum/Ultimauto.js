@@ -32,7 +32,7 @@ function Ultimauto () {
 			b.onclick = function() {
 				node.DONE();
 			};
-			
+
 			//////////////////////////////////////////////
 			// nodeGame hint:
 			//
@@ -41,16 +41,16 @@ function Ultimauto () {
 			//
 			//////////////////////////////////////////////
 			node.random.emit('DONE',2000);
+
 		});
 		
-		
+
 		console.log('Instructions');
 	};
 		
 	var ultimatum = function(){
 		var that = this;		
 		
-		//node.window.loadFrame('solo.html');
 		node.window.loadFrame('html/solo.html', function(){
 			
 			node.onDATA ('BIDDER', function(msg){
@@ -74,7 +74,7 @@ function Ultimauto () {
 						var offered = Math.floor(1+Math.random()*100);
 						node.set('offer', offered);
 						node.say('DATA','OFFER', that.other,offered);
-						node.window.write(root,' Your offer: ' +  offered);
+						node.window.write(' Your offer: ' +  offered, root);
 					}, 4000);
 					
 					
@@ -82,17 +82,17 @@ function Ultimauto () {
 						var offer = node.window.getElementById('offer');
 						// Store the value in memory
 						node.set('offer', offer.value);
-						node.say('DATA','OFFER', that.other,offer.value);
+						node.say('DATA','OFFER', that.other, offer.value);
 						node.window.write(root,' Your offer: ' +  offer.value);
 					};
 						
 					node.onDATA ('ACCEPT', function(msg) {
-						node.window.write(root, 'Your offer was accepted');
+						node.window.write('Your offer was accepted', root);
 						node.DONE();
 					});
 						
 					node.onDATA('REJECT', function (msg) {
-						node.window.write('Your offer was rejected');
+						node.window.write('Your offer was rejected', root);
 						node.DONE();
 					});
 					
@@ -113,7 +113,7 @@ function Ultimauto () {
 						var reject = node.window.getElementById('reject');
 					
 						var offered = node.window.getElementById('offered');
-						node.window.write(offered, 'You received an offer of ' + msg.text);
+						node.window.write('You received an offer of ' + msg.text, offered);
 						offered.style.display = '';
 					
 						node.random.exec(function(){
@@ -128,19 +128,19 @@ function Ultimauto () {
 							
 						}, 3000);
 						
+						accept.onclick = function() {
+							node.set('response','ACCEPT');
+							node.say('DATA', 'ACCEPT', that.other);
+							node.DONE();
+						};
+						
+						reject.onclick = function() {
+							node.set('response','REJECT');
+							node.say('DATA', 'REJECT', that.other);
+							node.DONE();
+						};
+
 					});
-							
-					accept.onclick = function() {
-						node.set('response','ACCEPT');
-						node.say('DATA', 'ACCEPT', that.other);
-						node.DONE();
-					};
-					
-					reject.onclick = function() {
-						node.set('response','REJECT');
-						node.say('DATA', 'REJECT', that.other);
-						node.DONE();
-					};
 					
 				});
 			
