@@ -1,13 +1,12 @@
 .project
 .settings
 
-tests/
+/tests/
 /server
-examples/test/*
-stuff/f
-yuicompressor-2.4.6
-log
-client/releases/*
+/examples/test/*
+/stuff/f
+/log
+/client/releases/*
 jquery
 
 *.tmp*
@@ -17,17 +16,12 @@ jquery
 \#*\#
 *~
 
-
 npm-debug.log
-games/PR
-games/TEST
-
-
 node_modules/
 
-nodegame_clients/pr.js
-nodegame_clients/node_modules/peerreview/
-games/pr.js
-games/pr/
+/nodegame_clients/pr.js
+/nodegame_clients/node_modules/peerreview/
 pr_server.js
+/games/PR
+/games/TEST
 
