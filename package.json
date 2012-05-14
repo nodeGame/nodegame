@@ -1,5 +1,5 @@
 {
-    "name": "server"
+    "name": "nodegame"
   , "version": "0.1.0"
   , "main" : "server.js"
   , "homepage": "http://nodegame.org"
@@ -12,10 +12,18 @@
       , "url": "https://github.com/Shakty/nodegame.git"
     }
   , "dependencies": {
-      "nodegame-server": ">= 0.1.15"
+      "nodegame-server": ">= 0.1.15",
+      "commander": "0.6.0",
+      "mkdirp": "0.3.2"
     }
-  , "engines": { "node": ">= 0.4.0" }
+  , "engines": { "node": ">= 0.6.11" }
   , "licenses": [
     { "type": "MIT" }
   ]
+  , "bin": {
+    "nodegame": "./bin/nodegame"
+  }
+  , "scripts": {
+    "start": "node server.js"
+  }
 }
