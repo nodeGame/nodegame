@@ -4,7 +4,22 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
 
 ---
 
-## Setup nodeGame on Windows 7
+## Getting started
+
+Install nodeGame via npm.
+
+    $ npm install nodegame -g
+
+Create a fresh nodeGame instance with the CLI tools and follow the instructions to start it up.
+
+    $ nodegame your-nodeGame-instance
+
+For further information see the [README](https://github.com/shakty/nodeGame/blob/master/doc/README.md) in the doc folder for now.
+
+
+## Advanced setup with the nodeGame git repository
+
+### Windows 7
 
 Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
 
@@ -28,13 +43,12 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ open http://localhost:8080/ultimatum/monitorgame.html
   
     # Start the game
-    $ cd games/ultimatum/server/
-    $ node ultimatum.js
+    $ node games/ultimatum/server/logic.js
   
     # Game runs through, go back to your previously opened 2 browser instances.
       
 
-## Deploy nodeGame on heroku
+### heroku
 
     # Clone the repository
     $ git clone git://github.com/shakty/nodeGame.git
@@ -49,7 +63,11 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
 
     $ open https://your-app-name.herokuapp.com
 
-## Setup (Dev-Env for Unix Systems)
+    # Before starting the game edit the url portion of logic.js to reflect you heroku url.
+    $ node games/ultimatum/server/logic.js
+
+
+### OS X
 
     # Install the Node.js Server
     $ git clone git://github.com/joyent/node.git
@@ -80,14 +98,10 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ open http://localhost:8080/ultimatum/monitorgame.html
   
     # Start the game
-    $ cd games/ultimatum/server/
-    $ node ultimatum.js
+    $ node game/ultimatum/server/logic.js
   
     # Game runs through, go back to your previously opened 2 browser instances.
 
-## Example
-
-See doc folder for now.
 
 ## Contribute
 
