@@ -15,7 +15,7 @@ function Ultimatum_monitor () {
 	};
 	
 	function printGameState () {
-		var name = node.game.gameLoop.getName(node.game.gameState);
+		var name = node.game.gameLoop.getName(node.state);
 		console.log(name);
 	};
 	

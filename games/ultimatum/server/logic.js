@@ -25,7 +25,7 @@ function Ultimatum () {
 		// Pairs all players
 		var groups = this.pl.getGroupsSizeN(2);
 	
-		console.log(node.state());
+		console.log(node.state);
 		console.log('PAIRS');
 		console.log(groups.length);
 		
@@ -33,7 +33,7 @@ function Ultimatum () {
 		var g = null;
 		for ( i = 0; i < groups.length; i++) {
 			g = groups[i];
-			if (g.size() > 1) {
+			if (g.length > 1) {
 				g.shuffle();
 				// Bidder
 				var bidder = g.first();
@@ -53,7 +53,7 @@ function Ultimatum () {
 				node.say(data_b, 'BIDDER', bidder.id);
 				node.say(data_r, 'RESPONDENT', respondent.id);
 				
-				console.log(node.state());
+				console.log(node.state);
 				console.log('SENT BIDDER AND RESPONDENT');
 				console.log(bidder.id);
 				console.log(respondent.id);

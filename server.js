@@ -7,16 +7,17 @@ var ServerNode = require('nodegame-server');
 var options = {
     name: "nodeGame Server",
     port: 8080,
-    verbosity: 10,
+//    verbosity: 10,
     dumpsys: false,
     dumpmsg: true,
     mail: false,
     io: {
-        set: {
-            'transports': ['xhr-polling'],
-            'polling duration': 10,
-            'log level': -1
-        }
+//        set: {
+//            'transports': ['xhr-polling'],
+//            'polling duration': 10,
+//            'log level': -1
+//        },
+        reconnect: false,
     },
     http: {}
 };
@@ -29,11 +30,12 @@ var options = {
 // If not passed, they will be created with default settings
 var sn = new ServerNode(options);
 
-sn.addChannel({
-    name: 'Ultimatum',
-    admin: 'ultimatum/admin',
-    player: 'ultimatum'
+var ultimatum = sn.addChannel({
+				    name: 'Ultimatum',
+				    admin: 'ultimatum/admin',
+				    player: 'ultimatum'
 });
+
 
 //sn.addChannel({
 //    name: 'pr',

@@ -103,8 +103,6 @@ function Ultimatum () {
 			//
 			//  node.on<[DATA,TXT,PLIST, etc]>
 			//
-			//	Whenever, a 
-			//
 			//  The low level event listener is simply 
 			//
 			//  node.on
@@ -181,8 +179,9 @@ function Ultimatum () {
 							node.DONE();
 						};
 					});
+				});	
 			});
-			
+				
 			node.onDATA('SOLO', function() {
 				console.log('solodone');
 				//////////////////////////////////////////////
@@ -197,10 +196,8 @@ function Ultimatum () {
 				// 
 				/////////////////////////////////////////////
 				node.DONE();
-			});
-				
-		});
-	
+			});	
+
 			console.log('Ultimatum');
 		});
 	};
@@ -255,4 +252,4 @@ function Ultimatum () {
 			name: 'Thank you!'
 		}
 	};	
-};
+}
