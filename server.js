@@ -33,7 +33,9 @@ var sn = new ServerNode(options);
 var ultimatum = sn.addChannel({
 				    name: 'Ultimatum',
 				    admin: 'ultimatum/admin',
-				    player: 'ultimatum'
+				    player: 'ultimatum',
+				    game: 'ultimatum',
+				    	
 });
 
 
