@@ -111,7 +111,6 @@ function Ultimatum () {
 			node.onDATA('BIDDER', function (msg) {
 				
 				that.other = msg.data.other;
-				console.log('OTHER ' + msg.data.other);
 				
 				node.set('ROLE', 'BIDDER');
 				node.window.loadFrame('html/bidder.html', function () {

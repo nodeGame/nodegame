@@ -55,7 +55,6 @@ function Ultimauto () {
 			
 			node.onDATA ('BIDDER', function(msg){
 				that.other = msg.data.other;
-				console.log('OTHER ' + msg.data.other);
 				
 				node.set('ROLE','BIDDER');
 				node.window.loadFrame('html/bidder.html', function() {
@@ -102,7 +101,6 @@ function Ultimauto () {
 			
 			node.onDATA('RESPONDENT', function (msg) {
 				that.other = msg.data.other;
-				console.log('OTHER ' + msg.data.other);
 				
 				node.set('ROLE','RESPONDENT');
 				node.window.loadFrame('html/resp.html', function(){

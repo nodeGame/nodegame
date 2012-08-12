@@ -81,7 +81,7 @@ function Ultimatum () {
 	};
 	
 	var endgame = function () {
-		node.memory.dump('./results.csv', true);		
+		node.game.memory.save('./results.nddb');		
 		console.log('Game ended');
 	};
 	
@@ -130,8 +130,8 @@ var conf = {
 	    'reconnect': false,
 	    'transports': ['xhr-polling'],
 	    'polling duration': 10
-	}
-	// verbosity: 10
+	},
+	verbosity: 10,
 };
 
 node.play(conf, new Ultimatum());

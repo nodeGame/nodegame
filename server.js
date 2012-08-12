@@ -2,7 +2,7 @@
  * Start File for nodeGame server with conf.
  */
 
-var ServerNode = require('nodegame-server');
+var ServerNode = require('nodegame-server').ServerNode;
 
 var options = {
     name: "nodeGame Server",
@@ -37,10 +37,3 @@ var ultimatum = sn.addChannel({
 				    game: 'ultimatum',
 				    	
 });
-
-
-//sn.addChannel({
-//    name: 'pr',
-//    admin: 'pr/admin',
-//    player: 'pr'
-//});

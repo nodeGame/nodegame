@@ -14,7 +14,7 @@
     }
   , "dependencies": {
       "nodegame-server": ">= 0.1.15",
-      "commander": "0.6.0",
+      "commander": "1.0.0",
       "mkdirp": "0.3.2"
     }
   , "engines": { "node": ">= 0.6.11" }
