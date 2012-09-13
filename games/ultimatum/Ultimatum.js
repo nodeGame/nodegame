@@ -73,6 +73,33 @@ function Ultimatum () {
 			b.onclick = function() {
 				node.DONE();
 			};
+			
+			
+			////////////////////////////////////////////////
+			// nodeGame hint:
+			//
+			// node.env executes a function conditionally to 
+			// the environments defined in the configuration 
+			// options. 
+			//
+			// If the 'auto' environment was set to TRUE,
+			// then the function will be executed
+			//
+			////////////////////////////////////////////////
+			node.env('auto', function() {
+				
+				
+				//////////////////////////////////////////////
+				// nodeGame hint:
+				//
+				// Emit an event randomly in a time interval 
+				// from 0 to 2000 milliseconds
+				//
+				//////////////////////////////////////////////
+				node.random.emit('DONE',2000);
+			});
+			
+			
 		});
 		console.log('Instructions');
 	};
@@ -117,6 +144,23 @@ function Ultimatum () {
 
 					var root = node.window.getElementById('root');
 					var b = node.window.getElementById('submitOffer');
+					
+					node.env('auto', function() {
+						
+						//////////////////////////////////////////////
+						// nodeGame hint:
+						//
+						// Execute a function randomly
+						// in a time interval between 0 and 1 second
+						//
+						//////////////////////////////////////////////
+						node.random.exec(function() {
+							var offered = Math.floor(1+Math.random()*100);
+							node.set('offer', offered);
+							node.say(offered, 'OFFER', that.other);
+							node.window.write(' Your offer: ' +  offered, root);
+						}, 4000);
+					});
 					
 					b.onclick = function() {
 						var offer = node.window.getElementById('offer');
@@ -165,6 +209,20 @@ function Ultimatum () {
 					
 						var accept = node.window.getElementById('accept');
 						var reject = node.window.getElementById('reject');
+					
+						node.env('auto', function() {
+							node.random.exec(function(){
+								var accepted = Math.round(Math.random());
+								
+								if (accepted) {
+									accept.click();
+								}
+								else {
+									reject.click();
+								}
+								
+							}, 3000);
+						});
 						
 						accept.onclick = function() {
 							node.set('response','ACCEPT');
