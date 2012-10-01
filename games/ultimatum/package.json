@@ -6,31 +6,33 @@
     "name": "Stefano Balietti",
     "email": "sbalietti@ethz.ch",
     "url": "http://www.nodegame.org"
-},
+  }
+,
   "main": "./index.html"
 ,
- "keywords": [
+  "keywords": [
     "ultimatum",
     "game theory"
-],
-//  "repository": {
-//    "type": "git",
-//     "url": "git://github.com/substack/node-mkdirp.git"
-//  },
+  ]
+,
+  "repository": {
+    "type": "git",
+     "url": "git://github.com/nodegame/ultimatum.git"
+  },
   "license": "MIT/X11"
 ,
   "engines": {
     "node": "*",
-    "nodegame": "0.2.0",
+    "nodegame": "0.2.0"
   }
 ,
 	"nodegame": {
 	   "logic": "./server/logic.js",
 	   "dependencies": {
-	     // empty
+	     "not_used": "for now"
 	   },
 	   "widgets": {
 	     "moneytalk": "0.1.0"
 	   }
+	}
 }
-	

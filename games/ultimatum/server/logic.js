@@ -15,13 +15,12 @@ function Ultimatum () {
 		console.log('Pregame');
 	};
 	
-	var instructions = function () {
+	var instructions = function () {	
 		console.log('Instructions');
 	};
 		
 	var game = function () {
 		var that = this;
-		
 		// Pairs all players
 		var groups = this.pl.getGroupsSizeN(2);
 	

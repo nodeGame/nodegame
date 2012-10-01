@@ -12,17 +12,25 @@ var options = {
     dumpmsg: false,
     mail: false,
     io: {
-//        set: {
+        set: {
 //            'transports': ['xhr-polling'],
 //            'polling duration': 10,
-//            'log level': -1
-//        },
+//            'log level': 10
+        },
         reconnect: false,
     },
-    http: {}
+    http: {},
+    gamesDirs: './games/',
+    auth: myAuthFunc, // every client that connects to the server
+    				  // is checked through this function
+    
+    
 };
 
 
+var myAuthFunc = function() {
+	return true;
+};
 
 // ServerNode accepts two additional parameters:
 // - an instance of an http Express server
@@ -34,6 +42,5 @@ var ultimatum = sn.addChannel({
 				    name: 'Ultimatum',
 				    admin: 'ultimatum/admin',
 				    player: 'ultimatum',
-				    game: 'ultimatum',
-				    	
+				    game: 'ultimatum',		    	
 });
