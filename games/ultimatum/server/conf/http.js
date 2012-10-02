@@ -50,19 +50,33 @@ function configure (app) {
 	
 	app.param('game', function(req, res, next, game){
 		  if (game !== 'ultimatum') next();
-			  
+		  console.log(req.params);
+		  if (req.params[0] !== 'room.html') {
+			  console.log('req0 ' + req.params[0]);
+			  next();
+			  return;
+		  }
+		  
 		  if (!req.query || !req.query.id) {
-			  res.redirect(url);
+			  res.send('You cannot access this page without a valid access code. An administrator has been contacted.');
+			  //res.redirect(url);
 			  return;
 		  }
 		  
 		  var found =  codes.select('AccessCode', '=', req.query.id).first();
 		  
 		  if (!found) {
-			  res.send('Your code is invalid. An administrator has benn contacted.');
+			  res.send('Your access code is invalid. An administrator has been contacted.');
 			  return;
 		  }
-			  
+		  
+		  if (found.used) {
+			  res.send('This access code is already in use. An administrator has been contacted.');
+			  return;
+		  }
+			
+		  found.used = true;
+		  
 		  next();
 	});
 	

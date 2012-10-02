@@ -225,13 +225,21 @@ function Ultimatum () {
 						});
 						
 						accept.onclick = function() {
-							node.set('response','ACCEPT');
+							node.set('response', {
+								response: 'ACCEPT',
+								value: msg.data,
+								from: that.other,
+							});
 							node.say('ACCEPT', 'ACCEPT', that.other);
 							node.DONE();
 						};
 						
 						reject.onclick = function() {
-							node.set('response','REJECT');
+							node.set('response', {
+								response: 'REJECT',
+								value: msg.data,
+								from: that.other,
+							});
 							node.say('REJECT', 'REJECT', that.other);
 							node.DONE();
 						};

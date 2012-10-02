@@ -12,12 +12,21 @@ function Ultimatum_wait () {
 //	this.minPlayers = 2;
 //	this.maxPlayers = 10;
 	
+	var NUMPLAYERS = 3;
+	var open = true; // Sends or not players to the game
+	
 	this.init = function() {
+		var open = true;
 		node.on('UPDATED_PLIST', function(){
 			console.log('Player list = ' + node.game.pl.length);
 			
-			if (node.game.pl.length === 3) {
-				node.redirect('/ultimatum/index.html', 'ALL');
+			if (open && node.game.pl.length === NUMPLAYERS) {
+				open = false; // only one set of players allowed now
+				node.game.pl.each(function(p){
+					var mtid = p.mtid;
+					node.redirect('/ultimatum/index.html?id=' + mtid, p.id);
+				});
+				
 			}
 		});
 		
@@ -50,7 +59,7 @@ var conf = {
 	    'transports': ['xhr-polling'],
 	    'polling duration': 10
 	},
-	verbosity: 10,
+	verbosity: 0,
 };
 
 node.play(conf, new Ultimatum_wait());

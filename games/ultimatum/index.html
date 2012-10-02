@@ -16,6 +16,9 @@
 <script>
   window.onload = function () {
 	
+	  // Player ID from Mturk
+	  var mtid = JSUS.getQueryString('id');
+	  
 		// Create the Client
 			
 		var conf = {
@@ -31,7 +34,10 @@
 			env: {
         auto: true,
         debug: false,
-      }
+      },
+      player: {
+          mtid: mtid,
+      },
 		};
 
     node.play(conf, new Ultimatum());

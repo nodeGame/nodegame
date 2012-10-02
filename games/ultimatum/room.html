@@ -30,6 +30,9 @@
 		  }, 1000)    
 		})();
 	  
+	   // Player ID from Mturk
+	   var mtid = JSUS.getQueryString('id');
+	  
 		// Create the Client
 			
 		 var conf = {
@@ -42,10 +45,13 @@
       window: {
     	  promptOnleave: false,
       },
+      player: {
+          mtid: mtid,
+      },
 		};
 
 		
-    node.connect(conf, new Ultimatum_wait());
+    node.play(conf, new Ultimatum_wait());
     
 	  
     

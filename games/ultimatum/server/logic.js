@@ -1,3 +1,6 @@
+var request = require('request');
+var NDDB = require('NDDB').NDDB;
+
 function Ultimatum () {
 
 	this.name = 'Backend logic for Ultimatum Game';
@@ -9,9 +12,66 @@ function Ultimatum () {
 	
 	this.automatic_step = true;
 	
-	this.init = function () {};
+	this.init = function () {
+		
+		//node.on('in.set.DATA', function(msg) {
+		// if (msg.text === 'response')
+		node.onDATA('response', function(msg) {
+			var response = msg.data;
+			if (!response) return;
+			if (response.response === 'ACCEPT') {
+				var p = node.game.pl.get(msg.from);
+				if (!p.win) {
+					p.win = response.value;
+				}
+				else {
+					p.win+= response.value;
+				}
+				
+				node.log('Added to respondent ' + msg.from + ' ' + response.value + ' ECU');
+			
+				p = node.game.pl.get(msg.from);
+				if (!p.win) {
+					p.win = response.value;
+				}
+				else {
+					p.win+= response.value;
+				}
+				node.log('Added to bidder ' + p.id + ' ' + response.value + ' ECU');
+			}
+		});
+	};
 	
 	var pregame = function () {
+		
+		
+		node.log(codes.fetch());
+		node.on('UPDATED_PLIST', function(){
+			
+			// Security check
+			var mtid, found;
+			node.game.pl.each(function(p){
+				mtid = p.mtid;
+				found = codes.select('AccessCode', '=', mtid);
+				
+				if (!found) {
+					node.log('Found invalid access code ' + mtid + ' for player ' + p.id);
+					return;
+				}
+				  
+				if (found.length > 1) {
+					node.log('Access code used multiple times: ' + mtid);
+					found.each(function(p){
+						node.log(' - player: ' + p.id);
+					});
+					return;
+				}
+				
+				
+			});
+			
+		});
+		
 		console.log('Pregame');
 	};
 	
@@ -24,9 +84,8 @@ function Ultimatum () {
 		// Pairs all players
 		var groups = this.pl.getGroupsSizeN(2);
 	
-		console.log(node.state);
-		console.log('PAIRS');
-		console.log(groups.length);
+		node.log('PAIRS');
+		node.log(groups.length);
 		
 		var i;
 		var g = null;
@@ -52,24 +111,23 @@ function Ultimatum () {
 				node.say(data_b, 'BIDDER', bidder.id);
 				node.say(data_r, 'RESPONDENT', respondent.id);
 				
-				console.log(node.state);
-				console.log('SENT BIDDER AND RESPONDENT');
-				console.log(bidder.id);
-				console.log(respondent.id);
+				node.log('SENT BIDDER AND RESPONDENT');
+				node.log(bidder.id);
+				node.log(respondent.id);
 				
 			}
 			// Someone was not paired. Let him wait
 			else {
 				var solo = g.first();
 				node.say('SOLO', 'SOLO', solo.id);
-				console.log('SENT SOLO');
-				console.log(solo.id);
+				node.log('SENT SOLO');
+				node.log(solo.id);
 				
 			}	
 		}
 		
 	//	setTimeout(function(){
-	//		console.log(node.game.memory.fetch());
+	//		node.log(node.game.memory.fetch());
 	//	}, 2000);
 		
 		console.log('Game');
@@ -80,7 +138,49 @@ function Ultimatum () {
 	};
 	
 	var endgame = function () {
-		node.game.memory.save('./results.nddb');		
+		node.game.memory.save('./results.nddb');	
+		
+		var p;
+		codes.each(function(c) {
+			p = node.game.pl.select('mtid', '=', c.AccessCode).first();
+			if (!p) {
+				c.Bonus = 0;
+			}
+			else {
+				c.Bonus = p.win || 0;
+			}
+			
+	    });
+	      
+	    var payoffs = codes.fetch();
+	    console.log('FINAL PAYOFF PER PLAYER');
+	    console.log('***********************')
+	    console.log(payoffs);
+	    console.log('***********************')
+	      
+	    var postpayoffs = {
+	    		"Operation": "PostPayoffs",
+	      		"ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
+	      		"ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
+	      		"AccessCode":"",
+	      		"ExitCode":"",
+	      		"Bonus":0,
+	      		"Payoffs": payoffs,
+	      		"Codes":[]
+	    };
+
+	    request(
+      	    { method: 'POST'
+      	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
+      	    , json: postpayoffs
+      	    }
+      	  , function (error, response, body) {
+      		  if (error) console.log('Error: ' + error);
+      		  console.log('Response code: '+ response.statusCode);
+      	      console.log(body);
+      	    }
+	    );
+	      
 		console.log('Game ended');
 	};
 	
@@ -113,6 +213,7 @@ function Ultimatum () {
 
 }
 
+/// Start it!
 
 if ('object' === typeof module && 'function' === typeof require) {
 	//var node = require('../../../node_modules/nodegame-server/node_modules/nodegame-client');
@@ -123,15 +224,47 @@ if ('object' === typeof module && 'function' === typeof require) {
 	module.exports.Ultimatum = Ultimatum;
 }
 
-var conf = {
-	name: "P_" + Math.floor(Math.random()*100),
-	url: "http://localhost:8080/ultimatum/admin",
-	io: {
-	    'reconnect': false,
-	    'transports': ['xhr-polling'],
-	    'polling duration': 10
-	},
-	verbosity: 10,
+var codes = new NDDB();
+
+var body = {
+		 "Operation": "GetCodes",
+		 "ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
+		 "ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
+		 "AccessCode":"",
+		 "ExitCode":"",
+		 "Bonus":0,
+		 "Payoffs":[],
+		 "Codes":[]
 };
 
-node.play(conf, new Ultimatum());
+request(
+	    { method: 'POST'
+	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
+	    , json: body
+	    }
+	  , function (error, response, body) {
+		  if (error) {
+			  console.log(error);
+			  console.log('Error. Cannot proceed without the list of valid access codes');
+			  throw new Error(error);
+		  }
+		  console.log('Response code: '+ response.statusCode);
+	      codes.importDB(body.Codes);
+	      console.log(codes.fetchValues());
+
+	    	var conf = {
+	    		name: "P_" + Math.floor(Math.random()*100),
+	    		url: "http://localhost:8080/ultimatum/admin",
+	    		io: {
+	    		    'reconnect': false,
+	    		    'transports': ['xhr-polling'],
+	    		    'polling duration': 10
+	    		},
+	    		verbosity: 0,
+	    	};
+
+	    	node.play(conf, new Ultimatum());
+	    }
+);
+
+
