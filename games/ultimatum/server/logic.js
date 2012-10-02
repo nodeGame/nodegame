@@ -12,8 +12,10 @@ function Ultimatum () {
 	
 	this.automatic_step = true;
 	
+	this.SHOWUP = 5000;
+	
 	this.init = function () {
-		
+
 		//node.on('in.set.DATA', function(msg) {
 		// if (msg.text === 'response')
 		node.onDATA('response', function(msg) {
@@ -31,20 +33,38 @@ function Ultimatum () {
 				node.log('Added to respondent ' + msg.from + ' ' + response.value + ' ECU');
 			
 				p = node.game.pl.get(msg.from);
-				if (!p.win) {
-					p.win = response.value;
-				}
-				else {
-					p.win+= response.value;
-				}
+				p.win+= response.value;
 				node.log('Added to bidder ' + p.id + ' ' + response.value + ' ECU');
 			}
 		});
 	};
 	
+	var checkOut = function (accesscode, exitcode, bonus) {
+		bonus = bonus || 0;
+		var checkout = {
+	    		"Operation": "CheckOut",
+	      		"ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
+	      		"ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
+	      		"AccessCode": accesscode,
+	      		"ExitCode": exitcode,
+	      		"Bonus": bonus,
+	    };
+
+	    request(
+      	    { method: 'POST'
+      	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
+      	    , json: checkout
+      	    }
+      	  , function (error, response, body) {
+      		  if (error) console.log('Error: ' + error);
+      		  console.log('Response code: '+ response.statusCode);
+      	      console.log(body);
+      	    }
+	    );
+	};
+	
 	var pregame = function () {
-		
-		
+		var that = this;
 		node.log(codes.fetch());
 		node.on('UPDATED_PLIST', function(){
 			
@@ -67,7 +87,9 @@ function Ultimatum () {
 					return;
 				}
 				
-				
+				// Setting default winning
+				p.win = that.SHOWUP;
+			
 			});
 			
 		});
@@ -140,47 +162,22 @@ function Ultimatum () {
 	var endgame = function () {
 		node.game.memory.save('./results.nddb');	
 		
-		var p;
-		codes.each(function(c) {
-			p = node.game.pl.select('mtid', '=', c.AccessCode).first();
-			if (!p) {
-				c.Bonus = 0;
-			}
-			else {
-				c.Bonus = p.win || 0;
-			}
-			
-	    });
+		var exitcode;
+		node.game.pl.each(function(p){
+			exitcode = codes.select('AccessCode', '=', p.mtid).first().ExitCode;
+			checkOut(p.mtid, exitcode, p.win);
+			node.say(p.win, 'WIN', p.id);
+		});
+		
 	      
-	    var payoffs = codes.fetch();
+	    
 	    console.log('FINAL PAYOFF PER PLAYER');
-	    console.log('***********************')
-	    console.log(payoffs);
-	    console.log('***********************')
+	    console.log('***********************');
+	    console.log(node.game.pl.keep(['mtid', 'win']).fetch());
+	    
+	    console.log('***********************');
 	      
-	    var postpayoffs = {
-	    		"Operation": "PostPayoffs",
-	      		"ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
-	      		"ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
-	      		"AccessCode":"",
-	      		"ExitCode":"",
-	      		"Bonus":0,
-	      		"Payoffs": payoffs,
-	      		"Codes":[]
-	    };
-
-	    request(
-      	    { method: 'POST'
-      	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
-      	    , json: postpayoffs
-      	    }
-      	  , function (error, response, body) {
-      		  if (error) console.log('Error: ' + error);
-      		  console.log('Response code: '+ response.statusCode);
-      	      console.log(body);
-      	    }
-	    );
-	      
+	    	      
 		console.log('Game ended');
 	};
 	

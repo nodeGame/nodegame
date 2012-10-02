@@ -34,7 +34,7 @@ function Ultimatum () {
 	this.init = function() {
 		this.BIDDER = 1;
 		this.RESPONDENT = 0;	
-		node.window.setup('PLAYER');
+		W.setup('PLAYER');
 	};
 
 	//////////////////////////////////////////////
@@ -47,29 +47,29 @@ function Ultimatum () {
 	//
 	/////////////////////////////////////////////
 	var pregame = function() {
-		node.window.loadFrame('html/pregame.html');
+		W.loadFrame('html/pregame.html');
 		console.log('Pregame');
 	};
 	
 
-	var instructions = function(){	
+	var instructions = function() {	
 		var that = this;
 		
 		//////////////////////////////////////////////
 		// nodeGame hint:
 		//
-		// The node.window object takes care of all 
+		// The W object takes care of all 
 		// visual operation of the game. E.g.,
 		//
-		// node.window.loadFrame()
+		// W.loadFrame()
 		//
 		// loads an HTML file into the game screen, 
 		// and the execute the callback function 
 		// passed as second parameter.
 		//
 		/////////////////////////////////////////////
-		node.window.loadFrame('html/instructions.html', function() {
-			var b = node.window.getElementById('read');
+		W.loadFrame('html/instructions.html', function() {
+			var b = W.getElementById('read');
 			b.onclick = function() {
 				node.DONE();
 			};
@@ -119,136 +119,158 @@ function Ultimatum () {
 		//
 		/////////////////////////////////////////////
 		var that = this;
-		node.window.loadFrame('html/solo.html', function () {
+//		W.loadFrame('html/solo.html', function () {
 			
 			
-			//////////////////////////////////////////////
-			// nodeGame hint:
-			//
-			//	nodeGame offers several types of event
-			//  listeners. They are all resemble the syntax
-			//
-			//  node.on<[DATA,TXT,PLIST, etc]>
-			//
-			//  The low level event listener is simply 
-			//
-			//  node.on
-			//
-			/////////////////////////////////////////////
-			node.onDATA('BIDDER', function (msg) {
+		//////////////////////////////////////////////
+		// nodeGame hint:
+		//
+		//	nodeGame offers several types of event
+		//  listeners. They are all resemble the syntax
+		//
+		//  node.on<[DATA,TXT,PLIST, etc]>
+		//
+		//  The low level event listener is simply 
+		//
+		//  node.on
+		//
+		/////////////////////////////////////////////
+		node.onDATA('BIDDER', function (msg) {
+			
+			that.other = msg.data.other;
+			
+			node.set('ROLE', 'BIDDER');
+			W.loadFrame('html/bidder.html', function () {
 				
-				that.other = msg.data.other;
-				
-				node.set('ROLE', 'BIDDER');
-				node.window.loadFrame('html/bidder.html', function () {
+				// Start the timer after an offer was received.
+				var options = {
+						milliseconds: 30000,
+						timeup: function(){
+							// Doing random offer;
+						},
+				};
+				node.game.timer.init(options);
+				node.game.timer.start();
 
-					var root = node.window.getElementById('root');
-					var b = node.window.getElementById('submitOffer');
+				var root = W.getElementById('root');
+				var b = W.getElementById('submitOffer');
+				
+				node.env('auto', function() {
 					
-					node.env('auto', function() {
-						
-						//////////////////////////////////////////////
-						// nodeGame hint:
-						//
-						// Execute a function randomly
-						// in a time interval between 0 and 1 second
-						//
-						//////////////////////////////////////////////
-						node.random.exec(function() {
-							var offered = Math.floor(1+Math.random()*100);
-							node.set('offer', offered);
-							node.say(offered, 'OFFER', that.other);
-							node.window.write(' Your offer: ' +  offered, root);
-						}, 4000);
-					});
-					
-					b.onclick = function() {
-						var offer = node.window.getElementById('offer');
-						//////////////////////////////////////////////
-						// nodeGame hint:
-						//
-						// nodeGame offers the possibility to send
-						// messages both to the nodeGame server and 
-						// to other players. For example:
-						//
-						// - node.say -> sends data to player or server.
-						//   It will be upon the receiver what to do
-						//   the incoming data.
-						//
-						// - node.set -> stores in the memory of the 
-						//   server a piece of information.
-						//
-						/////////////////////////////////////////////
-						node.set('offer', offer.value);
-						node.say(offer.value, 'OFFER', that.other);
-						node.window.write(' Your offer: ' +  offer.value);
-					};
-					
-					node.onDATA('ACCEPT', function (msg) {
-							node.window.write('Your offer was accepted');
-							node.DONE();
-					});
-						
-					node.onDATA('REJECT', function (msg) {
-						node.window.write('Your offer was rejected');
+					//////////////////////////////////////////////
+					// nodeGame hint:
+					//
+					// Execute a function randomly
+					// in a time interval between 0 and 1 second
+					//
+					//////////////////////////////////////////////
+					node.random.exec(function() {
+						var offered = Math.floor(1+Math.random()*100);
+						node.set('offer', offered);
+						node.say(offered, 'OFFER', that.other);
+						W.write(' Your offer: ' +  offered, root);
+					}, 4000);
+				});
+				
+				b.onclick = function() {
+					var offer = W.getElementById('offer');
+					//////////////////////////////////////////////
+					// nodeGame hint:
+					//
+					// nodeGame offers the possibility to send
+					// messages both to the nodeGame server and 
+					// to other players. For example:
+					//
+					// - node.say -> sends data to player or server.
+					//   It will be upon the receiver what to do
+					//   the incoming data.
+					//
+					// - node.set -> stores in the memory of the 
+					//   server a piece of information.
+					//
+					/////////////////////////////////////////////
+					node.set('offer', offer.value);
+					node.say(offer.value, 'OFFER', that.other);
+					W.write(' Your offer: ' +  offer.value);
+				};
+				
+				node.onDATA('ACCEPT', function (msg) {
+						W.write('Your offer was accepted');
 						node.DONE();
-					});
+				});
+					
+				node.onDATA('REJECT', function (msg) {
+					W.write('Your offer was rejected');
+					node.DONE();
 				});
 			});
+		});
+			
+		node.onDATA('RESPONDENT', function (msg) {
+			that.other = msg.data.other;
+			node.set('ROLE', 'RESPONDENT');
+			
+			W.loadFrame('html/resp.html', function () {
 				
-			node.onDATA('RESPONDENT', function (msg) {
-				that.other = msg.data.other;
-				node.set('ROLE', 'RESPONDENT');
+				node.onDATA('OFFER', function (msg) {
+					
+					var options = {
+							milliseconds: 30000,
+							timeup: function(){
+								// random accept reject
+							},
+					};
 				
-				node.window.loadFrame('html/resp.html', function () {
+					// Start the timer after an offer was received.
+					node.game.timer.init(options);
+					node.game.timer.start();
 					
-					node.onDATA('OFFER', function (msg) {			
-						var offered = node.window.getElementById('offered');
-						node.window.write('You received an offer of ' + msg.data, offered);
-						offered.style.display = '';
-					
-						var accept = node.window.getElementById('accept');
-						var reject = node.window.getElementById('reject');
-					
-						node.env('auto', function() {
-							node.random.exec(function(){
-								var accepted = Math.round(Math.random());
-								
-								if (accepted) {
-									accept.click();
-								}
-								else {
-									reject.click();
-								}
-								
-							}, 3000);
-						});
-						
-						accept.onclick = function() {
-							node.set('response', {
-								response: 'ACCEPT',
-								value: msg.data,
-								from: that.other,
-							});
-							node.say('ACCEPT', 'ACCEPT', that.other);
-							node.DONE();
-						};
-						
-						reject.onclick = function() {
-							node.set('response', {
-								response: 'REJECT',
-								value: msg.data,
-								from: that.other,
-							});
-							node.say('REJECT', 'REJECT', that.other);
-							node.DONE();
-						};
+					var offered = W.getElementById('offered');
+					W.write('You received an offer of ' + msg.data, offered);
+					offered.style.display = '';
+				
+					var accept = W.getElementById('accept');
+					var reject = W.getElementById('reject');
+				
+					node.env('auto', function() {
+						node.random.exec(function(){
+							var accepted = Math.round(Math.random());
+							
+							if (accepted) {
+								accept.click();
+							}
+							else {
+								reject.click();
+							}
+							
+						}, 3000);
 					});
-				});	
-			});
-				
-			node.onDATA('SOLO', function() {
-				console.log('solodone');
+					
+					accept.onclick = function() {
+						node.set('response', {
+							response: 'ACCEPT',
+							value: msg.data,
+							from: that.other,
+						});
+						node.say('ACCEPT', 'ACCEPT', that.other);
+						node.DONE();
+					};
+					
+					reject.onclick = function() {
+						node.set('response', {
+							response: 'REJECT',
+							value: msg.data,
+							from: that.other,
+						});
+						node.say('REJECT', 'REJECT', that.other);
+						node.DONE();
+					};
+				});
+			});	
+		});
+			
+		node.onDATA('SOLO', function() {
+			W.loadFrame('html/solo.html', function () {
 				//////////////////////////////////////////////
 				// nodeGame hint:
 				//
@@ -261,21 +283,31 @@ function Ultimatum () {
 				// 
 				/////////////////////////////////////////////
 				node.DONE();
-			});	
+			});
+
+			console.log('solodone');
+			
+		});	
 
 			console.log('Ultimatum');
-		});
+//		});
 	};
 	
 	var postgame = function(){
-		node.window.loadFrame('html/postgame.html', function(){
-			node.random.emit('DONE');
+		W.loadFrame('html/postgame.html', function(){
+			node.env('auto', function(){
+				node.random.emit('DONE');
+			});
 		});
 		console.log('Postgame');
 	};
 	
 	var endgame = function(){
-		node.window.loadFrame('html/ended.html');
+		W.loadFrame('html/ended.html', function(){
+			node.on('WIN', function(msg) {
+				W.write('Your earning in the game is: ' + msg.data);
+			});
+		});
 		console.log('Game ended');
 	};
 	
@@ -301,16 +333,23 @@ function Ultimatum () {
 		},
 		
 		2: {state: instructions,
-			name: 'Instructions'
+			name: 'Instructions',
+			timer: 120000,
 		},
 		
 		3: {rounds: 10, 
 			state:  ultimatum,
-			name: 'Ultimatum Game'
+			name: 'Ultimatum Game',
 		}, 
 		
 		4: {state: postgame,
-			name: 'Questionnaire'
+			name: 'Questionnaire',
+			timer: 120000,
+			done: function(){
+				var ta = W.getElementById('comment_done');
+				node.set('comment', ta.value);
+				return true;
+			}
 		},
 		
 		5: {state: endgame,

@@ -22,7 +22,13 @@ function Ultimatum_wait () {
 //	this.minPlayers = 2;
 //	this.maxPlayers = 10;
 	
-	this.init = function() {};
+	this.init = function() {
+		node.onDATA('FULL', function(msg){
+			console.log('I have excluded');
+			console.log(msg);
+			W.getElementById('h2title').innerHTML = 'I am sorry but the game has already started, and for the moment you cannot join it. Please try again later.'
+		});
+	};
 
 	var waiting = function() {		
 		node.log('Waiting room loaded');
