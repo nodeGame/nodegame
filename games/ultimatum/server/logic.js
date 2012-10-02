@@ -4,7 +4,7 @@ function Ultimatum () {
 	this.description = 'No Description';
 	this.version = '0.2';
 	
-	this.minPlayers = 2;
+	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
 	this.automatic_step = true;
@@ -115,7 +115,8 @@ function Ultimatum () {
 
 
 if ('object' === typeof module && 'function' === typeof require) {
-	var node = require('../../../node_modules/nodegame-server/node_modules/nodegame-client');
+	//var node = require('../../../node_modules/nodegame-server/node_modules/nodegame-client');
+	var node = require('nodegame-client');
 	var JSUS = node.JSUS;
 	
 	module.exports.node = node;

@@ -44,3 +44,12 @@ var ultimatum = sn.addChannel({
 				    player: 'ultimatum',
 				    game: 'ultimatum',		    	
 });
+
+var waitingRoom = sn.addChannel({
+				name: 'Wroom',
+				admin: 'ultimatum/wait/admin',
+				player: 'ultimatum/wait',
+				game: 'wait',
+});
+
+			
