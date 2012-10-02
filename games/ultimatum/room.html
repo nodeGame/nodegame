@@ -8,19 +8,33 @@
 <!-- end -->
 
 <!-- Loading the Ultimatum game -->
-<!-- <script src="./Ultimatum.js" charset="utf-8"></script> -->
+<script src="./Ultimatum_wait.js" charset="utf-8"></script>
 <!-- end -->
 
 <body>
-<div id="root"></div>
+<div id="root">
+  <h2>Please be patient. We are waiting for all the players to connect<span id="wait">...</span></h2>
+</div>
 <script>
   window.onload = function () {
-	
+	 
+	  (function(){
+		  var wait = document.getElementById('wait');
+		  setInterval(function(){
+		    if (wait.innerHTML !== '.....') {
+		      wait.innerHTML = wait.innerHTML + '.';  
+		    }
+		    else {
+		      wait.innerHTML = '..';
+		    }
+		  }, 1000)    
+		})();
+	  
 		// Create the Client
 			
-		/* var conf = {
+		 var conf = {
 			name: "P_" + Math.floor(Math.random()*100),
-			url: "/ultimatum",
+			url: "/wait",
 			//verbosity: 10,
       io: {        
            reconnect: false
@@ -30,13 +44,10 @@
       },
 		};
 
-    node.play(conf, new Ultimatum()); */
+		
+    node.connect(conf, new Ultimatum_wait());
     
-	  var socket = io.connect('/ultimatum/1/');
-	  socket.on('message', function (data) {
-	    console.log(data);
-	    //socket.emit('my other event', { my: 'data' });
-	  });
+	  
     
 	}
 </script>
