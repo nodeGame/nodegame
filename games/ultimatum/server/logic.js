@@ -7,7 +7,7 @@ function Ultimatum () {
 	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = true;
+	this.automatic_step = false;
 	
 	this.SHOWUP = 5000;
 	
@@ -118,10 +118,6 @@ function Ultimatum () {
 				
 			}	
 		}
-		
-	//	setTimeout(function(){
-	//		node.log(node.game.memory.fetch());
-	//	}, 2000);
 		
 		console.log('Game');
 	};

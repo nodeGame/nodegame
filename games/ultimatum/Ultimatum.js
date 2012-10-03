@@ -38,10 +38,11 @@ function Ultimatum () {
 		
 		var that = this;
 		node.on('BID_DONE', function(offer, to) {
+			node.game.timer.stop();
 			W.getElementById('submitOffer').disabled = 'disabled';
 			node.set('offer', offer);
 			node.say(offer, 'OFFER', to);
-			W.write(' Your offer: ' +  offer);
+			W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
 		});
 		
 		node.on('RESPONSE_DONE', function(response, offer, from) {
@@ -53,6 +54,26 @@ function Ultimatum () {
 			node.say(response, response, from);
 			node.DONE();
 		});
+		
+		this.randomAccept = function(offer, other) {
+			var accepted = Math.round(Math.random());
+			console.log('randomaccept');
+			console.log(offer + ' ' + other);
+			if (accepted) {
+				node.emit('RESPONSE_DONE', 'ACCEPT', offer, other);
+				W.write(' You accepted the offer.');
+			}
+			else {
+				node.emit('RESPONSE_DONE', 'REJECT', offer, other);
+				W.write(' You rejected the offer.');
+			}
+		};
+		
+		this.isValidBid = function (n) {
+			n = parseInt(n);
+			return !isNaN(n) && isFinite(n) && n >= 0 && n <= 100;
+		};
+
 	};
 
 	//////////////////////////////////////////////
@@ -106,7 +127,6 @@ function Ultimatum () {
 			////////////////////////////////////////////////
 			node.env('auto', function() {
 				
-				console.log('EHH???');
 				//////////////////////////////////////////////
 				// nodeGame hint:
 				//
@@ -140,9 +160,8 @@ function Ultimatum () {
 		//
 		/////////////////////////////////////////////
 		var that = this;
-//		W.loadFrame('html/solo.html', function () {
 			
-			
+		
 		//////////////////////////////////////////////
 		// nodeGame hint:
 		//
@@ -167,7 +186,7 @@ function Ultimatum () {
 				var options = {
 						milliseconds: 30000,
 						timeup: function(){
-							// Doing random offer;
+							node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
 						},
 				};
 				
@@ -185,13 +204,16 @@ function Ultimatum () {
 					//
 					//////////////////////////////////////////////
 					node.random.exec(function() {
-						var offered = Math.floor(1+Math.random()*100);
-						node.emit('BID_DONE', offered, other)
+						node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
 					}, 4000);
 				});
 				
 				b.onclick = function() {
 					var offer = W.getElementById('offer');
+					if (!that.isValidBid(offer.value)) {
+						W.writeln('Please enter a number between 0 and 100');
+						return;
+					}
 					node.emit('BID_DONE', offer.value, other)
 				};
 				
@@ -211,19 +233,21 @@ function Ultimatum () {
 			var other = msg.data.other;
 			node.set('ROLE', 'RESPONDENT');
 			
+			var options = {
+					milliseconds: 30000,
+					timeup: function() {
+						that.randomAccept(msg.data, other);
+					},
+			};
+			node.game.timer.init(options);
+			// set to 30:00
+			node.game.timer.updateDisplay();
+			
 			W.loadFrame('html/resp.html', function () {
 				
 				node.onDATA('OFFER', function (msg) {
-					
-					var options = {
-							milliseconds: 30000,
-							timeup: function(){
-								// random accept reject
-							},
-					};
-				
+										
 					// Start the timer after an offer was received.
-					node.game.timer.init(options);
 					node.game.timer.start();
 					
 					var offered = W.getElementById('offered');
@@ -234,16 +258,8 @@ function Ultimatum () {
 					var reject = W.getElementById('reject');
 				
 					node.env('auto', function() {
-						node.random.exec(function(){
-							var accepted = Math.round(Math.random());
-							
-							if (accepted) {
-								accept.click();
-							}
-							else {
-								reject.click();
-							}
-							
+						node.random.exec(function() {
+							that.randomAccept(msg.data, other);
 						}, 3000);
 					});
 					
@@ -260,13 +276,23 @@ function Ultimatum () {
 			
 		node.onDATA('SOLO', function() {
 			W.loadFrame('html/solo.html', function () {
+				var options = {
+						milliseconds: 0,
+						timeup: function() {
+							that.randomAccept(msg.data, other);
+						},
+				};
+				node.game.timer.init(options);
+				// set to 30:00
+				node.game.timer.updateDisplay();
+				
 				//////////////////////////////////////////////
 				// nodeGame hint:
 				//
 				// node.DONE() communicates to the server that 
 				// the player has completed the current state.
 				//
-				// What happens next, depends on the game. 
+				// What happens next depends on the game. 
 				// In this game the player will have to wait
 				// until all the other players are also "done".
 				// 
@@ -278,8 +304,7 @@ function Ultimatum () {
 			
 		});	
 
-			console.log('Ultimatum');
-//		});
+		console.log('Ultimatum');
 	};
 	
 	var postgame = function(){
