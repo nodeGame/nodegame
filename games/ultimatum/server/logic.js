@@ -1,6 +1,3 @@
-var request = require('request');
-var NDDB = require('NDDB').NDDB;
-
 function Ultimatum () {
 
 	this.name = 'Backend logic for Ultimatum Game';
@@ -16,8 +13,6 @@ function Ultimatum () {
 	
 	this.init = function () {
 
-		//node.on('in.set.DATA', function(msg) {
-		// if (msg.text === 'response')
 		node.onDATA('response', function(msg) {
 			var response = msg.data;
 			if (!response) return;
@@ -39,40 +34,16 @@ function Ultimatum () {
 		});
 	};
 	
-	var checkOut = function (accesscode, exitcode, bonus) {
-		bonus = bonus || 0;
-		var checkout = {
-	    		"Operation": "CheckOut",
-	      		"ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
-	      		"ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
-	      		"AccessCode": accesscode,
-	      		"ExitCode": exitcode,
-	      		"Bonus": bonus,
-	    };
-
-	    request(
-      	    { method: 'POST'
-      	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
-      	    , json: checkout
-      	    }
-      	  , function (error, response, body) {
-      		  if (error) console.log('Error: ' + error);
-      		  console.log('Response code: '+ response.statusCode);
-      	      console.log(body);
-      	    }
-	    );
-	};
-	
 	var pregame = function () {
 		var that = this;
-		node.log(codes.fetch());
+		node.log(dk.codes.fetch());
 		node.on('UPDATED_PLIST', function(){
 			
 			// Security check
 			var mtid, found;
 			node.game.pl.each(function(p){
 				mtid = p.mtid;
-				found = codes.select('AccessCode', '=', mtid);
+				found = dk.codes.select('AccessCode', '=', mtid);
 				
 				if (!found) {
 					node.log('Found invalid access code ' + mtid + ' for player ' + p.id);
@@ -164,9 +135,9 @@ function Ultimatum () {
 		
 		var exitcode;
 		node.game.pl.each(function(p){
-			exitcode = codes.select('AccessCode', '=', p.mtid).first().ExitCode;
-			checkOut(p.mtid, exitcode, p.win);
 			node.say(p.win, 'WIN', p.id);
+			exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
+			dk.checkOut(p.mtid, exitcode, p.win);
 		});
 		
 	      
@@ -210,58 +181,27 @@ function Ultimatum () {
 
 }
 
-/// Start it!
+/// RUN
 
-if ('object' === typeof module && 'function' === typeof require) {
-	//var node = require('../../../node_modules/nodegame-server/node_modules/nodegame-client');
-	var node = require('nodegame-client');
-	var JSUS = node.JSUS;
-	
-	module.exports.node = node;
-	module.exports.Ultimatum = Ultimatum;
-}
+var NDDB = require('NDDB').NDDB,
+dk = require('descil-mturk'),
+node = require('nodegame-client'),
+JSUS = node.JSUS;
 
-var codes = new NDDB();
+module.exports.node = node;
+module.exports.Ultimatum = Ultimatum;
 
-var body = {
-		 "Operation": "GetCodes",
-		 "ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
-		 "ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
-		 "AccessCode":"",
-		 "ExitCode":"",
-		 "Bonus":0,
-		 "Payoffs":[],
-		 "Codes":[]
-};
-
-request(
-	    { method: 'POST'
-	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
-	    , json: body
-	    }
-	  , function (error, response, body) {
-		  if (error) {
-			  console.log(error);
-			  console.log('Error. Cannot proceed without the list of valid access codes');
-			  throw new Error(error);
-		  }
-		  console.log('Response code: '+ response.statusCode);
-	      codes.importDB(body.Codes);
-	      console.log(codes.fetchValues());
-
-	    	var conf = {
-	    		name: "P_" + Math.floor(Math.random()*100),
-	    		url: "http://localhost:8080/ultimatum/admin",
-	    		io: {
-	    		    'reconnect': false,
-	    		    'transports': ['xhr-polling'],
-	    		    'polling duration': 10
-	    		},
-	    		verbosity: 0,
-	    	};
-
-	    	node.play(conf, new Ultimatum());
-	    }
-);
-
-
+/// Start the game only after we have received the list of access codes
+dk.getCodes(function(){
+	var conf = {
+		name: "P_" + Math.floor(Math.random()*100),
+		url: "http://localhost:8080/ultimatum/admin",
+		io: {
+		    'reconnect': false,
+		    'transports': ['xhr-polling'],
+		    'polling duration': 10
+		},
+		verbosity: 0,
+	};
+	node.play(conf, new Ultimatum());
+});

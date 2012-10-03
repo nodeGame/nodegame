@@ -35,6 +35,24 @@ function Ultimatum () {
 		this.BIDDER = 1;
 		this.RESPONDENT = 0;	
 		W.setup('PLAYER');
+		
+		var that = this;
+		node.on('BID_DONE', function(offer, to) {
+			W.getElementById('submitOffer').disabled = 'disabled';
+			node.set('offer', offer);
+			node.say(offer, 'OFFER', to);
+			W.write(' Your offer: ' +  offer);
+		});
+		
+		node.on('RESPONSE_DONE', function(response, offer, from) {
+			node.set('response', {
+				response: response,
+				value: offer,
+				from: from,
+			});
+			node.say(response, response, from);
+			node.DONE();
+		});
 	};
 
 	//////////////////////////////////////////////
@@ -88,7 +106,7 @@ function Ultimatum () {
 			////////////////////////////////////////////////
 			node.env('auto', function() {
 				
-				
+				console.log('EHH???');
 				//////////////////////////////////////////////
 				// nodeGame hint:
 				//
@@ -105,6 +123,9 @@ function Ultimatum () {
 	};
 		
 	var ultimatum = function () {
+		
+		node.game.timer.stop();
+		
 		//////////////////////////////////////////////
 		// nodeGame hint:
 		//
@@ -137,7 +158,7 @@ function Ultimatum () {
 		/////////////////////////////////////////////
 		node.onDATA('BIDDER', function (msg) {
 			
-			that.other = msg.data.other;
+			var other = msg.data.other;
 			
 			node.set('ROLE', 'BIDDER');
 			W.loadFrame('html/bidder.html', function () {
@@ -149,10 +170,9 @@ function Ultimatum () {
 							// Doing random offer;
 						},
 				};
-				node.game.timer.init(options);
-				node.game.timer.start();
+				
+				node.game.timer.restart(options);
 
-				var root = W.getElementById('root');
 				var b = W.getElementById('submitOffer');
 				
 				node.env('auto', function() {
@@ -166,48 +186,29 @@ function Ultimatum () {
 					//////////////////////////////////////////////
 					node.random.exec(function() {
 						var offered = Math.floor(1+Math.random()*100);
-						node.set('offer', offered);
-						node.say(offered, 'OFFER', that.other);
-						W.write(' Your offer: ' +  offered, root);
+						node.emit('BID_DONE', offered, other)
 					}, 4000);
 				});
 				
 				b.onclick = function() {
 					var offer = W.getElementById('offer');
-					//////////////////////////////////////////////
-					// nodeGame hint:
-					//
-					// nodeGame offers the possibility to send
-					// messages both to the nodeGame server and 
-					// to other players. For example:
-					//
-					// - node.say -> sends data to player or server.
-					//   It will be upon the receiver what to do
-					//   the incoming data.
-					//
-					// - node.set -> stores in the memory of the 
-					//   server a piece of information.
-					//
-					/////////////////////////////////////////////
-					node.set('offer', offer.value);
-					node.say(offer.value, 'OFFER', that.other);
-					W.write(' Your offer: ' +  offer.value);
+					node.emit('BID_DONE', offer.value, other)
 				};
 				
 				node.onDATA('ACCEPT', function (msg) {
-						W.write('Your offer was accepted');
-						node.DONE();
+					W.write(' Your offer was accepted.');
+					node.random.emit('DONE', 3000);
 				});
 					
 				node.onDATA('REJECT', function (msg) {
-					W.write('Your offer was rejected');
-					node.DONE();
+					W.write(' Your offer was rejected.');
+					node.random.emit('DONE', 3000);
 				});
 			});
 		});
 			
 		node.onDATA('RESPONDENT', function (msg) {
-			that.other = msg.data.other;
+			var other = msg.data.other;
 			node.set('ROLE', 'RESPONDENT');
 			
 			W.loadFrame('html/resp.html', function () {
@@ -247,23 +248,11 @@ function Ultimatum () {
 					});
 					
 					accept.onclick = function() {
-						node.set('response', {
-							response: 'ACCEPT',
-							value: msg.data,
-							from: that.other,
-						});
-						node.say('ACCEPT', 'ACCEPT', that.other);
-						node.DONE();
+						node.emit('RESPONSE_DONE', 'ACCEPT', msg.data, other);
 					};
 					
 					reject.onclick = function() {
-						node.set('response', {
-							response: 'REJECT',
-							value: msg.data,
-							from: that.other,
-						});
-						node.say('REJECT', 'REJECT', that.other);
-						node.DONE();
+						node.emit('RESPONSE_DONE', 'REJECT', msg.data, other);
 					};
 				});
 			});	
@@ -346,7 +335,7 @@ function Ultimatum () {
 			name: 'Questionnaire',
 			timer: 120000,
 			done: function(){
-				var ta = W.getElementById('comment_done');
+				var ta = W.getElementById('comment');
 				node.set('comment', ta.value);
 				return true;
 			}

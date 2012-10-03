@@ -25,8 +25,8 @@ function Ultimatum_wait () {
 				node.game.pl.each(function(p){
 					if (!p.checkout && !p.playing) {
 						p.checkout = true;
-						exitcode = codes.select('AccessCode', '=', p.mtid).first().ExitCode;
-						checkOut(p.mtid, exitcode, 0);
+						exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
+						dk.checkOut(p.mtid, exitcode, 0);
 					}
 					if (!p.playing) {
 						node.say(null, 'FULL', p.id);
@@ -51,36 +51,8 @@ function Ultimatum_wait () {
 			}
 		});
 		
-		console.log('init!!!!');
 	};
-	
-	var checkOut = function (accesscode, exitcode, bonus, cb) {
-		bonus = bonus || 0;
-		var checkout = {
-	    		"Operation": "CheckOut",
-	      		"ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
-	      		"ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
-	      		"AccessCode": accesscode,
-	      		"ExitCode": exitcode,
-	      		"Bonus": bonus,
-	    };
-
-	    request(
-      	    { method: 'POST'
-      	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
-      	    , json: checkout
-      	    }
-      	  , function (error, response, body) {
-      		  if (error) console.log('Error: ' + error);
-      		  console.log('Response code: '+ response.statusCode);
-      	      console.log(body);
-      	      if (!error && cb) {
-      	    	  cb();
-      	      }
-      	    }
-	    );
-	};
-	
+		
 	var waiting = function() {
 		
 		node.log('Waiting room loaded');
@@ -94,55 +66,32 @@ function Ultimatum_wait () {
 	};	
 }
 
-//Starting the Game
+//// RUN
 
 var node = require('nodegame-client'),
 	NDDB = node.NDDB,
 	JSUS = node.JSUS,
-	request = require('request');
+	request = require('request'),
+	dk = require('descil-mturk');
+	
 
-var codes = new NDDB();
 
-var body = {
-		 "Operation": "GetCodes",
-		 "ServiceKey": "18F072F7850A4BBEB3EF6A372CBECEE3",
-		 "ProjectCode":"7D1503C55EC44EF1A7B31CEB69E8498C",
-		 "AccessCode":"",
-		 "ExitCode":"",
-		 "Bonus":0,
-		 "Payoffs":[],
-		 "Codes":[]
-};
+/// Start the game only after we have received the list of access codes
+dk.getCodes(function(){
+	var conf = {
+		name: "waiter",
+		url: "http://localhost:8080/ultimatum/wait/admin",
+		io: {
+			'reconnect': false,
+			'transports': ['xhr-polling'],
+			'polling duration': 10
+		},
+		verbosity: 0,
+    };
 
-request(
-	    { method: 'POST'
-	    , uri: 'https://www.descil.ethz.ch/apps/mturk2/api/service.ashx'
-	    , json: body
-	    }
-	  , function (error, response, body) {
-		  if (error) {
-			  console.log(error);
-			  console.log('Error. Cannot proceed without the list of valid access codes');
-			  throw new Error(error);
-		  }
-		  console.log('Response code: '+ response.statusCode);
-	      codes.importDB(body.Codes);
-	      console.log(codes.fetchValues());
+    node.play(conf, new Ultimatum_wait());
+});
 
-	      var conf = {
-	    			name: "waiter",
-	    			url: "http://localhost:8080/ultimatum/wait/admin",
-	    			io: {
-	    			    'reconnect': false,
-	    			    'transports': ['xhr-polling'],
-	    			    'polling duration': 10
-	    			},
-	    			verbosity: 0,
-	    		};
-
-	    		node.play(conf, new Ultimatum_wait());
-	    }
-);
 
 
 
