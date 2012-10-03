@@ -351,7 +351,7 @@ function Ultimatum () {
 			timer: 120000,
 		},
 		
-		3: {rounds: 10, 
+		3: {rounds: 2, 
 			state:  ultimatum,
 			name: 'Ultimatum Game',
 		}, 

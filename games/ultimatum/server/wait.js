@@ -13,11 +13,11 @@ function Ultimatum_wait () {
 //	this.maxPlayers = 10;
 	
 	var NUMPLAYERS = 3;
-	var open = true; // Sends or not players to the game
+	var open = false; // Sends or not players to the game
 	
 	this.init = function() {
 		var open = true;
-		node.on('UPDATED_PLIST', function(){
+		node.on('UPDATED_PLIST', function() {
 			console.log('Player list = ' + node.game.pl.length);
 			
 			if (!open) {

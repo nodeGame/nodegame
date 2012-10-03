@@ -9,27 +9,28 @@ function Ultimatum () {
 	
 	this.automatic_step = false;
 	
-	this.SHOWUP = 5000;
-	
 	this.init = function () {
-
+		
+		this.SHOWUP = 500;
+		
 		node.onDATA('response', function(msg) {
 			var response = msg.data;
 			if (!response) return;
 			if (response.response === 'ACCEPT') {
-				var p = node.game.pl.get(msg.from);
-				if (!p.win) {
-					p.win = response.value;
-				}
-				else {
-					p.win+= response.value;
-				}
+				var resWin, bidWin, p;
 				
-				node.log('Added to respondent ' + msg.from + ' ' + response.value + ' ECU');
-			
+				resWin = parseInt(response.value);
+				bidWin = 100 - resWin;
+				
+				// Respondent payoff
 				p = node.game.pl.get(msg.from);
-				p.win+= response.value;
-				node.log('Added to bidder ' + p.id + ' ' + response.value + ' ECU');
+				p.win = (!p.win) ? resWin : p.win + resWin;
+				node.log('Added to respondent ' + msg.from + ' ' + response.value + ' ECU');
+				
+				// Bidder payoff
+				p = node.game.pl.get(response.from);
+				p.win = (!p.win) ? bidWin : p.win + bidWin;
+				node.log('Added to bidder ' + p.id + ' ' + p.win + ' ECU');
 			}
 		});
 	};
@@ -57,10 +58,6 @@ function Ultimatum () {
 					});
 					return;
 				}
-				
-				// Setting default winning
-				p.win = that.SHOWUP;
-			
 			});
 			
 		});
@@ -128,11 +125,12 @@ function Ultimatum () {
 	
 	var endgame = function () {
 		node.game.memory.save('./results.nddb');	
-		
+		var that = this;
 		var exitcode;
-		node.game.pl.each(function(p){
+		node.game.pl.each(function(p) {
 			node.say(p.win, 'WIN', p.id);
 			exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
+			p.win = (that.SHOWUP + (p.win || 0)) / 1000;
 			dk.checkOut(p.mtid, exitcode, p.win);
 		});
 		
@@ -161,7 +159,7 @@ function Ultimatum () {
 				name: 	'Instructions'
 			},
 				
-			3: {rounds:	10, 
+			3: {rounds:	2, 
 				state: 	game,
 				name: 	'Game'
 			},
