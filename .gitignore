@@ -21,9 +21,12 @@ _*
 npm-debug.log
 node_modules/
 
+node_modules_old
+
 /nodegame_clients/pr.js
 /nodegame_clients/node_modules/peerreview/
 pr_server.js
 /games/PR
 /games/TEST
 /games/PR2/
+
