@@ -21,10 +21,12 @@ function configure (app) {
 	var url = 'http://google.com';
 	
 	app.param('game', function(req, res, next, game){
-		  if (game !== 'ultimatum') next();
-		  console.log(req.params);
+		  if (game !== 'ultimatum') {
+			  next();
+			  return;
+		  }
 		  if (req.params[0] !== 'room.html') {
-			  console.log('req0 ' + req.params[0]);
+			  //console.log('req0 ' + req.params[0]);
 			  next();
 			  return;
 		  }
