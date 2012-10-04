@@ -15,6 +15,7 @@
   , "dependencies": {
       "nodegame-server": ">= 0.2.6",
       "nodegame-client": ">= 0.2.6",
+      "descil-mturk": ">= 0.0.1",
       "commander": "1.0.0",
       "mkdirp": "0.3.2",
       "NDDB": ">= 0.3.1"
