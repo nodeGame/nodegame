@@ -20,7 +20,7 @@ function configure (app) {
 //	
 	var url = 'http://google.com';
 	
-	app.param('game', function(req, res, next, game){
+	app.param('game', function(req, res, next, game) {
 		  if (game !== 'ultimatum') {
 			  next();
 			  return;
