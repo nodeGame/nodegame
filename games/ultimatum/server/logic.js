@@ -58,6 +58,8 @@ function Ultimatum () {
 					});
 					return;
 				}
+				
+				dk.checkIn(mtid);
 			});
 			
 		});
