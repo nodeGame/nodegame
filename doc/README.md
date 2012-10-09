@@ -10,7 +10,7 @@ nodeGame is under active development and new features are constantly added. We d
 
 ## Introduction
 
-nodeGame is a free, open source, event-driven javascript framework for multiplayer online games in a browser environment.
+nodeGame is a free, open source, event-driven javascript framework for on line, multiplayer games in the browser.
 
 ### Features
 
@@ -18,8 +18,6 @@ nodeGame is a free, open source, event-driven javascript framework for multiplay
 - Keep track of the state of the players
 - Start/Pause/Resume games
 - Reliable Messaging
-- Anti flood protection (to do)
-- SSL connection (to check)
 - Statistics 
 - Output Formatting
 - Mailing
@@ -29,7 +27,17 @@ nodeGame is a free, open source, event-driven javascript framework for multiplay
 
 ## Technology
 
-nodeGame is 100% javascript code. It is built upon [node.js](http://nodejs.org) and  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
+nodeGame is 100% javascript code. 
+
+### Server
+
+It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine.
+
+### Client
+
+The client makes use
+
+  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
 
 ## Targeted audience
 
@@ -47,18 +55,18 @@ If you are familiar enough with javascript you can proceeds to the next section,
 
 - You need to have [node.js](http://nodejs.org) installed in your system.
 
-- Get the latest nodeGame module from [github](https://github.com/shakty/nodeGame/).
+- Get the latest nodeGame module from [github](https://github.com/nodeGame/nodegame).
 
 - Copy the server directory in a folder of your choice.
 
-- Create a launcher file in the same directory, or use the predefined one `server.js`.
+- Create a launcher file in the same directory, or use the default server.js`.
 
 - A minimal launcher configuration file would look like the following example:
 
 
 #### nodeServer launcher file
 ```js
-    var ServerNode = require('./nodegame-server');
+    var ServerNode = require('./nodegame-server').ServerNode;
     var options = { 
 		name: "nodeGame Server",
 		port: 8080
@@ -74,8 +82,8 @@ If you are familiar enough with javascript you can proceeds to the next section,
 The above snippet of code can be easily explained:
 
 - the `require` directive import the nodegame-server module;
-- a `ServerNode` object with a given name is created listening on port 8004  
-- a _channel_ is added to the server; a channel is just specific address which can be bound to a specific game.
+- a `ServerNode` object with a given name is created listening on port 8080  
+- a _channel_ is added to the server; a channel binds a route to a specific game. It contains two end-points: for users and administrators.
 
 Save the above file as `server.js`, and run the server with command: 
 
@@ -102,7 +110,7 @@ The server architecture is very flexible, and a client can be written mostly in 
       window.onload = function(){
         var conf = {
           name: 'Player_1',
-          url: 'http://localhost:8080/ultimatum/'
+          url: '/ultimatum'
         };
         node.play(conf, new Ultimatum());
       }
@@ -114,7 +122,7 @@ The server architecture is very flexible, and a client can be written mostly in 
 
 ```js
     var GameExample = require(ultimatum'); // path/to/ultimatum
-    var nodegame = require('nodegame-client'); //path/to/nodegame-client
+    var nodegame = require('nodegame-client'); 
 
     var conf = {
       name: 'Player_1',
@@ -139,11 +147,11 @@ A game consist in a set of states, steps and rounds. For each step it is possibl
 | **State B** | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
 | **State C** | Debrief	     | Step 1  	 	        | x1 round    |
 
-It is possible to associate other properties to each game state, however they may depends on the additianal modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
+It is possible to associate other properties to each game state, however they may depend on the additianal modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
 
 #### Game Messages
 
-Games are played exchanging messages between players. All messages pass through the server, which routes them to the correct receiver. Whenever a message is received an event is raised informing that such a event has just event. Writing a game reduces to emitting and catching the events you are interested in.
+Games are played exchanging messages between players. All messages pass through the server, which routes them to the correct receiver. Whenever a message is received an event is raised informing that such a event has just event. Writing a game consists simply in emitting and catching the events you are interested in.
 
 ##### What are events?
 
@@ -181,21 +189,6 @@ Each message which is sent belongs to a certain category, which can specified by
 | TXT	 | Pass over a text message |
 | DONE   | Communicate that a player has terminated a stage of the game |
 | BYE	 | Terminate the connection between server and client **Not yet implemented** |
-
-
-
-## nodeGame TODO
-
-
-There is still a long list of things which are planned for future development.
-
-
-1. Games can directly passed as an object in the server.
-2. Better export of results.
-3. Storing the state of the game locally and resume it upon reconnection.
-4. Implementing a variety of standard games.
-5. Create a custom nodeGame package manager for games and widgets only (ngpm).
-6. Implement a large battery of tests.
 
 
 ## License
