@@ -1,15 +1,15 @@
 # nodeGame Documentation
 
-- last Update: 10/10/2012 
+- last update: 10/10/2012 
 - status: incomplete
 
 ## Disclaimer to this documentation
 
-nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
+`nodeGame` is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
 ## Who should read this document
 
-This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification always refer to    
+This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification please read the other files in the doc directory of this repository.   
 
 ## Introduction
 
@@ -140,9 +140,11 @@ The server architecture is very flexible, and a client can be written mostly in 
 As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the `play` method.
 
 
-#### The game structure
+### The game structure
 
-**Section still under construction...** This is just a brief introduction for a complete guide refer to the specific guide.
+**Section still under construction...**
+
+This is just a brief introduction for a complete guide refer to the specific guide.
 
 
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
@@ -150,27 +152,28 @@ A game consist in a set of states, steps and rounds. For each step it is possibl
 
 | State       | State name   | Steps                | Repetitions |
 | ----------- | ------------ | -------------------- | ----------- |
-| **State A** | Instructions | Step 1		        | x1 round    |
-| **State B** | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
-| **State C** | Debrief	     | Step 1  	 	        | x1 round    |
+| **State A** | Instructions | Step 1		            | x1 round    |
+| **State B** | Game  	     | Step 1, Step2, Step3	| x10 rounds  |
+| **State C** | Debrief	     | Step 1  	 	          | x1 round    |
 
-It is possible to associate other properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
+It is possible to associate other properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties.
 
 #### What happens during a game ?
 
-nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver.
+nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver. When a message is received a particular event is created.
 
-nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases. 
+nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases and events. 
+
+###### What are events?
+
+An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
 
 ##### Game Messages
 
 Whenever a message is received an event is raised informing that such a event has just occurred. Writing a game consists simply in emitting and catching the events you are interested in.
 
-##### What are events?
 
-An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
-
-##### Message categories (targets)
+###### Message categories (targets)
 
 Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
 
@@ -185,7 +188,7 @@ Each message which is sent belongs to a certain category, which can specified by
 | REDIRECT | Redirect a client to a new address (available only for administrator) |
 | BYE	   | Terminate the connection between server and client **Not yet implemented** |
 
-##### Message actions
+###### Message actions
 
 Each message category can belong to one of the following actions:
 
@@ -194,6 +197,8 @@ Each message category can belong to one of the following actions:
 | SAY    | Send |
 | SET    | Communicate or set the state of the game |
 | GET    | Communicate or set the list of players |
+
+###### A final example on game messages
 
 Finally, messages can be _incoming_ or _outgoing_, therefore a typically event listener is of the form
 
@@ -205,7 +210,7 @@ Finally, messages can be _incoming_ or _outgoing_, therefore a typically event l
     // do something
   });
 ``` 
-Predefined event listeners are already defined. See 
+Predefined event listeners are already defined. See the `nodegame-client` documentation for help. 
 
 ## Brief API summary
 
