@@ -1,28 +1,33 @@
 # nodeGame Documentation
 
-- version 5.0.0
+- last Update: 10/10/2012 
 - status: incomplete
 
 ## Disclaimer to this documentation
 
 nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
+## Who should read this document
+
+This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification always refer to    
 
 ## Introduction
 
-nodeGame is a free, open source, event-driven Javascript framework for on line, multiplayer games in the browser.
+nodeGame is a free, open source, event-driven Javascript framework for on line, multiplayer games in the browser. It is specially designed to run social science experiments, for studying both individual choices and collective behavior. However, its architecture is general enough to run any type of game. 
 
-### Features
+### The good parts
 
-- Synchronous and asynchronous games 
-- Keep track of the state of the players
-- Start/Pause/Resume games
-- Reliable Messaging
-- Statistics 
-- Output Formatting
-- Mailing
-- Easy to customize
-- much more... 
+- Open source and open standard (HTML5)
+- Modular framework (games + widgets)
+- Low / Medium level of programming required
+- Powerful API
+- Real-time plotting in combination with [D3.js](http://d3js.org)
+- Integrated Javascript database with [NDDB](http://github.com/nodeGame/NDDB)
+- Server can run multiple games at the same time
+- Customizable waiting rooms for online games
+- Works on mobile devices and tablets
+- Integrates smoothly with other libraries, such as jQuery, or web services, such as Amazon Mturk
+- much more...
 
 
 ## Technology
@@ -55,23 +60,20 @@ nodeGame is designed to be as user-friendly as possible, but not more. This mean
 
 If you are familiar enough with Javascript you can proceed to the next section, and learn how to setup the nodeGame server, how clients can connect to it, and how to write games for nodeGame.
 
-## Examples
+## Getting started
+                                                     
+1. Download node.js (see references)
+2. From the console type: `npm install nodegame` 
+3. Start the server: `node server.js`
+4. Open two or more browser windows pointing to `localhost:8080/ultimatum/index.html`
+5. Browse to the `./games/ultimatum/server/` folder and start the game: `node logic.js`
 
 
-### How to run the server
 
-- Remember, you need to have [node.js](http://nodejs.org) installed in your system.
-
-- Get the latest nodeGame module from [github](https://github.com/nodeGame/nodegame).
-
-- Copy the server directory in a folder of your choice.
-
-- Create a launcher file in the same directory, or use the default server.js`.
-
-- A minimal launcher configuration file would look like the following example:
-
+### A closer look
 
 #### nodeServer launcher file
+
 ```js
     var ServerNode = require('./nodegame-server').ServerNode;
     var options = { 
@@ -92,15 +94,12 @@ The above snippet of code can be easily explained:
 - a `ServerNode` object with a given name is created listening on port 8080  
 - a _channel_ is added to the server; a channel binds a route to a specific game. It contains two end-points: for users and administrators.
 
-Save the above file as `server.js`, and run the server with command: 
-
-    node server.js
 
 If you want to make sure that your server stays always up you can read this great tutorial:
 
 - http://blog.nodejitsu.com/keep-a-nodejs-server-up-with-forever
 
-### How to write a client
+#### The client in the browser
 
 The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the nodeGame client library is for now available in Javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
 
@@ -128,22 +127,23 @@ The server architecture is very flexible, and a client can be written mostly in 
 #### nodeGame client in Node.js
 
 ```js
-    var GameExample = require(ultimatum'); // path/to/ultimatum
-    var nodegame = require('nodegame-client'); 
+    var GameExample = require('ultimatum'); // path/to/ultimatum
+    var node = require('nodegame-client'); 
 
     var conf = {
       name: 'Player_1',
       url: 'http://localhost:8080/ultimatum/'
     };
-    nodegame.play(conf, new Ultimatum());
+    node.play(conf, new Ultimatum());
 ```
 
 As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the `play` method.
 
 
-### How to write a game
+#### The game structure
 
-Section still under construction...
+**Section still under construction...** This is just a brief introduction for a complete guide refer to the specific guide.
+
 
 A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
 
@@ -154,49 +154,69 @@ A game consist in a set of states, steps and rounds. For each step it is possibl
 | **State B** | Game)	     | Step 1, Step2, Step3	| x10 rounds  |
 | **State C** | Debrief	     | Step 1  	 	        | x1 round    |
 
-It is possible to associate other properties to each game state, however they may depend on the additianal modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
+It is possible to associate other properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties, explained later.
 
-#### Game Messages
+#### What happens during a game ?
 
-Games are played exchanging messages between players. All messages pass through the server, which routes them to the correct receiver. Whenever a message is received an event is raised informing that such a event has just event. Writing a game consists simply in emitting and catching the events you are interested in.
+nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver.
+
+nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases. 
+
+##### Game Messages
+
+Whenever a message is received an event is raised informing that such a event has just occurred. Writing a game consists simply in emitting and catching the events you are interested in.
 
 ##### What are events?
 
 An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
 
-
-##### How to emit and catch events?
-
-
-After importing the `nodeGame-client` library, the `node` object is available in your programming environment, with the following built-in methods.
-
-| **Method**                     | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| node.emit('KEY')               | Generic hook for emitting an event locally.                                 |
-| node.set('KEY', value)         | Saves a key value pair to the server memory object                          |
-| node.say(value, 'KEY', player) | An generic piece of information is send out to the players or to the server |
-| node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
-| node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
-
-
-It is important to understand that the `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
-
+##### Message categories (targets)
 
 Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
 
-
 | Type   | Meaning |
 | ------ | --------------------------------------------------- |
-| HI	 | Establish the connection between server and clients |
+| HI	   | Establish the connection between server and clients |
 | STATE  | Communicate or set the state of the game |
 | PLIST  | Communicate or set the list of players |
 | DATA	 | Pass over some data |
-| TXT	 | Pass over a text message |
+| TXT	   | Pass over a text message |
 | DONE   | Communicate that a player has terminated a stage of the game |
-| BYE	 | Terminate the connection between server and client **Not yet implemented** |
+| REDIRECT | Redirect a client to a new address (available only for administrator) |
+| BYE	   | Terminate the connection between server and client **Not yet implemented** |
 
+##### Message actions
+
+Each message category can belong to one of the following actions:
+
+| Type   | Meaning |
+| ------ | --------------------------------------------------- |
+| SAY    | Send |
+| SET    | Communicate or set the state of the game |
+| GET    | Communicate or set the list of players |
+
+Finally, messages can be _incoming_ or _outgoing_, therefore a typically event listener is of the form
+
+```javascript
+  
+  node.emit('out.say.DATA', myData);
+
+  node.on('in.say.DATA', function(msg) {
+    // do something
+  });
+``` 
+Predefined event listeners are already defined. See 
 
 ## Brief API summary
+
+By loading the _nodegame-client_ library you get access to the `node` 
+
+### Connect to a server
+
+| **Method**                     | **Meaning** |
+| ------------------------------ | ----------------------------------------------------------------------------|
+| node.connect(conf, game)       | Connects to the url specified in configuration object and start the game object|
+| node.play(conf, game)          | _Deprecated_ The same as node.connect |
 
 
 ### Emitting and catching events
@@ -209,16 +229,33 @@ Each message which is sent belongs to a certain category, which can specified by
 | node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
 | node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
 
+
+Important! The `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
+
+
 ### Objects 
+
+
 
 | **Objects**                    | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
-| node.game.memory               | The local database                                                          |
-| node.game.pl                   | The player list |
-| node.window                    | An object    |
-| node.window.widgets            | Request something to the server, and then executes the callback.            |
+| node.game                      | The game currently loaded                                                   |
+| node.game.memory               | The local database (see below for more details)                             |
+| node.game.pl                   | The player list object of clients connected|
+| node.msg                       | The msg generator object. Can create custom game messages |
+| node.socket                    | The connection socket with the server |
+| node.player                    | The player data for the client |
+
+### nodegame-window and nodegame-widgets
+
+
+| **Objects**                    | **Meaning** |
+| ------------------------------ | ----------------------------------------------------------------------------|
+| node.window                    | An helper object to interact with the browser window    |
+| node.window.widgets            | A collection of reusable functions to             |
 
 ### Memory api
+
 
 | **Memory api**                 | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
@@ -226,7 +263,20 @@ Each message which is sent belongs to a certain category, which can specified by
 | memory.select('state', '>', '2.1')| Select only entries inserted after game state _'2.1'_ |
 | memory.select('state', '=', this.previous()).join('player', 'player', 'CF', 'value') | Advanced operation |
 
+
+The memory object is a special instance of the _NDDB_ database. 
 For more information about the _node.game.memory_ API see the [NDDB home page](http://nodegame.github.com/NDDB/).
+
+### JSUS
+
+`node.JSUS` contains a collection of helper functions for diverse purpose, from randomization and sorting, to creation of a latin square. 
+See the [JSUS home page](http://nodegame.github.com/JSUS/) for the full API.
+
+
+## Further reading
+
+This little guide is far from being complete. It may also be not updated. 
+You can find additional information in the other files present in doc directory of this repository. 
 
 
 ## License
