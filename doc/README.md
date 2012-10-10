@@ -170,14 +170,13 @@ An event is literally something that has happened. It can really be anything, e.
 
 After importing the `nodeGame-client` library, the `node` object is available in your programming environment, with the following built-in methods.
 
-
 | **Method**                     | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
-| node.emit('EVENT', p1, p2, p3) | Generic hook for emitting an event locally.                                 |
-| node.set('EVENT', p1, p2, p3)  | A specific piece of information is send out to the players or to the server |
-| node.say('EVENT', p1, p2, p3)  | An generic piece of information is send out to the players or to the server |
-| node.get('EVENT', callback)    | Request something to the server, and then executes the callback.            |
-| node.on('EVENT', function)	   | Execute function whenever 'EVENT' is triggered                              |
+| node.emit('KEY')               | Generic hook for emitting an event locally.                                 |
+| node.set('KEY', value)         | Saves a key value pair to the server memory object                          |
+| node.say(value, 'KEY', player) | An generic piece of information is send out to the players or to the server |
+| node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
+| node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
 
 
 It is important to understand that the `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
@@ -199,6 +198,9 @@ Each message which is sent belongs to a certain category, which can specified by
 
 ## Brief API summary
 
+
+### Emitting and catching events
+
 | **Method**                     | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
 | node.emit('KEY')               | Generic hook for emitting an event locally.                                 |
@@ -207,6 +209,8 @@ Each message which is sent belongs to a certain category, which can specified by
 | node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
 | node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
 
+### Objects 
+
 | **Objects**                    | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
 | node.game.memory               | The local database                                                          |
@@ -214,7 +218,7 @@ Each message which is sent belongs to a certain category, which can specified by
 | node.window                    | An object    |
 | node.window.widgets            | Request something to the server, and then executes the callback.            |
 
-
+### Memory api
 
 | **Memory api**                 | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
