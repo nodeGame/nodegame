@@ -10,11 +10,11 @@ nodeGame is under active development and new features are constantly added. We d
 
 ## Introduction
 
-nodeGame is a free, open source, event-driven javascript framework for on line, multiplayer games in the browser.
+nodeGame is a free, open source, event-driven Javascript framework for on line, multiplayer games in the browser.
 
 ### Features
 
-- Synchronous and Asynchronous games 
+- Synchronous and asynchronous games 
 - Keep track of the state of the players
 - Start/Pause/Resume games
 - Reliable Messaging
@@ -27,7 +27,7 @@ nodeGame is a free, open source, event-driven javascript framework for on line, 
 
 ## Technology
 
-nodeGame is 100% javascript code. 
+nodeGame is 100% Javascript code. 
 
 ### Server
 
@@ -35,25 +35,32 @@ It order to run the server you need to have [node.js](http://nodejs.org) install
 
 ### Client
 
-The client makes use
+The client makes use [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries, such as:
 
-  [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries. 
+  * [D3](http://d3js.org/)
+  * [jQuery](http://jquery.com/)
+
+Two additional packages - already shipped with the default installation of nodegame - extend the capabilities of _nodegame-client_:
+
+  * [nodegame-window](https://github.com/nodeGame/nodegame-window) 
+  * [nodegame-widgets](https://github.com/nodeGame/nodegame-widgets)
+
 
 ## Targeted audience
 
-nodeGame is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of javascript, the programming language of the browser. For starting guides about javascript you can look into:
+nodeGame is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of Javascript, the programming language of the browser. For beginner guides about Javascript you can look into:
 
 - [A beginner tutorial](http://www.w3schools.com/js/)
 - [An advanced (not free) book](http://www.amazon.com/JavaScript-Good-Parts-Douglas-Crockford/dp/0596517742)
 
-If you are familiar enough with javascript you can proceeds to the next section, showing how to setup a nodeGame server, and clients, and how to write games for nodeGame.
+If you are familiar enough with Javascript you can proceed to the next section, and learn how to setup the nodeGame server, how clients can connect to it, and how to write games for nodeGame.
 
 ## Examples
 
 
 ### How to run the server
 
-- You need to have [node.js](http://nodejs.org) installed in your system.
+- Remember, you need to have [node.js](http://nodejs.org) installed in your system.
 
 - Get the latest nodeGame module from [github](https://github.com/nodeGame/nodegame).
 
@@ -95,7 +102,7 @@ If you want to make sure that your server stays always up you can read this grea
 
 ### How to write a client
 
-The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the nodeGame client library is for now available in javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
+The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the nodeGame client library is for now available in Javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
 
 #### nodeGame client in a browser
 
