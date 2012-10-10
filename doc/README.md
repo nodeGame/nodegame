@@ -177,8 +177,7 @@ After importing the `nodeGame-client` library, the `node` object is available in
 | node.set('EVENT', p1, p2, p3)  | A specific piece of information is send out to the players or to the server |
 | node.say('EVENT', p1, p2, p3)  | An generic piece of information is send out to the players or to the server |
 | node.get('EVENT', callback)    | Request something to the server, and then executes the callback.            |
-| node.show()                    | Automatically pops up an HTML node in the player's screnn. **Not yet implemented** |
-| node.on('EVENT', function)	 | Execute function whenever 'EVENT' is triggered                              |
+| node.on('EVENT', function)	   | Execute function whenever 'EVENT' is triggered                              |
 
 
 It is important to understand that the `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
@@ -196,6 +195,34 @@ Each message which is sent belongs to a certain category, which can specified by
 | TXT	 | Pass over a text message |
 | DONE   | Communicate that a player has terminated a stage of the game |
 | BYE	 | Terminate the connection between server and client **Not yet implemented** |
+
+
+## Brief API summary
+
+| **Method**                     | **Meaning** |
+| ------------------------------ | ----------------------------------------------------------------------------|
+| node.emit('KEY')               | Generic hook for emitting an event locally.                                 |
+| node.set('KEY', value)         | Saves a key value pair to the server memory object                          |
+| node.say(value, 'KEY', player) | An generic piece of information is send out to the players or to the server |
+| node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
+| node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
+
+| **Objects**                    | **Meaning** |
+| ------------------------------ | ----------------------------------------------------------------------------|
+| node.game.memory               | The local database                                                          |
+| node.game.pl                   | The player list |
+| node.window                    | An object    |
+| node.window.widgets            | Request something to the server, and then executes the callback.            |
+
+
+
+| **Memory api**                 | **Meaning** |
+| ------------------------------ | ----------------------------------------------------------------------------|
+| memory.sort('payoff')          | Sort all entries by a property called _'payoff'_                            |
+| memory.select('state', '>', '2.1')| Select only entries inserted after game state _'2.1'_ |
+| memory.select('state', '=', this.previous()).join('player', 'player', 'CF', 'value') | Advanced operation |
+
+For more information about the _node.game.memory_ API see the [NDDB home page](http://nodegame.github.com/NDDB/).
 
 
 ## License
