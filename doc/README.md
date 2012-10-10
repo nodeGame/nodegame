@@ -3,11 +3,11 @@
 - last update: 10/10/2012 
 - status: incomplete
 
-## Disclaimer to this documentation
+## Disclaimer
 
-`nodeGame` is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
+nodeGame is under active development and new features are constantly added. We do our best to keep this documentation up to date, but it may happen that the software still behave slightly differently than what herein documented. We apologize for this, and kindly ask you to report any gap between this documentation and the actual software behavior.
 
-## Who should read this document
+## Who should read this
 
 This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification please read the other files in the doc directory of this repository.   
 
