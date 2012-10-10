@@ -164,7 +164,7 @@ nodeGame is a messaging library. Clients exchange messages, and react accordingl
 
 nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases and events. 
 
-###### What are events?
+##### What are events?
 
 An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
 
@@ -188,17 +188,17 @@ Each message which is sent belongs to a certain category, which can specified by
 | REDIRECT | Redirect a client to a new address (available only for administrator) |
 | BYE	   | Terminate the connection between server and client **Not yet implemented** |
 
-###### Message actions
+##### Message actions
 
 Each message category can belong to one of the following actions:
 
 | Type   | Meaning |
 | ------ | --------------------------------------------------- |
-| SAY    | Send |
-| SET    | Communicate or set the state of the game |
-| GET    | Communicate or set the list of players |
+| SAY    | Send a piece of information to a remote receiver    |
+| SET    | Set the value of a variable of a remote object      |
+| GET    | Request a remote object                          |
 
-###### A final example on game messages
+##### A final example on game messages
 
 Finally, messages can be _incoming_ or _outgoing_, therefore a typically event listener is of the form
 
