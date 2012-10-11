@@ -24,6 +24,8 @@ function Ultimatum_wait () {
 	
 	this.init = function() {
 		node.onDATA('FULL', function(msg){
+			console.log('I have excluded');
+			console.log(msg);
 			W.getElementById('h2title').innerHTML = 'I am sorry but the game has already started, and for the moment you cannot join it. Please try again later.'
 		});
 	};

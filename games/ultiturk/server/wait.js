@@ -1,7 +1,7 @@
 function Ultimatum_wait () {
 	
 	this.name = 'Waiting Room Ultimatum Game - Client';
-	this.description = 'Waits until the game starts...';
+	this.description = 'Waits until the game starts....';
 	this.version = '0.1';
 	
 	// Wait for a STATE message from the server
@@ -13,20 +13,37 @@ function Ultimatum_wait () {
 //	this.maxPlayers = 10;
 	
 	var NUMPLAYERS = 3;
-	var open = true; // Sends or not players to the game
+	var open = false; // Sends or not players to the game
 	
 	this.init = function() {
 		var open = true;
-		node.on('PCONNECT', function(msg) {
+		node.on('UPDATED_PLIST', function() {
 			console.log('Player list = ' + node.game.pl.length);
 			
 			if (!open) {
-				node.say(null, 'FULL', msg.data.id);
+				var exitcode;
+				node.game.pl.each(function(p){
+					if (!p.checkout && !p.playing) {
+						p.checkout = true;
+						exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
+						dk.checkOut(p.mtid, exitcode, 0);
+					}
+					if (!p.playing) {
+						node.say(null, 'FULL', p.id);
+					}
+					
+				});
 			}
 			else if (node.game.pl.length === NUMPLAYERS) {
 				open = false; // only one set of players allowed now
-			
-				node.game.pl.each(function(p) {
+				
+				// We need to mark all selected players first
+				// otherwise the first that is redirected will
+				// trigger the UPDATED_PLIST event
+				node.game.pl.each(function(p){
+					p.playing = true;
+				});
+				node.game.pl.each(function(p){
 					var mtid = p.mtid;
 					node.redirect('/ultimatum/index.html?id=' + mtid, p.id);
 				});
