@@ -2,7 +2,7 @@ function Ultimatum_wait () {
 	
 	this.name = 'Waiting Room Ultimatum Game - Client';
 	this.description = 'Waits until the game starts...';
-	this.version = '0.1';
+	this.version = '0.2';
 	
 	// Wait for a STATE message from the server
 	// to go to next state
@@ -27,8 +27,7 @@ function Ultimatum_wait () {
 				open = false; // only one set of players allowed now
 			
 				node.game.pl.each(function(p) {
-					var mtid = p.mtid;
-					node.redirect('/ultimatum/index.html?id=' + mtid, p.id);
+					node.redirect('/ultimatum/index.html', p.id);
 				});
 				
 			}
@@ -37,7 +36,6 @@ function Ultimatum_wait () {
 	};
 		
 	var waiting = function() {
-		
 		node.log('Waiting room loaded');
 	};
 	
@@ -54,26 +52,21 @@ function Ultimatum_wait () {
 var node = require('nodegame-client'),
 	NDDB = node.NDDB,
 	JSUS = node.JSUS,
-	request = require('request'),
-	dk = require('descil-mturk');
-	
+	request = require('request');
 
+var conf = {
+	name: "waiter",
+	url: "http://localhost:8080/ultimatum/wait/admin",
+	io: {
+		'reconnect': false,
+		'transports': ['xhr-polling'],
+		'polling duration': 10
+	},
+	verbosity: 0,
+};
 
-/// Start the game only after we have received the list of access codes
-dk.getCodes(function(){
-	var conf = {
-		name: "waiter",
-		url: "http://localhost:8080/ultimatum/wait/admin",
-		io: {
-			'reconnect': false,
-			'transports': ['xhr-polling'],
-			'polling duration': 10
-		},
-		verbosity: 0,
-    };
+node.play(conf, new Ultimatum_wait());
 
-    node.play(conf, new Ultimatum_wait());
-});
 
 
 
