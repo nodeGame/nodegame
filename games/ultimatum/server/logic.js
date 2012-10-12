@@ -197,7 +197,7 @@ dk.getCodes(function(){
 		    'transports': ['xhr-polling'],
 		    'polling duration': 10
 		},
-		verbosity: 0,
+		verbosity: 10,
 	};
 	node.play(conf, new Ultimatum());
 });
