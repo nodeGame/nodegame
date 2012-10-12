@@ -8,11 +8,15 @@ Javascript framework (node.js + socket.io) for online multiplayer games in the b
 
 Install nodeGame via npm.
 
+```bash
     $ npm install nodegame -g
+```
 
 Create a fresh nodeGame instance with the CLI tools and follow the instructions to start it up.
 
+```bash
     $ nodegame your-nodeGame-instance
+```
 
 For further information see the [README](https://github.com/shakty/nodeGame/blob/master/doc/README.md) in the doc folder for now.
 

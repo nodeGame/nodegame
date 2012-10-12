@@ -15,7 +15,10 @@
 <div id="root"></div>
 <script>
   window.onload = function () {
-		  
+	
+	  // Player ID from Mturk
+	  var mtid = JSUS.getQueryString('id');
+	  
 		// Create the Client
 			
 		var conf = {
@@ -32,7 +35,7 @@
         debug: false,
       },
       player: {
-			  name: "P_" + Math.floor(Math.random()*100),
+          mtid: mtid,
       },
 		};
 

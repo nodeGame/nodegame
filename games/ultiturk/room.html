@@ -29,10 +29,14 @@
 		    }
 		  }, 1000)    
 		})();
-	  	  
+	  
+	   // Player ID from Mturk
+	   var mtid = JSUS.getQueryString('id');
+	  
 		// Create the Client
 			
 		 var conf = {
+			name: "P_" + Math.floor(Math.random()*100),
 			url: "/ultimatum/wait",
 			//verbosity: 10,
       io: {        
@@ -40,6 +44,9 @@
       },
       window: {
     	  promptOnleave: false,
+      },
+      player: {
+          mtid: mtid,
       },
 		};
 
