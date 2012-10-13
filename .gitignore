@@ -9,6 +9,8 @@
 /client/releases/*
 jquery
 
+/log/
+
 *.tmp*
 *.csv
 *.swp
