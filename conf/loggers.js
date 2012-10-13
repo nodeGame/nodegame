@@ -4,20 +4,39 @@ var path = require('path');
 
 function configure (loggers) {
 	
-	console.log(loggers)
+//	var config = {
+//		levels: {
+//		    silly: 0,
+//		    verbose: 1,
+//		    info: 2,
+//		    data: 3,
+//		    warn: 4,
+//		    debug: 5,
+//		    error: 6
+//		  },
+//		colors: {
+//		    silly: 'magenta',
+//		    verbose: 'cyan',
+//		    info: 'green',
+//		    data: 'grey',
+//		    warn: 'yellow',
+//		    debug: 'blue',
+//		    error: 'red'
+//		  }
+//	};
 	
 	var rootDir = path.resolve(__dirname, '..');
 	var logDir = rootDir + '/log/';
 	
 	loggers.add('servernode', {
 	    console: {
-	    	level: 'silly',
+	    	level: 'warn',
 	    	colorize: true,
 	    },
 	    file: {
 	    	level: 'silly',
 	    	timestamp: true,
-	    	filename: logDir + 'servernodes/servernode',
+	    	filename: logDir + 'servernode',
 	    	maxsize: 1000,
 	    	maxFiles: 10,
 	    },
@@ -25,13 +44,13 @@ function configure (loggers) {
 	
 	loggers.add('channel', {
 	    console: {
-	    	level: 'silly',
+	    	level: 'warn',
 	    	colorize: true,
 	    },
 	    file: {
 	    	level: 'silly',
 	    	timestamp: true,
-	    	filename: logDir + 'channels/channel',
+	    	filename: logDir + 'channel',
 	    	maxsize: 1000,
 	    	maxFiles: 10,
 	    },
@@ -42,7 +61,7 @@ function configure (loggers) {
 	    file: {
 	    	level: 'silly',
 	    	timestamp: true,
-	    	filename: logDir + 'messages/message',
+	    	filename: logDir + 'message',
 	    },
 	});
 	
