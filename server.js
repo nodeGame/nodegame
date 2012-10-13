@@ -5,37 +5,24 @@
 var ServerNode = require('nodegame-server').ServerNode;
 
 var options = {
-    name: "nodeGame Server",
-    port: 8080,
-    verbosity: 10,
-    dumpsys: false,
-    dumpmsg: false,
-    mail: false,
-    io: {
-        set: {
-//            'transports': ['xhr-polling'],
-//            'polling duration': 10,
-//            'log level': 10
-        },
-        reconnect: false,
-    },
-    http: {},
-    gamesDirs: './games/',
-    auth: myAuthFunc, // every client that connects to the server
-    				  // is checked through this function
-    
-    
-};
+		confDir: './conf',
+		servernode: function (servernode) {
+			servernode.verbosity = 10;
+			servernode.gamesDirs.push('./games');
+			return true;
+		},
+		http: function (http) {
+			// Special configuration here
+			return true;
+		},
+		sio: function (sio) {
+			// Special configuration here
+			return true;
+		},
+}
+// Start server
 
-
-var myAuthFunc = function() {
-	return true;
-};
-
-// ServerNode accepts two additional parameters:
-// - an instance of an http Express server
-// - an instance of socket.io
-// If not passed, they will be created with default settings
+// all input parameters are optional
 var sn = new ServerNode(options);
 
 var ultimatum = sn.addChannel({
@@ -51,5 +38,7 @@ var waitingRoom = sn.addChannel({
 				player: 'ultimatum/wait',
 				game: 'wait',
 });
+
+
 
 			

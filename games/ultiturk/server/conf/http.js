@@ -5,19 +5,13 @@ var request = require('request'),
 	dk = require('descil-mturk');
 
 function configure (app) {
+
+	// Comment to play with Mturk 
+	// Notice: requires valid descil-mturk credentials!
+	return true;
 	
 	dk.getCodes();
-
-//	app.all('*', requireAuthentication, loadUser);
-	// authentication
-//	app.get('/ultimatum/admin', function(req, res) {
-//		var auth = false;
-//		if (auth) {
-//			var url = 'http://www.google.com';
-//	    	res.redirect(url);
-//		}
-//	});
-//	
+	
 	var url = 'http://google.com';
 	
 	app.param('game', function(req, res, next, game) {

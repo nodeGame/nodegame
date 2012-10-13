@@ -6,8 +6,7 @@ var request = require('request'),
 
 function configure (app) {
 	
-	dk.getCodes();
-
+	
 //	app.all('*', requireAuthentication, loadUser);
 	// authentication
 //	app.get('/ultimatum/admin', function(req, res) {
