@@ -24,27 +24,13 @@ function configure (loggers) {
 //		    error: 'red'
 //		  }
 //	};
-	
+		
 	var rootDir = path.resolve(__dirname, '..');
 	var logDir = rootDir + '/log/';
 	
-	loggers.add('servernode', {
+	loggers.add('ultimatumchannel', {
 	    console: {
-	    	level: 'warn',
-	    	colorize: true,
-	    },
-	    file: {
 	    	level: 'silly',
-	    	timestamp: true,
-	    	filename: logDir + 'servernode',
-	    	maxsize: 1000,
-	    	maxFiles: 10,
-	    },
-	});
-	
-	loggers.add('channel', {
-	    console: {
-	    	level: 'warn',
 	    	colorize: true,
 	    },
 	    file: {
@@ -55,18 +41,6 @@ function configure (loggers) {
 	    	maxFiles: 10,
 	    },
 	});
-	
-	
-	loggers.add('messages', {
-	    file: {
-	    	level: 'silly',
-	    	timestamp: true,
-	    	filename: logDir + 'message',
-	    },
-	});
-	
-	
-    
-	
+		
 	return true;
 }
