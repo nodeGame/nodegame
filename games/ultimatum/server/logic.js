@@ -36,34 +36,6 @@ function Ultimatum () {
 	};
 	
 	var pregame = function () {
-		var that = this;
-		node.log(dk.codes.fetch());
-		node.on('UPDATED_PLIST', function(){
-			
-			// Security check
-			var mtid, found;
-			node.game.pl.each(function(p){
-				mtid = p.mtid;
-				found = dk.codes.select('AccessCode', '=', mtid);
-				
-				if (!found) {
-					node.log('Found invalid access code ' + mtid + ' for player ' + p.id);
-					return;
-				}
-				  
-				if (found.length > 1) {
-					node.log('Access code used multiple times: ' + mtid);
-					found.each(function(p){
-						node.log(' - player: ' + p.id);
-					});
-					return;
-				}
-				
-				dk.checkIn(mtid);
-			});
-			
-		});
-		
 		console.log('Pregame');
 	};
 	
@@ -131,9 +103,7 @@ function Ultimatum () {
 		var exitcode;
 		node.game.pl.each(function(p) {
 			node.say(p.win, 'WIN', p.id);
-			exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
 			p.win = (that.SHOWUP + (p.win || 0)) / 1000;
-			dk.checkOut(p.mtid, exitcode, p.win);
 		});
 		
 	      
@@ -180,24 +150,21 @@ function Ultimatum () {
 /// RUN
 
 var NDDB = require('NDDB').NDDB,
-dk = require('descil-mturk'),
 node = require('nodegame-client'),
 JSUS = node.JSUS;
 
 module.exports.node = node;
 module.exports.Ultimatum = Ultimatum;
 
-/// Start the game only after we have received the list of access codes
-dk.getCodes(function(){
-	var conf = {
-		name: "P_" + Math.floor(Math.random()*100),
-		url: "http://localhost:8080/ultimatum/admin",
-		io: {
-		    'reconnect': false,
-		    'transports': ['xhr-polling'],
-		    'polling duration': 10
-		},
-		verbosity: 10,
-	};
-	node.play(conf, new Ultimatum());
-});
+
+var conf = {
+	name: "P_" + Math.floor(Math.random()*100),
+	url: "http://localhost:8080/ultimatum/admin",
+	io: {
+	    'reconnect': false,
+	    'transports': ['xhr-polling'],
+	    'polling duration': 10
+	},
+	verbosity: 10,
+};
+node.play(conf, new Ultimatum());
