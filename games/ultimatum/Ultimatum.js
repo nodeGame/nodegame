@@ -86,7 +86,7 @@ function Ultimatum () {
 	//
 	/////////////////////////////////////////////
 	var pregame = function() {
-		W.loadFrame('html/pregame.html');
+		W.loadFrame('html/pregame.html', node.DONE);
 		console.log('Pregame');
 	};
 	

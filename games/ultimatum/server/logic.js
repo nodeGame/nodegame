@@ -7,9 +7,15 @@ function Ultimatum () {
 	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = false;
+	this.auto_step = true;
 	
 	this.init = function () {
+		
+		//node.removeListener('STATEDONE');
+		
+//		node.on('STATEDONE', function(){
+//			console.log('ahah I should step!')
+//		});
 		
 		this.SHOWUP = 500;
 		
@@ -33,6 +39,9 @@ function Ultimatum () {
 				node.log('Added to bidder ' + p.id + ' ' + p.win + ' ECU');
 			}
 		});
+		
+		// this.state.is = node.GameState.iss.DONE;
+		
 	};
 	
 	var pregame = function () {
@@ -123,7 +132,11 @@ function Ultimatum () {
 	// Creating the Game Loop	
 	this.loops = {
 			
-			1: {state:	pregame,
+			1: {
+				// Depending on when we start the logic
+				// we need to have 1 or 2 rounds here.
+				// rounds: 2, 
+				state:	pregame,
 				name:	'Game will start soon'
 			},
 			
