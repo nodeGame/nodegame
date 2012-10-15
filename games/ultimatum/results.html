@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<title>Results for Ultimatum Game</title>
+<body>
+  <div id="root"></div> 
+<script src="./lib/d3.v2.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+
+<script src="./lib/D3.js" charset="utf-8"></script>
+<script src="./Ultimatum_results.js" charset="utf-8"></script>
+
+<style>
+
+svg {
+  border: 1px solid #CCC;
+  font: 10px sans-serif;
+  margin: 100px;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+<script>
+    window.onload = function(){
+   
+    var conf = {
+      url: "/ultimatum/admin",
+      player: {
+    	  name: "Display the results of Ultimatum in real time",  
+      },
+      io: {        
+        reconnect: false
+      },
+      window: {
+    	  promptOnleave: false,
+      },
+    };
+      
+    node.play(conf, node.Game);
+    this.oo = W.addWidget('D3ts', document.getElementById('root'), {
+    	fieldset: false,
+    });
+    node.emit('D3', 0.2);
+    //node.play(conf, new Ultimatum_results());
+  }
+</script>
+</body>
