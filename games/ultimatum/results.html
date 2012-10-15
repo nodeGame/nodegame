@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <title>Results for Ultimatum Game</title>
 <body>
-  <div id="root"></div> 
+  <h2>Visualizing the outcome of the game in real time</h2>
+  <div id="root">
+    <h3>The chart below shows the average winning of the bidders over all rounds</h3>
+  </div> 
 <script src="./lib/d3.v2.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
@@ -14,7 +17,8 @@
 svg {
   border: 1px solid #CCC;
   font: 10px sans-serif;
-  margin: 100px;
+  margin: 10px 100px;
+  font-size: 14px;
 }
 
 .line {
@@ -47,11 +51,21 @@ svg {
     };
       
     node.play(conf, node.Game);
-    this.oo = W.addWidget('D3ts', document.getElementById('root'), {
+    W.addWidget('D3ts', document.getElementById('root'), {
     	fieldset: false,
+    	n: 10,
+    	width: 400,
+    	height: 200,
+    	margin: {
+    		top: 10,
+    		bottom: 10,
+    		left: 10,
+    		right: 10
+    	}
     });
-    node.emit('D3', 0.2);
-    //node.play(conf, new Ultimatum_results());
+    
+    node.on('')
+    
   }
 </script>
 </body>

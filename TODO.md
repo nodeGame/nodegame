@@ -2,6 +2,7 @@
 ---
 
 * documentation
+* window.addWidget automatically merges input options with defaults option
 * window.loadFrame() can cache the frame. It could be possible to cache the original HTML as loaded the first time, or the final HTML as before updating the state
 * create a STEPDONE event. There should be a difference between STATEDONE and STEPDONE, also STEPDONE could be unsichronized 
 
