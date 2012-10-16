@@ -5,8 +5,6 @@ var path = require('path');
 function configure (servernode) {
 	
 	var rootDir = path.resolve(__dirname, '..');
-    
-	console.log('EXEXXX');
 	
 	servernode.name = "nodeGame server";
 	servernode.verbosity = 10;

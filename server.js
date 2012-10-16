@@ -1,5 +1,5 @@
 /*
- * Start File for nodeGame server with conf.
+ * Launcher file for nodeGame server with conf.
  */
 
 var ServerNode = require('nodegame-server').ServerNode;
@@ -22,7 +22,7 @@ var options = {
 }
 // Start server
 
-// all input parameters are optional
+// Option parameter is optional
 var sn = new ServerNode(options);
 
 var ultimatum = sn.addChannel({

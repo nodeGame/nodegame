@@ -40,7 +40,7 @@ It order to run the server you need to have [node.js](http://nodejs.org) install
 
 ### Client
 
-The client makes use [socket.io](http://socket.io) and it is designed to integrate seeminglessly with other libraries, such as:
+High performances communication is guaranteed by [socket.io](http://socket.io), the cross-browser WebSocket for realtime apps. Moreover, nodeGame integrates seeminglessly with other libraries, such as:
 
   * [D3](http://d3js.org/)
   * [jQuery](http://jquery.com/)
@@ -60,44 +60,49 @@ nodeGame is designed to be as user-friendly as possible, but not more. This mean
 
 If you are familiar enough with Javascript you can proceed to the next section, and learn how to setup the nodeGame server, how clients can connect to it, and how to write games for nodeGame.
 
-## Getting started
-                                                     
-1. Download node.js (see references)
-2. From the console type: `npm install nodegame` 
-3. Start the server: `node server.js`
-4. Open two or more browser windows pointing to `localhost:8080/ultimatum/index.html`
-5. Browse to the `./games/ultimatum/server/` folder and start the game: `node logic.js`
+## Quick start
 
+nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
 
+  1. Download node.js (from http://nodejs.org/)
+  2. From the console type: `npm install nodegame` 
+  3. Browse to the nodegame folder and start the server: `node server.js`
+  4. Browse to the `./games/ultimatum/server/` folder and start the game logic: `node logic.js`
+  5. Open three or more browser windows pointing to `localhost:8080/ultimatum/index.html`
+
+### There is more...
+
+  - A waiting room: `localhost:8080/ultimatum/room.html`
+  - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
+  - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
 
 ### A closer look
+
+In order to start nodeGame. The server requires 
 
 #### nodeServer launcher file
 
 ```js
-    var ServerNode = require('./nodegame-server').ServerNode;
-    var options = { 
-		name: "nodeGame Server",
-		port: 8080
-    };
-    var sn = new ServerNode(options);
+    var ServerNode = require('nodegame-server').ServerNode;
+    
+    // Options can be specified as input parameter
+    var sn = new ServerNode();
+    
     sn.addChannel({
-		name: 'Ultimatum Game',
-		player: 'ultimatum/'         // End point for users 
-		admin: 'ultimatum/admin/',   // End point for administrator
+        name: 'Ultimatum',
+        admin: 'ultimatum/admin',
+        player: 'ultimatum',
+        game: 'ultimatum',          
     });
 ```
 
 The above snippet of code can be easily explained:
 
 - the `require` directive import the nodegame-server module;
-- a `ServerNode` object with a given name is created listening on port 8080  
+- a `ServerNode` object with a given name is created listening on port 8080 (by default) 
 - a _channel_ is added to the server; a channel binds a route to a specific game. It contains two end-points: for users and administrators.
 
-
-If you want to make sure that your server stays always up you can read this great tutorial:
-
-- http://blog.nodejitsu.com/keep-a-nodejs-server-up-with-forever
+For detailed documentation on nodeGame server configuration read [this guide](https://github.com/nodeGame/nodeGame/blob/master/doc/configure-nodegame-server.md)
 
 #### The client in the browser
 
