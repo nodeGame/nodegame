@@ -12,8 +12,8 @@ nodeGame is a general framework to play any kind of game online, but it speciall
  - Modular framework (games + widgets)
  - Low / Medium level of programming required
  - Powerful API
- - Real-time plotting with (d3.js)[http://d3js.org]
- - Integrated Javascript (database)[http://nodegame.github.com/NDDB/docs/nddb.js.html]
+ - Real-time plotting with [d3.js](http://d3js.org)
+ - Integrated Javascript [database](http://nodegame.github.com/NDDB/docs/nddb.js.html)
  - Server can run multiple games at the same time
  - Customizable waiting rooms for online games
  - Works on mobile devices and tablets
