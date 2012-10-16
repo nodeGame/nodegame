@@ -1,111 +1,30 @@
 # nodeGame
 
-Javascript framework (node.js + socket.io) for online multiplayer games in the browser.
+nodeGame is a free, open source, event-driven javascript framework for online, multiplayer games in the browser.
 
 ---
 
-## Getting started
-
-Install nodeGame via npm.
-
-```bash
-    $ npm install nodegame -g
-```
-
-Create a fresh nodeGame instance with the CLI tools and follow the instructions to start it up.
-
-```bash
-    $ nodegame your-nodeGame-instance
-```
-
-For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder for now.
+nodeGame is a general framework to play any kind of game online, but it specially designed to conduct _social experiments_.
 
 
-## Advanced setup with the nodeGame git repository
+## Quick start
 
-### Windows 7
+nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
 
-Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
+  1. Download node.js (from http://nodejs.org/)
+  2. From the console type: `npm install nodegame` 
+  3. Browse to the nodegame folder and start the server: `node server.js`
+  4. Browse to the `./games/ultimatum/server/` folder and start the game logic: `node logic.js`
+  5. Open three or more browser windows pointing to `localhost:8080/ultimatum/index.html`
 
-    # cd into the directory where you want the repo to reside
-    $ cd Desktop
+### There is more...
+
+  6. A waiting room: `localhost:8080/ultimatum/room.html`
+  7. A Monitor interface: `localhost:8080/ultimatum/monitor.html`
+  8. Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
+
+For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder.
       
-    # clone the repo
-    $ git clone git://github.com/nodeGame/nodeGame.git
-      
-    # update the dependencies
-    $ cd nodeGame
-    $ npm install
-      
-    # start the server
-    $ node server.js
-      
-    # Open 2 different browser instances with the ultimatum game example
-    $ open http://localhost:8080/ultimatum/index.html
-     
-    # (optional) Monitor the game via the browser
-    $ open http://localhost:8080/ultimatum/monitorgame.html
-  
-    # Start the game
-    $ node games/ultimatum/server/logic.js
-  
-    # Game runs through, go back to your previously opened 2 browser instances.
-      
-
-### heroku
-
-    # Clone the repository
-    $ git clone git://github.com/nodeGame/nodeGame.git
-    $ cd nodeGame
-
-    # Install the heroku CLI tools & create an account
-    $ open https://toolbelt.heroku.com/
-    $ heroku create your-app-name --stack cedar
-
-    $ git remote add heroku git@heroku.com:your-app-name.git
-    $ git push heroku master
-
-    $ open https://your-app-name.herokuapp.com
-
-    # Before starting the game edit the url portion of logic.js to reflect you heroku url.
-    $ node games/ultimatum/server/logic.js
-
-
-### OS X
-
-    # Install the Node.js Server
-    $ git clone git://github.com/joyent/node.git
-    $ cd node/
-    $ git checkout v0.6.11
-    $ ./configure
-    $ sudo make
-    $ sudo make install
-
-    # Install the heroku toolbelt
-    $ open https://toolbelt.herokuapp.com/
-  
-    # Clone nodeGame
-    $ cd /into/the/place/where/you/put/project/folders
-    $ git clone git://github.com/nodeGame/nodeGame.git
-    $ cd nodeGame/
-  
-    # Install Dependencies
-    $ npm install (be aware of http://goo.gl/T8m9d)
-  
-    # Start the management server
-    $ node server.js
-  
-    # Open 2 different browser instances with the ultimatum game example
-    $ open http://localhost:8080/ultimatum/index.html
-  
-    # (optional) Monitor the game via the browser
-    $ open http://localhost:8080/ultimatum/monitorgame.html
-  
-    # Start the game
-    $ node game/ultimatum/server/logic.js
-  
-    # Game runs through, go back to your previously opened 2 browser instances.
-
 
 ## Contribute
 
