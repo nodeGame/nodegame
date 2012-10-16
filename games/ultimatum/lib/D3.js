@@ -86,9 +86,8 @@
 		D3.call(this, options);
 		
 		
-		var o = JSUS.merge(options, D3ts.defaults);
-		console.log(o)
-	    
+		var o = this.options = JSUS.merge(D3ts.defaults, options);
+		
 		var n = this.n = o.n;
 		
 	    this.data = [0];

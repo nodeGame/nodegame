@@ -42,6 +42,7 @@ svg {
       player: {
     	  name: "Display the results of Ultimatum in real time",  
       },
+      //verbosity: 100,
       io: {        
         reconnect: false
       },
@@ -50,21 +51,7 @@ svg {
       },
     };
       
-    node.play(conf, node.Game);
-    W.addWidget('D3ts', document.getElementById('root'), {
-    	fieldset: false,
-    	n: 10,
-    	width: 400,
-    	height: 200,
-    	margin: {
-    		top: 10,
-    		bottom: 10,
-    		left: 10,
-    		right: 10
-    	}
-    });
-    
-    node.on('')
+    node.play(conf, new Ultimatum_results()); 
     
   }
 </script>

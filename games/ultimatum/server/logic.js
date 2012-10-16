@@ -125,6 +125,7 @@ function Ultimatum () {
 	      
 	    	      
 		console.log('Game ended');
+		node.replay();
 	};
 	
 	
@@ -144,7 +145,7 @@ function Ultimatum () {
 				name: 	'Instructions'
 			},
 				
-			3: {rounds:	2, 
+			3: {rounds:	10, 
 				state: 	game,
 				name: 	'Game'
 			},
