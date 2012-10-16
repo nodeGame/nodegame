@@ -28,18 +28,15 @@ If you are familiar enough with Javascript you can proceed to the next section, 
 
 See [README](https://github.com/nodeGame/nodegame/blob/master/README.md) at the top of this root directory. 
 
-## Understanding 
+## Understanding nodeGame
 
-In order to run and conduct a game on nodeGame, it is necessary to know the essential components of the framework:
+In order to run and conduct a game on nodeGame, you will need to:
 
-  1. launcher file(#launcher)
-  2. client logic
-  3. server logic
-  4. various configuration files
+  1. setup the server(#setting-up-the-server)
+  2. create a game (#creating-a-game)
 
 
-
-### nodeServer launcher file {#launcher}
+### Setting up the server
 
 The launcher file starts the nodeGame server.
 
