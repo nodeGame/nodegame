@@ -1,6 +1,5 @@
 # nodeGame User Guide
 
-- last update: 16/10/2012 
 - status: incomplete
 
 ## Disclaimer
@@ -34,6 +33,7 @@ In order to run and conduct a game on nodeGame, you will need to:
 
   1. [setup the server](#setting-up-the-server)
   2. [create a game](#creating-a-game)
+  3. [connect to the server](#connecting-to-the-server)
 
 
 ### Setting up the server
@@ -64,7 +64,11 @@ The `ServerNode` object accepts a configuration object as input parameter. Moreo
 
 ### Creating a game
 
-Now that the server is running, we need to point our browsers to the  
+TODO...
+
+### Connecting to the server
+
+Now that the server is running, and the game was created, we need to point our browsers to the  
 
 ```html
     <!doctype html>
@@ -234,6 +238,7 @@ Important! The `emit` method by itself does **NOT** send data to other players o
 | node.game.memory               | The local database (see below for more details)                             |
 | node.game.pl                   | The player list object of clients connected|
 | node.msg                       | The msg generator object. Can create custom game messages |
+| node.events                    | The event emitter object. Registers a executes function listeners |
 | node.socket                    | The connection socket with the server |
 | node.player                    | The player data for the client |
 
