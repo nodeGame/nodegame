@@ -125,7 +125,8 @@ function Ultimatum () {
 	      
 	    	      
 		console.log('Game ended');
-		node.replay();
+		
+		//node.replay();
 	};
 	
 	
