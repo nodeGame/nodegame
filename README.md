@@ -42,9 +42,7 @@ For further information see the [README](https://github.com/nodeGame/nodeGame/bl
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
 
-## Contribute
-
-Any help is always appreciated, however please keep the our default [Code Conventions](http://javascript.crockford.com/code.html) in mind.
+Code contributions are welcome, please keep in mind default [Code Conventions](http://javascript.crockford.com/code.html).
 
 ## License
 
