@@ -76,11 +76,20 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
   - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
   - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
 
-### A closer look
+## A closer glance
 
-In order to start nodeGame. The server requires 
+In order to run and conduct a game on nodeGame, it is necessary to know the essential components of the framework:
 
-#### nodeServer launcher file
+  1. launcher file(#launcher)
+  2. client logic
+  3. server logic
+  4. various configuration files
+
+
+
+### nodeServer launcher file {#launcher}
+
+The launcher file starts the nodeGame server.
 
 ```js
     var ServerNode = require('nodegame-server').ServerNode;
@@ -96,31 +105,31 @@ In order to start nodeGame. The server requires
     });
 ```
 
-The above snippet of code can be easily explained:
+In the above example:
 
 - the `require` directive import the nodegame-server module;
 - a `ServerNode` object with a given name is created listening on port 8080 (by default) 
 - a _channel_ is added to the server; a channel binds a route to a specific game. It contains two end-points: for users and administrators.
 
-For detailed documentation on nodeGame server configuration read [this guide](https://github.com/nodeGame/nodeGame/blob/master/doc/configure-nodegame-server.md)
+The `ServerNode` object accepts a configuration object as input parameter. For detailed documentation on nodeGame server configuration read [this guide](https://github.com/nodeGame/nodeGame/blob/master/doc/configure-nodegame-server.md)
 
-#### The client in the browser
+### client logic {#client-logic}
 
-The server architecture is very flexible, and a client can be written mostly in any programming language able to implement web sockets. However, the nodeGame client library is for now available in Javascript only, therefore the only two enviroment where it can be run are the browser, and Node.js. Herein, two examples follows.
+Now that the server is running, we need to point our browsers to the  
 
-#### nodeGame client in a browser
-
-```js
+```html
     <!doctype html>
     <title>nodeClient Example</title>
     <body>
-    <script src="http://localhost:8080/socket.io/socket.io.js"></script> 
-    <script src="http://localhost:8080/nodegame.js" charset="utf-8"></script>
+    <script src="/socket.io/socket.io.js"></script> 
+    <script src="/javascript/nodegame.js" charset="utf-8"></script>
     <script src="Ultimatum.js" charset="utf-8"></script>
     <script>
       window.onload = function(){
         var conf = {
-          name: 'Player_1',
+          player: {
+            name: 'Player_1',
+          }
           url: '/ultimatum'
         };
         node.play(conf, new Ultimatum());
@@ -129,20 +138,43 @@ The server architecture is very flexible, and a client can be written mostly in 
    </body>
 ```
 
-#### nodeGame client in Node.js
+The above example shows a piece of HTML code containing three Javascript scripts. In this script 
+
+
+Clients do not necessarily need to connect with the browser, or to be human. An automaton bot-player could be launched in the following way.
 
 ```js
-    var GameExample = require('ultimatum'); // path/to/ultimatum
+    var UltiBot = require('ultimatum-bot'); // path/to/ultimatum-bot
     var node = require('nodegame-client'); 
 
     var conf = {
-      name: 'Player_1',
+      player: {
+        name: 'Player_Bot',
+      },
       url: 'http://localhost:8080/ultimatum/'
     };
-    node.play(conf, new Ultimatum());
+    node.play(conf, new UltiBot());
 ```
 
 As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the `play` method.
+
+
+### server logic {#server-logic}
+
+The automaton bot client already showed how to connect 
+
+```js
+    var UltiBot = require('ultimatum-bot'); // path/to/ultimatum-bot
+    var node = require('nodegame-client'); 
+
+    var conf = {
+      player: {
+        name: 'Player_Bot',
+      },
+      url: 'http://localhost:8080/ultimatum/'
+    };
+    node.play(conf, new UltiBot());
+```
 
 
 ### The game structure
