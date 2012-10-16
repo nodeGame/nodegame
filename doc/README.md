@@ -32,8 +32,8 @@ See [README](https://github.com/nodeGame/nodegame/blob/master/README.md) at the 
 
 In order to run and conduct a game on nodeGame, you will need to:
 
-  1. setup the server(#setting-up-the-server)
-  2. create a game (#creating-a-game)
+  1. [setup the server](#setting-up-the-server)
+  2. [create a game](#creating-a-game)
 
 
 ### Setting up the server
