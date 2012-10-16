@@ -6,6 +6,20 @@ nodeGame is a free, open source, event-driven javascript framework for online, m
 
 nodeGame is a general framework to play any kind of game online, but it specially designed to conduct _social experiments_.
 
+## The Good parts
+
+ - Open source and open standard (HTML5)
+ - Modular framework (games + widgets)
+ - Low / Medium level of programming required
+ - Powerful API
+ - Real-time plotting with (d3.js)[http://d3js.org]
+ - Integrated Javascript (database)[http://nodegame.github.com/NDDB/docs/nddb.js.html]
+ - Server can run multiple games at the same time
+ - Customizable waiting rooms for online games
+ - Works on mobile devices and tablets
+ - Installation is required only for the server, clients just need their browser windows
+ - Integrates smoothly with other libraries and web services, such as Amazon Mturk
+ - Find out what more...
 
 ## Quick start
 
@@ -19,9 +33,9 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
 
 ### There is more...
 
-  6. A waiting room: `localhost:8080/ultimatum/room.html`
-  7. A Monitor interface: `localhost:8080/ultimatum/monitor.html`
-  8. Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
+  - A waiting room: `localhost:8080/ultimatum/room.html`
+  - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
+  - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
 
 For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder.
       
