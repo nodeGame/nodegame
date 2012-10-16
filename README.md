@@ -42,6 +42,24 @@ For further information see the [README](https://github.com/nodeGame/nodeGame/bl
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
 
+### Building from sources
+
+Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
+
+    # cd into the directory where you want the repo to reside
+    $ cd Desktop
+      
+    # clone the repo
+    $ git clone git://github.com/nodeGame/nodeGame.git
+      
+    # update the dependencies
+    $ cd nodeGame
+    $ npm install
+ 
+Continue from point _3._ of the section "Quick Start".    
+    
+### Code contributions    
+
 Code contributions are welcome, please keep in mind default [Code Conventions](http://javascript.crockford.com/code.html).
 
 ## License
