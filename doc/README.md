@@ -1,6 +1,6 @@
 # nodeGame Documentation
 
-- last update: 10/10/2012 
+- last update: 16/10/2012 
 - status: incomplete
 
 ## Disclaimer
