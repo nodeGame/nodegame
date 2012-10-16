@@ -18,7 +18,7 @@ Create a fresh nodeGame instance with the CLI tools and follow the instructions 
     $ nodegame your-nodeGame-instance
 ```
 
-For further information see the [README](https://github.com/shakty/nodeGame/blob/master/doc/README.md) in the doc folder for now.
+For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder for now.
 
 
 ## Advanced setup with the nodeGame git repository
@@ -31,7 +31,7 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ cd Desktop
       
     # clone the repo
-    $ git clone git://github.com/shakty/nodeGame.git
+    $ git clone git://github.com/nodeGame/nodeGame.git
       
     # update the dependencies
     $ cd nodeGame
@@ -55,7 +55,7 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
 ### heroku
 
     # Clone the repository
-    $ git clone git://github.com/shakty/nodeGame.git
+    $ git clone git://github.com/nodeGame/nodeGame.git
     $ cd nodeGame
 
     # Install the heroku CLI tools & create an account
@@ -86,7 +86,7 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
   
     # Clone nodeGame
     $ cd /into/the/place/where/you/put/project/folders
-    $ git clone git://github.com/shakty/nodeGame.git
+    $ git clone git://github.com/nodeGame/nodeGame.git
     $ cd nodeGame/
   
     # Install Dependencies
