@@ -11,7 +11,7 @@ function Ultimatum () {
 	
 	this.init = function () {
 		
-		//node.removeListener('STATEDONE');
+		//node.events.remove('STATEDONE');
 		
 //		node.on('STATEDONE', function(){
 //			console.log('ahah I should step!')
@@ -39,8 +39,6 @@ function Ultimatum () {
 				node.log('Added to bidder ' + p.id + ' ' + p.win + ' ECU');
 			}
 		});
-		
-		// this.state.is = node.GameState.iss.DONE;
 		
 	};
 	
@@ -119,7 +117,7 @@ function Ultimatum () {
 	    
 	    console.log('FINAL PAYOFF PER PLAYER');
 	    console.log('***********************');
-	    console.log(node.game.pl.keep(['mtid', 'win']).fetch());
+	    console.log(node.game.pl.keep(['id', 'win']).fetch());
 	    
 	    console.log('***********************');
 	      

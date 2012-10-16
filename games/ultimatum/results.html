@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <title>Results for Ultimatum Game</title>
-<body>
+<body id="body">
   <h2>Visualizing the outcome of the game in real time</h2>
   <div id="root">
     <h3>The chart below shows the average winning of the bidders over all rounds</h3>
-    Current average is <span id="AVG">0</span>.
+    Current average is <span id="AVG">0.00</span>.<br/>
   </div> 
 <script src="./lib/d3.v2.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -12,7 +12,6 @@
 
 <script src="./lib/D3.js" charset="utf-8"></script>
 <script src="./Ultimatum_results.js" charset="utf-8"></script>
-
 <style>
 
 svg {
