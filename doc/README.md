@@ -1,4 +1,4 @@
-# nodeGame Documentation
+# nodeGame User Guide
 
 - last update: 16/10/2012 
 - status: incomplete
@@ -15,43 +15,7 @@ This guide covers the basic functionalities of the framework, and offers a broad
 
 nodeGame is a free, open source, event-driven Javascript framework for on line, multiplayer games in the browser. It is specially designed to run social science experiments, for studying both individual choices and collective behavior. However, its architecture is general enough to run any type of game. 
 
-### The good parts
-
-- Open source and open standard (HTML5)
-- Modular framework (games + widgets)
-- Low / Medium level of programming required
-- Powerful API
-- Real-time plotting in combination with [D3.js](http://d3js.org)
-- Integrated Javascript database with [NDDB](http://github.com/nodeGame/NDDB)
-- Server can run multiple games at the same time
-- Customizable waiting rooms for online games
-- Works on mobile devices and tablets
-- Integrates smoothly with other libraries, such as jQuery, or web services, such as Amazon Mturk
-- much more...
-
-
-## Technology
-
-nodeGame is 100% Javascript code. 
-
-### Server
-
-It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine.
-
-### Client
-
-High performances communication is guaranteed by [socket.io](http://socket.io), the cross-browser WebSocket for realtime apps. Moreover, nodeGame integrates seeminglessly with other libraries, such as:
-
-  * [D3](http://d3js.org/)
-  * [jQuery](http://jquery.com/)
-
-Two additional packages - already shipped with the default installation of nodegame - extend the capabilities of _nodegame-client_:
-
-  * [nodegame-window](https://github.com/nodeGame/nodegame-window) 
-  * [nodegame-widgets](https://github.com/nodeGame/nodegame-widgets)
-
-
-## Targeted audience
+### Targeted audience
 
 nodeGame is designed to be as user-friendly as possible, but not more. This means that with little programming skills is already possible to create complex multiplayer games. On the other hand, minimal programming skills are indeed required. This obviously entails also some knowledge of Javascript, the programming language of the browser. For beginner guides about Javascript you can look into:
 
@@ -60,23 +24,11 @@ nodeGame is designed to be as user-friendly as possible, but not more. This mean
 
 If you are familiar enough with Javascript you can proceed to the next section, and learn how to setup the nodeGame server, how clients can connect to it, and how to write games for nodeGame.
 
-## Quick start
+## Installation and Quick start
 
-nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
+See [README](https://github.com/nodeGame/nodegame/blob/master/README.md) at the top of this root directory. 
 
-  1. Download node.js (from http://nodejs.org/)
-  2. From the console type: `npm install nodegame` 
-  3. Browse to the nodegame folder and start the server: `node server.js`
-  4. Browse to the `./games/ultimatum/server/` folder and start the game logic: `node logic.js`
-  5. Open three or more browser windows pointing to `localhost:8080/ultimatum/index.html`
-
-### There is more...
-
-  - A waiting room: `localhost:8080/ultimatum/room.html`
-  - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
-  - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
-
-## A closer glance
+## Understanding 
 
 In order to run and conduct a game on nodeGame, it is necessary to know the essential components of the framework:
 
@@ -319,6 +271,28 @@ See the [JSUS home page](http://nodegame.github.com/JSUS/) for the full API.
 
 This little guide is far from being complete. It may also be not updated. 
 You can find additional information in the other files present in doc directory of this repository. 
+
+
+## Technology
+
+nodeGame is 100% Javascript code. 
+
+### Server
+
+It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine.
+
+### Client
+
+High performances communication is guaranteed by [socket.io](http://socket.io), the cross-browser WebSocket for realtime apps. Moreover, nodeGame integrates seeminglessly with other libraries, such as:
+
+  * [D3](http://d3js.org/)
+  * [jQuery](http://jquery.com/)
+
+Two additional packages - already shipped with the default installation of nodegame - extend the capabilities of _nodegame-client_:
+
+  * [nodegame-window](https://github.com/nodeGame/nodegame-window) 
+  * [nodegame-widgets](https://github.com/nodeGame/nodegame-widgets)
+
 
 
 ## License

@@ -38,6 +38,9 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
 
 For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder.
       
+## Source codes
+
+All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
 
 ## Contribute
 
