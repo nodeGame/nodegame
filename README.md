@@ -36,7 +36,7 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
   - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
   - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
 
-For further information see the [README](https://github.com/nodeGame/nodeGame/blob/master/doc/README.md) in the doc folder.
+For further information refer to the [nodeGame user guide](https://github.com/nodeGame/nodeGame/blob/master/doc/user-guide.md) in the doc folder.
       
 ## Source codes
 
