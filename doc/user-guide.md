@@ -139,7 +139,7 @@ The above table is translated into the game object inside the game _loop_.
   }
 ```
 
-Please refer to the 
+Detailed documentation available: [nodeGame game structure](https://github.com/nodeGame/nodegame/blob/master/doc/game-structure.md). 
 
 For complete, extensively commented examples see:
 
