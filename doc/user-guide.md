@@ -8,7 +8,7 @@ nodeGame is under active development and new features are constantly added. We d
 
 ## Who should read this
 
-This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification please read the other files in the doc directory of this repository.   
+This guide covers the basic functionalities of the framework, and offers a broad picture of nodeGame to the beginner. For detailed documentation, API, and format specification please read the other files in the doc directory of the nodeGame repository.   
 
 ## Introduction
 
@@ -34,11 +34,12 @@ In order to run and conduct a game on nodeGame, you will need to:
   1. [setup the server](#setting-up-the-server)
   2. [create a game](#creating-a-game)
   3. [connect to the server](#connecting-to-the-server)
+  4. [analyze the results](#analyzing-the-results)
 
 
 ### Setting up the server
 
-The launcher file starts the nodeGame server.
+In order to run the server you will need to write a small launcher file.
 
 ```js
     var ServerNode = require('nodegame-server').ServerNode;
@@ -64,18 +65,85 @@ The `ServerNode` object accepts a configuration object as input parameter. Moreo
 
 ### Creating a game
 
-TODO...
+Create a new directory in one of the `games` folder, as defined in the configuration of your nodeGame server. This folder will contain all files necessary to run your game.
+
+Designing a game can vary design. However, e is usually 
+
+  - the client logic
+  - the server logic
+  - additional files (e.g. images and HTML files)
+
+
+
+This is the file that is included in the HTML page
+
+#### The game object
+
+A game object defines a sequence of game states. Each state defines a set of local variables, the screens that will be shown, and the rules that will apply to user actions.
+States can be repeated for a certain number of rounds, and divided in sub-states, called _steps_. It is possible to associate properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties.
+
+
+| State       | State name   | Steps                | Repetitions | Properties  |
+| ----------- | ------------ | -------------------- | ----------- | ----------- |
+| **State A** | Instructions | Step 1               | x1 round    | timer       |
+| **State B** | Game         | Step 1, Step2        | x10 rounds  | -           |
+| **State C** | Debrief      | Step 1               | x1 round    | -           |
+
+The game states are defined in the game _loop_.
+
+```javascript
+
+  var game = {
+    1: function() {
+      // some code here
+    },
+    2: function() {
+      // some code here
+    }
+  };
+  
+  this.loop = {
+
+      1: {
+        state: function() {
+          // the code for the instruction goes here
+        },
+        name: 'Instructions',
+        timer: 120000,
+      },
+      
+      2: {
+        state: game,
+        name: 'Game will start soon',
+        rounds: 10,
+      },
+      
+      3: {
+        state: function() {
+          // the code goes here
+        },
+        name: 'Game will start soon'
+      },
+      
+  }
+```
+
+
+For complete, extensively commented examples see:
+
+  - the [Ultimatum client](https://github.com/nodeGame/nodegame/blob/master/games/ultimatum/Ultimatum.js) file in the `games` folder.
+  - the [Ultimatum logic](https://github.com/nodeGame/nodegame/blob/master/games/ultimatum/server/logic.js) file in the `games/server` folder.
 
 ### Connecting to the server
 
-Now that the server is running, and the game was created, we need to point our browsers to the  
+Now that the server is running, and that a new game folder was created, we need to point our browsers to the our game page, usually called `index.html`.
 
 ```html
     <!doctype html>
     <title>nodeClient Example</title>
     <body>
     <script src="/socket.io/socket.io.js"></script> 
-    <script src="/javascript/nodegame.js" charset="utf-8"></script>
+    <script src="/javascript/nodegame-full.js" charset="utf-8"></script>
     <script src="Ultimatum.js" charset="utf-8"></script>
     <script>
       window.onload = function(){
@@ -91,7 +159,7 @@ Now that the server is running, and the game was created, we need to point our b
    </body>
 ```
 
-The above example shows a piece of HTML code containing three Javascript scripts. In this script 
+The above example shows a piece of HTML code containing four Javascript scripts. In this script 
 
 
 Clients do not necessarily need to connect with the browser, or to be human. An automaton bot-player could be launched in the following way.
@@ -134,19 +202,6 @@ The automaton bot client already showed how to connect
 
 **Section still under construction...**
 
-This is just a brief introduction for a complete guide refer to the specific guide.
-
-
-A game consist in a set of states, steps and rounds. For each step it is possible to define different screens, and rules to apply to the user actions. 
-
-
-| State       | State name   | Steps                | Repetitions |
-| ----------- | ------------ | -------------------- | ----------- |
-| **State A** | Instructions | Step 1		            | x1 round    |
-| **State B** | Game  	     | Step 1, Step2, Step3	| x10 rounds  |
-| **State C** | Debrief	     | Step 1  	 	          | x1 round    |
-
-It is possible to associate other properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties.
 
 #### What happens during a game ?
 
