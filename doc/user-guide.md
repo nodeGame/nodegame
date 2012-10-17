@@ -131,7 +131,7 @@ The above table is translated into the game object inside the game _loop_.
       
       2: {
         state: game,
-        name: 'Game will start soon',
+        name: 'Game',
         rounds: 10,
       },
       
@@ -139,7 +139,7 @@ The above table is translated into the game object inside the game _loop_.
         state: function() {
           // the code goes here
         },
-        name: 'Game will start soon'
+        name: 'Debrief'
       },
       
   }
@@ -216,11 +216,6 @@ The automaton bot client already showed how to connect
 ```
 
 
-### The game structure
-
-**Section still under construction...**
-
-
 #### What happens during a game ?
 
 nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver. When a message is received a particular event is created.
@@ -231,115 +226,6 @@ nodeGame provides a convenient API (application programming interface) to deal w
 
 An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
 
-##### Game Messages
-
-Whenever a message is received an event is raised informing that such a event has just occurred. Writing a game consists simply in emitting and catching the events you are interested in.
-
-
-###### Message categories (targets)
-
-Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
-
-| Type   | Meaning |
-| ------ | --------------------------------------------------- |
-| HI	   | Establish the connection between server and clients |
-| STATE  | Communicate or set the state of the game |
-| PLIST  | Communicate or set the list of players |
-| DATA	 | Pass over some data |
-| TXT	   | Pass over a text message |
-| DONE   | Communicate that a player has terminated a stage of the game |
-| REDIRECT | Redirect a client to a new address (available only for administrator) |
-| BYE	   | Terminate the connection between server and client **Not yet implemented** |
-
-##### Message actions
-
-Each message category can belong to one of the following actions:
-
-| Type   | Meaning |
-| ------ | --------------------------------------------------- |
-| SAY    | Send a piece of information to a remote receiver    |
-| SET    | Set the value of a variable of a remote object      |
-| GET    | Request a remote object                          |
-
-##### A final example on game messages
-
-Finally, messages can be _incoming_ or _outgoing_, therefore a typically event listener is of the form
-
-```javascript
-  
-  node.emit('out.say.DATA', myData);
-
-  node.on('in.say.DATA', function(msg) {
-    // do something
-  });
-``` 
-Predefined event listeners are already defined. See the `nodegame-client` documentation for help. 
-
-## Brief API summary
-
-By loading the _nodegame-client_ library you get access to the `node` 
-
-### Connect to a server
-
-| **Method**                     | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| node.connect(conf, game)       | Connects to the url specified in configuration object and start the game object|
-| node.play(conf, game)          | _Deprecated_ The same as node.connect |
-
-
-### Emitting and catching events
-
-| **Method**                     | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| node.emit('KEY')               | Generic hook for emitting an event locally.                                 |
-| node.set('KEY', value)         | Saves a key value pair to the server memory object                          |
-| node.say(value, 'KEY', player) | An generic piece of information is send out to the players or to the server |
-| node.get('KEY', callback)      | Request something to the server, and then executes the callback.            |
-| node.on('KEY', callback)       | Execute function whenever an event 'KEY' is triggered                       |
-
-
-Important! The `emit` method by itself does **NOT** send data to other players or the server. However, emitting particular types of events locally triggers other hooks which in turn send the data out. 
-
-
-### Objects 
-
-
-
-| **Objects**                    | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| node.game                      | The game currently loaded                                                   |
-| node.game.memory               | The local database (see below for more details)                             |
-| node.game.pl                   | The player list object of clients connected|
-| node.msg                       | The msg generator object. Can create custom game messages |
-| node.events                    | The event emitter object. Registers a executes function listeners |
-| node.socket                    | The connection socket with the server |
-| node.player                    | The player data for the client |
-
-### nodegame-window and nodegame-widgets
-
-
-| **Objects**                    | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| node.window                    | An helper object to interact with the browser window    |
-| node.window.widgets            | A collection of reusable functions to             |
-
-### Memory api
-
-
-| **Memory api**                 | **Meaning** |
-| ------------------------------ | ----------------------------------------------------------------------------|
-| memory.sort('payoff')          | Sort all entries by a property called _'payoff'_                            |
-| memory.select('state', '>', '2.1')| Select only entries inserted after game state _'2.1'_ |
-| memory.select('state', '=', this.previous()).join('player', 'player', 'CF', 'value') | Advanced operation |
-
-
-The memory object is a special instance of the _NDDB_ database. 
-For more information about the _node.game.memory_ API see the [NDDB home page](http://nodegame.github.com/NDDB/).
-
-### JSUS
-
-`node.JSUS` contains a collection of helper functions for diverse purpose, from randomization and sorting, to creation of a latin square. 
-See the [JSUS home page](http://nodegame.github.com/JSUS/) for the full API.
 
 
 ## Further reading

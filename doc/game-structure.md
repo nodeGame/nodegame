@@ -1,10 +1,10 @@
-# nodeGame: game structure
+# nodeGame: brief API
 
 - status: incomplete
 
-## Game structure
+## Game Structure
 
-TODO...    
+TODO...
     
 ## License
 
