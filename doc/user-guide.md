@@ -61,7 +61,8 @@ In the above example:
 - a `ServerNode` object with a given name is created listening on port 8080 (by default) 
 - a _channel_ is added to the server; a channel binds a route to a specific game. It contains two end-points: for users and administrators.
 
-The `ServerNode` object accepts a configuration object as input parameter. Moreover, it is possible to write separate configuration files for different features of the server. For a detailed documentation on how to configure the nodeGame server read [this guide](https://github.com/nodeGame/nodeGame/blob/master/doc/configure-nodegame-server.md)
+The `ServerNode` object accepts a configuration object as input parameter. Moreover, it is possible to write separate configuration files for different features of the server.
+Detailed documentation available: [nodeGame server configuration guide](https://github.com/nodeGame/nodeGame/blob/master/doc/configure-nodegame-server.md).
 
 ### Creating a game
 
@@ -138,6 +139,7 @@ The above table is translated into the game object inside the game _loop_.
   }
 ```
 
+Please refer to the 
 
 For complete, extensively commented examples see:
 
