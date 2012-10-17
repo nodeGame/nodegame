@@ -50,6 +50,7 @@ Important! The `emit` method by itself does **NOT** send data to other players o
 
 ### Memory api
 
+node.game.memory
 
 | **Memory api**                 | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
