@@ -54,7 +54,8 @@ Finally, messages can be _incoming_ or _outgoing_, therefore a typically event l
     // do something
   });
 ``` 
-Predefined event listeners are already defined. See the `nodegame-client` documentation for help. 
+
+Predefined event listeners are already defined. See the `nodegame-client` API. 
   
     
 ## License

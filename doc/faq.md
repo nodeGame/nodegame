@@ -1,15 +1,17 @@
 # nodeGame Frequently Asked Questions (FAQ)
 
 
-1. What are the technical requirements?
-
-nodeGame is 100% Javascript code. That means that it can run directly in any browser window, without 
-
-It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine.
+1. What are technical requirements for nodeGame clients?
 
 
+nodeGame is 100% Javascript code. That means that it can run directly in any browser window, without the need to installation.
 High performances communication is guaranteed by [socket.io](http://socket.io), the cross-browser WebSocket for realtime apps. 
 
+Some widgets may need external libraries to run properly. Please check the documentation. 
+
+2. What are technical requirements for nodeGame server?
+ 
+It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine. Recommended version 6.14+.
 
 
 

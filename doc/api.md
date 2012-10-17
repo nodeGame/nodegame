@@ -50,13 +50,13 @@ Important! The `emit` method by itself does **NOT** send data to other players o
 
 ### Memory api
 
-node.game.memory
+_node.game.memory_
 
 | **Memory api**                 | **Meaning** |
 | ------------------------------ | ----------------------------------------------------------------------------|
-| memory.sort('payoff')          | Sort all entries by a property called _'payoff'_                            |
-| memory.select('state', '>', '2.1')| Select only entries inserted after game state _'2.1'_ |
-| memory.select('state', '=', this.previous()).join('player', 'player', 'CF', 'value') | Advanced operation |
+| .sort('payoff')          | Sort all entries by a property called _'payoff'_                            |
+| .select('state', '>', '2.1')| Select only entries inserted after game state _'2.1'_ |
+| .select('state', '=', this.previous()).join('player', 'player', 'CF', 'value') | Advanced operation |
 
 
 The memory object is a special instance of the _NDDB_ database. 
