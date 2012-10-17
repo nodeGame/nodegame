@@ -67,20 +67,30 @@ The `ServerNode` object accepts a configuration object as input parameter. Moreo
 
 Create a new directory in one of the `games` folder, as defined in the configuration of your nodeGame server. This folder will contain all files necessary to run your game.
 
-Designing a game can vary design. However, e is usually 
+The structure of the game directory can vary depending on the game design. However, it will usually contain: 
 
-  - the client logic
-  - the server logic
-  - additional files (e.g. images and HTML files)
+  - [the client logic](#client-logic)
+  - [the server logic](#server-logic)
+  - [additional files](#additional-files) (e.g. images and HTML files)
 
-
+Both server and client logic follow the same game structure.
+#### Client logic
 
 This is the file that is included in the HTML page
 
+#### Server logic
+
+This file is actually not necessary in single player games.
+
+#### Additional files
+
+At least one index file is
+Files that should not be accessible, such as the server logic, can be placed in a directory named `server` inside the game directory. The content of this directory is private and will not be served by the HTTP server.
+
 #### The game object
 
-A game object defines a sequence of game states. Each state defines a set of local variables, the screens that will be shown, and the rules that will apply to user actions.
-States can be repeated for a certain number of rounds, and divided in sub-states, called _steps_. It is possible to associate properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done` properties.
+A game object defines a sequence of game _states_. Each state defines a set of local variables, the screens that will be shown, and the rules that will apply to user actions.
+States can be repeated for a certain number of rounds, and divided in sub-states, called _steps_. It is possible to associate properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done`.
 
 
 | State       | State name   | Steps                | Repetitions | Properties  |
@@ -89,7 +99,7 @@ States can be repeated for a certain number of rounds, and divided in sub-states
 | **State B** | Game         | Step 1, Step2        | x10 rounds  | -           |
 | **State C** | Debrief      | Step 1               | x1 round    | -           |
 
-The game states are defined in the game _loop_.
+The above table is translated into the game object inside the game _loop_.
 
 ```javascript
 
