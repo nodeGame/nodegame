@@ -29,7 +29,7 @@ See [README](https://github.com/nodeGame/nodegame/blob/master/README.md) at the 
 
 ## Understanding nodeGame
 
-In order to run and conduct a game on nodeGame, you will need to:
+This guide will walk you through all the steps necessary to run a nodeGame game:
 
   1. [setup the server](#setting-up-the-server)
   2. [create a game](#creating-a-game)
@@ -66,31 +66,40 @@ Detailed documentation available: [nodeGame server configuration guide](https://
 
 ### Creating a game
 
-Create a new directory in one of the `games` folder, as defined in the configuration of your nodeGame server. This folder will contain all files necessary to run your game.
+Create a new directory in one of the `games` folder, as defined in the configuration of your nodeGame server. This folder will contain all the necessary files to run your game.
 
-The structure of the game directory can vary depending on the game design. However, it will usually contain: 
+The structure of the game directory varies depending on the game design. However, it will usually contain: 
 
+  - [the package.json file](#package.json)
   - [the client logic](#client-logic)
   - [the server logic](#server-logic)
   - [additional files](#additional-files) (e.g. images and HTML files)
 
-Both server and client logic follow the same game structure.
+### Package.json
+
+This file contains contains all the game metadata, such as name, general description, dependencies and requirements. If this file is missing, nodeGame server will be unable to load the game. 
+
+An example [package.json](https://github.com/nodeGame/nodegame/blob/master/doc/game-structure.md) file is available in the Ultimatum game folder. 
+
 #### Client logic
 
-This is the file that is included in the HTML page
+This is the Javascript file that takes care of loading the different game screens, and registering the actions of the players during the game, and sending back information to the server.
+This file will be included in an HTML page, and loaded automatically.
 
 #### Server logic
 
-This file is actually not necessary in single player games.
+This is the Javascript file responsible for all the backend processing. Here you can implement player matching, data processing, and save the results of the game to an output file.  
+As an alternative, you can embed the server logic in one of the client files, and in this case you do not need to write a separate file. However, this is discouraged for security reason.   
+Notice also that this file is not strictly necessary for single player games. 
 
 #### Additional files
 
-At least one index file is
+A game usually includes additional files such as: an index page, other HTML files defining the game screens, or external libraries, such as jQuery. 
 Files that should not be accessible, such as the server logic, can be placed in a directory named `server` inside the game directory. The content of this directory is private and will not be served by the HTTP server.
 
 #### The game object
 
-A game object defines a sequence of game _states_. Each state defines a set of local variables, the screens that will be shown, and the rules that will apply to user actions.
+Both server and and client logic files are instances of game objects. A game object defines a sequence of game _states_. Each state defines a set of local variables, the screens that will be shown, and the rules that will apply to user actions.
 States can be repeated for a certain number of rounds, and divided in sub-states, called _steps_. It is possible to associate properties to each game state, however they may depend on the additional modules installed with nodeGame. Common extensions are the `timer`, or `done`.
 
 
@@ -198,7 +207,7 @@ Clients do not necessarily need to connect with the browser, or to be human. An 
 As you could see, both files are rather similar, and the main difference concerns how to import the nodeGame library. Notice that the actual game to play must be instantiated and passed as a parameter to the `play` method.
 
 
-### server logic {#server-logic}
+### server logic
 
 The automaton bot client already showed how to connect 
 
@@ -216,38 +225,13 @@ The automaton bot client already showed how to connect
 ```
 
 
-#### What happens during a game ?
-
-nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver. When a message is received a particular event is created.
-
-nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases and events. 
-
-##### What are events?
-
-An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
-
-
 
 ## Further reading
 
 This little guide is far from being complete. It may also be not updated. 
 You can find additional information in the other files present in doc directory of this repository. 
 
-
-## Technology
-
-nodeGame is 100% Javascript code. 
-
-### Server
-
-It order to run the server you need to have [node.js](http://nodejs.org) installed on your machine.
-
-### Client
-
-High performances communication is guaranteed by [socket.io](http://socket.io), the cross-browser WebSocket for realtime apps. Moreover, nodeGame integrates seeminglessly with other libraries, such as:
-
-  * [D3](http://d3js.org/)
-  * [jQuery](http://jquery.com/)
+## Other packages
 
 Two additional packages - already shipped with the default installation of nodegame - extend the capabilities of _nodegame-client_:
 

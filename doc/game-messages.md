@@ -1,15 +1,23 @@
-# nodeGame: game structure
+# nodeGame: game messages
 
 - status: incomplete
 
-## Game structure
+## Game messages
 
-##### Game Messages
+nodeGame is a messaging library. Clients exchange messages, and react accordingly. All messages pass through the server, which routes them to the correct receiver. When a message is received a particular event is created.
+
+nodeGame provides a convenient API (application programming interface) to deal with most of the standard use cases and events.
+
+### What are events?
+
+An event is literally something that has happened. It can really be anything, e.g. the user moving the mouse over a given area of the screen, or clicking a button. Javascript is shipped already with an exhaustive list of event handlers, nodeGame adds some extra ones more targeted for a gaming environment. 
+
+### A closer glance
 
 Whenever a message is received an event is raised informing that such a event has just occurred. Writing a game consists simply in emitting and catching the events you are interested in.
 
 
-###### Message categories (targets)
+### Message categories (targets)
 
 Each message which is sent belongs to a certain category, which can specified by the users. Some categories are already prepared and have special meaning.
 
