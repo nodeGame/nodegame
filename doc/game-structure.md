@@ -6,7 +6,7 @@
 
 This guide will explain you how to write a nodeGame game. 
 
-A game is a Javascript function that needs to implement special properties. Such function is passed as input parameter to the `node.play` method, and then used to instantiate the [node.game](https://github.com/nodeGame/nodegame/blob/master/games/ultimatum/Ultimatum.js) object. 
+A game is a Javascript function that needs to implement special properties. Such function is passed as input parameter to the `node.play` method, and then used to instantiate the [node.game](https://github.com/nodeGame/nodegame/blob/master/lib/Game.js) object. 
 
 ## Game properties
 
