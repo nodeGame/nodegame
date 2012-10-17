@@ -105,11 +105,17 @@ The above table is translated into the game object inside the game _loop_.
 ```javascript
 
   var game = {
-    1: function() {
-      // some code here
+    1: {
+        name: 'Step1',
+        state: function() {
+          // some code here
+        },
     },
-    2: function() {
-      // some code here
+    2: {
+        name: 'Step2',
+        state: function() {
+          // some code here
+        },
     }
   };
   
