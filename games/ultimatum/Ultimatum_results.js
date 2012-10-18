@@ -59,8 +59,8 @@ function Ultimatum_results () {
 	        if (response.response === 'ACCEPT') {
 	        	var resWin, bidWin;
 	            
-	            resWin = parseInt(response.value);
-	            bidWin = 100 - resWin;
+	            bidWin = parseInt(response.value);
+	            resWin = 100 - bidWin;
 	            totbidwin += bidWin;
 	        }
 	        avgbidwin = totbidwin / countbid;
