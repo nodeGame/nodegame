@@ -53,27 +53,17 @@ function Ultimatum_wait () {
 
 var node = require('nodegame-client'),
 	NDDB = node.NDDB,
-	JSUS = node.JSUS,
-	request = require('request'),
-	dk = require('descil-mturk');
-	
+	JSUS = node.JSUS;
 
-
-/// Start the game only after we have received the list of access codes
-dk.getCodes(function(){
-	var conf = {
+var conf = {
+	player: {
 		name: "waiter",
-		url: "http://localhost:8080/ultimatum/wait/admin",
-		io: {
-			'reconnect': false,
-			'transports': ['xhr-polling'],
-			'polling duration': 10
-		},
-		verbosity: 0,
-    };
+	},
+	url: "http://localhost:8080/ultimatum/wait/admin",
+	verbosity: 0,
+};
 
-    node.play(conf, new Ultimatum_wait());
-});
+node.play(conf, new Ultimatum_wait());
 
 
 
