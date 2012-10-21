@@ -70,6 +70,9 @@ function Ultimatum () {
 		};
 		
 		this.isValidBid = function (n) {
+			if (!n) return false;
+			console.log(n)
+			console.log('valid?')
 			n = parseInt(n);
 			return !isNaN(n) && isFinite(n) && n >= 0 && n <= 100;
 		};
@@ -214,7 +217,7 @@ function Ultimatum () {
 						W.writeln('Please enter a number between 0 and 100');
 						return;
 					}
-					node.emit('BID_DONE', offer.value, other)
+					node.emit('BID_DONE', offer.value, other);
 				};
 				
 				node.onDATA('ACCEPT', function (msg) {

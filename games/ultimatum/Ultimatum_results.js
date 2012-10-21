@@ -31,7 +31,7 @@ function Ultimatum_results () {
 		// D3ts creates a time series plot where
 		// new data can be added by emitting events.
 		///////////////////////////////////////////
-		this.d3ts = W.addWidget('D3ts', document.getElementById('body'), {
+		this.d3ts = node.widgets.append('D3ts', document.getElementById('body'), {
 			fieldset: false,
 		    n: 10,
 		    width: 400,
