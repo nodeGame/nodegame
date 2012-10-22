@@ -86,7 +86,7 @@ function Ultimatum () {
 	//
 	/////////////////////////////////////////////
 	var pregame = function() {
-		W.loadFrame('html/pregame.html');
+		W.loadFrame('html/pregame.html', node.DONE);
 		console.log('Pregame');
 	};
 	
@@ -351,7 +351,7 @@ function Ultimatum () {
 			timer: 120000,
 		},
 		
-		3: {rounds: 2, 
+		3: {rounds: 10, 
 			state:  ultimatum,
 			name: 'Ultimatum Game',
 		}, 

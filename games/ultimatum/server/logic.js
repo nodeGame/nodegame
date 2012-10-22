@@ -7,9 +7,15 @@ function Ultimatum () {
 	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = false;
+	this.auto_step = true;
 	
 	this.init = function () {
+		
+		//node.events.remove('STATEDONE');
+		
+//		node.on('STATEDONE', function(){
+//			console.log('ahah I should step!')
+//		});
 		
 		this.SHOWUP = 500;
 		
@@ -33,10 +39,10 @@ function Ultimatum () {
 				node.log('Added to bidder ' + p.id + ' ' + p.win + ' ECU');
 			}
 		});
+		
 	};
 	
 	var pregame = function () {
-		var that = this;
 		console.log('Pregame');
 	};
 	
@@ -111,12 +117,14 @@ function Ultimatum () {
 	    
 	    console.log('FINAL PAYOFF PER PLAYER');
 	    console.log('***********************');
-	    console.log(node.game.pl.keep(['mtid', 'win']).fetch());
+	    console.log(node.game.pl.keep(['id', 'win']).fetch());
 	    
 	    console.log('***********************');
 	      
 	    	      
 		console.log('Game ended');
+		
+		//node.replay();
 	};
 	
 	
@@ -124,7 +132,11 @@ function Ultimatum () {
 	// Creating the Game Loop	
 	this.loops = {
 			
-			1: {state:	pregame,
+			1: {
+				// Depending on when we start the logic
+				// we need to have 1 or 2 rounds here.
+				// rounds: 2, 
+				state:	pregame,
 				name:	'Game will start soon'
 			},
 			
@@ -132,7 +144,7 @@ function Ultimatum () {
 				name: 	'Instructions'
 			},
 				
-			3: {rounds:	2, 
+			3: {rounds:	10, 
 				state: 	game,
 				name: 	'Game'
 			},
@@ -151,21 +163,22 @@ function Ultimatum () {
 /// RUN
 
 var NDDB = require('NDDB').NDDB,
-
-node = require('nodegame-client'),
-JSUS = node.JSUS;
+	node = require('nodegame-client'),
+	JSUS = node.JSUS;
 
 module.exports.node = node;
 module.exports.Ultimatum = Ultimatum;
 
+
 var conf = {
 	name: "P_" + Math.floor(Math.random()*100),
 	url: "http://localhost:8080/ultimatum/admin",
-	io: {
-	    'reconnect': false,
-	    'transports': ['xhr-polling'],
-	    'polling duration': 10
-	},
-	verbosity: 0,
+//	io: {
+//	    'reconnect': false,
+//	    'transports': ['xhr-polling'],
+//	    'polling duration': 10
+//	},
+	verbosity: 10,
+
 };
 node.play(conf, new Ultimatum());

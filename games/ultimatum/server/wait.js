@@ -51,22 +51,17 @@ function Ultimatum_wait () {
 
 var node = require('nodegame-client'),
 	NDDB = node.NDDB,
-	JSUS = node.JSUS,
-	request = require('request');
+	JSUS = node.JSUS;
 
 var conf = {
-	name: "waiter",
-	url: "http://localhost:8080/ultimatum/wait/admin",
-	io: {
-		'reconnect': false,
-		'transports': ['xhr-polling'],
-		'polling duration': 10
+	player: {
+		name: "waiter",
 	},
+	url: "http://localhost:8080/ultimatum/wait/admin",
 	verbosity: 0,
 };
 
 node.play(conf, new Ultimatum_wait());
-
 
 
 
