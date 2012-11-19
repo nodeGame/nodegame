@@ -163,8 +163,8 @@ function Ultimatum () {
 /// RUN
 
 var NDDB = require('NDDB').NDDB,
-node = require('nodegame-client'),
-JSUS = node.JSUS;
+	node = require('nodegame-client'),
+	JSUS = node.JSUS;
 
 module.exports.node = node;
 module.exports.Ultimatum = Ultimatum;
@@ -173,11 +173,12 @@ module.exports.Ultimatum = Ultimatum;
 var conf = {
 	name: "P_" + Math.floor(Math.random()*100),
 	url: "http://localhost:8080/ultimatum/admin",
-	io: {
-	    'reconnect': false,
-	    'transports': ['xhr-polling'],
-	    'polling duration': 10
-	},
+//	io: {
+//	    'reconnect': false,
+//	    'transports': ['xhr-polling'],
+//	    'polling duration': 10
+//	},
 	verbosity: 10,
+
 };
 node.play(conf, new Ultimatum());

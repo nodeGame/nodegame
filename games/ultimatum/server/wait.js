@@ -2,7 +2,7 @@ function Ultimatum_wait () {
 	
 	this.name = 'Waiting Room Ultimatum Game - Client';
 	this.description = 'Waits until the game starts...';
-	this.version = '0.1';
+	this.version = '0.2';
 	
 	// Wait for a STATE message from the server
 	// to go to next state
@@ -27,8 +27,7 @@ function Ultimatum_wait () {
 				open = false; // only one set of players allowed now
 			
 				node.game.pl.each(function(p) {
-					var mtid = p.mtid;
-					node.redirect('/ultimatum/index.html?id=' + mtid, p.id);
+					node.redirect('/ultimatum/index.html', p.id);
 				});
 				
 			}
@@ -37,7 +36,6 @@ function Ultimatum_wait () {
 	};
 		
 	var waiting = function() {
-		
 		node.log('Waiting room loaded');
 	};
 	
