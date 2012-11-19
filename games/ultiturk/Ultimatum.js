@@ -49,7 +49,7 @@ function Ultimatum () {
 			node.set('response', {
 				response: response,
 				value: offer,
-				from: from,
+				from: from
 			});
 			node.say(response, response, from);
 			node.DONE();
@@ -187,7 +187,7 @@ function Ultimatum () {
 						milliseconds: 30000,
 						timeup: function(){
 							node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
-						},
+						}
 				};
 				
 				node.game.timer.restart(options);
@@ -237,7 +237,7 @@ function Ultimatum () {
 					milliseconds: 30000,
 					timeup: function() {
 						that.randomAccept(msg.data, other);
-					},
+					}
 			};
 			node.game.timer.init(options);
 			// set to 30:00
@@ -280,7 +280,7 @@ function Ultimatum () {
 						milliseconds: 0,
 						timeup: function() {
 							that.randomAccept(msg.data, other);
-						},
+						}
 				};
 				node.game.timer.init(options);
 				// set to 30:00
@@ -348,12 +348,12 @@ function Ultimatum () {
 		
 		2: {state: instructions,
 			name: 'Instructions',
-			timer: 120000,
+			timer: 120000
 		},
 		
 		3: {rounds: 2, 
 			state:  ultimatum,
-			name: 'Ultimatum Game',
+			name: 'Ultimatum Game'
 		}, 
 		
 		4: {state: postgame,

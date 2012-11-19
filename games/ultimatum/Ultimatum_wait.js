@@ -36,6 +36,6 @@ function Ultimatum_wait () {
 	this.loops = {
 		1: {state: waiting,
 			name: 'Waiting Room'
-		},
+		}
 	};	
 }
