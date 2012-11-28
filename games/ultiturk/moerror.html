@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<title>Monitor Screen for Waiting Room</title>
+<body>
+  <div id="root"></div> 
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+
+<link rel='stylesheet' href='/stylesheets/monitor.css'></link>
+
+
+<script>
+    window.onload = function(){
+    
+    function Erroom () {
+    	  
+    	  this.name = 'Error Room - Server';
+    	  this.description = 'Opens a communication channel with the clients redirected to the error page';
+    	  this.version = '0.2';
+    	  
+    	  // Wait for a STATE message from the server
+    	  // to go to next state
+    	  this.auto_step = false; 
+    	  this.auto_wait = false;
+    	  
+    	  this.minPlayers = 100;
+    	  this.maxPlayers = 1000;
+    	  
+    	  
+    	  this.init = function() {
+					
+					// fix bug on MsgBar
+					node.widgets.widgets.MsgBar.prototype.listeners = function () {
+            var that = this;  
+            node.on('UPDATED_PLIST', function() {
+              node.window.populateRecipientSelector(that.recipient, node.game.pl);
+	          }); 
+	        };
+					
+    		  this.chat = node.widgets.append('Chat');
+					this.gboard = node.widgets.append('GameBoard');
+					this.msgbar = node.widgets.append('MsgBar');
+    	  };
+    	  
+
+    	  this.loop = {
+    	    1: {
+    	      state: function() {
+    	        node.log('Error room loaded');  
+    	      },
+    	      name: 'Error Room',
+    	    },
+    	  };  
+    }
+    
+    var conf = {
+	      url: "/ultimatum/erroom/admin",
+	      verbosity: 100,
+	      io: {        
+	        reconnect: true
+	      },
+	      window: {
+	        promptOnleave: false
+	      },
+	      events: {
+	        dumpEvents: false,
+	        history: false
+	      }
+	    };
+    
+    	node.play(conf, new Erroom());
+    
+  }
+</script>
+</body>

@@ -2,12 +2,12 @@ function Ultimatum () {
 
 	this.name = 'Backend logic for Ultimatum Game';
 	this.description = 'No Description';
-	this.version = '0.2';
+	this.version = '0.3';
 	
 	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
-	this.automatic_step = false;
+	this.auto_step = false;
 	
 	this.init = function () {
 		
@@ -132,7 +132,7 @@ function Ultimatum () {
 		node.game.pl.each(function(p) {
 			node.say(p.win, 'WIN', p.id);
 			exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
-			p.win = (that.SHOWUP + (p.win || 0)) / 1000;
+			p.win = (p.win || 0) / 1000;
 			dk.checkOut(p.mtid, exitcode, p.win);
 		});
 		
@@ -161,7 +161,7 @@ function Ultimatum () {
 				name: 	'Instructions'
 			},
 				
-			3: {rounds:	2, 
+			3: {rounds:	10, 
 				state: 	game,
 				name: 	'Game'
 			},

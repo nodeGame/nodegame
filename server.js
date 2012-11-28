@@ -40,5 +40,10 @@ var waitingRoom = sn.addChannel({
 });
 
 
+sn.addChannel({
+    name: 'Erroom',
+    admin: 'ultimatum/erroom/admin',
+    player: 'ultimatum/erroom'
+});
 
 			

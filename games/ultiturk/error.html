@@ -1,0 +1,77 @@
+<!doctype html>
+<title>Sorry</title>
+<body>
+<div id="root">
+  <h2 id="h2title">Sorry, an error has occurred</h2>
+   Please try again, Go back to Amazon and click return the HIT.
+</div>
+<div id="chatDiv">
+    You can contact the game master using the chat window below. 
+  </div>
+</body>
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<script>
+<!--
+  window.onload = function () {
+    
+	  function Erroom() {
+		  
+		  this.solo_mode = true;
+		  
+         this.init = function() {
+           node.widgets.append('Chat', document.getElementById('chatDiv'), {
+                  mode: 'ONE_TO_ONE',
+                  displayName: function() {
+                    return 'Game Master';
+                  }
+                });
+         }
+         
+         this.auto_step = false; 
+         this.auto_wait = true;
+         
+         this.loop = {
+        		 1: {
+        			 state: function() {
+        				 console.log('Error Room loaded');
+        			 }
+        		 }
+         }
+	  }
+	
+    // Player ID from Mturk
+     var mtid = JSUS.getQueryString('id');
+     
+    
+    // Create the Client
+      
+     var conf = {
+      url: "/ultimatum/erroom",
+      verbosity: 1000,
+      io: {        
+        reconnect: true
+      },
+      window: {
+    	  promptOnleave: false
+      },
+      player: {
+        mtid: mtid,
+        navigator: navigator
+      },
+      events: {
+        dumpEvents: false,
+        history: false
+      }
+    };
+
+    
+       node.play(conf, new Erroom());
+       node.game.step();
+      
+       
+       W.noEscape(window);
+
+  }
+  // -->
+</script>

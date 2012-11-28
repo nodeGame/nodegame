@@ -1,0 +1,59 @@
+<!doctype html>
+<title>Ultimatum Game</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<!-- end -->
+
+<!-- Loading the Ultimatum game -->
+<script src="./Ultimatum_wait.js" charset="utf-8"></script>
+<!-- end -->
+
+<body>
+<div id="root">
+  <h2 id="h2title">Please be patient. We are waiting for all the players to connect<span id="wait">...</span></h2>
+</div>
+<script>
+  window.onload = function () {
+	 
+	  (function(){
+		  var wait = document.getElementById('wait');
+		  setInterval(function(){
+		    if (wait.innerHTML !== '.....') {
+		      wait.innerHTML = wait.innerHTML + '.';  
+		    }
+		    else {
+		      wait.innerHTML = '..';
+		    }
+		  }, 1000)    
+		})();
+	  
+	   // Player ID from Mturk
+	   var mtid = JSUS.getQueryString('id');
+	  
+		// Create the Client
+			
+		 var conf = {
+			url: "/ultimatum/wait",
+			verbosity: 0,
+      io: {        
+           reconnect: false
+      },
+      window: {
+    	  promptOnleave: false
+      },
+      player: {
+          mtid: mtid
+      }
+		};
+
+		
+    node.play(conf, new Ultimatum_wait());
+    
+	  
+    
+	}
+</script>
+</body>

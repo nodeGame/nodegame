@@ -318,7 +318,7 @@ function Ultimatum () {
 	
 	var endgame = function(){
 		W.loadFrame('html/ended.html', function(){
-			node.on('WIN', function(msg) {
+			node.onDATA('WIN', function(msg) {
 				W.write('Your earning in the game is: ' + msg.data);
 			});
 		});
@@ -351,7 +351,7 @@ function Ultimatum () {
 			timer: 120000
 		},
 		
-		3: {rounds: 2, 
+		3: {rounds: 10, 
 			state:  ultimatum,
 			name: 'Ultimatum Game'
 		}, 
