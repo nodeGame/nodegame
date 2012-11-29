@@ -11,6 +11,7 @@ function Ultimatum_monitor () {
 	this.observer = true;
 	
 	this.init = function() {
+		this.chat = node.widgets.append('Chat');
 		node.window.setup('MONITOR');
 	};
 	

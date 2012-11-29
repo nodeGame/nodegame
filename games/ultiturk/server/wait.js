@@ -50,8 +50,7 @@ function wait () {
 				// PLAYER IS AUTHORIZED
 				dk.incrementUsage(mtid);
 				dk.checkIn(mtid);
-				node.say('CHECKEDIN', 'CHECKEDIN', msg.data.id);
-				
+				node.say('CHECKEDIN', 'CHECKEDIN', msg.data.id);	
 			}	
 		});
 		
