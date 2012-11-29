@@ -36,10 +36,7 @@ function Ultimatum () {
 				node.redirect(errUri, msg.data.id);
 				dk.decrementUsage(mtid);
 			}
-			else {
-				dk.incrementUsage(mtid);
-				node.say('CHECKEDIN', 'CHECKEDIN', msg.data.id);
-			}	
+
 		});
 		
 		node.on('in.say.PDISCONNECT', function(msg) {

@@ -57,15 +57,15 @@ function Ultimatum_wait () {
 
 	this.loop = {
 		1: {state: checkingIn,
-			name: 'Test page',
+			name: 'Test page'
 		},	
 			
 		2: {state: testing,
-			name: 'Test page',
+			name: 'Test page'
 		},
 		
 		3: {state: waiting,
-			name: 'Waiting Room',
-		},
+			name: 'Waiting Room'
+		}
 	};	
 }

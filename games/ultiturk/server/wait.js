@@ -2,7 +2,7 @@ function wait () {
 	
 	this.name = 'Waiting Room - Server';
 	this.description = 'Waits until the game starts....';
-	this.version = '0.2';
+	this.version = '0.3';
 	
 	// Wait for a STATE message from the server
 	// to go to next state
@@ -13,7 +13,7 @@ function wait () {
 	this.maxPlayers = 10;
 	
 
-	var open = false; // Sends or not players to the game
+	var open = true; // Sends or not players to the game
 	
 	this.init = function() {
 		var open = true;
@@ -88,8 +88,7 @@ function wait () {
 					
 					// Redirect the players to the game uri
 					node.game.waiting.each(function(p){
-						var mtid = p.mtid,
-							pc = p.pc;
+						var mtid = p.mtid;
 						node.redirect('/ultiturk/index.html?&id=' + mtid, p.id);
 					});
 					
@@ -148,7 +147,6 @@ var conf = {
 };
 
 
-// codes already loaded
 dk.getCodes(function(){
 	node.play(conf, new wait());
 });
