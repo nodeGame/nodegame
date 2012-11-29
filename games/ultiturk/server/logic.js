@@ -7,11 +7,52 @@ function Ultimatum () {
 	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
-	this.auto_step = false;
+	this.auto_step = true;
 	
 	this.init = function () {
 		
 		this.SHOWUP = 500;
+		
+		node.on('in.say.PCONNECT', function(msg) {
+			if (!msg.data) {
+				node.err('Received an empty PCONNECT message. This should not happen.');
+				node.err(msg);
+				return false;
+			}
+			var mtid = msg.data.mtid;
+			
+			var valid = dk.codes.id[mtid];
+			//var valid = dk.codes.select('AccessCode', '=', mtid).first();
+			
+			var errUri;
+			
+			if (!valid) {
+				errUri = '/ultiturk/error.html?id=' + mtid + '&err0=1';	
+				node.redirect(errUri, msg.data.id);
+				return;
+			}
+			else if (dk.codeUsage(mtid)) {
+				errUri = '/ultiturk/error.html?id=' + mtid + '&codeInUse=1';
+				node.redirect(errUri, msg.data.id);
+				dk.decrementUsage(mtid);
+			}
+			else {
+				dk.incrementUsage(mtid);
+				node.say('CHECKEDIN', 'CHECKEDIN', msg.data.id);
+			}	
+		});
+		
+		node.on('in.say.PDISCONNECT', function(msg) {
+			if (!msg.data) {
+				node.err('Received an empty PCONNECT message. This should not happen.');
+				node.err(msg);
+				return false;
+			}
+			var mtid = msg.data.mtid;
+			dk.decrementUsage(mtid);
+			//dk.codes.id[mtid].used = false;
+		
+		});
 		
 		node.onDATA('response', function(msg) {
 			var response = msg.data;
@@ -130,10 +171,10 @@ function Ultimatum () {
 		var that = this;
 		var exitcode;
 		node.game.pl.each(function(p) {
-			node.say(p.win, 'WIN', p.id);
 			exitcode = dk.codes.select('AccessCode', '=', p.mtid).first().ExitCode;
 			p.win = (p.win || 0) / 1000;
 			dk.checkOut(p.mtid, exitcode, p.win);
+			node.say(p.win, 'WIN', p.id);
 		});
 		
 	      
@@ -153,7 +194,10 @@ function Ultimatum () {
 	// Creating the Game Loop	
 	this.loops = {
 			
-			1: {state:	pregame,
+			1: {// Depending on when we start the logic
+				// we need to have 1 or 2 rounds here.
+				rounds: 2, 
+				state:	pregame,
 				name:	'Game will start soon'
 			},
 			
@@ -187,17 +231,20 @@ JSUS = node.JSUS;
 module.exports.node = node;
 module.exports.Ultimatum = Ultimatum;
 
+
 /// Start the game only after we have received the list of access codes
+
+var conf = {
+	name: "P_" + Math.floor(Math.random()*100),
+	url: "http://localhost:8080/ultimatum/admin",
+	io: {
+	    'reconnect': false,
+	    'transports': ['xhr-polling'],
+	    'polling duration': 10
+	},
+	verbosity: 0,
+};
+
 dk.getCodes(function(){
-	var conf = {
-		name: "P_" + Math.floor(Math.random()*100),
-		url: "http://localhost:8080/ultimatum/admin",
-		io: {
-		    'reconnect': false,
-		    'transports': ['xhr-polling'],
-		    'polling duration': 10
-		},
-		verbosity: 0,
-	};
 	node.play(conf, new Ultimatum());
 });

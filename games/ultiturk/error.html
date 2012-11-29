@@ -1,12 +1,24 @@
 <!doctype html>
 <title>Sorry</title>
+<style>
+div#errors {
+  margin: 20px;
+}
+span.error {
+  color: red;
+  font-family: courier;
+}
+
+</style>
+<link rel='stylesheet' href='/stylesheets/monitor.css'></link>
 <body>
 <div id="root">
   <h2 id="h2title">Sorry, an error has occurred</h2>
    Please try again, Go back to Amazon and click return the HIT.
 </div>
+<div id="errors"></div>
 <div id="chatDiv">
-    You can contact the game master using the chat window below. 
+    You can contact the game master using the chat window below. <br>
   </div>
 </body>
 <script src="/socket.io/socket.io.js"></script> 
@@ -43,6 +55,43 @@
     // Player ID from Mturk
      var mtid = JSUS.getQueryString('id');
      
+    
+    var errors = {
+    		'codeInUse': function() {
+    			var str = 'Code already in use: ';
+          var code = JSUS.getQueryString('id');
+          return str + code;
+    		},
+    		'err0': function(){
+    			var str = 'Invalid or missing authorization code: ';
+    			var code = JSUS.getQueryString('id');
+    			return str + code;
+    		},
+    		'err1': 'nodeGame general error',
+    		'err2': 'insufficient screen resolution',
+    		'err3': 'game play requirement not met'
+    };
+    
+    var err, opt, errMsg, errDiv = document.getElementById('errors');
+    for (var e in errors) {
+    	if (errors.hasOwnProperty(e)) {
+    		err = JSUS.getQueryString(e);
+    		
+    		if (err) {
+    			errMsg = ('function' === typeof errors[e]) ? errors[e].call(this) : errors[e];
+    			 
+    				
+    			opt = {
+	              '%err': { 'class': 'error'},
+	              '!e': errMsg
+	        };
+    			W.sprintf('%err!e%err', opt, errDiv);
+    			W.writeln('', errDiv);
+    		}
+    	}
+    }
+    
+    W.writeln('Your browser is: ' + navigator.userAgent, errDiv);
     
     // Create the Client
       

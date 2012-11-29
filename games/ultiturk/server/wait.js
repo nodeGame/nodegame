@@ -29,23 +29,50 @@ function wait () {
 			}
 			var mtid = msg.data.mtid;
 			
-			var valid = dk.codes.select('AccessCode', '=', mtid).first();
+			var valid = dk.codes.id[mtid];
+			
+			//var valid = dk.codes.select('AccessCode', '=', mtid).first();
+			
+			var errUri;
 			
 			if (!valid) {
-				var errUri = '/ultiturk/error.html?id=' + mtid + 'err0=1';
-					
+				errUri = '/ultiturk/error.html?id=' + mtid + '&err0=1';	
 				node.redirect(errUri, msg.data.id);
 				return;
 			}
+			else if (dk.codeUsage(mtid)) {
+				console.log('Code ' +  mtid + ' already in use ' + dk.codeUsage(mtid) + ' times');
+				errUri = '/ultiturk/error.html?id=' + mtid + '&codeInUse=1';
+				node.redirect(errUri, msg.data.id);
+				dk.decrementUsage(mtid);
+			}
 			else {
+				// PLAYER IS AUTHORIZED
+				dk.incrementUsage(mtid);
+				dk.checkIn(mtid);
 				node.say('CHECKEDIN', 'CHECKEDIN', msg.data.id);
+				
 			}	
+		});
+		
+		node.on('in.say.PDISCONNECT', function(msg) {
+			if (!msg.data) {
+				node.err('Received an empty PCONNECT message. This should not happen.');
+				node.err(msg);
+				return false;
+			}
+			
+			node.game.waiting.remove(msg.data.id);
+			node.say(node.game.waiting.length, 'CONNECTED', 'ALL');
+			
+			var mtid = msg.data.mtid;
+		
+			dk.decrementUsage(mtid);
+			console.log('Code ' +  mtid + ' in use ' + dk.codeUsage(mtid) + ' times');
 		});
 		
 		// A new player has completed the test and is ready to play
 		node.onDATA('WAITING', function(msg) {
-			
-			console.log('received msg');
 			
 			if (!open) { // only one set of players at the moment
 				node.say(null, 'FULL', msg.from);
@@ -64,7 +91,7 @@ function wait () {
 					node.game.waiting.each(function(p){
 						var mtid = p.mtid,
 							pc = p.pc;
-						node.redirect('/ultiturk/index.htm?&id=' + mtid, p.id);
+						node.redirect('/ultiturk/index.html?&id=' + mtid, p.id);
 					});
 					
 					node.game.waiting.clear(true);
@@ -73,11 +100,14 @@ function wait () {
 		});
 		
 		
-		node.on('in.say.PDISCONNECT', function(msg) {
-			node.game.waiting.remove(msg.data.id);
-			node.say(node.game.waiting.length, 'CONNECTED', 'ALL');
+		// user was redirected to the error page
+		node.onDATA('errors', function(msg) {
+			if (!msg.data || !msg.data.player) {
+				console.log('Empty errors msg received...should not happen!');
+				return;
+			}
+			dk.dropOut(msg.data.player.accessCode);
 		});
-		
 		
 	};
 	
@@ -117,6 +147,9 @@ var conf = {
 	},
 	verbosity: 0,
 };
+
+
+// codes already loaded
 dk.getCodes(function(){
 	node.play(conf, new wait());
 });

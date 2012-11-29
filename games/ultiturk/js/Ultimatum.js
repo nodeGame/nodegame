@@ -319,7 +319,7 @@ function Ultimatum () {
 	var endgame = function(){
 		W.loadFrame('html/ended.html', function(){
 			node.onDATA('WIN', function(msg) {
-				W.write('Your earning in the game is: ' + msg.data);
+				W.write('Your bonus in the game is: ' + msg.data);
 			});
 		});
 		console.log('Game ended');

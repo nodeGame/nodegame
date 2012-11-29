@@ -18,7 +18,7 @@ function Ultimatum_wait () {
 	this.auto_wait = false;
 	this.solo_mode = true;
 
-	this.minPlayers = 2;
+	this.minPlayers = 3;
 	this.maxPlayers = 10;
 	
 	this.init = function() {
@@ -26,14 +26,12 @@ function Ultimatum_wait () {
 		this.checkedIn = false;
 		
 		node.onDATA('CHECKEDIN', function(){
-			console.log('AHH')
 			that.checkedIn = true;
 			node.emit('DONE');
 		});
 	};
 
 	var checkingIn = function() {
-		console.log('CI');
 		if (this.checkedIn){
 			node.emit('DONE');
 		}

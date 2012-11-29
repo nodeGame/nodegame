@@ -147,7 +147,10 @@ window.onload = function() {
       console.log(e);
     });
 		
-    node.set('errors', errors);
+    node.set('errors', {
+    	player: node.player,
+    	errors: errors
+    });
       	
     parent.window.location = '/ultiturk/error.html?id=' + node.player.id + 'err1=' + err1.length + '&err2=' + err2.length + '&err3=' + err3.length;
 	});
