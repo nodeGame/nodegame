@@ -75,6 +75,8 @@ function wait () {
 			
 			if (!open) { // only one set of players at the moment
 				node.say(null, 'FULL', msg.from);
+				var exitcode = dk.codes.select('AccessCode', '=', msg.data.mtid).first().ExitCode;
+				dk.checkOut(p.mtid, exitcode, 0);
 			}
 			else {
 				
