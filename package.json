@@ -18,7 +18,7 @@
       "descil-mturk": ">= 0.0.1",
       "commander": "1.0.0",
       "mkdirp": "0.3.2",
-      "NDDB": ">= 0.3.1",
+      "NDDB": ">= 0.5.9",
 		  "request": "2.11.4"
     }
   , "engines": { "node": ">= 0.6.11" }
