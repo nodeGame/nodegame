@@ -51,10 +51,10 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     $ cd Desktop
       
     # clone the repo
-    $ git clone git://github.com/nodeGame/nodeGame.git
+    $ git clone git://github.com/nodeGame/nodegame.git
       
     # update the dependencies
-    $ cd nodeGame
+    $ cd nodegame
     $ npm install
  
 Continue from point _3._ of the section "Quick Start".    
