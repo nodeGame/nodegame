@@ -130,7 +130,7 @@ function Ultimatum () {
 	
 	
 	// Creating the Game Loop	
-	this.loops = {
+	this.loop = {
 			
 			1: {
 				// Depending on when we start the logic
@@ -144,7 +144,7 @@ function Ultimatum () {
 				name: 	'Instructions'
 			},
 				
-			3: {rounds:	10, 
+			3: {rounds:	3, 
 				state: 	game,
 				name: 	'Game'
 			},
@@ -166,8 +166,6 @@ var NDDB = require('NDDB').NDDB,
 	node = require('nodegame-client'),
 	JSUS = node.JSUS;
 
-module.exports.node = node;
-module.exports.Ultimatum = Ultimatum;
 
 
 var conf = {
@@ -181,4 +179,19 @@ var conf = {
 	verbosity: 10,
 
 };
-node.play(conf, new Ultimatum());
+
+
+//node.setup(conf);
+//		
+//node.configure('socket', {
+//	type: 'SocketIo'
+//});
+//		
+//node.socket.setSocketType('SocketIo');
+//node.connect(conf.url);		   
+//
+//node.play(new Ultimatum());
+
+
+//module.exports = node;
+module.exports = Ultimatum;

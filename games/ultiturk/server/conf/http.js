@@ -1,11 +1,15 @@
 module.exports = configure;
 
 var request = require('request'),
-	NDDB = require('NDDB').NDDB,
-	dk = require('descil-mturk');
+	NDDB = require('NDDB').NDDB;
+
+// REMOVED FOR NOT - undocumented
+//	var dk = require('descil-mturk');
 
 function configure (app) {
 
+	return true;
+	
 	// Comment to play with Mturk 
 	// Notice: requires valid descil-mturk credentials!
 	

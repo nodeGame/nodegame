@@ -377,3 +377,6 @@ function Ultimatum () {
 		}
 	};	
 }
+
+
+module.exports = Ultimatum;

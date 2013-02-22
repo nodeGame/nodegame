@@ -7,7 +7,7 @@ var ServerNode = require('nodegame-server').ServerNode;
 var options = {
 		confDir: './conf',
 		servernode: function (servernode) {
-			servernode.verbosity = 10;
+			servernode.verbosity = 100;
 			servernode.gamesDirs.push('./games');
 			return true;
 		},
@@ -28,8 +28,8 @@ var sn = new ServerNode(options);
 var ultimatum = sn.addChannel({
 				    name: 'Ultimatum',
 				    admin: 'ultimatum/admin',
-				    player: 'ultimatum',
-				    game: 'ultimatum',		    	
+				    player: 'ultimatum',		    	
+
 });
 
 var waitingRoom = sn.addChannel({
@@ -47,3 +47,11 @@ sn.addChannel({
 });
 
 			
+
+var ultimatum = require('./games/ultimatum/server/logic.js');
+
+sn.startGame('Ultimatum', ultimatum);
+
+
+module.exports = sn;
+
