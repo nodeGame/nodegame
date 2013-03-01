@@ -31,10 +31,19 @@ function configure (servernode) {
 	servernode.maxListeners = 0; // unlimited
 	
 	servernode.defaults.channel = {
-		port: servernode.port,
-		log: servernode.log,
-		verbosity: servernode.verbosity,
-	};
+			sockets: {
+				sio: true,
+				direct: true
+			},
+			port: servernode.port,
+			log: servernode.log,
+			verbosity: servernode.verbosity,
+			notifyPlayers: {
+				onConnect: false,
+				onStateUpdate: false,
+			},
+			forwardAllMessages: true,
+		};
 	
 	return true;
 }

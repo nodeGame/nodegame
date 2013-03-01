@@ -25,22 +25,22 @@ function configure (loggers) {
 //		  }
 //	};
 		
-	var rootDir = path.resolve(__dirname, '..');
-	var logDir = rootDir + '/log/';
-	
-	loggers.add('ultimatumchannel', {
-	    console: {
-	    	level: 'silly',
-	    	colorize: true,
-	    },
-	    file: {
-	    	level: 'silly',
-	    	timestamp: true,
-	    	filename: logDir + 'channel',
-	    	maxsize: 1000,
-	    	maxFiles: 10,
-	    },
-	});
-		
+//	var rootDir = path.resolve(__dirname, '..');
+//	var logDir = rootDir + '/log/';
+//	
+//	loggers.add('ultimatumchannel', {
+//	    console: {
+//	    	level: 'silly',
+//	    	colorize: true,
+//	    },
+//	    file: {
+//	    	level: 'silly',
+//	    	timestamp: true,
+//	    	filename: logDir + 'channel',
+//	    	maxsize: 1000,
+//	    	maxFiles: 10,
+//	    },
+//	});
+//		
 	return true;
 }

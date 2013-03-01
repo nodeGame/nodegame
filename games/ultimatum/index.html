@@ -16,10 +16,12 @@
 <script>
   window.onload = function () {
 		  
-		// Create the Client
+		// Configure the Client
 			
 		var conf = {
-			url: "/ultimatum",
+			// HOST needs to be specified only 
+			// if this file is located in another server
+			// host: http://myserver.com,	  
 			verbosity: 100,
       io: {        
            reconnect: false
@@ -33,6 +35,9 @@
       },
       player: {
 			  name: "P_" + Math.floor(Math.random()*100)
+      },
+      events: {
+    	  dumpEvents: true
       }
 		};
 		
@@ -43,10 +48,10 @@
 		});
 		
 		//node.socket.setSocketType('SocketIo');
-		node.connect(conf.url);		   
-	
-    node.play(new Ultimatum());
-    //node.game.step();
+		node.connect("/ultimatum");
+		  
+    //node.play(new Ultimatum());
+    
     
 	}
 </script>

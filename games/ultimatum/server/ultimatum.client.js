@@ -347,7 +347,7 @@ function Ultimatum () {
 	// has to complete the state.
 	//
 	/////////////////////////////////////////////
-	this.loops = {
+	this.loop = {
 		1: {state: pregame,
 			name: 'Game will start soon'
 		},

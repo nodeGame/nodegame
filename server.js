@@ -6,6 +6,7 @@ var ServerNode = require('nodegame-server').ServerNode;
 
 var options = {
 		confDir: './conf',
+		// logDir: './log', // not working at the moment
 		servernode: function (servernode) {
 			servernode.verbosity = 100;
 			servernode.gamesDirs.push('./games');
@@ -48,8 +49,9 @@ sn.addChannel({
 
 			
 
-var ultimatum = require('./games/ultimatum/server/logic.js');
-
+// We can load a game here
+var path = require('path');
+var ultimatum = path.resolve('./games/ultimatum/server/ultimatum.logic.4.server.js');
 sn.startGame('Ultimatum', ultimatum);
 
 

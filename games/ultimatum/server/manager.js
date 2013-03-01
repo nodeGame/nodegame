@@ -1,11 +1,10 @@
-var	node = require('nodegame-client'),
-	JSUS = node.JSUS;
-
-
+var	JSUS = require('JSUS').JSUS,
+	node = require('nodegame-client');
+	
 
 var conf = {
 	url: "http://localhost:8080/ultimatum/admin",
-	verbosity: 10,
+	verbosity: 100,
 };
 
 
@@ -21,9 +20,22 @@ node.connect(conf.url);
 
 var gameClient = require('./ultimatum.client');
 
-console.log(gameClient);
+//console.log(gameClient);
 
-node.remoteSetup('game', {game: gameClient}, 'ALL');
+var strGameClient = JSUS.stringify(gameClient, 2);
 
-node.remoteSetup('env', {fru2: true}, 'ALL');
+node.remoteSetup('game', strGameClient, 'ALL');
 
+var msg = node.msg.create({
+				action: node.action.SAY,
+				target: 'GAMECOMMAND',
+				data: {},
+				text: 'start',
+				to: 'ALL'
+			});
+
+node.socket.send(msg);
+
+
+//node.remoteSetup('env', {fru2: true}, 'ALL');
+module.exports = node;
