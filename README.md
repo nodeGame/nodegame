@@ -43,6 +43,8 @@ For further information refer to the documentation in nodeGame [wiki](https://gi
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
 
+**IMPORTANT:** At the moment the master branch of the github repository has been refactored, and the current documentation is slightly outdated, and refers to the version available from `npm`.
+
 ### Building from sources
 
 Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
