@@ -25,18 +25,20 @@ function Ultimatum () {
 	//////////////////////////////////////////////
 	// nodeGame hint:
 	//
-	// The init function is the place to defined
+	// The init function is the place to define
 	// global variables, and to setup the game
 	// Event listeners defined here are valid 
 	// for the whole game.
 	//
 	/////////////////////////////////////////////
 	this.init = function() {
+		// can we get away without setting these vars by the client?
 		this.BIDDER = 1;
 		this.RESPONDENT = 0;	
 		W.setup('PLAYER');
 		
 		var that = this;
+		// BID_DONE message - should be sent to choreographer
 		node.on('BID_DONE', function(offer, to) {
 			node.game.timer.stop();
 			W.getElementById('submitOffer').disabled = 'disabled';
@@ -45,6 +47,7 @@ function Ultimatum () {
 			W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
 		});
 		
+		// I assume from will be the choreographer, right?
 		node.on('RESPONSE_DONE', function(response, offer, from) {
 			node.set('response', {
 				response: response,
@@ -55,6 +58,7 @@ function Ultimatum () {
 			node.DONE();
 		});
 		
+		// shouldn't this be sent by the choreographer, or by the backend logic?
 		this.randomAccept = function(offer, other) {
 			var accepted = Math.round(Math.random());
 			console.log('randomaccept');
@@ -69,6 +73,7 @@ function Ultimatum () {
 			}
 		};
 		
+		// isn't this backend logic?
 		this.isValidBid = function (n) {
 			if (!n) return false;
 			console.log(n)
@@ -213,6 +218,8 @@ function Ultimatum () {
 					}, 4000);
 				});
 				
+				// this error checking should be done by client or server logic
+				// if done by server logic, must go through choreographer
 				b.onclick = function() {
 					var offer = W.getElementById('offer');
 					if (!that.isValidBid(offer.value)) {
@@ -347,6 +354,7 @@ function Ultimatum () {
 	// has to complete the state.
 	//
 	/////////////////////////////////////////////
+	// this belongs in the logic
 	this.loop = {
 		1: {state: pregame,
 			name: 'Game will start soon'
