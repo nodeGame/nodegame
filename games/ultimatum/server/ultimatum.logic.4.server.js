@@ -1,5 +1,6 @@
-module.exports = function(node) {
+module.exports = function(node, channel) {
 
+var Stager = node.Stager;
 
 function Ultimatum () {
 

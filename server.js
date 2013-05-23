@@ -26,33 +26,17 @@ var options = {
 // Option parameter is optional
 var sn = new ServerNode(options);
 
-var ultimatum = sn.addChannel({
-				    name: 'Ultimatum',
-				    admin: 'ultimatum/admin',
-				    player: 'ultimatum',		    	
+var mygame = sn.addChannel({
+				    name: 'mygame',
+				    admin: 'mygame/admin',
+				    player: 'mygame',		    	
 
 });
-
-var waitingRoom = sn.addChannel({
-				name: 'Wroom',
-				admin: 'ultimatum/wait/admin',
-				player: 'ultimatum/wait',
-				game: 'wait',
-});
-
-
-sn.addChannel({
-    name: 'Erroom',
-    admin: 'ultimatum/erroom/admin',
-    player: 'ultimatum/erroom'
-});
-
-			
 
 // We can load a game here
 var path = require('path');
-var ultimatum = path.resolve('./games/ultimatum/server/ultimatum.logic.4.server.js');
-sn.startGame('Ultimatum', ultimatum);
+var mygame = path.resolve('./games/mygame/server/game.daemon.js');
+sn.startGame('mygame', mygame);
 
 
 module.exports = sn;
