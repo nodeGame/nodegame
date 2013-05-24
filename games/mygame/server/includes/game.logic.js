@@ -1,11 +1,11 @@
-var game = {};
+var logic = {};
 
-module.exports = game;
+module.exports = logic;
 
 //The stages / steps of the logic are defined here
 // but could be loaded from the database
 
-var tutorialStage = {
+logic.tutorialStage = {
 	 	id: 'tutorial',
 		cb: function() {
 			
@@ -28,7 +28,7 @@ var tutorialStage = {
 		},
 		onexit: function() {
 			
-			// We can decide on real time how the game develops
+			// We can decide on real time how the logic develops
 //				if (node.game.globals.A) {
 //					node.game.plot.next('gameA');
 //				}
@@ -39,7 +39,7 @@ var tutorialStage = {
 		}
 };
 
-var gameStage = {
+logic.gameStage = {
 		id: 'game',
 		init: function() {
 			// something
@@ -65,20 +65,20 @@ var gameStage = {
 						stage: 'bidder',
 						env: {
 							otherVar: 'foo1'
-						}},
+						}
 					},
 					RESPONDENT: {
 						player: CLIENT_A,
 						stage: 'respondent',
 						env: {
 							otherVar: 'foo2'
-						}},
+						}
 					}
 				});
 				
 				channel.startSubGame({
 					id: 'gameround',
-					players: rolesMap,
+					players: rolesMap
 					// no logic process will be loaded, 
 					// clients will just exchange messages
 					// and their exchange registered
@@ -91,7 +91,7 @@ var gameStage = {
 		}
 };
 
-var questionnaireStage = {
+logic.questionnaireStage = {
 	 	id: 'questionnaire', 
 		cb: function() {
 			
@@ -122,7 +122,6 @@ var questionnaireStage = {
 };
 
 
-game.stages = [ tutorialStage, gameStage, questionnaireStage];
 
-game.init = function(); // optional
-game.gameover = function(); // optional
+logic.init = function() {}; // optional
+logic.gameover = function() {}; // optional

@@ -7,7 +7,7 @@ function configure (servernode) {
 	var rootDir = path.resolve(__dirname, '..');
 	
 	servernode.name = "nodeGame server";
-	servernode.verbosity = 10;
+	servernode.verbosity = 100;
 	
 //	servernode.log.msg = false;
 //	servernode.log.sys = false;
