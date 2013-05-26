@@ -64,7 +64,7 @@ var gameover = function() {};
 
 
 var pregame = function() {
-	W.loadFrame('html/prevar html', function(){
+	W.loadFrame('/mygame/html/prevar html', function(){
 		node.DONE();
 	});
 	console.log('Pregame');
@@ -87,7 +87,7 @@ var instructions = function() {
 	// passed as second parameter.
 	//
 	/////////////////////////////////////////////
-	W.loadFrame('html/instructions.html', function() {
+	W.loadFrame('/mygame/html/instructions.html', function() {
 		var b = W.getElementById('read');
 		b.onclick = function() {
 			node.DONE();
@@ -123,13 +123,19 @@ var instructions = function() {
 };
 
 var quiz = function() {
-    console.log('QUIZ');
+    W.loadFrame('/mygame/html/quiz.html', function () {
+	console.log('QUIZ');
+	var b = W.getElementById('quiz');
+	b.onclick = function() {
+	    node.DONE();
+	};
+    });
 };
 	
 var bidder = function () {
 
 	node.set('ROLE', 'BIDDER');
-	W.loadFrame('html/bidder.html', function () {
+	W.loadFrame('/mygame/html/bidder.html', function () {
 		
 		// Start the timer after an offer was received.
 		var options = {
@@ -193,7 +199,7 @@ var respondent = function() {
 	// set to 30:00
 	node.game.timer.updateDisplay();
 	
-	W.loadFrame('html/resp.html', function () {
+	W.loadFrame('/mygame/html/resp.html', function () {
 		
 		node.onDATA('OFFER', function (msg) {
 								
@@ -228,7 +234,7 @@ var respondent = function() {
 
 var solowait = function() {
 	
-	W.loadFrame('html/solo.html', function () {
+	W.loadFrame('/mygame/html/solo.html', function () {
 		var options = {
 				milliseconds: 0,
 				timeup: function() {
@@ -258,7 +264,7 @@ var solowait = function() {
 };
 
 var questionnaire = function() {
-	W.loadFrame('html/postgame.html', function(){
+	W.loadFrame('/mygame/html/postgame.html', function(){
 		node.env('auto', function(){
 			node.random.emit('DONE');
 		});
@@ -267,7 +273,7 @@ var questionnaire = function() {
 };
 
 var endgame = function() {
-	W.loadFrame('html/ended.html', function(){
+	W.loadFrame('/mygame/html/ended.html', function(){
 		node.on('WIN', function(msg) {
 			W.write('Your earning in the game is: ' + msg.data);
 		});
@@ -277,12 +283,16 @@ var endgame = function() {
 };
 
 var gameplay = function() {
-	W.loadFrame('html/game.html', function(){
-		node.env('auto', function(){
-			node.random.emit('DONE');
-		});
+    W.loadFrame('/mygame/html/game.html', function(){
+	node.env('auto', function(){
+	    node.random.emit('DONE');
 	});
-	console.log('Game');
+	var b = W.getElementById('play');
+	b.onclick = function() {
+	    node.DONE();
+	};
+    });
+    console.log('Game');
 };
 
 
