@@ -1,3 +1,5 @@
+var channel = module.parent.exports.channel;
+
 var logic = {};
 
 module.exports = logic;
@@ -8,7 +10,10 @@ module.exports = logic;
 logic.tutorialStage = {
 	 	id: 'tutorial',
 		cb: function() {
-			
+
+            console.log('TUTORIAL STAGE');
+            return;
+
 			// everybody plays the same stage 
 			// as it was defined in game.client, 
 			// and already setup on the client
@@ -42,10 +47,14 @@ logic.tutorialStage = {
 logic.gameStage = {
 		id: 'game',
 		init: function() {
+            console.log('INITING THE GAME STAGE')
 			// something
 			return true;
 		},
 		cb: function() {
+
+            console.log('GAME STAGE');
+            return;
 
 			// creates groups here
 			
@@ -94,7 +103,9 @@ logic.gameStage = {
 logic.questionnaireStage = {
 	 	id: 'questionnaire', 
 		cb: function() {
-			
+			console.log('QUESTIONNAIRE STAGE');
+            return;
+
 			// everybody plays the same stage 
 			// as it was defined in game.client, 
 			// and already setup on the client

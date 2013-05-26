@@ -13,24 +13,19 @@ module.exports = function(node, channel) {
 	stager.addStage(logic.gameStage);
 	stager.addStage(logic.questionnaireStage);
 
-    // This returns NULL??
-    console.log(stager.init().next('tutorial'))
-	// Set the game plot: the order and the conditions / repetitions
-	// under which the stages of this game are executed
-	
 	stager.init()
         .next('tutorial')
         .next('game')
         .next('questionnaire')
         .gameover();
 	
-    var game = {
+    var settings = {
         name: "mygame",
-        stages: stager.getSequence(),
+        stages: stager,
         gameover: logic.gameover,
         init: logic.init
     };
     	
-	return game;
+	return settings;
 
 };

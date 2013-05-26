@@ -36,9 +36,10 @@ var mygame = sn.addChannel({
 
 // We can load a game here
 var path = require('path');
-var mygamePath = path.resolve('./games/mygame/server/game.daemon.js');
+var mygamePath = path.resolve('./games/mygame/server/game.room.js');
 sn.startGame('mygame', mygamePath);
 
+// a
 
 module.exports = sn;
 

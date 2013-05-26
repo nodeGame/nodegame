@@ -2,6 +2,10 @@
  * This file contains all the building blocks (functions, and configuration) that will be send to the client
  */
 
+var Stager = module.parent.exports.Stager;
+
+var stager = new Stager();
+
 var game = {};
 
 module.exports = game;
@@ -57,18 +61,18 @@ game.init = function() {
 
 };
 
-game.gameover = function() {};
+var gameover = function() {};
 
 
-game.pregame = function() {
-	W.loadFrame('html/pregame.html', function(){
+var pregame = function() {
+	W.loadFrame('html/prevar html', function(){
 		node.DONE();
 	});
 	console.log('Pregame');
 };
 
 
-game.instructions = function() {	
+var instructions = function() {	
 	var that = this;
 	
 	//////////////////////////////////////////////
@@ -118,8 +122,12 @@ game.instructions = function() {
 	});
 	console.log('Instructions');
 };
+
+var quiz = function() {
+    console.log('QUIZ');
+};
 	
-game.bidder = function () {
+var bidder = function () {
 
 	node.set('ROLE', 'BIDDER');
 	W.loadFrame('html/bidder.html', function () {
@@ -172,7 +180,7 @@ game.bidder = function () {
 
 };		
 
-game.respondent = function() {
+var respondent = function() {
 	var other = msg.data.other;
 	node.set('ROLE', 'RESPONDENT');
 	
@@ -219,7 +227,7 @@ game.respondent = function() {
 	console.log('Ultimatum');
 };
 
-game.solowait = function() {
+var solowait = function() {
 	
 	W.loadFrame('html/solo.html', function () {
 		var options = {
@@ -250,7 +258,7 @@ game.solowait = function() {
 		
 };
 
-game.postgame = function() {
+var questionnaire = function() {
 	W.loadFrame('html/postgame.html', function(){
 		node.env('auto', function(){
 			node.random.emit('DONE');
@@ -259,7 +267,7 @@ game.postgame = function() {
 	console.log('Postgame');
 };
 
-game.endgame = function() {
+var endgame = function() {
 	W.loadFrame('html/ended.html', function(){
 		node.on('WIN', function(msg) {
 			W.write('Your earning in the game is: ' + msg.data);
@@ -269,27 +277,49 @@ game.endgame = function() {
 	console.log('Game ended');
 };
 
+var gameplay = function() {
+	W.loadFrame('html/game.html', function(){
+		node.env('auto', function(){
+			node.random.emit('DONE');
+		});
+	});
+	console.log('Game');
+};
 
-game.steps = [
-              { id: 'instructions', 
-            	cb: instructions },
-              { id: 'quiz', 
-            	cb: quiz }
-];
 
-game.stages = [
-	{
-		id: 'tutorial',
-	 	steps: [ 'instructions', 'quiz'], // step ids in sequential order 
-		onstepdone: 'GOTONEXT' // executes the next step of the stage automatically after a successfull DONE, 
-	},
-    { 	id: 'bidder', 
-		cb: bidder },
-    {	id: 'respondent', 
-    	cb: respondent },
-    {	id: 'solowait',
-    	cb: solowait },
-    {	id: 'questionnaire', 
-    	cb: questionnaire }
-];
+stager.addStep({
+    id: 'instructions',
+    cb: instructions
+});
 
+stager.addStep({
+    id: 'quiz',
+    cb: quiz
+});
+
+stager.addStage({
+    id: 'tutorial',
+    steps: [ 'instructions', 'quiz' ],
+    onstepdone: 'GOTONEXT'
+});
+
+stager.addStage({
+    id: 'game',
+    cb: gameplay
+});
+
+stager.addStage({
+    id: 'questionnaire',
+    cb: questionnaire
+});
+
+
+
+stager.init()
+    .next('tutorial')
+    .next('game')
+    .next('questionnaire')
+    .gameover();
+
+
+game.stages = stager;

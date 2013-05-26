@@ -1,0 +1,57 @@
+<!doctype html>
+<title>My Game</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<!-- end -->
+
+<body>
+<div id="root"></div>
+<script>
+  window.onload = function () {
+		  
+		// Configure the Client
+			
+		var conf = {
+			// HOST needs to be specified only 
+			// if this file is located in another server
+			// host: http://myserver.com,	  
+			verbosity: 100,
+            io: {
+               reconnect: false
+            },
+            window: {
+                promptOnleave: false
+            },
+                env: {
+                auto: true,
+                debug: false
+            },
+            player: {
+                name: "NodeGame Player"
+            },
+            events: {
+              dumpEvents: true
+            }
+		};
+		
+		node.setup('nodegame', conf);
+		
+		node.setup('socket', {
+            type: 'SocketIo'
+		});
+		
+		//node.socket.setSocketType('SocketIo');
+		node.connect("/mygame");
+		  
+
+	node.debug = true;
+
+        //node.play(new Ultimatum());
+	W.setup('PLAYER');
+    
+	}
+</script>
+</body>
