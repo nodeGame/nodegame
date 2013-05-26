@@ -41,5 +41,7 @@ sn.startGame('mygame', mygamePath);
 
 // a
 
+
+
 module.exports = sn;
 

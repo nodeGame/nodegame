@@ -37,28 +37,27 @@ game.globals = {
 };
 
 game.init = function() {
-		
-	W.setup('PLAYER');
-	
-	var that = this;
-	node.on('BID_DONE', function(offer, to) {
-		node.game.timer.stop();
-		W.getElementById('submitOffer').disabled = 'disabled';
-		node.set('offer', offer);
-		node.say(offer, 'OFFER', to);
-		W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
+    console.log('INIT PLAYER!');
+    W.setup('PLAYER');
+    
+    var that = this;
+    node.on('BID_DONE', function(offer, to) {
+	node.game.timer.stop();
+	W.getElementById('submitOffer').disabled = 'disabled';
+	node.set('offer', offer);
+	node.say(offer, 'OFFER', to);
+	W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
+    });
+    
+    node.on('RESPONSE_DONE', function(response, offer, from) {
+	node.set('response', {
+	    response: response,
+	    value: offer,
+	    from: from
 	});
-	
-	node.on('RESPONSE_DONE', function(response, offer, from) {
-		node.set('response', {
-			response: response,
-			value: offer,
-			from: from
-		});
-		node.say(response, response, from);
-		node.DONE();
-	});
-
+	node.say(response, response, from);
+	node.DONE();
+    });
 };
 
 var gameover = function() {};

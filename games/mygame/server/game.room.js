@@ -17,7 +17,6 @@ module.exports = function(node, channel) {
         cb: function() {
             node.on.pconnect(function(p) {
                 console.log('-----------Player connected ' + p.id);
-                console.log(node.game.pl.db);
                 //debugger;
 		
 		// clientGame gets *fully* stringifies with JSUS.stringified
@@ -25,6 +24,7 @@ module.exports = function(node, channel) {
                 node.remoteSetup('env', {
                     ahah: true
                 }, p.id);
+		node.remoteCommand('start', p.id);
             });
             return;
         }
