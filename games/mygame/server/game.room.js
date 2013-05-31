@@ -1,6 +1,6 @@
 /**
- * This is a game that spawns sub-games 
- * 
+ * This is a game that spawns sub-games
+ *
  */
 module.exports = function(node, channel) {
 
@@ -9,7 +9,8 @@ module.exports = function(node, channel) {
     var stager = new node.Stager();
 
     var clientGame = channel.require(__dirname + '/includes/game.client', {
-	Stager: node.Stager
+        Stager: node.Stager,
+        stepRules: node.stepRules
     });
 
     var waitingStage = {
@@ -18,29 +19,29 @@ module.exports = function(node, channel) {
             node.on.pconnect(function(p) {
                 console.log('-----------Player connected ' + p.id);
                 //debugger;
-		
-		// clientGame gets *fully* stringifies with JSUS.stringified
+
+                // clientGame gets *fully* stringifies with JSUS.stringified
                 node.remoteSetup('game', clientGame, p.id);
                 node.remoteSetup('env', {
                     ahah: true
                 }, p.id);
-		node.remoteCommand('start', p.id);
+                node.remoteCommand('start', p.id);
             });
             return;
         }
 
     };
-	
-	stager.addStage(waitingStage);
 
-	stager.init().next('waiting')
+    stager.addStage(waitingStage);
 
-	
+    stager.init().next('waiting');
+
+
     var settings = {
         name: "wroom",
         stages: stager
     };
-    	
-	return settings;
+
+    return settings;
 
 };

@@ -13,7 +13,7 @@ logic.tutorialStage = {
 
         console.log('TUTORIAL STAGE');
         return;
-
+/*
         // everybody plays the same stage
         // as it was defined in game.client,
         // and already setup on the client
@@ -29,6 +29,7 @@ logic.tutorialStage = {
             // logics: null,
             // env: null,
         });
+*/
 
     },
     onexit: function() {
@@ -41,7 +42,7 @@ logic.tutorialStage = {
 //                  node.game.plot.next('gameB');
 //              }
 
-        }
+    }
 };
 
 logic.gameStage = {

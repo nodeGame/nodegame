@@ -3,6 +3,7 @@
  */
 
 var Stager = module.parent.exports.Stager;
+var stepRules = module.parent.exports.stepRules;
 
 var stager = new Stager();
 
