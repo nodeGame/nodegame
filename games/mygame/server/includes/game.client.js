@@ -1,5 +1,5 @@
 /**
- * This file contains all the building blocks (functions, and configuration) that will be send to the client
+ * This file contains all the building blocks (functions, and configuration) that will be sent to the client
  */
 
 var Stager = module.parent.exports.Stager;
@@ -65,7 +65,7 @@ var gameover = function() {};
 
 
 var pregame = function() {
-    W.loadFrame('/mygame/html/prevar html', function() {
+    W.loadFrame('/mygame/html/prevar.html', function() {
         node.DONE();
     });
     console.log('Pregame');
@@ -299,7 +299,8 @@ var gameplay = function() {
 
 stager.addStep({
     id: 'instructions',
-    cb: instructions
+    cb: instructions,
+    steprule: stepRules.get('SYNC_ALL')
 });
 
 stager.addStep({

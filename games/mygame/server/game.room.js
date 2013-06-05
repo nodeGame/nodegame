@@ -3,7 +3,7 @@
  *
  */
 module.exports = function(node, channel) {
-
+    node.debug = true;
 
     node.verbosity = 100;
     var stager = new node.Stager();
