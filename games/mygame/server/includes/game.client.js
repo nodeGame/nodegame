@@ -37,7 +37,7 @@ game.globals = {
     }
 };
 
-game.init = function() {
+stager.setOnInit(function() {
     console.log('INIT PLAYER!');
     W.setup('PLAYER');
 
@@ -59,10 +59,11 @@ game.init = function() {
         node.say(response, response, from);
         node.DONE();
     });
-};
+});
 
-var gameover = function() {};
+var gameover = function() {console.log('gameover!!'); };
 
+stager.setOnGameover(gameover);
 
 var pregame = function() {
     W.loadFrame('/mygame/html/prevar.html', function() {

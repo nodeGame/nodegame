@@ -20,7 +20,7 @@ module.exports = function(node, channel) {
                 console.log('-----------Player connected ' + p.id);
                 //debugger;
 
-                // clientGame gets *fully* stringifies with JSUS.stringified
+                // clientGame gets *fully* stringified with JSUS.stringified
                 node.remoteSetup('game', clientGame, p.id);
                 node.remoteSetup('env', {
                     ahah: true
