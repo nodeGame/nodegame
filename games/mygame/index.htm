@@ -15,40 +15,38 @@
 		// Configure the Client
 			
 		var conf = {
-			// HOST needs to be specified only 
-			// if this file is located in another server
-			// host: http://myserver.com,	  
-			verbosity: 100,
-            io: {
-               reconnect: false
-            },
-            window: {
+		// HOST needs to be specified only 
+		// if this file is located in another server
+		// host: http://myserver.com,	  
+		verbosity: 100,
+		io: {
+		reconnect: false
+		},
+		window: {
                 promptOnleave: false
-            },
+		},
                 env: {
                 auto: false,
                 debug: false
-            },
-            player: {
-                name: "NodeGame Player"
-            },
-            events: {
-              dumpEvents: true
-            }
+		},
+		player: {
+		name: "NodeGame Player"
+		},
+		events: {
+		dumpEvents: true
+		}
 		};
 		
 		node.setup('nodegame', conf);
 		
 		node.setup('socket', {
-            type: 'SocketIo'
+		type: 'SocketIo'
 		});
 		
 		//node.socket.setSocketType('SocketIo');
 		node.debug = true;
 		node.connect("/mygame");
 		  
-
-	
 
         //node.play(new Ultimatum());
 	//W.setup('PLAYER');

@@ -4,20 +4,21 @@
  */
 module.exports = function(node, channel) {
 
-
+    node.debug = true;
     node.verbosity = 100;
     var stager = new node.Stager();
 
     var clientGame = channel.require(__dirname + '/includes/game.client', {
-	Stager: node.Stager
+        Stager: node.Stager
     });
 
     var waitingStage = {
         id: 'waiting',
         cb: function() {
+	    debugger;
             node.on.pconnect(function(p) {
                 console.log('-----------Player connected ' + p.id);
-                //debugger;
+                debugger;
 		
 		// clientGame gets *fully* stringifies with JSUS.stringified
                 node.remoteSetup('game', clientGame, p.id);
