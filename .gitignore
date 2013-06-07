@@ -17,6 +17,7 @@ jquery
 *.swp
 .DS_Store
 \#*\#
+.\#*
 *~
 *.nddb
 _*

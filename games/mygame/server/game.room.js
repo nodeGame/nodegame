@@ -13,26 +13,39 @@ module.exports = function(node, channel) {
         stepRules: node.stepRules
     });
 
+ 
+    var times = 0;
     var waitingStage = {
         id: 'waiting',
         cb: function() {
-	    debugger;
-            node.on.pconnect(function(p) {
-                console.log('-----------Player connected ' + p.id);
-
-                // clientGame gets *fully* stringified with JSUS.stringified
-                node.remoteSetup('game', clientGame, p.id);
-                node.remoteSetup('env', {
-                    ahah: true
-                }, p.id);
-                node.remoteCommand('start', p.id);
-            });
-            return;
+	    times++;
+	    console.log('I am executing waiting: ' + times);
+            return true;
         }
 
     };
 
     stager.addStage(waitingStage);
+
+
+    stager.setOnInit(function(){
+
+        node.on.pconnect(function(p) {
+            console.log('-----------Player connected ' + p.id);
+	    
+            // clientGame gets *fully* stringified with JSUS.stringified
+            node.remoteSetup('game', clientGame, p.id);
+            node.remoteSetup('env', {
+                ahah: true
+            }, p.id);
+            node.remoteCommand('start', p.id);
+        });
+    });
+
+    stager.setOnGameOver(function(){
+	console.log('^^^^^^^^^^^^^^^^GAME OVER^^^^^^^^^^^^^^^^^^');
+    });
+    
 
     stager.init().next('waiting');
 
