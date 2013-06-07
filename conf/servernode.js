@@ -39,8 +39,9 @@ function configure (servernode) {
 			log: servernode.log,
 			verbosity: servernode.verbosity,
 			notifyPlayers: {
-				onConnect: false,
-				onStateUpdate: false,
+				onConnect: true,
+				onStageUpdate: true,
+				onStageLevelUpdate: true
 			},
 			forwardAllMessages: true,
 		};
