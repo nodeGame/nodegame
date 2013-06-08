@@ -57,7 +57,7 @@ stager.setOnInit(function() {
             from: from
         });
         node.say(response, response, from);
-        node.DONE();
+        node.done();
     });
 });
 
@@ -67,7 +67,7 @@ stager.setOnGameover(gameover);
 
 var pregame = function() {
     W.loadFrame('/mygame/html/prevar.html', function() {
-        node.DONE();
+        node.done();
     });
     console.log('Pregame');
 };
@@ -92,7 +92,7 @@ var instructions = function() {
     W.loadFrame('/mygame/html/instructions.html', function() {
         var b = W.getElementById('read');
         b.onclick = function() {
-            node.DONE();
+            node.done();
         };
 
 
@@ -129,7 +129,7 @@ var quiz = function() {
         console.log('QUIZ');
         var b = W.getElementById('quiz');
         b.onclick = function() {
-            node.DONE();
+            node.done();
         };
     });
 };
@@ -250,7 +250,7 @@ var solowait = function() {
         //////////////////////////////////////////////
         // nodeGame hint:
         //
-        // node.DONE() communicates to the server that
+        // node.done() communicates to the server that
         // the player has completed the current state.
         //
         // What happens next depends on the game.
@@ -258,7 +258,7 @@ var solowait = function() {
         // until all the other players are also "done".
         //
         /////////////////////////////////////////////
-        node.DONE();
+        node.done();
     });
 
     console.log('solodone');
@@ -291,7 +291,7 @@ var gameplay = function() {
         });
         var b = W.getElementById('play');
         b.onclick = function() {
-            node.DONE();
+            node.done();
         };
     });
     console.log('Game');

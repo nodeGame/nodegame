@@ -8,6 +8,7 @@ module.exports = function(node, channel) {
     node.verbosity = 100;
     var stager = new node.Stager();
 
+    // second parameter makes available to the required file its properties
     var clientGame = channel.require(__dirname + '/includes/game.client', {
         Stager: node.Stager,
         stepRules: node.stepRules
@@ -33,11 +34,17 @@ module.exports = function(node, channel) {
         node.on.pconnect(function(p) {
             console.log('-----------Player connected ' + p.id);
 	    
-            // clientGame gets *fully* stringified with JSUS.stringified
+            // clientGame gets *fully* stringified with JSUS.stringifyAll
             node.remoteSetup('game', clientGame, p.id);
             node.remoteSetup('env', {
                 ahah: true
             }, p.id);
+	    // resend the player list (it gets overridden by the game setup
+	    node.socket.send(node.msg.create({
+		target: 'PLIST',
+		to: p.id,
+		data: node.game.pl
+	    }));
             node.remoteCommand('start', p.id);
         });
     });
