@@ -46,7 +46,7 @@ stager.setOnInit(function() {
         node.game.timer.stop();
         W.getElementById('submitOffer').disabled = 'disabled';
         node.set('offer', offer);
-        node.say(offer, 'OFFER', to);
+        node.say('OFFER', to, offer);
         W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
     });
 
@@ -56,7 +56,7 @@ stager.setOnInit(function() {
             value: offer,
             from: from
         });
-        node.say(response, response, from);
+        node.say(response, from, response);
         node.done();
     });
 });
