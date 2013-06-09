@@ -33,7 +33,7 @@ module.exports = function(node, channel) {
 
         node.on.pconnect(function(p) {
             console.log('-----------Player connected ' + p.id);
-	    
+	    debugger;
             // clientGame gets *fully* stringified with JSUS.stringifyAll
             node.remoteSetup('game', clientGame, p.id);
             node.remoteSetup('env', {
@@ -43,7 +43,7 @@ module.exports = function(node, channel) {
 	    node.socket.send(node.msg.create({
 		target: 'PLIST',
 		to: p.id,
-		data: node.game.pl
+		data: node.game.pl.db
 	    }));
             node.remoteCommand('start', p.id);
         });
