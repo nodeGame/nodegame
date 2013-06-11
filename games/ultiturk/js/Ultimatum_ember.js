@@ -75,9 +75,9 @@ function Ultimatum(){
         // Update VisualState bindings.
         setTimeout(function(){
             var miss = '-';
-            Game.state.set('previous', window.node.game.gameLoop.getName(window.node.game.gameState) || miss);
-            Game.state.set('current', window.node.game.gameLoop.getName(window.node.game.previous()) || miss);
-            Game.state.set('next', window.node.game.gameLoop.getName(window.node.game.next()) || miss);
+            Game.state.set('previous', window.node.game.plot.getName(window.node.game.gameState) || miss);
+            Game.state.set('current', window.node.game.plot.getName(window.node.game.previous()) || miss);
+            Game.state.set('next', window.node.game.plot.getName(window.node.game.next()) || miss);
         }, 4000);
 
         // Update VisualTimer bindings.
