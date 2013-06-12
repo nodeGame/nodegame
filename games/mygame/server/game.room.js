@@ -35,10 +35,10 @@ module.exports = function(node, channel) {
             console.log('-----------Player connected ' + p.id);
 	    debugger;
             // clientGame gets *fully* stringified with JSUS.stringifyAll
-            node.remoteSetup('game', clientGame, p.id);
-            node.remoteSetup('env', {
+            node.remoteSetup('game', p.id, clientGame);
+            node.remoteSetup('env', p.id, {
                 ahah: true
-            }, p.id);
+            });
 	    // resend the player list (it gets overridden by the game setup
 	    node.socket.send(node.msg.create({
 		target: 'PLIST',
