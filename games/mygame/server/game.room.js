@@ -4,8 +4,7 @@
  */
 module.exports = function(node, channel) {
 
-    node.debug = true;
-    node.verbosity = 100;
+   
     var stager = new node.Stager();
 
     // second parameter makes available to the required file its properties
@@ -33,7 +32,6 @@ module.exports = function(node, channel) {
 
         node.on.pconnect(function(p) {
             console.log('-----------Player connected ' + p.id);
-
 	    // Setting metadata, settings, and plot
             node.remoteSetup('game_metadata',  p.id, client.metadata);
 	    node.remoteSetup('game_settings', p.id, client.settings);
@@ -57,11 +55,17 @@ module.exports = function(node, channel) {
     stager.init().next('waiting');
 
 
-    var settings = {
-        name: "wroom",
-        stages: stager
+    return {
+	game_metadata: {
+	    name: 'wroom',
+	    version: '0.0.1'
+	},
+	game_settings: {
+	    observer: false
+	},
+	plot: stager.getState(),
+	debug: true,
+	verbosity: 100
     };
-
-    return settings;
 
 };
