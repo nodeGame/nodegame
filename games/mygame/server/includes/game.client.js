@@ -301,28 +301,31 @@ var gameplay = function() {
 stager.addStep({
     id: 'instructions',
     cb: instructions,
-    steprule: stepRules.get('SYNC_ALL')
+//    steprule: stepRules.get('SOLO')
 });
 
 stager.addStep({
     id: 'quiz',
-    cb: quiz
+    cb: quiz,
+//    steprule: stepRules.get('SYNC_ALL')
 });
 
 stager.addStage({
     id: 'tutorial',
     steps: [ 'instructions', 'quiz' ],
-    onstepdone: 'GOTONEXT'
+    steprule: stepRules.get('SYNC_STAGE')
 });
 
 stager.addStage({
     id: 'game',
-    cb: gameplay
+    cb: gameplay,
+    steprule: stepRules.get('SYNC_ALL')
 });
 
 stager.addStage({
     id: 'questionnaire',
-    cb: questionnaire
+    cb: questionnaire,
+    steprule: stepRules.get('SOLO')
 });
 
 
@@ -334,4 +337,16 @@ stager.init()
     .gameover();
 
 
-game.stages = stager;
+game.plot = stager.getState();
+
+game.metadata = {
+    name: 'ultimatum',
+    version: '0.0.1',
+    session: 1,
+    description: 'no descr'
+};
+
+game.settings = {
+    observer: false,
+    auto_wait: true
+};

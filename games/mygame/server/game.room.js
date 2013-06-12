@@ -9,7 +9,7 @@ module.exports = function(node, channel) {
     var stager = new node.Stager();
 
     // second parameter makes available to the required file its properties
-    var clientGame = channel.require(__dirname + '/includes/game.client', {
+    var client = channel.require(__dirname + '/includes/game.client', {
         Stager: node.Stager,
         stepRules: node.stepRules
     });
@@ -23,7 +23,7 @@ module.exports = function(node, channel) {
 	    console.log('I am executing waiting: ' + times);
             return true;
         }
-
+	
     };
 
     stager.addStage(waitingStage);
@@ -33,18 +33,18 @@ module.exports = function(node, channel) {
 
         node.on.pconnect(function(p) {
             console.log('-----------Player connected ' + p.id);
-	    debugger;
-            // clientGame gets *fully* stringified with JSUS.stringifyAll
-            node.remoteSetup('game', clientGame, p.id);
-            node.remoteSetup('env', {
-                ahah: true
-            }, p.id);
-	    // resend the player list (it gets overridden by the game setup
-	    node.socket.send(node.msg.create({
-		target: 'PLIST',
-		to: p.id,
-		data: node.game.pl.db
-	    }));
+
+	    // Setting metadata, settings, and plot
+            node.remoteSetup('game_metadata',  p.id, client.metadata);
+	    node.remoteSetup('game_settings', p.id, client.settings);
+	    node.remoteSetup('plot', p.id, client.plot);
+	    
+            // resend the player list (it gets overridden by the game setup
+//	    node.socket.send(node.msg.create({
+//	    	target: 'PLIST',
+//	    	to: p.id,
+//	    	data: node.game.pl.db
+//	    }));
             node.remoteCommand('start', p.id);
         });
     });

@@ -13,6 +13,11 @@ module.exports = function(node, channel) {
     stager.addStage(logic.gameStage);
     stager.addStage(logic.questionnaireStage);
 
+    stager.setOnInit(logic.onInit);
+    stager.setOnGameover(logic.OnGameover);
+    
+    stager.setDefaultGlobals(logic.globals);
+
     stager.init()
         .next('tutorial')
         .next('game')
@@ -21,9 +26,7 @@ module.exports = function(node, channel) {
 
     var settings = {
         name: "mygame",
-        stages: stager,
-        gameover: logic.gameover,
-        init: logic.init
+        stages: stager
     };
 
     return settings;
