@@ -34,7 +34,7 @@ logic.tutorialStage = {
 	// nothing
     },
     each: function(c) {
-    
+	
     },
     cb: function() {
         console.log('TUTORIAL STAGE');
@@ -56,8 +56,8 @@ logic.gameStage = {
     cb: function() {
         console.log('GAME STAGE');
         return;
-
     }
+
 };
 
 logic.questionnaireStage = {
