@@ -14,12 +14,9 @@ module.exports = function(node, channel) {
     });
 
  
-    var times = 0;
     var waitingStage = {
         id: 'waiting',
         cb: function() {
-	    times++;
-	    console.log('I am executing waiting: ' + times);
             return true;
         }
 	
@@ -36,24 +33,25 @@ module.exports = function(node, channel) {
             node.remoteSetup('game_metadata',  p.id, client.metadata);
 	    node.remoteSetup('game_settings', p.id, client.settings);
 	    node.remoteSetup('plot', p.id, client.plot);
-	    
-            // resend the player list (it gets overridden by the game setup
-//	    node.socket.send(node.msg.create({
-//	    	target: 'PLIST',
-//	    	to: p.id,
-//	    	data: node.game.pl.db
-//	    }));
-            node.remoteCommand('start', p.id);
+            
+            // Start the game if we have enough players
+            var minp = node.game.plot.getGlobal(null, 'MINPLAYERS');
+            if (node.game.pl.length > minp) {
+                node.remoteCommand('start', 'ALL');
+            }
         });
     });
 
-    stager.setOnGameOver(function(){
+    stager.setOnGameOver(function() {
 	console.log('^^^^^^^^^^^^^^^^GAME OVER^^^^^^^^^^^^^^^^^^');
     });
     
 
-    stager.init().next('waiting');
+    stager.setDefaultGlobals({
+        MINPLAYERS: 3
+    });
 
+    stager.init().loop('waiting');
 
     return {
 	game_metadata: {

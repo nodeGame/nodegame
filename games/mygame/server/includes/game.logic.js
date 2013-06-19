@@ -46,11 +46,46 @@ logic.tutorialStage = {
 logic.gameStage = {
     id: 'game',
     init: function() {
-        console.log('INITING THE GAME STAGE');
+        node.info('Pairing up the players');
+        var groups, i, g;
+        var pairs = [], leftOut;
+        
+	// Pairs all players
+        groups = this.pl.getGroupsSizeN(2);	
+	
+	for (i = 0; i < groups.length; i++) {
+	    g = groups[i];
+	    if (g.length > 1) {
+		g.shuffle();
+                out.push({
+                    bidder: g.first(),
+                    respondent: g.last();
+                });
+            }
+            else {
+                leftOut = g;
+            }
+        }
+        
+        node.game.group.add('pairs', pairs);
+        node.game.group.add('leftOut', leftOut);
+
         // something
         return true;
     },
+    eachGroup: function(g) {
+        if (g.name === 'pairs') {
+            // send the game stage
+            // make the role map
+            // send the role map
+            
+        }
+        else {
+            
+        }
+    },
     eachClient: function(p) {
+        var pairs, lef
 	node.remoteSetup('plot', p.id, clientStager.extractStage('game')); // two steps
     },
     cb: function() {

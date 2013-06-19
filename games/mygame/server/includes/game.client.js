@@ -11,6 +11,8 @@ var game = {};
 
 module.exports = game;
 
+// GLOBALS
+
 game.globals = {
     BIDDER: 1,
     RESPONDENT: 0,
@@ -37,6 +39,8 @@ game.globals = {
     }
 };
 
+// INIT and GAMEOVER
+
 stager.setOnInit(function() {
     console.log('INIT PLAYER!');
     W.setup('PLAYER');
@@ -61,9 +65,12 @@ stager.setOnInit(function() {
     });
 });
 
-var gameover = function() {console.log('gameover!!'); };
+stager.setOnGameover(function() {
+    W.loadFrame('/mygame/html/gameover.html');
+    console.log('gameover!!')
+});
 
-stager.setOnGameover(gameover);
+///// STAGES and STEPS
 
 var pregame = function() {
     W.loadFrame('/mygame/html/prevar.html', function() {
@@ -301,25 +308,23 @@ var gameplay = function() {
 stager.addStep({
     id: 'instructions',
     cb: instructions,
-//    steprule: stepRules.get('SOLO')
 });
 
 stager.addStep({
     id: 'quiz',
     cb: quiz,
-//    steprule: stepRules.get('SYNC_ALL')
 });
 
 stager.addStage({
     id: 'tutorial',
     steps: [ 'instructions', 'quiz' ],
-    steprule: stepRules.get('SYNC_STAGE')
+    steprule: 'SYNC_STAGE'
 });
 
 stager.addStage({
     id: 'game',
     cb: gameplay,
-    steprule: stepRules.get('SYNC_ALL')
+    steprule: 'SYNC_ALL'
 });
 
 stager.addStage({
@@ -328,7 +333,8 @@ stager.addStage({
     steprule: stepRules.get('SOLO')
 });
 
-
+// Now that all the stages have been added,
+// we can build the game plot
 
 stager.init()
     .next('tutorial')
@@ -336,17 +342,21 @@ stager.init()
     .next('questionnaire')
     .gameover();
 
-
+// We serialize the game sequence before sending it
 game.plot = stager.getState();
 
+// Let's add the metadata information
+
 game.metadata = {
-    name: 'ultimatum',
-    version: '0.0.1',
+    name: 'mygame',
+    version: '0.0.2',
     session: 1,
     description: 'no descr'
 };
 
+
+// Other settings, optional
+
 game.settings = {
-    observer: false,
-    auto_wait: true
+    observer: false
 };
