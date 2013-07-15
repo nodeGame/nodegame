@@ -97,6 +97,7 @@ var instructions = function() {
     //
     /////////////////////////////////////////////
     W.loadFrame('/mygame/html/instructions.html', function() {
+        //debugger;
         var b = W.getElementById('read');
         b.onclick = function() {
             node.done();
