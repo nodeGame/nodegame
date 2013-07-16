@@ -1,0 +1,55 @@
+<!doctype html>
+<title>My Game</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<!-- end -->
+
+<body>
+<div id="root">
+  15*9*30= 4050 + 1*9*25= 225 , tot = 4275 + extra session = 270, very tot = 4275
+  
+  which painting is better for in absolute
+  which painting is better as a face
+  which painting is better as a non-face, resembling something else concrete (car, dick, boobs, bird...)
+  which painting is better as a purely abstract forms
+  give a tag (car, happy, sad, bigeyed, bodypart, abstract)
+</div>
+<script>
+  window.onload = function () {
+  
+      
+      // Configuring nodegame
+      node.setup('nodegame', {
+	  // HOST needs to be specified only 
+	  // if this file is located in another server
+	  // host: http://myserver.com,	  
+	  verbosity: 100,
+	  debug: true,
+	  window: {
+	      promptOnleave: false
+              //transitions: true // not used for now (transitions are on by default)
+	  },
+	  env: {
+	      auto: false,
+	      debug: false
+	  },
+	  player: {
+	      name: "NodeGame Player", id: 'nodegame player id'
+	  },
+	  events: {
+	      dumpEvents: true
+	  },
+	  socket: {
+	      type: 'SocketIo',
+	      reconnect: false
+	  }
+      });
+      
+      // connecting
+      node.connect("/facerank");
+  }
+</script>
+</body>
