@@ -5,18 +5,87 @@
 <script src="/socket.io/socket.io.js"></script> 
 <script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
 <link rel='stylesheet' href='/stylesheets/player.css'></link>
+<link rel='stylesheet' href='./css/main.css'></link>
+<link rel='stylesheet' href='./css/evaluation.css'></link>
 <!-- end -->
 
 <body>
-<div id="root">
-  15*9*30= 4050 + 1*9*25= 225 , tot = 4275 + extra session = 270, very tot = 4275
+<div id="root" style="display:none">
+  15*9*30= 4050 + 1*9*26= 234 , tot = 4284 + extra session = 270, very tot = 4554
   
   which painting is better for in absolute
   which painting is better as a face
   which painting is better as a non-face, resembling something else concrete (car, dick, boobs, bird...)
   which painting is better as a purely abstract forms
   give a tag (car, happy, sad, bigeyed, bodypart, abstract)
+  shall we make all of the same color, or keep original colors
 </div>
+<table id="facerank_table">
+<tr>
+  <td colspan="2" id="taskDescription">
+     Click on the picture that you like most, and then complete the forms below.
+  </td>
+<tr>
+  <td id="face_Left"><img class="face" src="./faces/com_choice_25_jan_2013/02_9.png" /></td>
+  <td id="face_Right"><img class="face" src="./faces/com_choice_25_jan_2013/02_10.png" /></td>
+</tr>
+<!-- <tr>
+  <td><button id="moreBeautiful_Left" class="moreBeautiful" >More Beautiful</button>
+  <td><button id="moreBeautiful_Right" class="moreBeautiful" >More Beautiful</button>
+</tr>
+-->
+<tr>
+  <td>
+    Which one of the following categories fits more the picture above?
+    <radio group="category_Left">
+      <dl>
+        <dt><input type="radio" group="category_Left">Human Face</input></dt>
+        <dt><input type="radio" group="category_Left">Non-human Face</input></dt>
+        <dt><input type="radio" group="category_Left">Abstract Dtnes</input></dt>
+        <dt><input type="radio" group="category_Left">An Identifiable Object</input></dt>
+      </dl>
+    </radio>
+  </td>
+  <td>
+     Which one of the following categories fits more the picture above?
+    <radio group="category_Right">
+      <dl>
+        <dt><input type="radio" group="category_Right">Human Face</input></dt>
+        <dt><input type="radio" group="category_Right">Non-human Face</input></dt>
+        <dt><input type="radio" group="category_Right">Abstract Lines</input></dt>
+        <dt><input type="radio" group="category_Right">An Identifiable Object</input></dt>
+      </dl>
+    </radio>
+  </td>
+</tr>
+<tr>
+  <td>
+    <label for="tag_Left">Write one or more words describing the picture above. Use comma as separator. </label><br/>
+    <input type="text" id="tagLeft" class="tag"/>
+  </td>
+  <td>
+    <label for="tag_Right">Write one or more words describing the picture above. Use comma as separator. </label><br/>
+    <input type="text" id="tagRight" class="tag"/>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <button id="doneButton">Click here to review the next pictures</button>
+  </td>
+</tr>
+
+</table>
+
+<script>
+  var doneB = window.getElementById("doneButton");
+  doneB.onclick = function() {
+  node.emit('DONE');
+
+  // TODO: move in the appropriate place
+  node.on('DONE', function() {
+      if (
+  
+  }
 <script>
   window.onload = function () {
   
