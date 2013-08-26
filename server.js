@@ -27,17 +27,35 @@ var options = {
 // Option parameter is optional
 var sn = new ServerNode(options);
 
-var mygame = sn.addChannel({
-    name: 'mygame',
-    admin: 'mygame/admin',
-    player: 'mygame',
+//var mygame = sn.addChannel({
+//    name: 'mygame',
+//    admin: 'mygame/admin',
+//    player: 'mygame',
+//    verbosity: 100
+//});
+
+var facerank = sn.addChannel({
+    name: 'facerank',
+    admin: 'facerank/admin',
+    player: 'facerank',
     verbosity: 100
 });
 
+
+
+
 // We can load a game here
 var path = require('path');
-var mygamePath = path.resolve('./games/mygame/server/game.room.js');
-sn.startGame('mygame', mygamePath);
+
+//var mygamePath = path.resolve('./games/mygame/server/game.room.js');
+//sn.startGame('mygame', mygamePath);
+
+var mygamePath = path.resolve('./games/facerank/server/game.room.js');
+sn.startGame('facerank', mygamePath);
+
+
+
+
 
 module.exports = sn;
 

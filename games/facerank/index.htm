@@ -26,8 +26,8 @@
      Click on the picture that you like most, and then complete the forms below.
   </td>
 <tr>
-  <td id="face_Left"><img class="face" src="./faces/com_choice_25_jan_2013/02_9.png" /></td>
-  <td id="face_Right"><img class="face" src="./faces/com_choice_25_jan_2013/02_10.png" /></td>
+  <td id="td_face_left"><img class="face" src="./faces/com_choice_25_jan_2013/02_9.png" /></td>
+  <td id="td_face_right"><img class="face" src="./faces/com_choice_25_jan_2013/02_10.png" /></td>
 </tr>
 <!-- <tr>
   <td><button id="moreBeautiful_Left" class="moreBeautiful" >More Beautiful</button>
@@ -35,25 +35,25 @@
 </tr>
 -->
 <tr>
-  <td>
+  <td id="td_radio_left">
     Which one of the following categories fits more the picture above?
     <radio group="category_Left">
       <dl>
-        <dt><input type="radio" group="category_Left">Human Face</input></dt>
-        <dt><input type="radio" group="category_Left">Non-human Face</input></dt>
-        <dt><input type="radio" group="category_Left">Abstract Dtnes</input></dt>
-        <dt><input type="radio" group="category_Left">An Identifiable Object</input></dt>
+        <dt><input type="radio" name="category_Left">Human face</input></dt>
+        <dt><input type="radio" name="category_Left">Non-human face</input></dt>
+        <dt><input type="radio" name="category_Left">Abstract lines</input></dt>
+        <dt><input type="radio" name="category_Left">Any other known object</input></dt>
       </dl>
     </radio>
   </td>
-  <td>
+  <td id="td_radio_right">
      Which one of the following categories fits more the picture above?
     <radio group="category_Right">
       <dl>
-        <dt><input type="radio" group="category_Right">Human Face</input></dt>
-        <dt><input type="radio" group="category_Right">Non-human Face</input></dt>
-        <dt><input type="radio" group="category_Right">Abstract Lines</input></dt>
-        <dt><input type="radio" group="category_Right">An Identifiable Object</input></dt>
+        <dt><input type="radio" name="category_Right">Human face</input></dt>
+        <dt><input type="radio" name="category_Right">Non-human face</input></dt>
+        <dt><input type="radio" name="category_Right">Abstract lines</input></dt>
+        <dt><input type="radio" name="category_Right">Any other known object</input></dt>
       </dl>
     </radio>
   </td>
@@ -61,11 +61,11 @@
 <tr>
   <td>
     <label for="tag_Left">Write one or more words describing the picture above. Use comma as separator. </label><br/>
-    <input type="text" id="tagLeft" class="tag"/>
+    <input type="text" id="tag_left" class="tag"/>
   </td>
   <td>
     <label for="tag_Right">Write one or more words describing the picture above. Use comma as separator. </label><br/>
-    <input type="text" id="tagRight" class="tag"/>
+    <input type="text" id="tag_right" class="tag"/>
   </td>
 </tr>
 <tr>
@@ -75,17 +75,6 @@
 </tr>
 
 </table>
-
-<script>
-  var doneB = window.getElementById("doneButton");
-  doneB.onclick = function() {
-  node.emit('DONE');
-
-  // TODO: move in the appropriate place
-  node.on('DONE', function() {
-      if (
-  
-  }
 <script>
   window.onload = function () {
   

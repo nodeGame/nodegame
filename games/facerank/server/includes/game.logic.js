@@ -1,109 +1,48 @@
 var channel = module.parent.exports.channel;
+var node = module.parent.exports.node;
+var Database = require('nodegame-db').Database;
+var ngdb = new Database(node);
+var mdb = ngdb.getLayer('MongoDB');
 
-var client = channel.require(__dirname + '/includes/game.client');  
+var Stager = module.parent.exports.Stager;
+var stepRules = module.parent.exports.stepRules;
+var stager = new Stager();
 
-var clientStager = client.stager;
+//var ff = require('./facefactory.js')
 
-var logic = {};
 
-module.exports = logic;
+var game = {};
 
-logic.globals = {
-    g1: "G1"
-};
+module.exports = game;
 
 
 //The stages / steps of the logic are defined here
 // but could be loaded from the database
 
-logic.init = function(
+stager.setOnInit(function() {
+    // nothing
+});
 
-    node.remoteSetup('game', 'ALL', {});
-);
-
-logic.tutorialStage = {
-    id: 'tutorial',
-    init: function() {
-	// Do something
-    },
-    // TODO not to himself
-    eachPlayer: function(p) {
-	node.remoteSetup('plot', p.id, clientStager.extractStage('tutorial')); // two steps
-    },
-    eachMonitor: function(m) {
-	// nothing
-    },
-    each: function(c) {
-	
-    },
+stager.addStage({
+    id: 'facerank',
     cb: function() {
-        console.log('TUTORIAL STAGE');
-        return;
-    },
-
-};
-
-logic.gameStage = {
-    id: 'game',
-    init: function() {
-        node.info('Pairing up the players');
-        var groups, i, g;
-        var pairs = [], leftOut;
         
-	// Pairs all players
-        groups = this.pl.getGroupsSizeN(2);	
-	
-	for (i = 0; i < groups.length; i++) {
-	    g = groups[i];
-	    if (g.length > 1) {
-		g.shuffle();
-                out.push({
-                    bidder: g.first(),
-                    respondent: g.last();
-                });
-            }
-            else {
-                leftOut = g;
-            }
-        }
+        node.on('NEXT', function() {
+            var face, msg;
+            face = ff.getNextFace();
+            
+            msg = node.msg.create({
+                text: 'FACE',
+                data: face.path
+            });
+            
+            node.socket.send(msg, 'ALL');
+        });
+
+        node.on('EVA', function(msg) {
+            // Saving the evaluation.
+            db.store(msg);
+        });
         
-        node.game.group.add('pairs', pairs);
-        node.game.group.add('leftOut', leftOut);
-
-        // something
-        return true;
-    },
-    eachGroup: function(g) {
-        if (g.name === 'pairs') {
-            // send the game stage
-            // make the role map
-            // send the role map
-            
-        }
-        else {
-            
-        }
-    },
-    eachClient: function(p) {
-        var pairs, lef
-	node.remoteSetup('plot', p.id, clientStager.extractStage('game')); // two steps
-    },
-    cb: function() {
-        console.log('GAME STAGE');
-        return;
     }
-
-};
-
-logic.questionnaireStage = {
-    id: 'questionnaire',
-    eachClient: function(p) {
-	node.remoteSetup('plot', p.id, clientStager.extractStage('questionnaire')); // one step
-    },
-    cb: function() {
-        console.log('QUESTIONNAIRE STAGE');
-        return;
-    }
-};
-
-
+});
