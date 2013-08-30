@@ -68,14 +68,14 @@ stager.addStage({
         console.log('instructions');
         return true;
     },
-    steprule: stepRules.get('SOLO')
+    steprule: stepRules.SOLO
 });
 
 
 stager.addStage({
     id: 'facerank',
     cb: facerank,
-    steprule: stepRules.get('SOLO')
+    steprule: stepRules.SOLO
 });
 
 // Now that all the stages have been added,

@@ -7,8 +7,6 @@ module.exports = function(node, channel) {
     var Database = require('nodegame-db').Database;
     var ngdb = new Database(node);
     var mdb = ngdb.getLayer('MongoDB');
-
-    
    
     var stager = new node.Stager();
 
