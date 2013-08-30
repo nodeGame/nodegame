@@ -50,12 +50,14 @@ var path = require('path');
 //var mygamePath = path.resolve('./games/mygame/server/game.room.js');
 //sn.startGame('mygame', mygamePath);
 
-var mygamePath = path.resolve('./games/facerank/server/game.room.js');
-sn.startGame('facerank', mygamePath);
+var logicPath = path.resolve('./games/facerank/server/game.room.js');
+//sn.startGame('facerank', mygamePath);
+var room = facerank.createGameRoom({
+    name: 'Waiting Room',
+    logicPath: logicPath
+});
 
-
-
-
+room.startGame();
 
 module.exports = sn;
 
