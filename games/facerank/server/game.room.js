@@ -9,6 +9,7 @@ module.exports = function(node, channel) {
     var mdb = ngdb.getLayer('MongoDB');
    
     var stager = new node.Stager();
+    var logicPath = __dirname + '/includes/game.logic';
 
     // second parameter makes available to the required file its properties
     var client = channel.require(__dirname + '/includes/game.client', {
@@ -17,12 +18,12 @@ module.exports = function(node, channel) {
     });
 
     // second parameter makes available to the required file its properties
-    var logic = channel.require(__dirname + '/includes/game.logic', {
-        Stager: node.Stager,
-        stepRules: node.stepRules,
-        mdb: mdb,
-        node: node
-    });
+    //var logic = channel.require(__dirname + '/includes/game.logic', {
+    //    Stager: node.Stager,
+    //    stepRules: node.stepRules,
+    //    mdb: mdb,
+    //    node: node
+    //});
 
     var waitingStage = {
         id: 'waiting',
@@ -45,9 +46,16 @@ module.exports = function(node, channel) {
 	    node.remoteSetup('plot', p.id, client.plot);
             
             // create the object
+            debugger;
+            var tmpPlayerList = new node.PlayerList(null, [p]);
+            //var tmpPlayerList = new node.PlayerList();
+            //tmpPlayerList.add(p);
+            tmpPlayerList.rebuildIndexes();
             room = channel.createGameRoom({
-                players: new node.PlayerList(null, [p]),
-                logic: logic 
+                name: 'facerank-room',
+                playerList: tmpPlayerList,
+                channel: channel,
+                logicPath: logicPath
             });
                    
             // not existing at the moment
@@ -57,6 +65,7 @@ module.exports = function(node, channel) {
             // or we can use the this:
             // node.remoteCommand('start', p.id);
             
+            room.startGame();
         });
     });
 

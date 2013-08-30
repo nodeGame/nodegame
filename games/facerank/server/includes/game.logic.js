@@ -11,21 +11,18 @@ var stager = new Stager();
 //var ff = require('./facefactory.js')
 
 
-var game = {};
-
-module.exports = game;
-
-
 //The stages / steps of the logic are defined here
 // but could be loaded from the database
 
 stager.setOnInit(function() {
     // nothing
+    console.log('init');
 });
 
 stager.addStage({
     id: 'facerank',
     cb: function() {
+        console.log('facerank stage');
         
         node.on('NEXT', function() {
             var face, msg;
@@ -46,3 +43,17 @@ stager.addStage({
         
     }
 });
+
+
+module.exports = {
+    game_metadata: {
+        name: 'facerank',
+        version: '0.0.1'
+    },
+    game_settings: {
+        observer: false
+    },
+    plot: stager.getState(),
+    debug: true,
+    verbosity: 100
+};
