@@ -41,9 +41,6 @@ var facerank = sn.addChannel({
     verbosity: 100
 });
 
-
-
-
 // We can load a game here
 var path = require('path');
 
@@ -52,12 +49,10 @@ var path = require('path');
 
 var logicPath = path.resolve('./games/facerank/server/game.room.js');
 //sn.startGame('facerank', mygamePath);
-var room = facerank.createGameRoom({
-    name: 'Waiting Room',
+
+var room = facerank.createWaitingRoom({
     logicPath: logicPath
 });
-
-room.startGame();
 
 module.exports = sn;
 

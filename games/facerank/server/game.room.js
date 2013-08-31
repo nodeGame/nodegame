@@ -37,6 +37,8 @@ module.exports = function(node, channel) {
 
     stager.setOnInit(function() {
 
+        console.log('********Initializing Game Room*****************');
+
         node.on.pconnect(function(p) {
             var room;
             console.log('-----------Player connected ' + p.id);
