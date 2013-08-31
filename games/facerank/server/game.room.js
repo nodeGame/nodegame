@@ -11,10 +11,12 @@ module.exports = function(node, channel) {
     var stager = new node.Stager();
     var logicPath = __dirname + '/includes/game.logic';
 
+    var ngc = require('nodegame-client');
+
     // second parameter makes available to the required file its properties
     var client = channel.require(__dirname + '/includes/game.client', {
-        Stager: node.Stager,
-        stepRules: node.stepRules
+        Stager: ngc.Stager,
+        stepRules: ngc.stepRules
     });
 
     // second parameter makes available to the required file its properties
@@ -47,14 +49,13 @@ module.exports = function(node, channel) {
 	    node.remoteSetup('game_settings', p.id, client.settings);
 	    node.remoteSetup('plot', p.id, client.plot);
             
-            // create the object
-            debugger;
-            var tmpPlayerList = new node.PlayerList(null, [p]);
-            //var tmpPlayerList = new node.PlayerList();
-            //tmpPlayerList.add(p);
-            tmpPlayerList.rebuildIndexes();
+            // create the object            
+            //var tmpPlayerList = new ngc.PlayerList(null, [p]);
+            var tmpPlayerList = new ngc.PlayerList();
+            tmpPlayerList.add(p);
+            //tmpPlayerList.rebuildIndexes();
             room = channel.createGameRoom({
-                name: 'facerank-room',
+                name: 'facerank',
                 playerList: tmpPlayerList,
                 channel: channel,
                 logicPath: logicPath
