@@ -66,7 +66,7 @@ module.exports = function(node, channel) {
             // room.start(); // .exec();
 
             // or we can use the this:
-            // node.remoteCommand('start', p.id);
+            node.remoteCommand('start', p.id);
             
             room.startGame();
         });

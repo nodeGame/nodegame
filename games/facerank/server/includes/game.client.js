@@ -20,6 +20,8 @@ game.globals = {};
 stager.setOnInit(function() {
     console.log('INIT PLAYER!');
 
+    W.setup('PLAYER');
+
     var that = this;
     node.on.data('facerank', function(msg) {
         var leftSrc, rightSrc, data, imgLeft, imgRight;
@@ -37,7 +39,6 @@ stager.setOnInit(function() {
         console.log('created and updated pictures');
     });
 
- 
 });
 
 ///// STAGES and STEPS
@@ -65,6 +66,7 @@ var facerank = function() {
 stager.addStage({
     id: 'instructions',
     cb: function() {
+        W.loadFrame('/facerank/html/facepage.htm');
         console.log('instructions');
         return true;
     },
