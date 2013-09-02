@@ -56,7 +56,7 @@ module.exports = function(node, channel) {
             //tmpPlayerList.rebuildIndexes();
             room = channel.createGameRoom({
                 name: 'facerank',
-                playerList: tmpPlayerList,
+                clients: tmpPlayerList,
                 channel: channel,
                 logicPath: logicPath
             });
