@@ -14,6 +14,7 @@ var stepRules = ngc.stepRules;
 
 var stager = new Stager();
 
+var counter = 0;
 
 /**
  * This is a game that spawns sub-games
@@ -35,7 +36,7 @@ module.exports = function(node, channel) {
     stager.addStage({
         id: 'facerank',
         cb: function() {
-            console.log('facerank stage');
+            console.log('********************** facerank stage ' + counter++ + ' **********************');
             
             node.on('NEXT', function() {
                 var face, msg;
