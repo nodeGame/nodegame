@@ -18,7 +18,7 @@ module.exports = function(node, channel) {
         Stager: ngc.Stager,
         stepRules: ngc.stepRules
     });
-
+    
     // second parameter makes available to the required file its properties
     //var logic = channel.require(__dirname + '/includes/game.logic', {
     //    Stager: node.Stager,
@@ -53,7 +53,7 @@ module.exports = function(node, channel) {
             //var tmpPlayerList = new ngc.PlayerList(null, [p]);
             var tmpPlayerList = new ngc.PlayerList();
             tmpPlayerList.add(p);
-            //tmpPlayerList.rebuildIndexes();
+         
             room = channel.createGameRoom({
                 group: 'facerank',
                 playerList: tmpPlayerList,
