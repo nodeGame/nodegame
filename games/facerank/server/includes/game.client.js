@@ -19,7 +19,6 @@ game.globals = {};
 
 stager.setOnInit(function() {
     console.log('INIT PLAYER!');
-
     W.setup('PLAYER');
 
     var that = this;
@@ -46,19 +45,35 @@ stager.setOnInit(function() {
 var REPEAT = 10;
 
 var facerank = function() {
-    
-    // Clear current selections
-    // faces
-    W.getElementById('td_face_left').innerHTML = '';
-    W.getElementById('td_face_right').innerHTML = '';
-    // radios
-    W.getElementById('td_radio_left').innerHTML = '';
-    W.getElementById('td_radio_right').innerHTML = '';
-    // tags
-    W.getElementById('tag_left').value = '';
-    W.getElementById('tag_right').value = '';
-    
     console.log('facerank');
+    W.loadFrame('/facerank/html/facepage.htm', function() {
+        var next;
+
+        next = W.getElementById("doneButton");
+        next.disabled = "";
+
+        // Clear current selections
+        // faces
+        W.getElementById('td_face_left').innerHTML = '';
+        W.getElementById('td_face_right').innerHTML = '';
+        // radios
+        W.getElementById('td_radio_left').innerHTML = '';
+        W.getElementById('td_radio_right').innerHTML = '';
+        // tags
+        W.getElementById('tag_left').value = '';
+        W.getElementById('tag_right').value = '';
+
+        next.onclick = function() {
+            this.disabled = "disabled";
+            node.socket.send(node.msg.create({
+                text: 'NEXT',
+                data: {
+                    mydata: Math.random()
+                }
+            }));
+        };
+    });
+    return true;
 };
 
 
@@ -66,18 +81,26 @@ var facerank = function() {
 stager.addStage({
     id: 'instructions',
     cb: function() {
-        W.loadFrame('/facerank/html/facepage.htm');
         console.log('instructions');
+        W.loadFrame('/facerank/html/instructions.htm', function() {
+            var next;
+            next = W.getElementById("doneButton");
+            next.onclick = function() {
+                this.disabled = "disabled";
+                node.emit('DONE');
+            };
+        });
+        
         return true;
-    },
-    steprule: stepRules.SOLO
+    }
+    // steprule: stepRules.SOLO
 });
 
 
 stager.addStage({
     id: 'facerank',
-    cb: facerank,
-    steprule: stepRules.SOLO
+    cb: facerank
+    // steprule: stepRules.SOLO
 });
 
 // Now that all the stages have been added,

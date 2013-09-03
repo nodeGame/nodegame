@@ -38,16 +38,20 @@ module.exports = function(node, channel) {
         cb: function() {
             console.log('********************** facerank stage ' + counter++ + ' **********************');
             
-            node.on('NEXT', function() {
-                var face, msg;
-                face = ff.getNextFace();
+            node.on.data('NEXT', function(msg) {
+                console.log('*************************');
+                console.log('Received next', msg.data);
+                console.log('*************************');
                 
-                msg = node.msg.create({
-                    text: 'FACE',
-                    data: face.path
-                });
-                
-                node.socket.send(msg, 'ALL');
+//                var face, msg;
+//                face = ff.getNextFace();
+//                
+//                msg = node.msg.create({
+//                    text: 'FACE',
+//                    data: face.path
+//                });
+//                
+//                node.socket.send(msg, 'ALL');
             });
 
             node.on('EVA', function(msg) {
