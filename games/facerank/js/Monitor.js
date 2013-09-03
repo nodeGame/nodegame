@@ -2,10 +2,10 @@ function Monitor(node) {
     
     var stager = new node.Stager();
       
-    stager.setOnInit = function() {
+    stager.setOnInit(function() {
         console.log('INIT MONITOR!');
 	node.window.setup('MONITOR');
-    };
+    });
     
     stager.addStage({
         id: 'monitoring',
