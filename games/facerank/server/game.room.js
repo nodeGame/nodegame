@@ -55,7 +55,7 @@ module.exports = function(node, channel) {
          
             room = channel.createGameRoom({
                 group: 'facerank',
-                playerList: tmpPlayerList,
+                clients: tmpPlayerList,
                 channel: channel,
                 logicPath: logicPath
             });
