@@ -92,15 +92,15 @@ stager.addStage({
         });
         
         return true;
-    }
-    // steprule: stepRules.SOLO
+    },
+    steprule: stepRules.SOLO
 });
 
 
 stager.addStage({
     id: 'facerank',
-    cb: facerank
-    // steprule: stepRules.SOLO
+    cb: facerank,
+    steprule: stepRules.SOLO
 });
 
 // Now that all the stages have been added,

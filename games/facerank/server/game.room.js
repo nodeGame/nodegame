@@ -50,7 +50,6 @@ module.exports = function(node, channel) {
 	    node.remoteSetup('plot', p.id, client.plot);
             
             // create the object            
-            //var tmpPlayerList = new ngc.PlayerList(null, [p]);
             var tmpPlayerList = new ngc.PlayerList();
             tmpPlayerList.add(p);
          
@@ -61,10 +60,6 @@ module.exports = function(node, channel) {
                 logicPath: logicPath
             });
                    
-            // not existing at the moment
-            // the remoteCommand start on the client must be called
-            // room.start(); // .exec();
-
             // or we can use the this:
             node.remoteCommand('start', p.id);
             
@@ -79,6 +74,7 @@ module.exports = function(node, channel) {
     stager.init().loop('waiting');
 
     return {
+        nodename: 'wroom',
 	game_metadata: {
 	    name: 'wroom',
 	    version: '0.0.1'

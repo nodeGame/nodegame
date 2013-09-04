@@ -38,6 +38,13 @@ module.exports = function(node, channel) {
         cb: function() {
             console.log('********************** facerank stage ' + counter++ + ' **********************');
             
+
+            node.on('in.say.DATA', function(msg) {
+                console.log('*************************');
+                console.log(node.nodename + ': Received next', msg.data);
+                console.log('*************************');
+            });
+
             node.on.data('NEXT', function(msg) {
                 console.log('*************************');
                 console.log('Received next', msg.data);
@@ -66,6 +73,7 @@ module.exports = function(node, channel) {
     stager.init().next('facerank');
 
     return {
+        nodename: 'lgc' + counter,
         game_metadata: {
             name: 'facerank',
             version: '0.0.1'
