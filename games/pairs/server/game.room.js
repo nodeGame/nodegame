@@ -42,26 +42,33 @@ module.exports = function(node, channel) {
         console.log('********Initializing Game Room*****************');
 
         node.on.pconnect(function(p) {
-            var room;
+            var room, wRoom;
+
             console.log('-----------Player connected ' + p.id);
-	    // Setting metadata, settings, and plot
-            node.remoteSetup('game_metadata',  p.id, client.metadata);
-	    node.remoteSetup('game_settings', p.id, client.settings);
-	    node.remoteSetup('plot', p.id, client.plot);
-            
-            // create the object            
-            var tmpPlayerList = new ngc.PlayerList();
-            tmpPlayerList.add(p);
-         
+
+            wRoom = channel.waitingRoom.clients.player;
+            if (wRoom.size() < 2) return;
+
+            console.log('-----------We have two players');
+
+            var tmpPlayerList = wRoom.shuffle().limit(2);
+
             room = channel.createGameRoom({
-                group: 'facerank',
+                group: 'pairs',
                 clients: tmpPlayerList,
                 channel: channel,
                 logicPath: logicPath
             });
                    
-            // or we can use the this:
-            node.remoteCommand('start', p.id);
+	    // Setting metadata, settings, and plot
+            tmpPlayerList.each(function (p) {
+                node.remoteSetup('game_metadata',  p.id, client.metadata);
+                node.remoteSetup('game_settings', p.id, client.settings);
+                node.remoteSetup('plot', p.id, client.plot);
+                node.remoteSetup('env', p.id, client.env);
+
+                node.remoteCommand('start', p.id);
+            });
             
             room.startGame();
         });
