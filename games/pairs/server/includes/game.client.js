@@ -56,11 +56,20 @@ var pairs = function() {
         chat = W.getElementById('chat');
 
         send.onclick = function() {
+            // Send message to others in room:
             node.socket.send(node.msg.create({
+                to: 'ALL',
                 text: 'message',
                 data: input.value
             }));
-            chat.innerHTML = chat.innerHTML + '<br>' + input.value;
+
+            // Send message to ourselves for feedback:
+            node.socket.send(node.msg.create({
+                to: node.player.id,
+                text: 'message',
+                data: input.value
+            }));
+
             input.value = '';
         };
 
@@ -73,7 +82,8 @@ var pairs = function() {
 
         node.on('in.say.DATA', function(msg) {
             if (msg.text === 'message') {
-                chat.innerHTML = chat.innerHTML + '<br>' + msg.data;
+                chat.innerHTML = chat.innerHTML + msg.from + ': <strong>' +
+                                 msg.data + '</strong><br>';
             }
         });
 
