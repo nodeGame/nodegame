@@ -1,14 +1,15 @@
 var J = require('JSUS').JSUS;
 var path = require('path');
-var node = require('nodegame-client');
-node.setup('nodegame', {});
+var NDDB = require('NDDB').NDDB;
+//var node = require('nodegame-client');
+//node.setup('nodegame', {});
 
-var Database = require('nodegame-db').Database;
-var ngdb = new Database(node);
-var mdb = ngdb.getLayer('MongoDB', {
-    dbName: 'facerank_db',
-    collectionName: 'facerank_col'
-});
+//var Database = require('nodegame-db').Database;
+//var ngdb = new Database(node);
+//var mdb = ngdb.getLayer('MongoDB', {
+//    dbName: 'facerank_db',
+//    collectionName: 'facerank_col'
+//});
 
 var DIR = path.resolve(__dirname, '../faces');
 
@@ -120,26 +121,47 @@ var sessions = {
     }
 };
 
+var nddb = new NDDB();
+nddb.hash('ps', function(o) {
+    //debugger
+    return o.id + '_' + o.player;
+});
 
-mdb.connect(function() {
+//mdb.connect(function() {
     var count = 0;
     J.readdirRecursive(DIR, function(err, curFiles) {
         var i, filePath, dir, tmp, player, round, obj;
         // Last line
         if (curFiles === null) {
-            var db = mdb.getDbObj();
-            var collection = db.collection('facerank_col');
-
-            collection.find().toArray(function(err, data) {
-                console.log('data in facerank_col:', data[0]);
-                console.log();
-                
-                mdb.disconnect();
-                de = de
+//            var db = mdb.getDbObj();
+//            var collection = db.collection('facerank_col');
+//
+//            collection.find().toArray(function(err, data) {
+//                console.log('data in facerank_col:', data[0]);
+//                console.log();
+//                
+//                mdb.disconnect();
+//                de = de
+//            });
+            nddb.sort(function(o1, o2) {
+                if (o1.id < o2.id) return -1;
+                else return 1;
+                if (o1.player < o2.player) return -1;
+                else return 1;
+                if (o1.round < o2.round) return -1;
+                else return 1;
+                debugger
+                return 0;
             });
+            nddb.rebuildIndexes();
+            
+            //console.log(nddb.ps);
+            debugger
             return;
         }
+        console.log(curFiles.length);
         for (i = 0; i < curFiles.length; i++) {
+//        for (i = 0; i < 3; i++) {
             filePath = curFiles[i];
             tmp = filePath.split('/');
             dir = tmp[0];
@@ -156,9 +178,10 @@ mdb.connect(function() {
                 player: player,
                 round: round
             });
+            nddb.insert(obj);
             //console.log(obj);
-            //console.log(count++)
+            //console.log(count)
             //mdb.store(obj);
         }
     });
-});
+//});
