@@ -325,7 +325,7 @@ stager.addStage({
 stager.addStage({
     id: 'game',
     cb: gameplay,
-    steprule: 'SYNC_ALL'
+    steprule: 'SYNC_STEP'
 });
 
 stager.addStage({

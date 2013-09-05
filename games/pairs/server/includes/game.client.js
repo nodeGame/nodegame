@@ -120,7 +120,7 @@ stager.addStage({
 stager.addStage({
     id: 'pairs',
     cb: pairs,
-    steprule: stepRules.SYNC_ALL
+    steprule: stepRules.SYNC_STEP
 });
 
 // Now that all the stages have been added,
@@ -157,5 +157,5 @@ game.settings = {
 };
 
 game.env = {
-    auto: true
+    auto: false
 };
