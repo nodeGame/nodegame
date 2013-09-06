@@ -1,15 +1,16 @@
 var J = require('JSUS').JSUS;
 var path = require('path');
 var NDDB = require('NDDB').NDDB;
-//var node = require('nodegame-client');
-//node.setup('nodegame', {});
+var ngc = require('nodegame-client');
+var node = ngc.getClient();
+node.setup('nodegame', {});
 
-//var Database = require('nodegame-db').Database;
-//var ngdb = new Database(node);
-//var mdb = ngdb.getLayer('MongoDB', {
-//    dbName: 'facerank_db',
-//    collectionName: 'facerank_col'
-//});
+var Database = require('nodegame-db').Database;
+var ngdb = new Database(node);
+var mdb = ngdb.getLayer('MongoDB', {
+    dbName: 'facerank_db',
+    collectionName: 'facerank_sets_ordered'
+});
 
 var DIR = path.resolve(__dirname, '../faces');
 
@@ -104,7 +105,7 @@ var sessions = {
         after: 1,
         morn: 0,
         id: 14
-        
+
     },
     // 8 FEB 2013
     'com_choice_8_feb_2013': {
@@ -121,47 +122,67 @@ var sessions = {
     }
 };
 
-var nddb = new NDDB();
+var nddb = new NDDB({
+    update: { indexes: true }
+});
 nddb.hash('ps', function(o) {
-    //debugger
     return o.id + '_' + o.player;
 });
 
-//mdb.connect(function() {
+var dbSets = new NDDB()
+
+mdb.connect(function() {
+    
+    // Total count of files in all directories.
     var count = 0;
+    // Opens all directories of images (1 dir per session)
     J.readdirRecursive(DIR, function(err, curFiles) {
         var i, filePath, dir, tmp, player, round, obj;
-        // Last line
+        // All files opened.
         if (curFiles === null) {
-//            var db = mdb.getDbObj();
-//            var collection = db.collection('facerank_col');
-//
-//            collection.find().toArray(function(err, data) {
-//                console.log('data in facerank_col:', data[0]);
-//                console.log();
-//                
-//                mdb.disconnect();
-//                de = de
-//            });
-            nddb.sort(function(o1, o2) {
-                if (o1.id < o2.id) return -1;
-                else return 1;
-                if (o1.player < o2.player) return -1;
-                else return 1;
-                if (o1.round < o2.round) return -1;
-                else return 1;
-                debugger
-                return 0;
-            });
-            nddb.rebuildIndexes();
+            var ps, newObj, newCount;
+            newCount = 0;
+            // Creates a single obj out of every hash (session-player)
+            // The obj (newObj) contains general data (session, player, etc)
+            // and a new field called items that contains all the pictures
+            // made by that player sorted by round.
+            for ( ps in nddb.ps) {
+                if (nddb.ps.hasOwnProperty(ps)) {
+                    nddb.ps[ps].sort(function(o1, o2) {                      
+                        if (o1.id < o2.id) return -1;
+                        else if (o2.id < o1.id) return 1;
+                        if (o1.player < o2.player) return -1;
+                        else if (o2.player < o1.player) return 1;
+                        if (o1.round < o2.round) return -1;
+                        else if (o2.round < o1.round) return 1;
+                        return 0;
+                    });
+                    newObj = J.clone(nddb.ps[ps].first());
+                    delete newObj.file;
+                    delete newObj.path;
+                    newObj.count = ++newCount;
+                    newObj.items = nddb.ps[ps].fetchSubObj(['round', 'file', 'path']);
+
+                    // Storing the entry with ordered pictures of a player
+                    mdb.store(newObj);
+                }
+            }
             
-            //console.log(nddb.ps);
-            debugger
+            // Display data in collection and close db connection.
+            var db = mdb.getDbObj();
+            var collection = db.collection('facerank_sets_ordered');
+            collection.find().toArray(function(err, data) {
+                console.log('data in facerank_col:', data[0]);
+                console.log();
+
+                mdb.disconnect();
+            });
             return;
         }
-        console.log(curFiles.length);
+        
+        // For every file in set (full Dir or subset of dir)
+        // creates an object
         for (i = 0; i < curFiles.length; i++) {
-//        for (i = 0; i < 3; i++) {
             filePath = curFiles[i];
             tmp = filePath.split('/');
             dir = tmp[0];
@@ -178,10 +199,12 @@ nddb.hash('ps', function(o) {
                 player: player,
                 round: round
             });
+            
+            // Save into NDDB to reuse it later.
             nddb.insert(obj);
-            //console.log(obj);
-            //console.log(count)
+            
+            // Uncomment here to store every single picture
             //mdb.store(obj);
         }
     });
-//});
+});
