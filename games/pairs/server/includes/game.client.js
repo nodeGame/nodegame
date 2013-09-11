@@ -167,5 +167,5 @@ game.settings = {
 };
 
 game.env = {
-    auto: false
+    auto: true
 };

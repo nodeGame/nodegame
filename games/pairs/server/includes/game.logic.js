@@ -38,14 +38,8 @@ module.exports = function(node, channel) {
         cb: function() {
             console.log('********************** pairs stage ' + counter++ + ' **********************');
             
-
-            node.on('in.say.DATA', function(msg) {
-                console.log('*************************');
-                console.log(node.nodename + ': Received next', msg.data);
-                console.log('*************************');
-            });
-
-            node.on.data('NEXT', function(msg) {
+            node.on.data(function(msg) {
+                if (msg.text !== 'NEXT') return;
                 console.log('*************************');
                 console.log('Received next', msg.data);
                 console.log('*************************');
@@ -87,7 +81,7 @@ module.exports = function(node, channel) {
         },
         plot: stager.getState(),
         debug: true,
-        verbosity: 100
+        verbosity: 0
     };
 
 };

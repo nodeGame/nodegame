@@ -52,7 +52,9 @@ module.exports = function(node, channel) {
             console.log('-----------We have two players');
 
             var tmpPlayerList = wRoom.shuffle().limit(2);
-
+            debugger
+            //tmpPlayerList = new ngc.PlayerList();
+            //tmpPlayerList.importDB(wRoom.shuffle().limit(2).db);
             room = channel.createGameRoom({
                 group: 'pairs',
                 clients: tmpPlayerList,
@@ -91,7 +93,7 @@ module.exports = function(node, channel) {
 	},
 	plot: stager.getState(),
 	debug: true,
-	verbosity: 100
+	verbosity: 0
     };
 
 };
