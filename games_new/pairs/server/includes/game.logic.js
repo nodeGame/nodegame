@@ -56,7 +56,7 @@ module.exports = function(node, channel) {
             });
 
             node.on('in.set.DATA', function(msg) {
-                console.log('in.set.DATA received: memory size = ', node.game.memory.size());
+                // console.log('in.set.DATA received: memory size = ', node.game.memory.size());
             });
 
             node.on('EVA', function(msg) {
