@@ -10,7 +10,7 @@ var options = {
     servernode: function (servernode) {
         // TODO: check if the verbosity property here correctly affects the verbosity of the games in channels
 	servernode.verbosity = 100;
-	servernode.gamesDirs.push('./games');
+	servernode.gamesDirs.push('./games_new');
 	return true;
     },
     http: function (http) {

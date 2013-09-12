@@ -77,7 +77,7 @@ module.exports = function(node, channel) {
             version: '0.0.1'
         },
         game_settings: {
-            observer: false
+            publishLevel: 0
         },
         plot: stager.getState(),
         debug: true,

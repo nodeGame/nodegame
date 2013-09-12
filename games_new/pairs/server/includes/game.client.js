@@ -1,12 +1,14 @@
 /**
- * This file contains all the building blocks (functions, and configuration) that will be sent to the client
+ * This file contains all the building blocks (functions, and configuration)
+ * that will be sent to each connecting player.
  */
 
-var Stager = module.parent.exports.Stager;
-var stepRules = module.parent.exports.stepRules;
+var ngc = module.parent.exports.ngc;
+var Stager = ngc.Stager;
+var stepRules = ngc.stepRules;
+var constants = ngc.constants;
 
 var stager = new Stager();
-
 var game = {};
 
 module.exports = game;
@@ -163,9 +165,9 @@ game.metadata = {
 // Other settings, optional
 
 game.settings = {
-    observer: false
+    publishLevel: 2
 };
 
 game.env = {
-    auto: true
+    auto: false
 };

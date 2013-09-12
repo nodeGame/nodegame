@@ -15,17 +15,8 @@ module.exports = function(node, channel) {
 
     // second parameter makes available to the required file its properties
     var client = channel.require(__dirname + '/includes/game.client', {
-        Stager: ngc.Stager,
-        stepRules: ngc.stepRules
+        ngc: ngc
     });
-    
-    // second parameter makes available to the required file its properties
-    //var logic = channel.require(__dirname + '/includes/game.logic', {
-    //    Stager: node.Stager,
-    //    stepRules: node.stepRules,
-    //    mdb: mdb,
-    //    node: node
-    //});
 
     var waitingStage = {
         id: 'waiting',
@@ -52,7 +43,7 @@ module.exports = function(node, channel) {
             console.log('-----------We have two players');
 
             var tmpPlayerList = wRoom.shuffle().limit(2);
-            debugger
+            
             //tmpPlayerList = new ngc.PlayerList();
             //tmpPlayerList.importDB(wRoom.shuffle().limit(2).db);
             room = channel.createGameRoom({
@@ -89,7 +80,7 @@ module.exports = function(node, channel) {
 	    version: '0.0.1'
 	},
 	game_settings: {
-	    observer: false
+	    publishLevel: 0
 	},
 	plot: stager.getState(),
 	debug: true,
