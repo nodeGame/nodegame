@@ -37,7 +37,7 @@ var pairs = sn.addChannel({
 // We can load a game here
 var path = require('path');
 
-var logicPath = path.resolve('./games/pairs/server/game.room.js');
+var logicPath = path.resolve('./games_new/pairs/server/game.room.js');
 
 var room = pairs.createWaitingRoom({
     logicPath: logicPath
