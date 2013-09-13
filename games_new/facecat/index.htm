@@ -1,0 +1,48 @@
+<!doctype html>
+<title>My Game</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<link rel='stylesheet' href='./css/main.css'></link>
+<link rel='stylesheet' href='./css/evaluation.css'></link>
+<!-- end -->
+
+<body>
+<!-- <iframe id="mainframe" name="mainframe"></iframe> -->
+<script>
+  window.onload = function () {
+      
+      // Configuring nodegame
+      node.setup('nodegame', {
+	  // HOST needs to be specified only 
+	  // if this file is located in another server
+	  // host: http://myserver.com,	  
+	  verbosity: 100,
+	  debug: true,
+	  window: {
+	      promptOnleave: false
+              //transitions: true // not used for now (transitions are on by default)
+	  },
+	  env: {
+	      auto: false,
+	      debug: false
+	  },
+	  player: {
+	      name: "NodeGame Player", id: 'nodegame player id'
+	  },
+	  events: {
+	      dumpEvents: true
+	  },
+	  socket: {
+	      type: 'SocketIo',
+	      reconnect: false
+	  }
+      });
+      
+      // connecting
+      node.connect("/facerank");
+  }
+</script>
+</body>

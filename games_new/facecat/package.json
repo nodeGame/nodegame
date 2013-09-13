@@ -1,0 +1,33 @@
+{
+  "name": "facerank",
+  "description": "Ranks and tags faces",
+  "version": "0.0.1",
+  "author": {
+    "name": "Stefano Balietti",
+    "email": "sbalietti@ethz.ch",
+    "url": "http://www.nodegame.org"
+  }
+,
+  "main": "./index.html"
+,
+  "keywords": [
+    "testgame"
+  ]
+,
+  "license": "MIT/X11"
+,
+  "engines": {
+    "node": "*",
+    "nodegame": "0.2.0"
+  }
+,
+	"nodegame": {
+	   "logic": "./server/logic.js",
+	   "dependencies": {
+	     "not_used": "for now"
+	   },
+	   "widgets": {
+	     "moneytalk": "0.1.0"
+	   }
+	}
+}

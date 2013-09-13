@@ -1,0 +1,76 @@
+<!doctype html>
+<title>My Game</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<link rel='stylesheet' href='/facerank/css/main.css'></link>
+<link rel='stylesheet' href='/facerank/css/evaluation.css'></link>
+<!-- end -->
+
+<body>
+<div id="root" style="display:none">
+  15*9*30= 4050 + 1*9*26= 234 , tot = 4284 + extra session = 270, very tot = 4554
+  
+  which painting is better for in absolute
+  which painting is better as a face
+  which painting is better as a non-face, resembling something else concrete (car, dick, boobs, bird...)
+  which painting is better as a purely abstract forms
+  give a tag (car, happy, sad, bigeyed, bodypart, abstract)
+  shall we make all of the same color, or keep original colors
+</div>
+<table id="facerank_table">
+<tr>
+  <td colspan="2" id="taskDescription">
+     Click on the picture that you like most, and then complete the forms below.
+  </td>
+<tr>
+  <td id="td_face_left"><img class="face" src="/facerank/faces/com_choice_25_jan_2013/02_9.png" /></td>
+  <td id="td_face_right"><img class="face" src="/facerank/faces/com_choice_25_jan_2013/02_10.png" /></td>
+</tr>
+<!-- <tr>
+  <td><button id="moreBeautiful_Left" class="moreBeautiful" >More Beautiful</button>
+  <td><button id="moreBeautiful_Right" class="moreBeautiful" >More Beautiful</button>
+</tr>
+-->
+<tr>
+  <td id="td_radio_left">
+    Which one of the following categories fits more the picture above?
+    <radio group="category_Left">
+      <dl>
+        <dt><input type="radio" name="category_Left">Human face</input></dt>
+        <dt><input type="radio" name="category_Left">Non-human face</input></dt>
+        <dt><input type="radio" name="category_Left">Abstract lines</input></dt>
+        <dt><input type="radio" name="category_Left">Any other known object</input></dt>
+      </dl>
+    </radio>
+  </td>
+  <td id="td_radio_right">
+     Which one of the following categories fits more the picture above?
+    <radio group="category_Right">
+      <dl>
+        <dt><input type="radio" name="category_Right">Human face</input></dt>
+        <dt><input type="radio" name="category_Right">Non-human face</input></dt>
+        <dt><input type="radio" name="category_Right">Abstract lines</input></dt>
+        <dt><input type="radio" name="category_Right">Any other known object</input></dt>
+      </dl>
+    </radio>
+  </td>
+</tr>
+<tr>
+  <td>
+    <label for="tag_Left">Write one or more words describing the picture above. Use comma as separator. </label><br/>
+    <input type="text" id="tag_left" class="tag"/>
+  </td>
+  <td>
+    <label for="tag_Right">Write one or more words describing the picture above. Use comma as separator. </label><br/>
+    <input type="text" id="tag_right" class="tag"/>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <button id="doneButton">Click here to review the next pictures</button>
+  </td>
+</tr>
+
+</table>
+</body>

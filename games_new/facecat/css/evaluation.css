@@ -1,0 +1,22 @@
+ul {
+    margin: 10px;
+}
+
+div#container_evaluation {
+    float: left;
+    width: auto;
+}
+
+div#container_done {
+    float: right;
+    height: 100px;
+    width: 400px;
+    border: 0;
+    padding:0;
+    padding-top: 300px;
+    background: white;
+}
+
+table.reviewBox {
+    float: left;
+}
