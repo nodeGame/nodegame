@@ -1,7 +1,7 @@
 {
-  "name": "facerank",
-  "description": "Ranks and tags faces",
-  "version": "0.0.1",
+  "name": "facecat",
+  "description": "Tags faces",
+  "version": "0.0.2",
   "author": {
     "name": "Stefano Balietti",
     "email": "sbalietti@ethz.ch",

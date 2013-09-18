@@ -22,54 +22,122 @@ stager.setOnInit(function() {
     console.log('** INIT PLAYER! **');
     W.setup('PLAYER');
     this.counter = 0;
-
-    function showFace(data) {
-        var faceImg;
-        faceImg = W.getElementById('face');
-        faceImg.src = this.faces.items[counter++];
-    }
-    var that = this;
-    node.on.data('FACES', function(msg) {
-        if (!msg.data) return;
-        this.counter = 0;
-        this.faces = msg.data;
-        this.faces
-    });
-
+    this.faces = {};
 });
 
 ///// STAGES and STEPS
 
 var REPEAT = 10;
 
-var facerank = function() {
-    console.log('facerank');
-    W.loadFrame('/facerank/html/facepage.htm', function() {
-        var next;
-
-        next = W.getElementById("doneButton");
-        next.disabled = "";
-
-        next.onclick = function() {
-            next.disabled = "disabled";
-            node.socket.send(node.msg.create({
-                text: 'NEXT',
-                data: {
-                    mydata: Math.random()
-                }
-            }));
+var facecat = function() {
+    console.log('facecat');
+    W.loadFrame('/facecat/html/facepage.htm', function() {
+        var next, faceImg, td, dlcat, tagTr, inputTag;
+        var translate_radio = {
+            'radio_hface': 'Human face',
+            'radio_nhface': 'Non-human face',
+            'radio_abstract': 'Abstract lines',
+            'radio_other': 'Any other known object or shape'
         };
+
+        var chosen_cat;
+       
+        node.on('radio', function(radio) {
+            chosen_cat = radio.id;
+            console.log('chosen ' + chosen_cat);
+            selectedSpan.innerHTML = translate_radio[chosen_cat];
+            displayTags();
+        });
+
+        node.on('undo_radio', function(radio) {
+            console.log('undoing ' + chosen_cat);
+            chosen_cat = null;
+            selectedSpan.innerHTML = '';
+            displayCats();
+        });
+
+        function displayTags() {
+            td.style.display = 'none';
+            tagInput.value = '';
+            tagTr.style.display = '';
+            next.disabled = false;
+            next.innerHTML = 'Next';
+        }
+
+        function displayFace() {
+            var order;
+            imgPath = node.game.faces.items[node.game.counter++].path;
+            faceImg.src = '/facecat/faces/' + imgPath;
+            console.log(imgPath);
+            
+            displayCats()
+        }
+            
+        function displayCats() {
+            td.style.display = '';
+
+            next.disabled = true;
+            next.innerHTML = 'Select a category';
+            tagTr.style.display = 'none';
+            order = JSUS.sample(0,3);
+            JSUS.shuffleNodes(dlcat, order);
+        }
+
+        function onNextFaces(faces) {
+            var imgPath;
+            console.log('******* AAH! received NEXT from server');
+            if ('object' !== typeof faces) {
+                console.log('**** Weird: wrong faces! ');
+                return;
+            }
+            else {
+                console.log(faces);
+            }
+            node.game.counter = 0;
+            node.game.faces = faces;
+            
+            displayFace();
+        }
+        
+        function askForNext() {
+            //next.disabled = true;
+            if (!node.game.faces.items || node.game.counter >= node.game.faces.items.length) {
+                node.get('NEXT', onNextFaces);
+            }
+            else {
+                displayFace();
+            }
+        }
+        
+        // Elements of the page.
+        
+        // Next button.
+        next = W.getElementById("doneButton");
+        
+        // Img.
+        faceImg = W.getElementById('face');
+        
+        // Categories.
+        td = W.getElementById('td_radio');
+        dlcat = W.getElementById('dlcat');
+        
+        // Tags
+        selectedSpan = W.getElementById('radio_selected');
+        tagTr = W.getElementById('trtags');
+        tagInput = W.getElementById('tag');
+
+        // Click!
+        next.onclick = askForNext;
+        next.click();
     });
     return true;
 };
-
-
 
 stager.addStage({
     id: 'instructions',
     cb: function() {
         console.log('instructions');
-        W.loadFrame('/facerank/html/instructions.htm', function() {
+        W.loadFrame('/facecat/html/instructions.htm', function() {
             var next;
             next = W.getElementById("doneButton");
             next.onclick = function() {
@@ -85,8 +153,8 @@ stager.addStage({
 
 
 stager.addStage({
-    id: 'facerank',
-    cb: facerank,
+    id: 'facecat',
+    cb: facecat,
     steprule: stepRules.SOLO
 });
 
@@ -95,7 +163,7 @@ stager.addStage({
 
 stager.init()
     .next('instructions')
-    .repeat('facerank', REPEAT)
+    .repeat('facecat', REPEAT)
     .gameover();
 
 stager.setOnGameOver(function() {
@@ -108,7 +176,7 @@ game.plot = stager.getState();
 // Let's add the metadata information
 
 game.metadata = {
-    name: 'facerank',
+    name: 'facecat',
     version: '0.0.2',
     session: 1,
     description: 'no descr'

@@ -20,14 +20,14 @@ module.exports = function(node, channel) {
 
     // Loads the sets of faces to send to players.
     var sets;
-    mdb.connect(function() {
-        var db = mdb.getDbObj();
+    mdbLoad.connect(function() {
+        var db = mdbLoad.getDbObj();
         var collection = db.collection('facerank_sets_ordered');
         collection.find().toArray(function(err, data) {
             console.log('data in facerank_col:', data[0]);
             console.log();
             sets = data;
-            mdb.disconnect();
+            mdbLoad.disconnect();
         });
     });
     
@@ -45,13 +45,13 @@ module.exports = function(node, channel) {
     var counter = 0;
 
     // Creating the Stager object to define the game.
-    var stager = new ngc.Stager();
+    var stager = new node.Stager();
 
     // Loading the game to send to each connecting client.
     // Second parameter makes available to the required file its properties.
     var client = channel.require(__dirname + '/includes/game.client', {
-        Stager: ngc.Stager,
-        stepRules: ngc.stepRules
+        Stager: node.Stager,
+        stepRules: node.stepRules
     });
     
     // Create one waiting stage where everything will happen.
@@ -81,13 +81,15 @@ module.exports = function(node, channel) {
             // Start the game on the client.
             node.remoteCommand('start', p.id);
         });
-
-        node.on.data('NEXT', function(msg) {
-            node.say('FACES', msg.from, sets[counter++]);
-            // Send a series of faces
-            // Saves who got which series
-            
+        
+        // Sends the faces (reply to a GET request from client.
+        node.on('NEXT', function(msg) {
+            return sets[counter++];
         });
+
+//        node.on.data('NEXT', function(msg) {
+//            return sets[counter++];
+//        });
 
         node.on.data('CAT', function(msg) {
             if (!msg.from) {

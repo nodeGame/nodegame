@@ -13,6 +13,44 @@
 <!-- <iframe id="mainframe" name="mainframe"></iframe> -->
 <script>
   window.onload = function () {
+  J = JSUS;
+  JSUS.sample = function(a, b) {
+        var out;
+        out = JSUS.seq(a,b)
+        if (!out) return false;
+        return JSUS.shuffle(out);
+    }
+
+  JSUS.shuffleNodes = function(parent, order) {
+        var i, len;
+        if (!JSUS.isNode(parent)) {
+            throw new TypeError('DOM.shuffleNodes: parent must node.');
+        }
+        if (!parent.children || !parent.children.length) {
+            JSUS.log('DOM.shuffleNodes: parent has no children.', 'ERR');
+            return false;
+        }
+        if (order) {
+            if (!J.isArray(order)) {
+                throw new TypeError('DOM.shuffleNodes: order must array.');
+            }
+            if (order.length !== parent.children.length) {
+                throw new Error('DOM.shuffleNodes: order length must match ' + 
+                                'the number of children nodes.');
+            }
+        }
+
+        len = parent.children.length;
+        if (!order) order = JSUS.sample(0,len);
+        for (i = 0 ; i < len; i++) {
+            parent.appendChild(parent.children[order[i]]);
+        }
+        
+        return true;
+    };
+
+
+
       
       // Configuring nodegame
       node.setup('nodegame', {
@@ -42,7 +80,7 @@
       });
       
       // connecting
-      node.connect("/facerank");
+      node.connect("/facecat");
   }
 </script>
 </body>

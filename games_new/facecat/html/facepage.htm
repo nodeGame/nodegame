@@ -3,8 +3,7 @@
 
 <!-- Loading  nodeGame libraries and CSS -->
 <link rel='stylesheet' href='/stylesheets/player.css'></link>
-<link rel='stylesheet' href='/facerank/css/main.css'></link>
-<link rel='stylesheet' href='/facerank/css/evaluation.css'></link>
+<link rel='stylesheet' href='/facecat/css/main.css'></link>
 <!-- end -->
 
 <body>
@@ -18,59 +17,42 @@
   give a tag (car, happy, sad, bigeyed, bodypart, abstract)
   shall we make all of the same color, or keep original colors
 </div>
-<table id="facerank_table">
+<table id="facecat_table">
 <tr>
-  <td colspan="2" id="taskDescription">
-     Click on the picture that you like most, and then complete the forms below.
-  </td>
-<tr>
-  <td id="td_face_left"><img class="face" src="/facerank/faces/com_choice_25_jan_2013/02_9.png" /></td>
-  <td id="td_face_right"><img class="face" src="/facerank/faces/com_choice_25_jan_2013/02_10.png" /></td>
+  <td id="td_face"><img class="face" id="face" src="/facecat/faces/loading.gif" /></td>
 </tr>
-<!-- <tr>
-  <td><button id="moreBeautiful_Left" class="moreBeautiful" >More Beautiful</button>
-  <td><button id="moreBeautiful_Right" class="moreBeautiful" >More Beautiful</button>
-</tr>
--->
-<tr>
-  <td id="td_radio_left">
-    Which one of the following categories fits more the picture above?
-    <radio group="category_Left">
-      <dl>
-        <dt><input type="radio" name="category_Left">Human face</input></dt>
-        <dt><input type="radio" name="category_Left">Non-human face</input></dt>
-        <dt><input type="radio" name="category_Left">Abstract lines</input></dt>
-        <dt><input type="radio" name="category_Left">Any other known object</input></dt>
+<tr id="trcat">
+  <td id="td_radio">
+    Which category do you find more adequate to describe the picture above?
+    <radio group="category_Left" id="radiocat">
+      <dl id="dlcat">
+        <dt><input type="radio" id="radio_hface" name="category" onclick="javascript:parent.node.emit('radio', this);">Human face</input></dt>
+        <dt><input type="radio" id="radio_nhface" name="category" onclick="javascript:parent.node.emit('radio', this);">Non-human face</input></dt>
+        <dt><input type="radio" id="radio_abstract" name="category" onclick="javascript:parent.node.emit('radio', this);">Abstract lines</input></dt>
+        <dt><input type="radio" id="radio_other" name="category" onclick="javascript:parent.node.emit('radio', this);">Any other known object or shape</input></dt>
       </dl>
     </radio>
   </td>
-  <td id="td_radio_right">
-     Which one of the following categories fits more the picture above?
-    <radio group="category_Right">
-      <dl>
-        <dt><input type="radio" name="category_Right">Human face</input></dt>
-        <dt><input type="radio" name="category_Right">Non-human face</input></dt>
-        <dt><input type="radio" name="category_Right">Abstract lines</input></dt>
-        <dt><input type="radio" name="category_Right">Any other known object</input></dt>
-      </dl>
-    </radio>
+ 
+</tr>
+<tr id="trtags" style="display: none">
+  <td>
+    You have selected: <strong><span id="radio_selected"></span></strong> 
+    <a href="#" onclick="javascript:parent.node.emit('undo_radio');">(Cancel)</a>
+    <br/><br/>
+    <label id="label" for="tag">
+      You can now write some some words (tags) to describe the picture above as compared to other potential picture in the same category that you have chosen. 
+      <br/><br/>
+      Good words make easy to distinguish two pictures in the same category. Do not write sentences, just nouns, adjectives, or adjectives plus nouns. Use comma to separate tags.
+    </label>
+    <br/><br/>
+    <input type="text" id="tag" class="tag"/>
   </td>
 </tr>
 <tr>
   <td>
-    <label for="tag_Left">Write one or more words describing the picture above. Use comma as separator. </label><br/>
-    <input type="text" id="tag_left" class="tag"/>
-  </td>
-  <td>
-    <label for="tag_Right">Write one or more words describing the picture above. Use comma as separator. </label><br/>
-    <input type="text" id="tag_right" class="tag"/>
+    <button id="doneButton">Next</button>
   </td>
 </tr>
-<tr>
-  <td colspan="2">
-    <button id="doneButton">Click here to review the next pictures</button>
-  </td>
-</tr>
-
 </table>
 </body>

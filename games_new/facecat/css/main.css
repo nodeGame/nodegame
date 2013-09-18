@@ -1,49 +1,36 @@
-img.face {
-    width: 300px;
-    border: 3px solid #CCC;
-}
+/* facecat table */
 
-img.face:hover {
-    border: 3px solid red;
-}
-
-table#facerank_table {
+table#facecat_table {
     border: 3px solid #CCC;
     border-spacing: 0;
     margin: auto;
     font: "Arial, Verdana, Sans";
 }
 
-table#facerank_table td {
+table#facecat_table td {
     width: 306px;
     padding: 20px;
     padding-top: 0;
     background: #DADCCB;
+    margin: auto;
 }
 
-table#facerank_table td#taskDescription {
+table#facecat_table td#td_face {
+    text-align: center;
+}
+
+table#facecat_table td#taskDescription {
     padding-top: 20px;
 }
 
-table#facerank_table button#doneButton {
+table#facecat_table button#doneButton {
     font-size: 20px;
     width: 652px;
     height: 50px;
     border: 3px solid #CCC;
 }
 
-
-table#facerank_table dt {
-    margin-left: 30px;
-    margin-bottom: 5px;
-}
-
-button.moreBeautiful {
-    width: 300px;
-    height: 50px;
-    font-size: 20px;
-    border: 3px solid #CCC;
-}
+/* other */
 
 input.tag {
     height: 30px;
@@ -51,3 +38,31 @@ input.tag {
     border: 3px solid #CCC;
     font-size: 14px;
 }
+
+img.face {
+    width: 300px;
+    border: 3px solid #CCC;
+    margin: auto;
+    margin-top: 20px;
+    background: white;
+}
+
+
+ul {
+    margin: 10px;
+}
+
+dl dt {
+    margin-top: 10px;
+}
+
+div#container_done {
+    float: right;
+    height: 100px;
+    width: 400px;
+    border: 0;
+    padding:0;
+    padding-top: 300px;
+    background: white;
+}
+
