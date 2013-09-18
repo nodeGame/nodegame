@@ -29,6 +29,7 @@ module.exports = function(node, channel) {
     stager.addStage(waitingStage);
 
     stager.setOnInit(function() {
+        var counter = 0;
 
         console.log('********Initializing Game Room*****************');
 
@@ -44,15 +45,13 @@ module.exports = function(node, channel) {
 
             var tmpPlayerList = wRoom.shuffle().limit(2);
             
-            //tmpPlayerList = new ngc.PlayerList();
-            //tmpPlayerList.importDB(wRoom.shuffle().limit(2).db);
             room = channel.createGameRoom({
                 group: 'pairs',
                 clients: tmpPlayerList,
                 channel: channel,
                 logicPath: logicPath
             });
-                   
+            
 	    // Setting metadata, settings, and plot
             tmpPlayerList.each(function (p) {
                 node.remoteSetup('game_metadata',  p.id, client.metadata);
@@ -64,6 +63,18 @@ module.exports = function(node, channel) {
             });
             
             room.startGame();
+            
+            // Send room number to admin
+            channel.admin.socket.send2roomAdmins(node.msg.create({
+                target: node.constants.target.TXT,
+                text: 'ROOMNO',
+                data: {
+                    roomNo: counter,
+                    pids: room.clients.player.id.getAllKeys(),
+                    aids: room.clients.admin.id.getAllKeys()
+                }
+            }), room);
+            counter ++;
         });
     });
 

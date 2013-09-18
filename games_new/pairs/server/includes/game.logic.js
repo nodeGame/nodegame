@@ -43,16 +43,6 @@ module.exports = function(node, channel) {
                 console.log('*************************');
                 console.log('Received next', msg.data);
                 console.log('*************************');
-                
-//                var face, msg;
-//                face = ff.getNextFace();
-//                
-//                msg = node.msg.create({
-//                    text: 'FACE',
-//                    data: face.path
-//                });
-//                
-//                node.socket.send(msg, 'ALL');
             });
 
             node.on('in.set.DATA', function(msg) {
