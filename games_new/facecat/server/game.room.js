@@ -37,6 +37,8 @@ module.exports = function(node, channel) {
         collectionName: 'facecats'
     });
 
+    // Opening the database for writing.
+    mdbWrite.connect(function(){});
 
     // 2. Defining the single player game.
 
@@ -90,51 +92,51 @@ module.exports = function(node, channel) {
 //        node.on.data('NEXT', function(msg) {
 //            return sets[counter++];
 //        });
-
-        node.on.data('CAT', function(msg) {
-            if (!msg.from) {
-                // Log error.
-                msg.from = 'NA';
-            }
-            if (!msg.data) {
-                // Log error.
-                return;
-            }
-            if (!msg.data.round) {
-                // Log and continue
-                msg.data.round = 'NA';
-            }
-            if (!msg.data.session) {
-                // Log and continue
-                msg.data.session = 'NA';
-            }
-            if (!msg.data.player) {
-                // Log and continue
-                msg.data.player = 'NA';
-            }
-            if (!msg.data.cat) {
-                // Log and continue
-                msg.data.cat = 'NA';
-            }
-            if (!msg.data.tags) {
-                // Log and continue
-                msg.data.tags = ['NA'];
-            }
-            if (!msg.data.id) {
-                // Log and continue
-                msg.data.id = 'NA';
-            }
+        
+        node.on.data('cat',function(msg) {
+            console.log('**** Received a CAT! ***');
+            console.log(msg.data);
+//            if (!msg.from) {
+//                // Log error.
+//                msg.from = 'NA';
+//            }
+//            if (!msg.data) {
+//                // Log error.
+//                return;
+//            }
+//            if (!msg.data.round) {
+//                // Log and continue
+//                msg.data.round = 'NA';
+//            }
+//            if (!msg.data.session) {
+//                // Log and continue
+//                msg.data.session = 'NA';
+//            }
+//            if (!msg.data.player) {
+//                // Log and continue
+//                msg.data.player = 'NA';
+//            }
+//            if (!msg.data.cat) {
+//                // Log and continue
+//                msg.data.cat = 'NA';
+//            }
+//            if (!msg.data.tags) {
+//                // Log and continue
+//                msg.data.tags = ['NA'];
+//            }
+//            if (!msg.data.id) {
+//                // Log and continue
+//                msg.data.id = 'NA';
+//            }
             
-            mdbWrite.store({
-                from: msg.from,
-                round: msg.data.round,
-                session: msg.data.sesion,
-                player: msg.data.player,
-                cat: msg.data.cat,
-                tags: msg.data.tags,
-                id: msg.data.id
-            });
-               
+            console.log('Writing!!!');
+            mdbWrite.store(msg.data);
+
+        });
+
+        node.on('sample', function(msg) {
+            console.log('**** Received a get SAMPLE! ***');
+            return sets[counter].items.concat(sets[(counter+1)].items);
         });
 
     });

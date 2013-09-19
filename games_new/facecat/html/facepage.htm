@@ -26,10 +26,10 @@
     Which category do you find more adequate to describe the picture above?
     <radio group="category_Left" id="radiocat">
       <dl id="dlcat">
-        <dt><input type="radio" id="radio_hface" name="category" onclick="javascript:parent.node.emit('radio', this);">Human face</input></dt>
-        <dt><input type="radio" id="radio_nhface" name="category" onclick="javascript:parent.node.emit('radio', this);">Non-human face</input></dt>
-        <dt><input type="radio" id="radio_abstract" name="category" onclick="javascript:parent.node.emit('radio', this);">Abstract lines</input></dt>
-        <dt><input type="radio" id="radio_other" name="category" onclick="javascript:parent.node.emit('radio', this);">Any other known object or shape</input></dt>
+        <dt id="dt_hface" onclick="javascript:parent.node.emit('radio', this);"><input  id="radio_hface"type="radio" name="category">Human face</input></dt>
+        <dt id="dt_nhface" onclick="javascript:parent.node.emit('radio', this);"><input type="radio" name="category" id="radio_nhface">Non-human face</input></dt>
+        <dt id="dt_abstract" onclick="javascript:parent.node.emit('radio', this);"><input type="radio" id="radio_abstract" name="category">Abstract lines</input></dt>
+        <dt id="dt_other"  onclick="javascript:parent.node.emit('radio', this);"><input type="radio" id="radio_other" name="category">Any other known object or shape</input></dt>
       </dl>
     </radio>
   </td>
@@ -37,13 +37,13 @@
 </tr>
 <tr id="trtags" style="display: none">
   <td>
-    You have selected: <strong><span id="radio_selected"></span></strong> 
-    <a href="#" onclick="javascript:parent.node.emit('undo_radio');">(Cancel)</a>
+    What type of <strong><span id="radio_selected"></span></strong> is this ?
+    <a href="#" onclick="javascript:parent.node.emit('undo_radio');">(Back)</a>
     <br/><br/>
     <label id="label" for="tag">
-      You can now write some some words (tags) to describe the picture above as compared to other potential picture in the same category that you have chosen. 
+      Write some words to best describe the salient features of the picture.
       <br/><br/>
-      Good words make easy to distinguish two pictures in the same category. Do not write sentences, just nouns, adjectives, or adjectives plus nouns. Use comma to separate tags.
+      Do not write sentences, just nouns, adjectives, or adjective plus noun. Use comma (,) as separator.
     </label>
     <br/><br/>
     <input type="text" id="tag" class="tag"/>

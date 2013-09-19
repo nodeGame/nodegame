@@ -20,7 +20,7 @@ game.globals = {};
 
 stager.setOnInit(function() {
     console.log('** INIT PLAYER! **');
-    W.setup('PLAYER');
+    W.setup('SOLO_PLAYER');
     this.counter = 0;
     this.faces = {};
 });
@@ -34,17 +34,18 @@ var facecat = function() {
     W.loadFrame('/facecat/html/facepage.htm', function() {
         var next, faceImg, td, dlcat, tagTr, inputTag;
         var translate_radio = {
-            'radio_hface': 'Human face',
-            'radio_nhface': 'Non-human face',
-            'radio_abstract': 'Abstract lines',
-            'radio_other': 'Any other known object or shape'
+            'hface': 'Human face',
+            'nhface': 'Non-human face',
+            'abstract': 'Abstract lines',
+            'other': 'Any other known object or shape'
         };
 
         var chosen_cat;
-       
+        
         node.on('radio', function(radio) {
-            chosen_cat = radio.id;
-            console.log('chosen ' + chosen_cat);
+            console.log(radio)
+            chosen_cat = radio.id.substr(3);
+            console.log('chosen: ' + chosen_cat);
             selectedSpan.innerHTML = translate_radio[chosen_cat];
             displayTags();
         });
@@ -65,17 +66,19 @@ var facecat = function() {
         }
 
         function displayFace() {
-            var order;
+            var imgPath;
             imgPath = node.game.faces.items[node.game.counter++].path;
             faceImg.src = '/facecat/faces/' + imgPath;
             console.log(imgPath);
             
             displayCats()
         }
-            
+        
         function displayCats() {
             td.style.display = '';
-
+            if (chosen_cat) {
+                W.getElementById('radio_' + chosen_cat).checked = false;
+            }
             next.disabled = true;
             next.innerHTML = 'Select a category';
             tagTr.style.display = 'none';
@@ -84,7 +87,6 @@ var facecat = function() {
         }
 
         function onNextFaces(faces) {
-            var imgPath;
             console.log('******* AAH! received NEXT from server');
             if ('object' !== typeof faces) {
                 console.log('**** Weird: wrong faces! ');
@@ -100,11 +102,25 @@ var facecat = function() {
         }
         
         function askForNext() {
-            //next.disabled = true;
-            if (!node.game.faces.items || node.game.counter >= node.game.faces.items.length) {
+            var tags, faces;
+            faces = node.game.faces;
+            if (!faces.items || node.game.counter >= faces.items.length) {
                 node.get('NEXT', onNextFaces);
             }
             else {
+                tags = tagInput.value.trim().split(',');
+                var obj =  {
+                    session: faces.id, 
+                    player: faces.player,
+                    round: faces.items[node.game.counter].round,
+                    morn: faces.morn,
+                    path: faces.items[node.game.counter].path,
+                    count: faces.count,
+                    cat: chosen_cat,
+                    tags: tags
+                };
+                console.log(obj);
+                node.set('cat',obj);
                 displayFace();
             }
         }
@@ -133,21 +149,71 @@ var facecat = function() {
     return true;
 };
 
-stager.addStage({
-    id: 'instructions',
-    cb: function() {
-        console.log('instructions');
-        W.loadFrame('/facecat/html/instructions.htm', function() {
-            var next;
-            next = W.getElementById("doneButton");
-            next.onclick = function() {
-                this.disabled = "disabled";
-                node.emit('DONE');
-            };
+function instructionsText() {
+    console.log('instructions');
+    W.loadFrame('/facecat/html/instructions.htm', function() {
+        var next, sampleDiv;
+        
+        sampleDiv = W.getElementById("sample");
+        next = W.getElementById("doneButton");
+        next.onclick = function() {
+            this.disabled = "disabled";
+            node.emit('DONE');
+        };
+
+        
+        // Preloading the sample
+        node.get('sample', function(sample) {
+            var i = -1, len = sample.length;
+            var imgPath, img;
+            console.log(sample);
+            for(; ++i < len;){
+                imgPath = sample[i].path;
+                img = document.createElement('img');
+                img.src = '/facecat/faces/' + imgPath;
+                img.className = 'imgSample';
+                sampleDiv.appendChild(img);
+            }
+            
         });
         
-        return true;
-    },
+    });
+    
+    
+    return true;
+}
+
+function sample() {
+    console.log('*** sample ! ***');
+    var sampleDiv, instructions, next;
+        
+    next = W.getElementById("doneButton");
+    next.disabled = false;
+    instructions = W.getElementById("instructions");
+    sampleDiv = W.getElementById("sample");
+    instructions.style.display = 'none';
+    sampleDiv.style.display = '';
+    return true;
+    
+}
+
+stager.addStep({
+    id: 'instructionsText',
+    cb: instructionsText
+});
+
+stager.addStep({
+    id: 'sample',
+    cb: sample
+});
+
+// TODO: when the stager adds the name of a step that is invalid
+// for example it contains a typo, the error msg is not clear.
+// Stager.addStage: invalid stage received. -> too generic
+
+stager.addStage({
+    id: 'instructions',
+    steps: ['instructionsText', 'sample'],
     steprule: stepRules.SOLO
 });
 
