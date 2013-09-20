@@ -8,7 +8,7 @@ table#facecat_table {
 }
 
 table#facecat_table td {
-    width: 306px;
+    /* width: 306px; */
     padding: 20px;
     padding-top: 0;
     background: #DADCCB;
@@ -23,12 +23,6 @@ table#facecat_table td#taskDescription {
     padding-top: 20px;
 }
 
-table#facecat_table button#doneButton {
-    font-size: 20px;
-    width: 652px;
-    height: 50px;
-    border: 3px solid #CCC;
-}
 
 /* other */
 
@@ -37,7 +31,7 @@ input.tag {
     padding-left: 5px;
     padding-right: 5px;
     height: 40px;
-    width: 652px;
+    width: 98%;
     border: 3px solid #CCC;
     font-size: 14px;
 }
@@ -55,18 +49,22 @@ ul {
     margin: 10px;
 }
 
-dl dt {
+td#td_radio dl dt {
     margin-top: 10px;
+    margin-left: 20px;
+    font-size: 20px;
+    cursor: pointer;
 }
-dt:hover {
+
+td#td_radio dt:hover {
     font-weight: bold;
+    background: #FFD;
 }
 
 
 div#container_done {
-    float: right;
     height: 100px;
-    width: 400px;
+    width: 98%;
     border: 0;
     padding:0;
     padding-top: 300px;

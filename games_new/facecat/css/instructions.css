@@ -1,8 +1,28 @@
+/* Instructions css */
+
+div#root {
+    border: 3px solid #CCC;
+    background: #DADCCB;
+    padding: 20px;
+}
 
 img.imgSample {
     width: 100px;
     border: 1px solid #CCC;
-    margin: 10px;
+    margin: 30px;
     background: white;
 }
 
+dl#instrcat {
+    margin: 40px 5px 40px 20px;
+    padding-left: 10px;
+}
+
+dl#instrcat dt {
+    margin-left: 30px 5px 20px 20px;
+    font-weight: bold;
+}
+
+dl#instrcat dd {
+    margin: 5px 5px 20px 20px;
+}

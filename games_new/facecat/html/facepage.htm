@@ -2,6 +2,7 @@
 <title>My Game</title>
 
 <!-- Loading  nodeGame libraries and CSS -->
+<!-- CSS needs to be reloaded in each iframe -->
 <link rel='stylesheet' href='/stylesheets/player.css'></link>
 <link rel='stylesheet' href='/facecat/css/main.css'></link>
 <!-- end -->
@@ -26,7 +27,7 @@
     Which category do you find more adequate to describe the picture above?
     <radio group="category_Left" id="radiocat">
       <dl id="dlcat">
-        <dt id="dt_hface" onclick="javascript:parent.node.emit('radio', this);"><input  id="radio_hface"type="radio" name="category">Human face</input></dt>
+        <dt id="dt_hface" onclick="javascript:parent.node.emit('radio', this);"><input id="radio_hface"type="radio" name="category">Human face</input></dt>
         <dt id="dt_nhface" onclick="javascript:parent.node.emit('radio', this);"><input type="radio" name="category" id="radio_nhface">Non-human face</input></dt>
         <dt id="dt_abstract" onclick="javascript:parent.node.emit('radio', this);"><input type="radio" id="radio_abstract" name="category">Abstract lines</input></dt>
         <dt id="dt_other"  onclick="javascript:parent.node.emit('radio', this);"><input type="radio" id="radio_other" name="category">Any other known object or shape</input></dt>
