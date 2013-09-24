@@ -23,6 +23,17 @@ stager.setOnInit(function() {
     console.log('INIT PLAYER!');
     W.setup('PLAYER');
 
+    node.on.pdisconnect(function(p) {
+        node.game.pause();
+        alert('game paused');
+    });
+    
+    node.on.pconnect(function(p) {
+        if (node.game.paused) {
+            alert('game not paused');
+        }
+    });
+
     var that = this;
     node.on.data('pairs', function(msg) {
         var leftSrc, rightSrc, data, imgLeft, imgRight;
@@ -117,9 +128,8 @@ stager.addStage({
                 this.disabled = "disabled";
                 node.emit('DONE');
             };
-
             node.env('auto', function() {
-                node.randomExec(function() { next.click(); });
+                //node.randomExec(function() { next.click(); });
             });
         });
         
@@ -135,6 +145,13 @@ stager.addStage({
     steprule: stepRules.SYNC_STEP
 });
 
+stager.setOnGameOver(function() {
+    W.loadFrame('/pairs/html/gameover.htm', function() {
+        console.log('Game over');
+    });
+});
+
+
 // Now that all the stages have been added,
 // we can build the game plot
 
@@ -143,11 +160,8 @@ stager.init()
     .repeat('pairs', REPEAT)
     .gameover();
 
-stager.setOnGameOver(function() {
-    W.loadFrame('/pairs/html/gameover.htm', function() {
-        console.log('Game over');
-    });
-});
+
+
 
 // We serialize the game sequence before sending it
 game.plot = stager.getState();

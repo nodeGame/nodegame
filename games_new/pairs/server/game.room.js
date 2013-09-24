@@ -33,6 +33,11 @@ module.exports = function(node, channel) {
 
         console.log('********Initializing Game Room*****************');
 
+        node.on.preconnect(function(p) {
+            console.log('Oh...somebody reconnected in the waiting room!', p);
+        });
+
+
         node.on.pconnect(function(p) {
             var room, wRoom;
 

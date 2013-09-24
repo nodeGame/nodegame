@@ -81,7 +81,7 @@ var facecat = function() {
             }
             next.disabled = true;
             next.innerHTML = 'Select a category';
-            tagTr.style.display = 'none';
+            //tagTr.style.display = 'none';
             order = JSUS.sample(0,3);
             JSUS.shuffleNodes(dlcat, order);
         }

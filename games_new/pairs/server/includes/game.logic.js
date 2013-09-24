@@ -29,7 +29,34 @@ module.exports = function(node, channel) {
     // but could be loaded from the database
 
     stager.setOnInit(function() {
-        // nothing
+        
+        var disconnected;
+        var disconnectedState
+
+        node.on.preconnect(function(p) {
+            console.log('Oh...somebody reconnected!', p);
+            if (p.id === disconnected) {
+                console.log('Ah it is him!');
+                
+                // Notify other player he is back.
+                node.socket.send(node.msg.create({
+                    target: 'PCONNECT',
+                    data: p,
+                    to: 'ALL'
+                }));
+
+                
+            }
+            else {
+                console.log('Who are you?');
+            }
+            
+        });
+
+        node.on.pdisconnect(function(p) {
+            disconnected = p.id;
+        });
+
         console.log('init');
     });
 
