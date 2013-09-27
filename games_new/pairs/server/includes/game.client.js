@@ -129,7 +129,7 @@ stager.addStage({
                 node.emit('DONE');
             };
             node.env('auto', function() {
-                //node.randomExec(function() { next.click(); });
+                node.randomExec(function() { next.click(); });
             });
         });
         
