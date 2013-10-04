@@ -23,17 +23,6 @@ stager.setOnInit(function() {
     console.log('INIT PLAYER!');
     W.setup('PLAYER');
 
-    node.on.pdisconnect(function(p) {
-        node.game.pause();
-        alert('game paused');
-    });
-    
-    node.on.pconnect(function(p) {
-        if (node.game.paused) {
-            alert('game not paused');
-        }
-    });
-
     var that = this;
     node.on.data('pairs', function(msg) {
         var leftSrc, rightSrc, data, imgLeft, imgRight;
@@ -142,13 +131,14 @@ stager.addStage({
 stager.addStage({
     id: 'pairs',
     cb: pairs,
+    minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.SYNC_STEP
 });
 
 stager.setOnGameOver(function() {
-    W.loadFrame('/pairs/html/gameover.htm', function() {
+    //W.loadFrame('/pairs/html/gameover.htm', function() {
         console.log('Game over');
-    });
+    //});
 });
 
 
