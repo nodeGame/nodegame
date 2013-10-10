@@ -40,7 +40,7 @@ var facecat = function() {
             'other': 'Any other known object or shape'
         };
 
-        var chosen_cat;
+        var chosen_cat, order;
         
         node.on('radio', function(radio) {
             console.log(radio)
@@ -81,9 +81,8 @@ var facecat = function() {
             }
             next.disabled = true;
             next.innerHTML = 'Select a category';
-            //tagTr.style.display = 'none';
-            order = JSUS.sample(0,3);
-            JSUS.shuffleNodes(dlcat, order);
+            tagTr.style.display = 'none';
+            order = JSUS.shuffleNodes(dlcat, JSUS.sample(0,3));
         }
 
         function onNextFaces(faces) {
@@ -117,7 +116,8 @@ var facecat = function() {
                     path: faces.items[node.game.counter].path,
                     count: faces.count,
                     cat: chosen_cat,
-                    tags: tags
+                    tags: tags,
+                    order: order
                 };
                 console.log(obj);
                 node.set('cat',obj);

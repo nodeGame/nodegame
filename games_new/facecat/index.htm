@@ -23,7 +23,7 @@
     }
 
   JSUS.shuffleNodes = function(parent, order) {
-        var i, len;
+        var i, len, idOrder;
         if (!JSUS.isNode(parent)) {
             throw new TypeError('DOM.shuffleNodes: parent must node.');
         }
@@ -41,13 +41,19 @@
             }
         }
 
-        len = parent.children.length;
+        len = parent.children.length, idOrder = [];
         if (!order) order = JSUS.sample(0,len);
         for (i = 0 ; i < len; i++) {
-            parent.appendChild(parent.children[order[i]]);
+            idOrder.push(parent.children[order[i]].id);
+        }
+        // Two fors are necessary to follow the real sequence.
+        // However parent.children is a special object, so the sequence could be
+        // unreliable.
+        for (i = 0 ; i < len; i++) {
+            parent.appendChild(parent.children[idOrder[i]]);
         }
         
-        return true;
+        return idOrder;
     };
 
 
