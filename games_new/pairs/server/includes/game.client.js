@@ -92,7 +92,7 @@ var pairs = function() {
         node.env('auto', function() {
             input.value = '' + Math.random();
             send.click();
-            node.randomExec(function() {
+            node.timer.randomExec(function() {
                 next.click();
                 node.set('EXIT', {
                     foo: Math.random()
@@ -118,7 +118,7 @@ stager.addStage({
                 node.emit('DONE');
             };
             node.env('auto', function() {
-                node.randomExec(function() { next.click(); });
+                node.timer.randomExec(function() { next.click(); });
             });
         });
         
@@ -132,7 +132,8 @@ stager.addStage({
     id: 'pairs',
     cb: pairs,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
-    steprule: stepRules.SYNC_STEP
+    steprule: stepRules.SYNC_STEP,
+    timer: 60000
 });
 
 stager.setOnGameOver(function() {
