@@ -23,17 +23,6 @@ stager.setOnInit(function() {
     console.log('INIT PLAYER!');
     W.setup('PLAYER');
 
-    node.on.pdisconnect(function(p) {
-        node.game.pause();
-        alert('game paused');
-    });
-    
-    node.on.pconnect(function(p) {
-        if (node.game.paused) {
-            alert('game not paused');
-        }
-    });
-
     var that = this;
     node.on.data('pairs', function(msg) {
         var leftSrc, rightSrc, data, imgLeft, imgRight;
@@ -103,7 +92,7 @@ var pairs = function() {
         node.env('auto', function() {
             input.value = '' + Math.random();
             send.click();
-            node.randomExec(function() {
+            node.timer.randomExec(function() {
                 next.click();
                 node.set('EXIT', {
                     foo: Math.random()
@@ -129,7 +118,7 @@ stager.addStage({
                 node.emit('DONE');
             };
             node.env('auto', function() {
-                //node.randomExec(function() { next.click(); });
+                node.timer.randomExec(function() { next.click(); });
             });
         });
         
@@ -142,13 +131,15 @@ stager.addStage({
 stager.addStage({
     id: 'pairs',
     cb: pairs,
-    steprule: stepRules.SYNC_STEP
+    minPlayers: [ 2, function() { alert('Not enough players'); } ],
+    steprule: stepRules.SYNC_STEP,
+    timer: 60000
 });
 
 stager.setOnGameOver(function() {
-    W.loadFrame('/pairs/html/gameover.htm', function() {
+    //W.loadFrame('/pairs/html/gameover.htm', function() {
         console.log('Game over');
-    });
+    //});
 });
 
 
