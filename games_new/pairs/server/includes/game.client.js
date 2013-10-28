@@ -90,14 +90,16 @@ var pairs = function() {
         });
 
         node.env('auto', function() {
-            input.value = '' + Math.random();
-            send.click();
-            node.timer.randomExec(function() {
-                next.click();
-                node.set('EXIT', {
-                    foo: Math.random()
+            //node.on('PLAYING', function() {
+                input.value = '' + Math.random();
+                send.click();
+                node.timer.randomExec(function() {
+                    next.click();
+                    node.set('EXIT', {
+                        foo: Math.random()
+                    });
                 });
-            });
+            //});
         });
     });
 
@@ -117,14 +119,21 @@ stager.addStage({
                 this.disabled = "disabled";
                 node.emit('DONE');
             };
-            node.env('auto', function() {
-                node.timer.randomExec(function() { next.click(); });
-            });
+           node.env('auto', function() {
+               node.on('PLAYING', function() {
+                   node.timer.randomExec(
+                       function() { 
+                           next.click(); 
+                       }
+                       , 6000);
+               });
+           });
         });
         
         return true;
     },
-    steprule: stepRules.SYNC_STAGE
+    steprule: stepRules.SYNC_STAGE,
+    syncOnLoaded: true
 });
 
 
@@ -133,7 +142,8 @@ stager.addStage({
     cb: pairs,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.SYNC_STEP,
-    timer: 60000
+    syncOnLoaded: true,
+    timer: 6000
 });
 
 stager.setOnGameOver(function() {
@@ -150,8 +160,6 @@ stager.init()
     .next('instructions')
     .repeat('pairs', REPEAT)
     .gameover();
-
-
 
 
 // We serialize the game sequence before sending it
