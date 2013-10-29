@@ -385,3 +385,4 @@ game.settings = {
 game.env = {
     auto: false
 };
+game.verbosity = 100;
