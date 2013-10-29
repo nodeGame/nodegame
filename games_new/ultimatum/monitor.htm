@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<title>Monitor Screen</title>
+<body>
+  <div id="root"></div> 
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<script src="./js/Monitor.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/monitor.css'></link>
+
+<script>
+    window.onload = function() {
+    var game = new Monitor(node);
+
+    var conf = {
+      url: "/pairs/admin",
+      io: {        
+          reconnect: false
+      },
+      socket: {
+    	  type: 'SocketIo'
+      },
+      events: {
+    	  dumpEvents: true
+      }
+    };
+    JSUS.mixin(conf, game);
+
+    node.setup('nodegame', conf);
+   
+    //node.socket.setSocketType('SocketIo');
+    
+    node.connect(conf.url);
+    node.once('PLAYER_CREATED', function(player) {
+      node.game.start();
+    });
+    
+  }
+</script>
+</body>
