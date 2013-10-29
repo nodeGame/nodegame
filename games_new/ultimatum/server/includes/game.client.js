@@ -53,7 +53,7 @@ stager.setOnInit(function() {
         node.game.timer.stop();
 	W.getElementById('submitOffer').disabled = 'disabled';
 	node.set('offer', offer);
-	node.say(offer, 'OFFER', to);
+	node.say('OFFER', to, offer);
 	W.write(' Your offer: ' +  offer + '. Waiting for the respondent... ');
     });
     
@@ -161,7 +161,7 @@ var instructions = function() {
     console.log('Instructions');
 };
 
-var ultimatum = function () {
+var ultimatum = function() {
     
     node.game.timer.stop();
     
@@ -186,7 +186,7 @@ var ultimatum = function () {
 	var other = msg.data.other;
 	node.set('ROLE', 'BIDDER');
 
-	W.loadFrame('/ultimatum/html/bidder.html', function () {
+	W.loadFrame('/ultimatum/html/bidder.html', function() {
 	    
             var b, options;
 
@@ -224,12 +224,12 @@ var ultimatum = function () {
 		node.emit('BID_DONE', offer.value, other);
 	    };
 	    
-	    node.on.data('ACCEPT', function (msg) {
+	    node.on.data('ACCEPT', function(msg) {
 		W.write(' Your offer was accepted.');
 		node.timer.randomEmit('DONE', 3000);
 	    });
 	    
-	    node.on.data('REJECT', function (msg) {
+	    node.on.data('REJECT', function(msg) {
 		W.write(' Your offer was rejected.');
 		node.timer.randomEmit('DONE', 3000);
 	    });
@@ -237,7 +237,8 @@ var ultimatum = function () {
     });
     
     // Loads the screen for a Respondent.
-    node.on.data('RESPONDENT', function (msg) {
+    node.on.data('RESPONDENT', function(msg) {
+        console.log('RECEIVED RESPONDENT!');
 	var other = msg.data.other;
 	node.set('ROLE', 'RESPONDENT');
 	
@@ -251,7 +252,7 @@ var ultimatum = function () {
 	
 	node.game.timer.updateDisplay();
 	
-	W.loadFrame('/ultimatum/html/resp.html', function () {
+	W.loadFrame('/ultimatum/html/resp.html', function() {
 	    
 
             //////////////////////////////////////////////
@@ -272,7 +273,7 @@ var ultimatum = function () {
             // listen to all incoming DATA messages.
             //
             /////////////////////////////////////////////
-	    node.on.data('OFFER', function (msg) {
+	    node.on.data('OFFER', function(msg) {
 		var offered, accept, reject;
                 
 		// Start the timer only after an offer is received.
@@ -332,7 +333,7 @@ stager.addStage({
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.SYNC_STAGE,
     syncOnLoaded: true,
-    timer: 60000
+    timer: 600000
 });
 
 stager.addStage({
@@ -341,7 +342,6 @@ stager.addStage({
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.SYNC_STEP,
     syncOnLoaded: true,
-    timer: 6000
 });
 
 stager.addStage({

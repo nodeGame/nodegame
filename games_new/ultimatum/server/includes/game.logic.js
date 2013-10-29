@@ -20,6 +20,8 @@ var mdb = ngdb.getLayer('MongoDB');
 var ngc = require('nodegame-client');
 var Stager = ngc.Stager;
 var stepRules = ngc.stepRules;
+var GameStage = ngc.GameStage;
+var J = ngc.JSUS;
 
 var stager = new Stager();
 
@@ -33,18 +35,7 @@ var PLAYING_STAGE = 2;
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which the this logic will be running.
 module.exports = function(node, channel) {
-    
-    var stepPointer
-
-    function shouldIdoMatching() {
-        var stage;
-        debugger
-        if (node.game.pl.size() !== MIN_PLAYERS) return false;
-        stage =  node.game.pl.first().stage.stage;
-        if (stage !== PLAYING_STAGE) return false;
-        if (!node.game.pl.isStepDone(stage)) return false;
-    }
-
+ 
     function doMatch() {
         var g, bidder, respondent, data_b, data_r;
         
@@ -75,27 +66,25 @@ module.exports = function(node, channel) {
         var disconnected, matchingSteps;
         disconnected = {};
         
-        matchingSteps = ['2.1.1', '2.1.2', '2.1.3'];
-
-        node.on.stepdone(matchingSteps, function(plist) {
-            doMatch();
-        });
-
+        matchingSteps = ['1.1.1', '2.1.1', '2.1.2'];
 
         // Matching, and stepping can be done in different ways. It can be 
-        // centralized, and the logic tells the clients when to step, or it
-        // clients can synchronized and step automatically.
+        // centralized, and the logic tells the clients when to step, or
+        // clients can synchronize themselves and step automatically.
         
         // In this game, the clients are stepping automatically, according
         // to the rules defined in `game.client`. Here we want to follow
         // their updates, and executes the matching callbeck each time
         // enter a new gaming stage
-        node.on('UPDATED_PLIST', function() {
-            if (shouldIdoMatching()) {
+        node.on.stepdone(function(plist) {
+            var stageStr;
+            stage = new GameStage(plist.first().stage).toString();
+            if (J.inArray(stage, matchingSteps)) {
+                debugger
                 doMatch();
             }
         });
-        
+
         // Reconnections must be handled by the game developer.
         node.on.preconnect(function(p) {
             console.log('Oh...somebody reconnected!', p);
@@ -111,7 +100,7 @@ module.exports = function(node, channel) {
             }
             else {
                 // Player was not authorized, redirect to a warning page.
-                node.redirect('/ultimatum2/unauth.htm', p.id);
+                node.redirect('/ultimatum/unauth.htm', p.id);
             }
             
         });
@@ -136,8 +125,8 @@ module.exports = function(node, channel) {
         cb: function() {
             return true;
         },
-        // Will automatically step each time a DONE event is emitted.
-        stepRule: stepRules.WAIT
+        // Will evaluate only synchronization of the clients.
+        steprule: stepRules.OTHERS_SYNC_STEP
     });
 
     // Building the game plot.
@@ -156,7 +145,7 @@ module.exports = function(node, channel) {
             publishLevel: 0
         },
         plot: stager.getState(),
-        debug: false,
+        debug: true,
         verbosity: 0
     };
 

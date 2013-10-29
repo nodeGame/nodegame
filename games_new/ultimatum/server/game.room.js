@@ -127,7 +127,7 @@ module.exports = function(node, channel) {
 	plot: stager.getState(),
         // If debug is true, the ErrorManager will throw errors 
         // also for the sub-rooms.
-	debug: false, 
+	debug: true, 
 	verbosity: 0,
         publishLevel: 2
     };
