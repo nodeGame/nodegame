@@ -61,12 +61,12 @@ module.exports = function(node, channel) {
 
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
-        console.log('********************** pairs stage ' + counter++ + ' **********************');
+        console.log('********************** ultimatum room ' + counter++ + ' **********************');
 
         var disconnected, matchingSteps;
         disconnected = {};
         
-        matchingSteps = ['1.1.1', '2.1.1', '2.1.2'];
+        // matchingSteps = ['1.1.1', '2.1.1', '2.1.2'];
 
         // Matching, and stepping can be done in different ways. It can be 
         // centralized, and the logic tells the clients when to step, or
@@ -76,14 +76,13 @@ module.exports = function(node, channel) {
         // to the rules defined in `game.client`. Here we want to follow
         // their updates, and executes the matching callbeck each time
         // enter a new gaming stage
-        node.on.stepdone(function(plist) {
-            var stageStr;
-            stage = new GameStage(plist.first().stage).toString();
-            if (J.inArray(stage, matchingSteps)) {
-                debugger
-                doMatch();
-            }
-        });
+//       node.on.stepdone(function(plist) {
+//           var stageStr;
+//           stage = new GameStage(plist.first().stage).toString();
+//           if (J.inArray(stage, matchingSteps)) {
+//               doMatch();
+//           }
+//       });
 
         // Reconnections must be handled by the game developer.
         node.on.preconnect(function(p) {
@@ -118,22 +117,76 @@ module.exports = function(node, channel) {
         console.log('init');
     });
     
+    // Functions
+    
+    function instructions() {
+        console.log('Instructions');
+        // Start the game in all clients.
+        node.game.pl.each(function (p) {
+            node.remoteCommand('start', p.id);
+        });
+    }
+
+    function ultimatum() {
+        console.log('Ultimatum');
+        node.game.pl.each(function(p) {
+            node.remoteCommand('step', p.id);
+        });
+        doMatch();
+    }
+    
+    function questionnaire() {
+        console.log('questionnaire');
+        node.game.pl.each(function(p) {
+            node.remoteCommand('step', p.id);
+        });
+    }
+    
+    function endgame() {
+        console.log('endgame');
+        node.game.pl.each(function(p) {
+            node.remoteCommand('step', p.id);
+        });
+    } 
+    
     // Adding the stage.
+    stager.addStage({
+        id: 'instructions',
+        cb: instructions,
+        steprule: stepRules.OTHERS_SYNC_STEP,
+        //syncOnLoaded: true,
+        //timer: 600000
+    });
 
     stager.addStage({
         id: 'ultimatum',
-        cb: function() {
-            return true;
-        },
-        // Will evaluate only synchronization of the clients.
+        cb: ultimatum,
+        steprule: stepRules.OTHERS_SYNC_STEP,
+        //syncOnLoaded: true,
+    });
+
+    stager.addStage({
+        id: 'questionnaire',
+        cb: questionnaire,
+        steprule: stepRules.OTHERS_SYNC_STEP
+    });
+    
+    stager.addStage({
+        id: 'endgame',
+        cb: endgame,
         steprule: stepRules.OTHERS_SYNC_STEP
     });
 
     // Building the game plot.
+    var REPEAT = 3;
 
     stager
         .init()
-        .loop('ultimatum');
+        .next('instructions')
+        .repeat('ultimatum', REPEAT)
+        .next('questionnaire')
+        .next('endgame')
+        .gameover();
 
     return {
         nodename: 'lgc' + counter,

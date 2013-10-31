@@ -10,6 +10,9 @@
  * ---
  */
 
+// NOTICE: for now do not call node.done() immediately in the callback.
+
+
 var ngc = module.parent.exports.ngc;
 var Stager = ngc.Stager;
 var stepRules = ngc.stepRules;
@@ -45,8 +48,7 @@ stager.setOnInit(function() {
     // - player.css
     W.setup('PLAYER');
 
-    this.BIDDER = 1;
-    this.RESPONDENT = 0;
+    this.other = null;
     
     node.on('BID_DONE', function(offer, to) {
 	// TODO: check this timer obj.
@@ -58,7 +60,8 @@ stager.setOnInit(function() {
     });
     
     node.on('RESPONSE_DONE', function(response, offer, from) {
-	node.set('response', {
+	console.log(response, offer, from);
+        node.set('response', {
 	    response: response,
 	    value: offer,
 	    from: from
@@ -180,127 +183,135 @@ var ultimatum = function() {
     /////////////////////////////////////////////
     var that = this;
     
-    // Loads the screen for a Bidder.
-    node.on.data('BIDDER', function(msg) {
-	console.log('RECEIVED BIDDER!');
-	var other = msg.data.other;
-	node.set('ROLE', 'BIDDER');
-
-	W.loadFrame('/ultimatum/html/bidder.html', function() {
-	    
-            var b, options;
-
-	    // Start the timer after an offer was received.
-	    options = {
-		milliseconds: 30000,
-		timeup: function(){
-		    node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
-		}
-	    };
-	    node.game.timer.restart(options);
-
-	    b = W.getElementById('submitOffer');
-	    
-	    node.env('auto', function() {
-		
-		//////////////////////////////////////////////
-		// nodeGame hint:
-		//
-		// Execute a function randomly
-		// in a time interval between 0 and 1 second
-		//
-		//////////////////////////////////////////////
-		node.timer.randomExec(function() {
-		    node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
-		}, 4000);
-	    });
-	    
-	    b.onclick = function() {
-		var offer = W.getElementById('offer');
-		if (!that.isValidBid(offer.value)) {
-		    W.writeln('Please enter a number between 0 and 100');
-		    return;
-		}
-		node.emit('BID_DONE', offer.value, other);
-	    };
-	    
-	    node.on.data('ACCEPT', function(msg) {
-		W.write(' Your offer was accepted.');
-		node.timer.randomEmit('DONE', 3000);
-	    });
-	    
-	    node.on.data('REJECT', function(msg) {
-		W.write(' Your offer was rejected.');
-		node.timer.randomEmit('DONE', 3000);
-	    });
-	});
-    });
+    var b, options, other;
     
-    // Loads the screen for a Respondent.
-    node.on.data('RESPONDENT', function(msg) {
-        console.log('RECEIVED RESPONDENT!');
-	var other = msg.data.other;
-	node.set('ROLE', 'RESPONDENT');
-	
-	var options = {
-	    milliseconds: 30000,
-	    timeup: function() {
-		that.randomAccept(msg.data, other);
-	    }
-	};
-	node.game.timer.init(options);
-	
-	node.game.timer.updateDisplay();
-	
-	W.loadFrame('/ultimatum/html/resp.html', function() {
-	    
+    // Load the ultimatum interface: waiting for the ROLE to be defined
+    W.loadFrame('/ultimatum/html/ultimatum.html', function() {
+    
+        // Load the BIDDER interface.
+        node.on.data('BIDDER', function(msg) {
+	    console.log('RECEIVED BIDDER!');
+	    other = msg.data.other;
+            
+            
+	    W.loadFrame('/ultimatum/html/bidder.html', function() {
 
-            //////////////////////////////////////////////
-            // nodeGame hint:
-            //
-            // nodeGame offers several types of event
-            // listeners. They are all resemble the syntax
-            //
-            // node.on.<target>
-            //
-            // For example: node.on.data(), node.on.plist().
-            //
-            // The low level event listener is simply 
-            //
-            // node.on
-            //
-            // For example, node.on('in.say.DATA', cb) can
-            // listen to all incoming DATA messages.
-            //
-            /////////////////////////////////////////////
-	    node.on.data('OFFER', function(msg) {
-		var offered, accept, reject;
-                
-		// Start the timer only after an offer is received.
-		node.game.timer.start();
-		
-		offered = W.getElementById('offered');
-		W.write('You received an offer of ' + msg.data, offered);
-		offered.style.display = '';
-		
-		accept = W.getElementById('accept');
-		reject = W.getElementById('reject');
-		
-		node.env('auto', function() {
-		    node.timer.randomExec(function() {
-			that.randomAccept(msg.data, other);
-		    }, 3000);
-		});
-		
-		accept.onclick = function() {
-		    node.emit('RESPONSE_DONE', 'ACCEPT', msg.data, other);
-		};
-		
-		reject.onclick = function() {
-		    node.emit('RESPONSE_DONE', 'REJECT', msg.data, other);
-		};
+	        // Start the timer after an offer was received.
+	        options = {
+		    milliseconds: 30000,
+		    timeup: function(){
+		        node.emit('BID_DONE', Math.floor(1 + Math.random()*100),
+                                  other);
+		    }
+	        };
+	        node.game.timer.restart(options);
+
+	        b = W.getElementById('submitOffer');
+	        
+	        node.env('auto', function() {
+		    
+		    //////////////////////////////////////////////
+		    // nodeGame hint:
+		    //
+		    // Execute a function randomly
+		    // in a time interval between 0 and 1 second
+		    //
+		    //////////////////////////////////////////////
+                    node.timer.randomExec(function() {
+                   	node.emit('BID_DONE', Math.floor(1+Math.random()*100), other);
+                    }, 4000);
+	        });
+	        
+	        b.onclick = function() {
+		    var offer = W.getElementById('offer');
+		    if (!that.isValidBid(offer.value)) {
+		        W.writeln('Please enter a number between 0 and 100');
+		        return;
+		    }
+		    node.emit('BID_DONE', offer.value, other);
+	        };
+	        
+	        node.on.data('ACCEPT', function(msg) {
+		    W.write(' Your offer was accepted.');
+		    node.timer.randomEmit('DONE', 3000);
+	        });
+	        
+	        node.on.data('REJECT', function(msg) {
+		    W.write(' Your offer was rejected.');
+		    node.timer.randomEmit('DONE', 3000);
+	        });
 	    });
-	});	
+
+        });
+
+        // Load the respondent interface.
+        node.on.data('RESPONDENT', function(msg) {
+            console.log('RECEIVED RESPONDENT!');
+            other = msg.data.other;
+    	    node.set('ROLE', 'RESPONDENT');
+	    
+	    options = {
+	        milliseconds: 30000,
+	        timeup: function() {
+		    that.randomAccept(msg.data, other);
+	        }
+	    };
+	    node.game.timer.init(options);
+	    node.game.timer.updateDisplay();
+	    
+	    W.loadFrame('/ultimatum/html/resp.html', function() {
+	        
+
+                //////////////////////////////////////////////
+                // nodeGame hint:
+                //
+                // nodeGame offers several types of event
+                // listeners. They are all resemble the syntax
+                //
+                // node.on.<target>
+                //
+                // For example: node.on.data(), node.on.plist().
+                //
+                // The low level event listener is simply 
+                //
+                // node.on
+                //
+                // For example, node.on('in.say.DATA', cb) can
+                // listen to all incoming DATA messages.
+                //
+                /////////////////////////////////////////////
+	        node.on.data('OFFER', function(msg) {
+		    var offered, accept, reject;
+                    
+		    // Start the timer only after an offer is received.
+		    node.game.timer.start();
+		    
+		    offered = W.getElementById('offered');
+		    W.write('You received an offer of ' + msg.data, offered);
+		    offered.style.display = '';
+		    
+		    accept = W.getElementById('accept');
+		    reject = W.getElementById('reject');
+		    
+		    node.env('auto', function() {
+                        node.timer.randomExec(function() {
+                            that.randomAccept(msg.data, other);
+                        }, 3000);
+		    });
+		    
+		    accept.onclick = function() {
+                        console.log('=========');
+		        node.emit('RESPONSE_DONE', 'ACCEPT', msg.data, other);
+		    };
+		    
+		    reject.onclick = function() {
+                        console.log('=========!');
+		        node.emit('RESPONSE_DONE', 'REJECT', msg.data, other);
+		    };
+	        });
+	    });	
+            
+        });
     });
 
     console.log('Ultimatum');
@@ -331,8 +342,8 @@ stager.addStage({
     id: 'instructions',
     cb: instructions,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
-    steprule: stepRules.SYNC_STAGE,
-    syncOnLoaded: true,
+    steprule: stepRules.WAIT,
+    //syncOnLoaded: true,
     timer: 600000
 });
 
@@ -340,18 +351,20 @@ stager.addStage({
     id: 'ultimatum',
     cb: ultimatum,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
-    steprule: stepRules.SYNC_STEP,
-    syncOnLoaded: true,
+    steprule: stepRules.WAIT,
+    //syncOnLoaded: true,
 });
 
 stager.addStage({
     id: 'endgame',
     cb: endgame,
+    steprule: stepRules.WAIT
 });
 
 stager.addStage({
     id: 'questionnaire',
     cb: postgame,
+    steprule: stepRules.WAIT
 });
 
 
@@ -384,5 +397,4 @@ game.settings = {
 };
 game.env = {
     auto: false
-};
-game.verbosity = 100;
+};game.verbosity = 100;

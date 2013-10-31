@@ -89,11 +89,6 @@ module.exports = function(node, channel) {
                 node.remoteSetup('plot', p.id, client.plot);
                 node.remoteSetup('env', p.id, client.env);
             });
-       
-	    // Start the game in all clients.
-            tmpPlayerList.each(function (p) {
-                node.remoteCommand('start', p.id);
-            });
             
             // Start the logic.
             room.startGame();
