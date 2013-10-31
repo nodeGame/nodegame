@@ -192,8 +192,7 @@ var ultimatum = function() {
         node.on.data('BIDDER', function(msg) {
 	    console.log('RECEIVED BIDDER!');
 	    other = msg.data.other;
-            
-            
+              
 	    W.loadFrame('/ultimatum/html/bidder.html', function() {
 
 	        // Start the timer after an offer was received.
@@ -343,7 +342,7 @@ stager.addStage({
     cb: instructions,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.WAIT,
-    //syncOnLoaded: true,
+    syncOnLoaded: true,
     timer: 600000
 });
 
@@ -352,7 +351,7 @@ stager.addStage({
     cb: ultimatum,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.WAIT,
-    //syncOnLoaded: true,
+    syncOnLoaded: true,
 });
 
 stager.addStage({
