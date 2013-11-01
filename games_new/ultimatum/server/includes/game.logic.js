@@ -6,6 +6,15 @@
  * Handles bidding, and responds between two players.
  * Extensively documented tutorial.
  *
+ * Info:
+ * Matching, and stepping can be done in different ways. It can be 
+ * centralized, and the logic tells the clients when to step, or
+ * clients can synchronize themselves and step automatically.
+ 
+ * In this game, the logic is synchronized with the clients. The logic
+ * will send automatically game-commands to start and step
+ * through the game plot whenever it enters a new game step.
+ *
  * http://www.nodegame.org
  * ---
  */
@@ -63,26 +72,8 @@ module.exports = function(node, channel) {
     stager.setOnInit(function() {
         console.log('********************** ultimatum room ' + counter++ + ' **********************');
 
-        var disconnected, matchingSteps;
+        var disconnected;
         disconnected = {};
-        
-        // matchingSteps = ['1.1.1', '2.1.1', '2.1.2'];
-
-        // Matching, and stepping can be done in different ways. It can be 
-        // centralized, and the logic tells the clients when to step, or
-        // clients can synchronize themselves and step automatically.
-        
-        // In this game, the clients are stepping automatically, according
-        // to the rules defined in `game.client`. Here we want to follow
-        // their updates, and executes the matching callbeck each time
-        // enter a new gaming stage
-//       node.on.stepdone(function(plist) {
-//           var stageStr;
-//           stage = new GameStage(plist.first().stage).toString();
-//           if (J.inArray(stage, matchingSteps)) {
-//               doMatch();
-//           }
-//       });
 
         // Reconnections must be handled by the game developer.
         node.on.preconnect(function(p) {
@@ -121,48 +112,35 @@ module.exports = function(node, channel) {
     
     function instructions() {
         console.log('Instructions');
-        // Start the game in all clients.
-        node.game.pl.each(function (p) {
-            node.remoteCommand('start', p.id);
-        });
     }
 
     function ultimatum() {
         console.log('Ultimatum');
-        node.game.pl.each(function(p) {
-            node.remoteCommand('step', p.id);
-        });
-        doMatch();
+        setTimeout(function() {
+            doMatch();
+        }, 10000);
     }
     
     function questionnaire() {
         console.log('questionnaire');
-        node.game.pl.each(function(p) {
-            node.remoteCommand('step', p.id);
-        });
     }
     
     function endgame() {
         console.log('endgame');
-        node.game.pl.each(function(p) {
-            node.remoteCommand('step', p.id);
-        });
     } 
     
-    // Adding the stage.
+    // Adding the stages. We can later on define the rules and order that
+    // will determine their execution.
     stager.addStage({
         id: 'instructions',
         cb: instructions,
-        steprule: stepRules.OTHERS_SYNC_STEP,
-        //syncOnLoaded: true,
-        //timer: 600000
+        steprule: stepRules.OTHERS_SYNC_STEP
     });
 
     stager.addStage({
         id: 'ultimatum',
         cb: ultimatum,
-        steprule: stepRules.OTHERS_SYNC_STEP,
-        //syncOnLoaded: true,
+        steprule: stepRules.OTHERS_SYNC_STEP
     });
 
     stager.addStage({
@@ -180,6 +158,7 @@ module.exports = function(node, channel) {
     // Building the game plot.
     var REPEAT = 3;
 
+    // Here we define the sequence of stages of the game (game plot).
     stager
         .init()
         .next('instructions')
@@ -188,6 +167,7 @@ module.exports = function(node, channel) {
         .next('endgame')
         .gameover();
 
+    // Here we group together the definition of the game logic.
     return {
         nodename: 'lgc' + counter,
         game_metadata: {
@@ -195,10 +175,20 @@ module.exports = function(node, channel) {
             version: '0.0.1'
         },
         game_settings: {
-            publishLevel: 0
+            // Will not publish any update of stage / stageLevel, etc.
+            publishLevel: 0,
+            // Will send a start / step command to ALL the clients when
+            // the logic will start / step through the game.
+            // This option requires that the game plots of the clients
+            // and logic are symmetric or anyway compatible.
+            syncStepping: true
         },
+        // Extracts, and compacts the game plot that we defined above.
         plot: stager.getState(),
+        // If debug is false (default false), exception will be caught and
+        // and printed to screen, and the game will continue.
         debug: true,
+        // Controls the amount of information printed to screen.
         verbosity: 0
     };
 

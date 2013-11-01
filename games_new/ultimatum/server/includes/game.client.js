@@ -114,7 +114,7 @@ stager.setOnGameOver(function() {
 
 ///// STAGES and STEPS
 
-var instructions = function() {	
+function instructions() {	
     var that = this;
     
     //////////////////////////////////////////////
@@ -131,8 +131,8 @@ var instructions = function() {
     //
     /////////////////////////////////////////////
     W.loadFrame('/ultimatum/html/instructions.html', function() {
-	var b = W.getElementById('read');
-	b.onclick = function() {
+	var bb = W.getElementById('read');
+	bb.onclick = function() {
 	    node.done();
 	};
 
@@ -162,9 +162,9 @@ var instructions = function() {
 	
     });
     console.log('Instructions');
-};
+}
 
-var ultimatum = function() {
+function ultimatum() {
     
     node.game.timer.stop();
     
@@ -186,7 +186,7 @@ var ultimatum = function() {
     var b, options, other;
     
     // Load the ultimatum interface: waiting for the ROLE to be defined
-    W.loadFrame('/ultimatum/html/ultimatum.html', function() {
+    //W.loadFrame('/ultimatum/html/ultimatum.html', function() {
     
         // Load the BIDDER interface.
         node.on.data('BIDDER', function(msg) {
@@ -311,21 +311,21 @@ var ultimatum = function() {
 	    });	
             
         });
-    });
+    //});
 
     console.log('Ultimatum');
-};
+}
 
-var postgame = function(){
+function postgame(){
     W.loadFrame('/ultimatum/html/postgame.html', function(){
 	node.env('auto', function(){
 	    node.timer.randomEmit('DONE');
 	});
     });
     console.log('Postgame');
-};
+}
 
-var endgame = function(){
+function endgame(){
     W.loadFrame('/ultimatum/html/ended.html', function(){
 	node.on('WIN', function(msg) {
 	    W.write('Your earning in the game is: ' + msg.data);
@@ -333,7 +333,12 @@ var endgame = function(){
     });
     
     console.log('Game ended');
-};
+}
+
+function clearFrame() {
+    W.clearFrame('The next stage is loading, please be patient...');
+    return true;
+}
 
 // Add all the stages into the stager.
 
@@ -343,7 +348,8 @@ stager.addStage({
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.WAIT,
     syncOnLoaded: true,
-    timer: 600000
+    timer: 600000,
+    done: clearFrame
 });
 
 stager.addStage({
@@ -352,12 +358,14 @@ stager.addStage({
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
     steprule: stepRules.WAIT,
     syncOnLoaded: true,
+    done: clearFrame
 });
 
 stager.addStage({
     id: 'endgame',
     cb: endgame,
-    steprule: stepRules.WAIT
+    steprule: stepRules.WAIT,
+    done: clearFrame
 });
 
 stager.addStage({
