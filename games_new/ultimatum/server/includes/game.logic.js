@@ -116,9 +116,7 @@ module.exports = function(node, channel) {
 
     function ultimatum() {
         console.log('Ultimatum');
-        setTimeout(function() {
-            doMatch();
-        }, 10000);
+        doMatch();
     }
     
     function questionnaire() {

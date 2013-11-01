@@ -336,17 +336,54 @@ function endgame(){
 }
 
 function clearFrame() {
-    W.clearFrame('The next stage is loading, please be patient...');
+    node.emit('INPUT_DISABLE');
     return true;
 }
 
 // Add all the stages into the stager.
 
+//////////////////////////////////////////////
+// nodeGame hint:
+//
+// A minimal stage must contain two properties:
+//
+// - id: a unique name for the stage
+// - cb: a callback function to execute once
+//     the stage is loaded.
+//
+// When adding a stage / step into the stager
+// there are many additional options to
+// configure it.
+//
+// Properties defined at higher levels are
+// inherited by each nested step, that in turn
+// can overwrite them.
+// 
+// For example if a step is missing a property,
+// it will be looked into the enclosing stage.
+// If it is not defined in the stage,
+// the value set with _setDefaultProperties()_
+// will be used. If still not found, it will
+// fallback to nodeGame defaults.
+//
+// The most important properties are used
+// and explained below.
+//
+/////////////////////////////////////////////
+
+// A step rule is a function deciding what to do when a player has
+// terminated a step and entered the stage level _DONE_.
+// Other stepRules are: SOLO, SYNC_STAGE, SYNC_STEP, OTHERS_SYNC_STEP.
+// In this case the client will wait for command from the server.    
+stager.setDefaultStepRule(stepRules.WAIT);
+
 stager.addStage({
     id: 'instructions',
     cb: instructions,
+    // `minPlayers` triggers the execution of a callback in the case
+    // the number of players (including this client) falls the below
+    // the chosen threshold. Related: `maxPlayers`, and `exactPlayers`.
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
-    steprule: stepRules.WAIT,
     syncOnLoaded: true,
     timer: 600000,
     done: clearFrame
@@ -356,7 +393,11 @@ stager.addStage({
     id: 'ultimatum',
     cb: ultimatum,
     minPlayers: [ 2, function() { alert('Not enough players'); } ],
-    steprule: stepRules.WAIT,
+    // `syncOnLoaded` forces the clients to wait for all the others to be
+    // fully loaded before releasing the control of the screen to the players.
+    // This options introduces a little overhead in communications and delay
+    // in the execution of a stage. It is probably not necessary in local
+    // networks, and it is FALSE by default.
     syncOnLoaded: true,
     done: clearFrame
 });
@@ -364,14 +405,17 @@ stager.addStage({
 stager.addStage({
     id: 'endgame',
     cb: endgame,
-    steprule: stepRules.WAIT,
+    // `done` is a callback function that is executed as soon as a
+    // _DONE_ event is emitted. It can perform clean-up operations (such
+    // as disabling all the forms) and only if it returns true, the
+    // client will enter the _DONE_ stage level, and the step rule
+    // will be evaluated.
     done: clearFrame
 });
 
 stager.addStage({
     id: 'questionnaire',
-    cb: postgame,
-    steprule: stepRules.WAIT
+    cb: postgame
 });
 
 
