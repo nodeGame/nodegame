@@ -1,0 +1,50 @@
+<!doctype html>
+<title>Ultimatum Quiz</title>
+
+<link rel="stylesheet" type="text/css" href="css/quiz.css">
+<body>
+  
+  <div id="container_quiz">
+    <h1>Before starting the game answer the following questions:</h1>
+    
+    <div id="quiz"> 
+      <dl>
+
+        <dt><strong>Q.1</strong></dt>        
+        <dd>
+          <span id="howMuch_result" class="quiz_result"></span>
+          <form name="howMuch" id="howMuch">
+	    <p> How much money will you divide with your partner </p>
+	    <p>
+	      <input type="radio" name="howMuch" value="50"> 50<br>
+	      <input type="radio" name="howMuch" value="100"> 100<br>
+	      <input type="radio" name="howMuch" value="0"> 0
+	    </p>
+	  </form>
+        </dd>
+
+        <dt><strong>Q.2</strong></dt>
+        <dd>
+          <span id="reject_result" class="quiz_result"></span>
+          <form name="reject" id="reject">
+            <p>If you are a bidder what happen if your partner reject your offer?</p>
+            <p>
+              <input type="radio" name="reject" value="0"> He does not get anything, I keep my share.<br>
+              <input type="radio" name="reject" value="1"> I get everything.<br>
+              <input type="radio" name="reject" value="2"> He gets what I offered, I get nothing.</br>
+              <input type="radio" name="reject" value="3"> Both get nothing.
+            </p>
+            
+          </form>
+        </dd>
+
+      </dl>
+      <div id="done_box">
+        <button onclick='javascript:QUIZ.checkAnswers();' id="submitQuiz">Click here to check your answers, and start the game. <br>Correct answers <span id="answers_counter">0 / 2</span></button>
+      </div>
+    </div>
+  </div>
+  
+</div>
+</body>
+<script src="/ultimatum/js/quiz.js"></script>

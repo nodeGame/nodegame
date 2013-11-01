@@ -113,6 +113,10 @@ module.exports = function(node, channel) {
     function instructions() {
         console.log('Instructions');
     }
+    
+    function quiz() {
+        console.log('Quiz');
+    }
 
     function ultimatum() {
         console.log('Ultimatum');
@@ -127,30 +131,35 @@ module.exports = function(node, channel) {
         console.log('endgame');
     } 
     
+
+    // Set default step rule.
+    stager.setDefaultStepRule(stepRules.OTHERS_SYNC_STEP);
+    
     // Adding the stages. We can later on define the rules and order that
     // will determine their execution.
     stager.addStage({
         id: 'instructions',
-        cb: instructions,
-        steprule: stepRules.OTHERS_SYNC_STEP
+        cb: instructions
+    });
+
+    stager.addStage({
+        id: 'quiz',
+        cb: quiz
     });
 
     stager.addStage({
         id: 'ultimatum',
-        cb: ultimatum,
-        steprule: stepRules.OTHERS_SYNC_STEP
+        cb: ultimatum
     });
 
     stager.addStage({
         id: 'questionnaire',
-        cb: questionnaire,
-        steprule: stepRules.OTHERS_SYNC_STEP
+        cb: questionnaire
     });
     
     stager.addStage({
         id: 'endgame',
-        cb: endgame,
-        steprule: stepRules.OTHERS_SYNC_STEP
+        cb: endgame
     });
 
     // Building the game plot.
@@ -160,6 +169,7 @@ module.exports = function(node, channel) {
     stager
         .init()
         .next('instructions')
+        .next('quiz')
         .repeat('ultimatum', REPEAT)
         .next('questionnaire')
         .next('endgame')

@@ -1,0 +1,26 @@
+ul, ol {
+    margin: 30px 0 30px 10px;
+
+}
+
+li {
+    margin-bottom: 20px;
+}
+
+div#container_quiz {
+    margin: 0 auto;
+    width: 800px;
+    border: 0;
+    background: #fff;
+}
+
+div#quiz {
+    margin: 0 auto;
+    width: 600px;
+    text-align: left;
+    padding: 10px;
+}
+
+.quiz_result {
+    font-weight: bold;
+}
