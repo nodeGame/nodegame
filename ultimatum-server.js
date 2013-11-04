@@ -9,6 +9,9 @@
  * ---
  */
 
+// Load the Node.js path object.
+var path = require('path');
+
 // Load the ServerNode class.
 var ServerNode = require('nodegame-server').ServerNode;
 
@@ -34,21 +37,27 @@ var options = {
     }
 };
 
-// Start server, option parameter is optional
+// Start server, option parameter is optional.
 var sn = new ServerNode(options);
 
 // Add a channel to the server.
-var pairs = sn.addChannel({
+var ultimatum = sn.addChannel({
     name: 'ultimatum',
     admin: 'ultimatum/admin',
     player: 'ultimatum',
     verbosity: 100
 });
 
-// Creates the waiting room for the channel.
-var path = require('path');
+
+//// Creates the waiting room for the channel.
+//var logicPath = path.resolve('./games_new/ultimatum/server/antechamber.turk.js');
+//var room = ultimatum.createWaitingRoom({
+//    logicPath: logicPath
+//});
+
+// Creates the room that will spawn the games for the channel
 var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
-var room = pairs.createWaitingRoom({
+var room = ultimatum.createWaitingRoom({
     logicPath: logicPath
 });
 

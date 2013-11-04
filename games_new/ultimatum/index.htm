@@ -11,7 +11,12 @@
 <noscript>
   Sorry, you need to enable javascript in order to play this game.
 </noscript>
-<p id="waitingForPlayers">Welcome to the game! Please be patient while waiting for enough players to connect.</p>
+<p id="waitingForPlayers">
+  Welcome to the game! Please be patient while waiting for enough players to connect
+  <span id="span_dots">.</span><br/>
+  Currently connected: <span id="span_connected"></span><br/>
+  <span id="span_msg"></span>
+</p>
 <!-- <iframe id="mainframe" name="mainframe"></iframe> -->
 <script>
   window.onload = function () {

@@ -1,0 +1,90 @@
+<!doctype html>
+<title>Waiting Room</title>
+
+<!-- Loading  nodeGame libraries and CSS -->
+<script src="/socket.io/socket.io.js"></script> 
+<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css'></link>
+<style>
+  noscript {
+  font-size: 20px;
+  padding: 5px;
+  margin: 5px;
+  }
+  
+  div#errorNodeGame {
+  font-size: 20px;
+  padding: 5px;
+  margin: 5px;
+  }
+  
+  iframe#mainframe {
+  height: 800px;
+  }
+  
+  
+</style>
+
+<script src="/ultimatum/js/wait.js" charset="utf-8"></script>
+
+
+<!-- end -->
+
+<body>
+  <div id="root">
+    <h2 id="h2title">Welcome to this game</h2>
+  </div>
+  <div id="errorNodeGame" style="display: none;">An error has occurred. Your browser is not supported. Please report the error:<br></div>
+  <noscript>Your browser does not support JavaScript. You cannot take this HIT, if you don't have JavaScript enabled in your browser.</noscript>
+  <iframe name="mainframe" id="mainframe"></iframe>
+  <script>
+    
+    window.onload = function () {
+    
+      // Player ID from Mturk
+      var mtid = JSUS.getQueryString('id');
+  
+      // Configuring nodegame.
+      node.setup('nodegame', {
+	  // HOST needs to be specified only 
+	  // if this file is located in another server
+	  // host: http://myserver.com,	  
+          verbosity: 10,
+	  window: {
+	      promptOnleave: false,
+              noEscape: true // Defaults TRUE
+	  },
+	  env: {
+	      auto: false,
+	      debug: false
+	  },
+	  player: {
+	      name: "NodeGame Player", // will be overwritten by the server
+              id: "nodegame player id" // will be overwritten by the server
+              mtid: mtid,
+              navigator, navigator
+	  },
+	  events: {
+	      dumpEvents: false, // output to console all fired events
+              history: false // keep a record of all fired events
+	  },
+	  socket: {
+	      type: 'SocketIo', // for remote connections
+	      reconnect: false
+	  }
+      });
+    
+    
+    try {
+      node.connect("/test");
+    }
+    catch(e) {
+      var errorDiv = document.getElementById('errorNodeGame');
+      errorDiv.appendChild(document.createTextNode(node.game ? node.game.state : 'no-state'));
+      errorDiv.appendChild(document.createTextNode(' - '));
+      errorDiv.appendChild(document.createTextNode(navigator.userAgent));
+      errorDiv.style.display = '';
+    }
+    
+  </script>
+</body>

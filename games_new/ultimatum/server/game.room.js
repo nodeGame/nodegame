@@ -7,7 +7,7 @@
  * in each client, move them in a separate gaming room, and start the game.
  * ---
  */
-module.exports = function(node, channel) {
+module.exports = function(node, channel, room) {
 
     // Loads the database layer. If you do not use the database
     // you do not these lines.
@@ -31,6 +31,10 @@ module.exports = function(node, channel) {
         ngc: ngc
     });
 
+    var clientWait = channel.require(__dirname + '/includes/wait.client', {
+        ngc: ngc
+    });
+
     // Creating a unique game stage that will handle all incoming connections. 
     stager.addStage({
         id: 'waiting',
@@ -44,6 +48,12 @@ module.exports = function(node, channel) {
     // Event listeners registered here are valid for all the stages of the game.
     stager.setOnInit(function() {
         var counter = 0;
+        var POOL_SIZE = 3;
+        var GROUP_SIZE = 2;
+
+        // references...
+        this.room = room;
+        this.channel = channel;
 
         console.log('********Waiting Room Created*****************');
 
@@ -55,43 +65,79 @@ module.exports = function(node, channel) {
 
         // This callback is executed whenever two players connect.
         node.on.pconnect(function(p) {
-            var room, wRoom, tmpPlayerList;
-
+            var gameRoom, wRoom, tmpPlayerList;
+            var nPlayers, i, len;
             console.log('-----------Player connected ' + p.id);
             
-            wRoom = channel.waitingRoom.clients.player;
-            
-            // Waiting for at least two players to be connected.
-            if (wRoom.size() < 2) return;
+            // PlayerList object of waiting players.
+            wRoom = room.clients.player;
+            nPlayers = wRoom.size();
 
-            console.log('-----------We have two players');
-
-            // Doing the random matching.
-            tmpPlayerList = wRoom.shuffle().limit(2);
+            // Send the client the waiting stage.
+            node.remoteSetup('game_metadata',  p.id, clientWait.metadata);
+            node.remoteSetup('plot', p.id, clientWait.plot);
+            node.remoteCommand('start', p.id);
             
-            // Creating a sub gaming room.
-            // The object must contains the following information:
-            // - clients: a list of players (array or PlayerList)
-            // - logicPath: the path to the file containing the logic (string)
-            // - channel: a reference to the channel of execution (ServerChannel)
-            // - group: a name to group together multiple game rooms (string)
-            room = channel.createGameRoom({
-                group: 'ultimatum',
-                clients: tmpPlayerList,
-                channel: channel,
-                logicPath: logicPath
+            node.say('waitingRoom', 'ALL', {
+                poolSize: POOL_SIZE,
+                nPlayers: nPlayers
             });
             
-	    // Setting metadata, settings, and plot.
-            tmpPlayerList.each(function (p) {
-                node.remoteSetup('game_metadata',  p.id, client.metadata);
-                node.remoteSetup('game_settings', p.id, client.settings);
-                node.remoteSetup('plot', p.id, client.plot);
-                node.remoteSetup('env', p.id, client.env);
-            });
+            // Wait to have enough clients connected.
+            if (nPlayers < POOL_SIZE) {
+                return;
+            }
+
+            console.log('-----------We have enough players: ' + wRoom.size());
+
+            i = -1, len = Math.floor(nPlayers / GROUP_SIZE);
+            for ( ; ++i < len ; ) {
+
+                // Doing the random matching.
+                tmpPlayerList = wRoom.shuffle().limit(GROUP_SIZE);
+                
+                // Creating a sub gaming room.
+                // The object must contains the following information:
+                // - clients: a list of players (array or PlayerList)
+                // - logicPath: the path to the file containing the logic (string)
+                // - channel: a reference to the channel of execution (ServerChannel)
+                // - group: a name to group together multiple game rooms (string)
+                gameRoom = channel.createGameRoom({
+                    group: 'ultimatum',
+                    clients: tmpPlayerList,
+                    channel: channel,
+                    logicPath: logicPath
+                });
+                
+	        // Setting metadata, settings, and plot.
+                tmpPlayerList.each(function (p) {
+                    // Clearing the waiting stage.
+                    node.remoteCommand('stop', p.id);
+                    // Setting the actual game.
+                    node.remoteSetup('game_metadata',  p.id, client.metadata);
+                    node.remoteSetup('game_settings', p.id, client.settings);
+                    node.remoteSetup('plot', p.id, client.plot);
+                    node.remoteSetup('env', p.id, client.env);
+                });
+                
+                // Start the logic.
+                gameRoom.startGame();
+            }
             
-            // Start the logic.
-            room.startGame();
+            // TODO: node.game.pl.size() is unchanged.
+            // We need to check with wRoom.size()
+            nPlayers = room.clients.player.size();
+            if (nPlayers) {
+                // If there are some players left out of the matching, notify
+                // them that they have to wait more.
+                wRoom.each(function(p) {
+                    node.say('waitingRoom', p.id, {
+                        poolSize: POOL_SIZE,
+                        nPlayers: nPlayers,
+                        retry: true
+                    });
+                });
+            }
         });
     });
     
@@ -114,7 +160,7 @@ module.exports = function(node, channel) {
         nodename: 'wroom',
 	game_metadata: {
 	    name: 'wroom',
-	    version: '0.0.1'
+	    version: '0.1.0'
 	},
 	game_settings: {
 	    publishLevel: 0

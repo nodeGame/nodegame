@@ -43,7 +43,7 @@ var PLAYING_STAGE = 2;
 // Here we export the logic function. Must accept two parameters:
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which the this logic will be running.
-module.exports = function(node, channel) {
+module.exports = function(node, channel, gameRoom) {
  
     function doMatch() {
         var g, bidder, respondent, data_b, data_r;
@@ -79,13 +79,14 @@ module.exports = function(node, channel) {
         node.on.preconnect(function(p) {
             console.log('Oh...somebody reconnected!', p);
             if (disconnected[p.id]) {
+                // Delete countdown to terminate the game.
+                clearTimeout(this.countdown);
                 // Notify other player he is back.
                 node.socket.send(node.msg.create({
                     target: 'PCONNECT',
                     data: p,
                     to: 'ALL'
                 }));
-
                 delete disconnected[p.id];
             }
             else {
@@ -101,13 +102,17 @@ module.exports = function(node, channel) {
                 id: p.id,
                 stage: p.stage
             }
-            // Wait for the player to reconnect, and after enough time
-            // cancel the game.
         });
 
         console.log('init');
     });
-    
+
+     // Event handler registered in the init function are always valid.
+    stager.setOnGameOver(function() {
+        // TODO: update database.
+        channel.destroyGameRoom(gameRoom.name);
+    });
+
     // Functions
     
     function instructions() {
@@ -131,6 +136,15 @@ module.exports = function(node, channel) {
         console.log('endgame');
     } 
     
+    function notEnoughPlayers() {
+        console.log('Warning: not enough players!!');
+        this.countdown = setTimeout(function() {
+            console.log('Countdown fired. Game terminated.');
+            // TODO needs to update the player in the registry too.
+            node.redirect('/ultimatum/gameterminated.html', 'ALL');
+            node.game.gameover();
+        }, 3000);
+    }
 
     // Set default step rule.
     stager.setDefaultStepRule(stepRules.OTHERS_SYNC_STEP);
@@ -139,17 +153,20 @@ module.exports = function(node, channel) {
     // will determine their execution.
     stager.addStage({
         id: 'instructions',
-        cb: instructions
+        cb: instructions,
+        minPlayers: [ 2, notEnoughPlayers ],
     });
 
     stager.addStage({
         id: 'quiz',
-        cb: quiz
+        cb: quiz,
+        minPlayers: [ 2, notEnoughPlayers ],
     });
 
     stager.addStage({
         id: 'ultimatum',
-        cb: ultimatum
+        cb: ultimatum,
+        minPlayers: [ 2, notEnoughPlayers ],
     });
 
     stager.addStage({

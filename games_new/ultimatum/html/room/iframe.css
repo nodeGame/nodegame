@@ -1,0 +1,36 @@
+body {
+  height: 600px;
+  margin: 0px auto;
+  padding: 0;
+  background: #FFF;
+  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+/*   overflow: hidden; */
+}
+
+div {
+	background: #DADCCB /* #eee1b3 #f3ede7; #D9DBCE; */ ;
+	color: black;
+  //border: 3px solid #CCC;
+  padding: 5px;
+  text-align: center;
+}
+
+canvas {
+  border: 3px solid #CCC;
+  padding: 5px;
+  background: white;
+}
+
+
+/* jQuery Sliders */
+
+.ui-slider {
+  height: 3px;
+} 
+
+.ui-slider-horizontal .ui-state-default {
+  height: 20px;
+  width: 10px;
+}

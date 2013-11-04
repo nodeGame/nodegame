@@ -1,0 +1,66 @@
+<!doctype html>
+<title>Test page</title>
+<style>
+ span.full {
+   font-size: 24px;
+   color: red;
+ }
+</style>
+<link rel='stylesheet' href='/stylesheets/monitor.css'></link>
+<body>
+<div id="root">
+  <h2 id="h2title">Congratulations! Your browser has the necessary requirements to play the game!</h2>
+  Please be patient. We still need connect<span id="wait">...</span>
+  <h3 id="h3_connected">Connected players: <span id="span_connected"></span></h3>
+  <div id="MESSAGE"></div>
+  <div id="chatDiv">
+    You can contact the game master using the chat window below. 
+  </div>
+</div>
+<script>
+  window.onload = function () {
+	  
+	  var node = parent.node,
+	      J = parent.JSUS;
+	  
+	  
+	  node.widgets.append('Chat', document.getElementById('chatDiv'), {
+      mode: 'ONE_TO_ONE',
+      displayName: function() {
+        return 'G.M.';
+      }
+    });
+	  
+    var wait = document.getElementById('wait');
+    setInterval(function(){
+      if (wait.innerHTML !== '......') {
+        wait.innerHTML = wait.innerHTML + '.';  
+      }
+      else {
+        wait.innerHTML = '..';
+      }
+    }, 1000)    
+	  
+		    
+	  var connected = 1;
+	  var span_connected = document.getElementById('span_connected');
+	  
+    node.onDATA('CONNECTED', function(msg) {
+    	  if (!msg.data) return;
+    	  span_connected.innerHTML = msg.data + ' / ' + node.game.minPlayers;  
+    });
+	  
+    node.say(node.player, 'WAITING', 'SERVER');
+    
+    node.onDATA('FULL', function(msg) {
+        var msgBox = document.getElementById('MESSAGE');
+        J.sprintf('%fullSorry%full, the game is full at the moment. Please try again later.', {'%full': {
+        	'class': 'full',
+        }}, msgBox);
+        span_connected.innerHTML = node.game.minPlayers + ' / ' + node.game.minPlayers;  
+    });
+    
+    
+	}
+</script>
+</body>
