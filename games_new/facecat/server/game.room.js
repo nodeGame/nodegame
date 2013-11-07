@@ -11,6 +11,8 @@
  */
 module.exports = function(node, channel) {
 
+    var J = require('JSUS').JSUS;
+
     // 1. Setting up database connection.
     
     // Establish the connection to database to load face sets.
@@ -76,6 +78,13 @@ module.exports = function(node, channel) {
 
         node.on.pconnect(function(p) {
             console.log('** Player connected: ' + p.id + ' **');
+
+            // Creating a state for reconnections.
+            gameState[p.id] = {
+                set: counter++,
+                pic: 0
+            };
+
 	    // Setting metadata, settings, and plot
             node.remoteSetup('game_metadata',  p.id, client.metadata);
 	    node.remoteSetup('game_settings', p.id, client.settings);
@@ -88,8 +97,7 @@ module.exports = function(node, channel) {
             node.remoteCommand('start', p.id);
         });
 
-        node.on.pdisconnect(function(p) {
-            gameState[p.id] = {};
+        node.on.pdisconnect(function(p) {   
             gameState[p.id].disconnected = true;
             gameState[p.id].stage = p.stage;
         });
@@ -106,40 +114,48 @@ module.exports = function(node, channel) {
             }
             pState.disconnected = false;
 
-            // It is not added automatically
+            // It is not added automatically.
+            // TODO: add it automatically if we return TRUE? It must be done
+            // both in the alias and the real event handler
             node.game.pl.add(p);
 
             // We could slice the game plot, and send just what we need
             // however here we resend all the stages, and within the 'facecat'
             // stage we send just some of the faces
             console.log('** Player connected: ' + p.id + ' **');
-	    // Setting metadata, settings, and plot
+	    // Setting metadata, settings, and plot.
             node.remoteSetup('game_metadata',  p.id, client.metadata);
 	    node.remoteSetup('game_settings', p.id, client.settings);
 	    node.remoteSetup('plot', p.id, client.plot);
-            
-            // Setting up the global variables in the client, if necessary.
-            // node.remoteSetup('env', ... );
-            
+
             // Start the game on the client.
             node.remoteCommand('start', p.id);
         });
         
         // Sends the faces (reply to a GET request from client.
         node.on('NEXT', function(msg) {
+            var set, state;
+            debugger
             console.log(msg);
-            gameState[msg.from] = {
-                set: counter++,
-                pic: 0
-            };
-            return sets[gameState[msg.from].set];
+            state = gameState[msg.from];
+            if (state.pic === 30) {
+                state.set++;
+            }
+            set = J.clone(sets[state.set-1]);
+            
+            if (state.pic > 0) {    
+                // We slice to the last picture that has an evaluation
+                // Since pictures are 1-based, we do not need to do -1.
+                set.items = set.items.slice(state.pic);
+            }
+            return set;
         });
 
         node.on.data('cat',function(msg) {
             console.log('**** Received a CAT! ***');
             console.log(msg.data);
             
-            gameStatep[msg.from].pic = msg.data.round;
+            gameState[msg.from].pic = msg.data.round;
             
             console.log('Writing!!!');
             mdbWrite.store(msg.data);
