@@ -45,21 +45,23 @@ var ultimatum = sn.addChannel({
     name: 'ultimatum',
     admin: 'ultimatum/admin',
     player: 'ultimatum',
-    verbosity: 100
+    verbosity: 100,
+    // If TRUE, players can invoke GET commands on admins.
+    getFromAdmins: true
 });
 
 
-//// Creates the waiting room for the channel.
-//var logicPath = path.resolve('./games_new/ultimatum/server/antechamber.turk.js');
-//var room = ultimatum.createWaitingRoom({
-//    logicPath: logicPath
-//});
-
-// Creates the room that will spawn the games for the channel
-var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
+// Creates the waiting room for the channel.
+var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
 var room = ultimatum.createWaitingRoom({
     logicPath: logicPath
 });
+
+// Creates the room that will spawn the games for the channel
+//var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
+//var room = ultimatum.createWaitingRoom({
+//    logicPath: logicPath
+//});
 
 // Exports the whole ServerNode.
 module.exports = sn;

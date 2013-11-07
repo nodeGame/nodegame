@@ -1,10 +1,13 @@
 /**
- * # FACECAT
+ * # Waiting Room for Face categorization Game
+ * Copyright(c) 2013 Stefano Balietti
+ * MIT Licensed
  *
- * This is the waiting room of a single player game.
- * Since it is single player, there is no need to create new sub rooms,
- * or nested groups.
- *
+ * Handles incoming connections, sets the Face Categorization game
+ * in each client, and start the game.
+ * The state of each player is saved, and in case of disconnections and
+ * reconnections the player restart from where it has left.
+ * ---
  */
 module.exports = function(node, channel) {
 
@@ -43,7 +46,7 @@ module.exports = function(node, channel) {
     // 2. Defining the single player game.
 
     // Every new connecting player will receive a new set of faces, indexed
-    // by counter; also on.data(NEXT) a new set will be sent.
+    // by counter; also on(NEXT) a new set will be sent.
     var counter = 0;
 
     // Creating the Stager object to define the game.
@@ -55,7 +58,9 @@ module.exports = function(node, channel) {
         Stager: node.Stager,
         stepRules: node.stepRules
     });
-    
+
+    var gameState = {};
+        
     // Create one waiting stage where everything will happen.
     stager.addStage({
         id: 'waiting',
@@ -70,7 +75,43 @@ module.exports = function(node, channel) {
         console.log('** Waiting Room: Initing... **');
 
         node.on.pconnect(function(p) {
-            var room;
+            console.log('** Player connected: ' + p.id + ' **');
+	    // Setting metadata, settings, and plot
+            node.remoteSetup('game_metadata',  p.id, client.metadata);
+	    node.remoteSetup('game_settings', p.id, client.settings);
+	    node.remoteSetup('plot', p.id, client.plot);
+            
+            // Setting up the global variables in the client, if necessary.
+            // node.remoteSetup('env', ... );
+            
+            // Start the game on the client.
+            node.remoteCommand('start', p.id);
+        });
+
+        node.on.pdisconnect(function(p) {
+            gameState[p.id] = {};
+            gameState[p.id].disconnected = true;
+            gameState[p.id].stage = p.stage;
+        });
+
+        node.on.preconnect(function(p) {
+            var p;
+            pState = gameState[p.id];
+            if (!p) {
+                // node.redirect();
+                return;
+            }
+            if (!pState.disconnected) {
+                // error
+            }
+            pState.disconnected = false;
+
+            // It is not added automatically
+            node.game.pl.add(p);
+
+            // We could slice the game plot, and send just what we need
+            // however here we resend all the stages, and within the 'facecat'
+            // stage we send just some of the faces
             console.log('** Player connected: ' + p.id + ' **');
 	    // Setting metadata, settings, and plot
             node.remoteSetup('game_metadata',  p.id, client.metadata);
@@ -86,48 +127,19 @@ module.exports = function(node, channel) {
         
         // Sends the faces (reply to a GET request from client.
         node.on('NEXT', function(msg) {
-            return sets[counter++];
+            console.log(msg);
+            gameState[msg.from] = {
+                set: counter++,
+                pic: 0
+            };
+            return sets[gameState[msg.from].set];
         });
 
-//        node.on.data('NEXT', function(msg) {
-//            return sets[counter++];
-//        });
-        
         node.on.data('cat',function(msg) {
             console.log('**** Received a CAT! ***');
             console.log(msg.data);
-//            if (!msg.from) {
-//                // Log error.
-//                msg.from = 'NA';
-//            }
-//            if (!msg.data) {
-//                // Log error.
-//                return;
-//            }
-//            if (!msg.data.round) {
-//                // Log and continue
-//                msg.data.round = 'NA';
-//            }
-//            if (!msg.data.session) {
-//                // Log and continue
-//                msg.data.session = 'NA';
-//            }
-//            if (!msg.data.player) {
-//                // Log and continue
-//                msg.data.player = 'NA';
-//            }
-//            if (!msg.data.cat) {
-//                // Log and continue
-//                msg.data.cat = 'NA';
-//            }
-//            if (!msg.data.tags) {
-//                // Log and continue
-//                msg.data.tags = ['NA'];
-//            }
-//            if (!msg.data.id) {
-//                // Log and continue
-//                msg.data.id = 'NA';
-//            }
+            
+            gameStatep[msg.from].pic = msg.data.round;
             
             console.log('Writing!!!');
             mdbWrite.store(msg.data);
@@ -157,7 +169,8 @@ module.exports = function(node, channel) {
 	    publishLevel: 0,
 	},
 	plot: stager.getState(),
-	verbosity: 1
+	verbosity: 1,
+        debug: true
     };
 
 };

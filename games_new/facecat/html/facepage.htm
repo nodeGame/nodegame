@@ -1,5 +1,4 @@
 <!doctype html>
-<title>My Game</title>
 
 <!-- Loading  nodeGame libraries and CSS -->
 <!-- CSS needs to be reloaded in each iframe -->
@@ -8,23 +7,30 @@
 <!-- end -->
 
 <body>
-<div id="root" style="display:none">
-  15*9*30= 4050 + 1*9*26= 234 , tot = 4284 + extra session = 270, very tot = 4554
-  
-  which painting is better for in absolute
-  which painting is better as a face
-  which painting is better as a non-face, resembling something else concrete (car, dick, boobs, bird...)
-  which painting is better as a purely abstract forms
-  give a tag (car, happy, sad, bigeyed, bodypart, abstract)
-  shall we make all of the same color, or keep original colors
-</div>
 <table id="facecat_table">
 <tr>
   <td id="td_face"><img class="face" id="face" src="/facecat/faces/loading.gif" /></td>
 </tr>
 <tr id="trcat">
   <td id="td_radio">
-    Which category do you find more adequate to describe the picture above?
+    Which category do you find more adequate to describe the picture above? 
+    <a href="#" id="helpCatsLink" onclick="javascript:parent.node.emit('helpCats');">(show help)</a>
+    <span id="helpCats" style="display: none">
+       <dl id="helpCatsDl" style="width: 635px">
+        <dt>Human face:</dt>
+        <dd>An image resembling a human face. Some traits can be missing, or be slightly distorted, or the face might look overall more like a caricature, or a cartooned version of a face.</dd>
+
+        <dt>Non-human face:</dt>
+        <dd>An image having some, or all, the characteristic traits of a face, but so distorted, or out of the normal positions (for example with the mouth above the eyes), that it cannot be human. For example, fantasy, animal, or alien faces would rather fit here than in the category above.</dd>
+
+        <dt>Any other known object or shape:</dt>
+        <dd>An image resembling a known object or shape, but not a face. For example, a car, a kitchen tool, or a full body - containing a face - would belong to this category. The image does not need to be a close representation of the object, but can just remind it.</dd>
+
+        <dt>Abstract lines:</dt>
+        <dd>An image not belonging to any of the categories above goes here.</dd>
+
+      </dl>
+    </span>
     <radio group="category_Left" id="radiocat">
       <dl id="dlcat">
         <dt id="dt_hface" onclick="javascript:parent.node.emit('radio', this);"><input id="radio_hface"type="radio" name="category">Human face</input></dt>
@@ -43,13 +49,19 @@
     <a href="#" onclick="javascript:parent.node.emit('undo_radio');">(Modify choice)</a>
     <br/>
     </p>
-    <label id="label" for="tag">
-      Write some words to best describe the salient features of the picture.
+    <label id="label" for="tag" style="width: 635px">
+      Type some words (tags) to describe the salient features of the image. <br/>
+      Good tags help to distinguish groups of similar images within the <em style="text-decoration:underline;">same</em> category.
+      <br/>
+       If you have used a tag in one image, please be consistent and use the same tag for all images containig the same salient feature.
       <br/><br/>
       Do not write sentences, just nouns, adjectives, or adjective plus noun. Use comma (,) as separator.
     </label>
     <br/><br/>
     <input type="text" id="tag" class="tag"/>
+    <br/><br/>
+    Previous tags by you: 
+    <ul id="previousTags"></ul>
   </td>
 </tr>
 <tr>

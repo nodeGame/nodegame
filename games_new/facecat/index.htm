@@ -1,5 +1,5 @@
 <!doctype html>
-<title>My Game</title>
+<title>Picture Categorization</title>
 
 <!-- Loading  nodeGame libraries and CSS -->
 <script src="/socket.io/socket.io.js"></script> 
@@ -60,29 +60,23 @@
 
       
       // Configuring nodegame
-      node.setup('nodegame', {
-	  // HOST needs to be specified only 
-	  // if this file is located in another server
-	  // host: http://myserver.com,	  
+      node.setup('nodegame', {	  
 	  verbosity: 100,
 	  debug: true,
 	  window: {
-	      promptOnleave: false
-              //transitions: true // not used for now (transitions are on by default)
+	      promptOnleave: false,
+              noEscape: true
 	  },
 	  env: {
 	      auto: false,
 	      debug: false
-	  },
-	  player: {
-	      name: "NodeGame Player", id: 'nodegame player id'
 	  },
 	  events: {
 	      dumpEvents: true
 	  },
 	  socket: {
 	      type: 'SocketIo',
-	      reconnect: false
+	      reconnect: true
 	  }
       });
       

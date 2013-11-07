@@ -1,8 +1,12 @@
 /**
- * This file contains all the building blocks (functions, and configuration)
- * that will be sent to the client.
+ * # Face categorization game - Client
+ * Copyright(c) 2013 Stefano Balietti
+ * MIT Licensed
+ *
+ * Client receives links of images and it goes through them
+ * displaying a set of categories to choose from and a tag box.
+ * ---
  */
-
 var Stager = module.parent.exports.Stager;
 var stepRules = module.parent.exports.stepRules;
 
@@ -21,18 +25,21 @@ game.globals = {};
 stager.setOnInit(function() {
     console.log('** INIT PLAYER! **');
     W.setup('SOLO_PLAYER');
-    this.counter = 0;
+    this.counter = -1;
     this.faces = {};
+    this.previousTags = {};
 });
 
 ///// STAGES and STEPS
 
-var REPEAT = 10;
+var REPEAT = 2;
 
 var facecat = function() {
     console.log('facecat');
     W.loadFrame('/facecat/html/facepage.htm', function() {
-        var next, faceImg, td, dlcat, tagTr, inputTag;
+        var next, faceImg, td, dlcat, tagTr, tagInput, previousTags;
+        var helpCats, helpCatsLink;
+
         var translate_radio = {
             'hface': 'Human face',
             'nhface': 'Non-human face',
@@ -41,7 +48,7 @@ var facecat = function() {
         };
 
         var chosen_cat, order;
-        
+
         node.on('radio', function(radio) {
             console.log(radio)
             chosen_cat = radio.id.substr(3);
@@ -50,11 +57,22 @@ var facecat = function() {
             displayTags();
         });
 
-        node.on('undo_radio', function(radio) {
+        node.on('undo_radio', function() {
             console.log('undoing ' + chosen_cat);
             chosen_cat = null;
             selectedSpan.innerHTML = '';
             displayCats();
+        });
+
+        node.on('helpCats', function() {
+            if (helpCats.style.display === 'none') {
+                helpCats.style.display = '';
+                helpCatsLink.innerHTML = '(hide help)';
+            }
+            else {
+                helpCats.style.display = 'none';
+                helpCatsLink.innerHTML = '(show help)';
+            }
         });
 
         function displayTags() {
@@ -67,7 +85,7 @@ var facecat = function() {
 
         function displayFace() {
             var imgPath;
-            imgPath = node.game.faces.items[node.game.counter++].path;
+            imgPath = node.game.faces.items[++node.game.counter].path;
             faceImg.src = '/facecat/faces/' + imgPath;
             console.log(imgPath);
             
@@ -82,6 +100,7 @@ var facecat = function() {
             next.disabled = true;
             next.innerHTML = 'Select a category';
             tagTr.style.display = 'none';
+            node.emit('HIDE',  helpCats);
             order = JSUS.shuffleNodes(dlcat, JSUS.sample(0,3));
         }
 
@@ -94,21 +113,26 @@ var facecat = function() {
             else {
                 console.log(faces);
             }
-            node.game.counter = 0;
+            node.game.counter = -1;
             node.game.faces = faces;
             
             displayFace();
         }
         
         function askForNext() {
-            var tags, faces;
+            var tags, faces, obj, i, len;
             faces = node.game.faces;
             if (!faces.items || node.game.counter >= faces.items.length) {
                 node.get('NEXT', onNextFaces);
             }
             else {
                 tags = tagInput.value.trim().split(',');
-                var obj =  {
+                // Cleaning and adding tags to the list
+                for (i = 0 ; i < tags.length; i++) {
+                    tags[i] = tags[i].trim();
+                    addTag2List(tags[i]);
+                }
+                obj = {
                     session: faces.id, 
                     player: faces.player,
                     round: faces.items[node.game.counter].round,
@@ -119,12 +143,34 @@ var facecat = function() {
                     tags: tags,
                     order: order
                 };
-                console.log(obj);
-                node.set('cat',obj);
+                node.set('cat', obj);
+                
                 displayFace();
             }
         }
-        
+
+        function addTag2List(tagName) {
+            var li;
+            if ('string' !== typeof tagName) {
+                throw new Error('addTag2List: tag must be string.');
+            }
+            if (tagName === '') {
+                return;
+            }
+            // Adding only new tags.
+            if (!node.game.previousTags[tagName]) {
+                node.game.previousTags[tagName] = tagName;
+                li = document.createElement('li');
+                li.appendChild(document.createTextNode(tagName));
+                li.name = tagName;
+                li.onclick = function() {
+                    tagInput.value += (tagName + ', ');
+                };
+                
+                previousTags.appendChild(li);
+            }
+        };
+
         // Elements of the page.
         
         // Next button.
@@ -136,11 +182,14 @@ var facecat = function() {
         // Categories.
         td = W.getElementById('td_radio');
         dlcat = W.getElementById('dlcat');
+        helpCats = W.getElementById('helpCats');
+        helpCatsLink = W.getElementById('helpCatsLink');
         
         // Tags
         selectedSpan = W.getElementById('radio_selected');
         tagTr = W.getElementById('trtags');
         tagInput = W.getElementById('tag');
+        previousTags = W.getElementById('previousTags');
 
         // Click!
         next.onclick = askForNext;
@@ -197,6 +246,13 @@ function sample() {
     
 }
 
+function thankyou() {
+    console.log('thank you.');
+    W.loadFrame('/facecat/html/thankyou.html');
+}
+
+// Creating stages and steps
+
 stager.addStep({
     id: 'instructionsText',
     cb: instructionsText
@@ -206,10 +262,6 @@ stager.addStep({
     id: 'sample',
     cb: sample
 });
-
-// TODO: when the stager adds the name of a step that is invalid
-// for example it contains a typo, the error msg is not clear.
-// Stager.addStage: invalid stage received. -> too generic
 
 stager.addStage({
     id: 'instructions',
@@ -224,12 +276,19 @@ stager.addStage({
     steprule: stepRules.SOLO
 });
 
+stager.addStage({
+    id: 'thankyou',
+    cb: thankyou,
+    steprule: stepRules.SOLO
+});
+
 // Now that all the stages have been added,
 // we can build the game plot
 
 stager.init()
     .next('instructions')
     .repeat('facecat', REPEAT)
+    .next('thankyou')
     .gameover();
 
 stager.setOnGameOver(function() {

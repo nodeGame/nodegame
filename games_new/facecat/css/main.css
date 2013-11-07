@@ -49,14 +49,18 @@ ul {
     margin: 10px;
 }
 
-td#td_radio dl dt {
+dl#helpCatsDl dt {
+    font-weight: bold;
+}
+
+dl#dlcat dt {
     margin-top: 10px;
     margin-left: 20px;
     font-size: 20px;
-    cursor: pointer;
 }
 
-td#td_radio dt:hover {
+dl#dlcat dt:hover {
+    cursor: pointer;
     font-weight: bold;
     background: #FFD;
 }
@@ -69,4 +73,15 @@ div#container_done {
     padding:0;
     padding-top: 300px;
     background: white;
+}
+
+ul#previousTags li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 10px;
+}
+
+ul#previousTags li:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }
