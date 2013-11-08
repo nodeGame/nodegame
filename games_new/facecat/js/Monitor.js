@@ -18,13 +18,22 @@ function Monitor(node) {
         .loop('monitoring');
 
     return {
+        io: {        
+          reconnect: false
+        },
+        socket: {
+    	  type: 'SocketIo'
+        },
+        events: {
+    	  dumpEvents: true
+        },
         game_metadata: {
             name: 'Monitor Screen',
             description: 'No Description',
             version: '0.3'
         },
         game_settings: {
-            observer: true
+            publishLevel: 0
         },
         plot: stager.getState(),
         debug: true,

@@ -9,31 +9,13 @@
 
 <script>
     window.onload = function() {
-    var game = new Monitor(node);
+      var game = new Monitor(node);
+      node.setup('nodegame', game);
+      node.connect('/facecat/admin');
 
-    var conf = {
-      url: "/facerank/admin",
-      io: {        
-          reconnect: false
-      },
-      socket: {
-    	  type: 'SocketIo'
-      },
-      events: {
-    	  dumpEvents: true
-      }
-    };
-    JSUS.mixin(conf, game);
-
-    node.setup('nodegame', conf);
-   
-    //node.socket.setSocketType('SocketIo');
-    
-    node.connect(conf.url);
-    node.once('PLAYER_CREATED', function(player) {
-      node.game.start();
-    });
-    
+      node.on('PLAYER_CREATED', function() {
+        node.game.start();
+      });
   }
 </script>
 </body>

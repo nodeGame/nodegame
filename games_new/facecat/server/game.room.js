@@ -102,6 +102,12 @@ module.exports = function(node, channel) {
             gameState[p.id].stage = p.stage;
         });
 
+        // This must be done manually for now (maybe change).
+        node.on.mreconnect(function(p) {
+            debugger
+            node.game.ml.add(p);
+        });
+
         node.on.preconnect(function(p) {
             var p;
             pState = gameState[p.id];
@@ -132,15 +138,33 @@ module.exports = function(node, channel) {
             node.remoteCommand('start', p.id);
         });
         
-        // Sends the faces (reply to a GET request from client.
+        // Sends the faces (reply to a GET request from client).
         node.on('NEXT', function(msg) {
             var set, state;
-            debugger
-            console.log(msg);
             state = gameState[msg.from];
-            if (state.pic === 30) {
-                state.set++;
+            
+            // This is a reconnection.
+            if (state.pic !== 0) {
+                node.remoteAlert('A previous unfinished game session has ' +
+                                 'been detected. You will continue from ' +
+                                 'the last image you saw.', msg.from);
             }
+
+            // Set is finished.
+            if (state.pic === 30) {
+                if (!state.completedSets) { 
+                    // Update to the next available counter level.
+                    state.set = ++counter;
+                    state.completedSets = 1;
+                }
+                else {
+                    // Player has rated 60 paintings.
+                    node.remoteCommand('step', msg.from);
+                    return;
+                }
+            }
+
+            // We need to clone it, otherwise it gets overwritten.
             set = J.clone(sets[state.set-1]);
             
             if (state.pic > 0) {    
@@ -151,20 +175,20 @@ module.exports = function(node, channel) {
             return set;
         });
 
-        node.on.data('cat',function(msg) {
-            console.log('**** Received a CAT! ***');
-            console.log(msg.data);
-            
-            gameState[msg.from].pic = msg.data.round;
-            
-            console.log('Writing!!!');
-            mdbWrite.store(msg.data);
-
-        });
-
+        // Client is requesting a random sample.
         node.on('sample', function(msg) {
             console.log('**** Received a get SAMPLE! ***');
             return sets[counter].items.concat(sets[(counter+1)].items);
+        });
+
+        // Client has categorized an image.
+        node.on.data('cat',function(msg) {
+            if (!msg.data) return;
+            console.log('**** Received a CAT! ' + msg.data.round + '***');
+            // Update the counter of the last categorized pic.
+            gameState[msg.from].pic = msg.data.round;
+            mdbWrite.store(msg.data);
+
         });
 
     });

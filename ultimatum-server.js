@@ -52,16 +52,16 @@ var ultimatum = sn.addChannel({
 
 
 // Creates the waiting room for the channel.
-var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
-var room = ultimatum.createWaitingRoom({
-    logicPath: logicPath
-});
-
-// Creates the room that will spawn the games for the channel
-//var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
+//var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
 //var room = ultimatum.createWaitingRoom({
 //    logicPath: logicPath
 //});
+
+// Creates the room that will spawn the games for the channel
+var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
+var room = ultimatum.createWaitingRoom({
+    logicPath: logicPath
+});
 
 // Exports the whole ServerNode.
 module.exports = sn;
