@@ -8,7 +8,7 @@
  * ---
  */
 module.exports = function(node, channel, room) {
-    var dk = require('descil-mturk');
+    //var dk = require('descil-mturk');
     var request = require('request');
     var stager = new node.Stager();
 
