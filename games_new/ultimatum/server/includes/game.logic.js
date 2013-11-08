@@ -143,7 +143,7 @@ module.exports = function(node, channel, gameRoom) {
             // TODO needs to update the player in the registry too.
             node.redirect('/ultimatum/gameterminated.html', 'ALL');
             node.game.gameover();
-        }, 3000);
+        }, 30000);
     }
 
     // Set default step rule.
