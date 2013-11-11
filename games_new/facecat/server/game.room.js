@@ -11,6 +11,7 @@
  */
 module.exports = function(node, channel) {
 
+    var dk = require('descil-mturk');
     var J = require('JSUS').JSUS;
 
     // 1. Setting up database connection.
@@ -63,17 +64,11 @@ module.exports = function(node, channel) {
 
     var gameState = {};
         
-    // Create one waiting stage where everything will happen.
-    stager.addStage({
-        id: 'waiting',
-        cb: function() { 
-            console.log('** Waiting Room: Opened! **');
-            return true;
-        }
-    });
 
-    stager.setOnInit(function() {
+    // Functions.
 
+    function init() {
+	
         console.log('** Waiting Room: Initing... **');
 
         node.on.pconnect(function(p) {
@@ -141,15 +136,17 @@ module.exports = function(node, channel) {
         // Sends the faces (reply to a GET request from client).
         node.on('NEXT', function(msg) {
             var set, state;
+            console.log('***** Received NEXT ******');
+
             state = gameState[msg.from];
-            
+            console.log(state);
             // This is a reconnection.
             if (state.pic !== 0) {
                 node.remoteAlert('A previous unfinished game session has ' +
                                  'been detected. You will continue from ' +
                                  'the last image you saw.', msg.from);
             }
-
+            
             // Set is finished.
             if (state.pic === 30) {
                 if (!state.completedSets) { 
@@ -165,13 +162,17 @@ module.exports = function(node, channel) {
             }
 
             // We need to clone it, otherwise it gets overwritten.
-            set = J.clone(sets[state.set-1]);
+            set = J.clone(sets[state.set]);
             
             if (state.pic > 0) {    
                 // We slice to the last picture that has an evaluation
                 // Since pictures are 1-based, we do not need to do -1.
                 set.items = set.items.slice(state.pic);
             }
+            console.log(counter);
+
+            console.log(set ? set.items.length : 'no set');
+
             return set;
         });
 
@@ -191,7 +192,18 @@ module.exports = function(node, channel) {
 
         });
 
+    }
+
+    // Create one waiting stage where everything will happen.
+    stager.addStage({
+        id: 'waiting',
+        cb: function() { 
+            console.log('** Waiting Room: Opened! **');
+            return true;
+        }
     });
+
+    stager.setOnInit(init);
 
     stager.setOnGameOver(function() {
 	console.log('^^^^^^^^^^^^^^^^GAME OVER^^^^^^^^^^^^^^^^^^');
