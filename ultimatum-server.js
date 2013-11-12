@@ -40,6 +40,19 @@ var options = {
 // Start server, option parameter is optional.
 var sn = new ServerNode(options);
 
+
+// Add a channel to the server.
+var feedback = sn.addChannel({
+    name: 'feedback',
+    admin: 'feedback/admin',
+    player: 'feedback',
+    verbosity: 100,
+    // If TRUE, players can invoke GET commands on admins.
+    getFromAdmins: false
+});
+
+
+
 // Add a channel to the server.
 var ultimatum = sn.addChannel({
     name: 'ultimatum',
@@ -50,17 +63,17 @@ var ultimatum = sn.addChannel({
     getFromAdmins: true
 });
 
-
 // Creates the waiting room for the channel.
-//var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
-//var room = ultimatum.createWaitingRoom({
-//    logicPath: logicPath
-//});
+var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
+var room = ultimatum.createWaitingRoom({
+    logicPath: logicPath
+});
 
 // Creates the room that will spawn the games for the channel
 var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
-var room = ultimatum.createWaitingRoom({
-    logicPath: logicPath
+var room = ultimatum.createGameRoom({
+    logicPath: logicPath,
+    name: 'gameRoom'
 });
 
 // Exports the whole ServerNode.

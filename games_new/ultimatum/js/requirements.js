@@ -21,12 +21,8 @@ function Requirements() {
     // Functions.
 
     function myInit() {
-	var that = this;
-
         W.setup('SOLO_PLAYER');
-        
 	this.checkedIn = false;
-
     }
 
     function requirements() {
@@ -39,14 +35,31 @@ function Requirements() {
             window.req = node.widgets.append('Requirements', div);
             
             req.onFail = function() {
+                var str, args;
                 console.log('failed');
+                str = '%spanYou are NOT allowed to take the HIT. If you ' +
+                    'have already taken it, you must return it. You can ' +
+                    'leave a feedback using the form below.%span';
+                args = {
+                    '%span': {
+                        'class': 'requirements-fail'
+                    }
+                };
+                W.sprintf(str, args, div);
                 window.feedback = node.widgets.append('Feedback', div);
             };
 
             req.onSuccess = function() {
-                console.log('success');
+                var str, args;
+                node.emit('HIDE', 'unsupported');
+                str = '%spanYou are allowed to take the HIT.%span';
+                args = {
+                    '%span': {
+                        'class': 'requirements-success'
+                    }
+                };
+                W.sprintf(str, args, div);
             };
-
 
             function checkToken(result) {
                 var token = J.getQueryString('id');
