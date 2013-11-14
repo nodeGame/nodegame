@@ -7,10 +7,10 @@
  * Extensively documented tutorial.
  *
  * Info:
- * Matching, and stepping can be done in different ways. It can be 
+ * Matching, and stepping can be done in different ways. It can be
  * centralized, and the logic tells the clients when to step, or
  * clients can synchronize themselves and step automatically.
- 
+
  * In this game, the logic is synchronized with the clients. The logic
  * will send automatically game-commands to start and step
  * through the game plot whenever it enters a new game step.
@@ -44,21 +44,21 @@ var PLAYING_STAGE = 2;
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which the this logic will be running.
 module.exports = function(node, channel, gameRoom) {
- 
+
     function doMatch() {
         var g, bidder, respondent, data_b, data_r;
-        
+
         g = node.game.pl.shuffle();
         bidder = g.first();
         respondent = g.last();
-        
+
         data_b = {
-	    role: 'bidder',
-	    other: respondent.id
+            role: 'bidder',
+            other: respondent.id
         };
         data_r = {
-	    role: 'respondent',
-	    other: bidder.id
+            role: 'respondent',
+            other: bidder.id
         };
         // Send a message to each player with their role
         // and the id of the other player.
@@ -93,7 +93,7 @@ module.exports = function(node, channel, gameRoom) {
                 // Player was not authorized, redirect to a warning page.
                 node.redirect('/ultimatum/unauth.htm', p.id);
             }
-            
+
         });
 
         // Register player disconnection, and wait for him...
@@ -101,7 +101,7 @@ module.exports = function(node, channel, gameRoom) {
             disconnected[p.id] = {
                 id: p.id,
                 stage: p.stage
-            }
+            };
         });
 
         console.log('init');
@@ -114,11 +114,11 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     // Functions
-    
+
     function instructions() {
         console.log('Instructions');
     }
-    
+
     function quiz() {
         console.log('Quiz');
     }
@@ -127,15 +127,15 @@ module.exports = function(node, channel, gameRoom) {
         console.log('Ultimatum');
         doMatch();
     }
-    
+
     function questionnaire() {
         console.log('questionnaire');
     }
-    
+
     function endgame() {
         console.log('endgame');
-    } 
-    
+    }
+
     function notEnoughPlayers() {
         console.log('Warning: not enough players!!');
         this.countdown = setTimeout(function() {
@@ -148,7 +148,7 @@ module.exports = function(node, channel, gameRoom) {
 
     // Set default step rule.
     stager.setDefaultStepRule(stepRules.OTHERS_SYNC_STEP);
-    
+
     // Adding the stages. We can later on define the rules and order that
     // will determine their execution.
     stager.addStage({
@@ -173,7 +173,7 @@ module.exports = function(node, channel, gameRoom) {
         id: 'questionnaire',
         cb: questionnaire
     });
-    
+
     stager.addStage({
         id: 'endgame',
         cb: endgame
