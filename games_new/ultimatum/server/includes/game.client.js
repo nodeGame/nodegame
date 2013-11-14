@@ -201,6 +201,30 @@ function ultimatum() {
             console.log('RECEIVED BIDDER!');
             other = msg.data.other;
 
+
+            //////////////////////////////////////////////
+            // nodeGame hint:
+            //
+            // W.loadFrame takes an optional third 'options' argument which can
+            // be used to request caching of the displayed frames (see the end
+            // of the following function call). The caching mode can be set with
+            // two fields: 'loadMode' and 'storeMode'.
+            //
+            // 'loadMode' specifies whether the frame should be reloaded
+            // regardless of caching (loadMode = 'reload', default) or whether
+            // the frame should be looked up in the cache (loadMode = 'cache').
+            // If the frame is not in the cache, it is always loaded from the
+            // server.
+            //
+            // 'storeMode' says when, if at all, to store the loaded frame. By
+            // default the cache isn't updated (storeMode = 'off'). The other
+            // options are to cache the frame right after it has been loaded
+            // (storeMode = 'onLoad') and to cache it when it is closed, that
+            // is, when the frame is replaced by other contents (storeMode =
+            // 'onClose'). This last mode preserves all the changes done while
+            // the frame was open.
+            //
+            /////////////////////////////////////////////
             W.loadFrame('/ultimatum/html/bidder.html', function() {
 
                 // Start the timer after an offer was received.
@@ -248,7 +272,8 @@ function ultimatum() {
                     W.write(' Your offer was rejected.');
                     node.timer.randomEmit('DONE', 3000);
                 });
-            });
+
+            }, { cache: { loadMode: 'cache', storeMode: 'onStore' } });
 
         });
 
@@ -317,7 +342,8 @@ function ultimatum() {
                         node.emit('RESPONSE_DONE', 'REJECT', msg.data, other);
                     };
                 });
-            });
+
+            }, { cache: { loadMode: 'cache', storeMode: 'onLoad' } });
 
         });
     //});
