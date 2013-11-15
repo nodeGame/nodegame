@@ -115,6 +115,10 @@ module.exports = function(node, channel, gameRoom) {
 
     // Functions
 
+    function precache() {
+        console.log('Pre-Cache');
+    }
+
     function instructions() {
         console.log('Instructions');
     }
@@ -152,21 +156,27 @@ module.exports = function(node, channel, gameRoom) {
     // Adding the stages. We can later on define the rules and order that
     // will determine their execution.
     stager.addStage({
+        id: 'precache',
+        cb: precache,
+        minPlayers: [ 2, notEnoughPlayers ]
+    });
+
+    stager.addStage({
         id: 'instructions',
         cb: instructions,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
         id: 'quiz',
         cb: quiz,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
         id: 'ultimatum',
         cb: ultimatum,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
@@ -185,6 +195,7 @@ module.exports = function(node, channel, gameRoom) {
     // Here we define the sequence of stages of the game (game plot).
     stager
         .init()
+        .next('precache')
         .next('instructions')
         .next('quiz')
         .repeat('ultimatum', REPEAT)

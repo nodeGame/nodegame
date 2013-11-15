@@ -114,6 +114,34 @@ stager.setOnGameOver(function() {
 
 ///// STAGES and STEPS
 
+//////////////////////////////////////////////
+// nodeGame hint:
+//
+// Pages can be preloaded with this method:
+//
+// W.preCache()
+//
+// It loads the content from the URIs given in an array parameter, and the next
+// time W.loadFrame() is used with those pages, they can be loaded from memory.
+//
+// W.preCache calls the function given as the second parameter when it's done.
+//
+/////////////////////////////////////////////
+function precache() {
+    W.lockFrame('Loading...');
+    W.preCache([
+        '/ultimatum/html/instructions.html',
+        '/ultimatum/html/quiz.html',
+        //'/ultimatum/html/bidder.html',  // these two are cached by following
+        //'/ultimatum/html/resp.html',    // loadFrame calls (for demonstration)
+        '/ultimatum/html/postgame.html',
+        '/ultimatum/html/ended.html'
+    ], function() {
+        // Pre-Caching done; proceed to the next stage.
+        node.done();
+    });
+}
+
 function instructions() {
     var that = this;
 
@@ -211,8 +239,8 @@ function ultimatum() {
             // two fields: 'loadMode' and 'storeMode'.
             //
             // 'loadMode' specifies whether the frame should be reloaded
-            // regardless of caching (loadMode = 'reload', default) or whether
-            // the frame should be looked up in the cache (loadMode = 'cache').
+            // regardless of caching (loadMode = 'reload') or whether the frame
+            // should be looked up in the cache (loadMode = 'cache', default).
             // If the frame is not in the cache, it is always loaded from the
             // server.
             //
@@ -419,11 +447,19 @@ function notEnoughPlayers() {
 stager.setDefaultStepRule(stepRules.WAIT);
 
 stager.addStage({
-    id: 'instructions',
-    cb: instructions,
+    id: 'precache',
+    cb: precache,
     // `minPlayers` triggers the execution of a callback in the case
     // the number of players (including this client) falls the below
     // the chosen threshold. Related: `maxPlayers`, and `exactPlayers`.
+    minPlayers: [ 2, notEnoughPlayers ],
+    syncOnLoaded: true,
+    done: clearFrame
+});
+
+stager.addStage({
+    id: 'instructions',
+    cb: instructions,
     minPlayers: [ 2, notEnoughPlayers ],
     syncOnLoaded: true,
     timer: 600000,
@@ -482,6 +518,7 @@ stager.addStage({
 var REPEAT = 3;
 
 stager.init()
+    .next('precache')
     .next('instructions')
     .next('quiz')
     .repeat('ultimatum', REPEAT)
