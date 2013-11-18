@@ -9,8 +9,21 @@
  */
 module.exports = function(node, channel, room) {
 
-    // Loads the database layer. If you do not use the database
-    // you do not these lines.
+    var path = require('path');
+    
+    // Reads in descil-mturk configuration.
+    var confPath = path.resolve(__dirname, 'descil.conf.js');
+    
+    // Load the code database.
+    var dk = require('descil-mturk')(confPath);
+    dk.getCodes(function() {
+        if (!dk.codes.size()) {
+            throw new Error('game.room: no codes found.');
+        }
+    });
+
+    // Loads the database layer. If you do not use an external database
+    // you do not need these lines.
     var Database = require('nodegame-db').Database;
     var ngdb = new Database(node);
     var mdb = ngdb.getLayer('MongoDB');
@@ -44,6 +57,51 @@ module.exports = function(node, channel, room) {
         }
     });
     
+    // Creating an authorization function for the players.
+    // This is executed before the client the PCONNECT listener.
+    channel.player.authorization(function(header, cookies, room) {
+        var code;
+
+        console.log('game.room: checking auth.');
+
+        // Weird thing.
+        if ('string' !== typeof cookies.player) {
+            console.log('no player: ', cookies.player)
+            return false;
+        }
+
+        // Weird thing.
+        if ('string' !== typeof cookies.token) {
+            console.log('no token: ', cookies.token)
+            return false;
+        }
+        
+        code = dk.codeExists(cookies.token);
+        
+        // Code not existing.
+	if (!code) {
+            console.log('not existing token: ', cookies.token);
+            return false;
+        }
+        
+        // Code in use.
+	if (code.usage) {
+            console.log('token already in use: ', cookies.token);
+            return false;
+	}
+        
+        // Mark the code as in use.
+        dk.incrementUsage(cookies.token);
+
+        // Client Authorized
+        return true;
+    });
+
+
+    channel.player.clientIdGenerator(function(headers, cookies, ids, info) {
+        return cookies.token;
+    });
+
     // Creating an init function.
     // Event listeners registered here are valid for all the stages of the game.
     stager.setOnInit(function() {
@@ -61,14 +119,24 @@ module.exports = function(node, channel, room) {
         // players reconnects.
         node.on.preconnect(function(p) {
             console.log('Oh...somebody reconnected in the waiting room!', p);
+            node.game.pl.add(p);
         });
 
-        // This callback is executed whenever two players connect.
+        // This must be done manually for now (maybe will change in the future).
+        node.on.mreconnect(function(p) {
+            node.game.ml.add(p);
+        });
+
+        // This callback is executed when a player connects to the channel.
         node.on.pconnect(function(p) {
             var gameRoom, wRoom, tmpPlayerList;
             var nPlayers, i, len;
             console.log('-----------Player connected ' + p.id);
             
+            node.remoteAlert('Your code has been marked as in use. Do not ' +
+                             'leave this page, otherwise you will not be ' +
+                             'able to join the experiment again.', p.id);
+
             // PlayerList object of waiting players.
             wRoom = room.clients.player;
             nPlayers = wRoom.size();

@@ -183,7 +183,7 @@ function Ultimatum () {
 	    console.log('***********************');
 	      
 	    	      
-		console.log('Game ended');
+	    console.log('Game ended');
 	};
 	
 	

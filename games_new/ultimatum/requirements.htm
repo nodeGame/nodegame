@@ -13,15 +13,15 @@
   <h2 id="h2title">Welcome!</h2>
   <noscript>Your browser does not support JavaScript. You cannot take this HIT, if you don't have JavaScript enabled in your browser.</noscript>
   <script>
-    
+
     window.onload = function () {
-    
+
       // Player ID from Mturk
       var mtid, game;
 
       mtid = JSUS.getQueryString('id');
       game = new Requirements();
-  
+
       // Configuring nodegame.
       node.setup('nodegame', {
 	  // HOST needs to be specified only 
@@ -48,7 +48,7 @@
           verbosity: 10,
       });
 
-      node.connect("/ultimatum");
+      node.connect("/requirements");
     
     };  
   </script>

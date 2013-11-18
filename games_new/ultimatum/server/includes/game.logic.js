@@ -10,7 +10,7 @@
  * Matching, and stepping can be done in different ways. It can be 
  * centralized, and the logic tells the clients when to step, or
  * clients can synchronize themselves and step automatically.
- 
+ *
  * In this game, the logic is synchronized with the clients. The logic
  * will send automatically game-commands to start and step
  * through the game plot whenever it enters a new game step.
@@ -19,12 +19,13 @@
  * ---
  */
 
-var channel = module.parent.exports.channel;
-var node = module.parent.exports.node;
-var Database = require('nodegame-db').Database;
-var ngdb = new Database(node);
-var mdb = ngdb.getLayer('MongoDB');
+var path = require('path');
 
+var Database = require('nodegame-db').Database;
+// Variable _node_ is shared by the requiring module
+// (game.room.js) through `channel.require` method.
+var ngdb = new Database(module.parent.exports.node);
+var mdb = ngdb.getLayer('MongoDB');
 
 var ngc = require('nodegame-client');
 var Stager = ngc.Stager;
@@ -40,11 +41,22 @@ var counter = 0;
 var MIN_PLAYERS = 2;
 var PLAYING_STAGE = 2;
 
-// Here we export the logic function. Must accept two parameters:
+// Here we export the logic function. Receives three parameters:
 // - node: the NodeGameClient object.
-// - channel: the ServerChannel object in which the this logic will be running.
+// - channel: the ServerChannel object in which this logic will be running.
+// - gameRoom: the GameRoom object in which this logic will be running. 
 module.exports = function(node, channel, gameRoom) {
  
+    // Reads in descil-mturk configuration.
+    var confPath = path.resolve(__dirname, '..', 'descil.conf.js');
+    var dk = require('descil-mturk')(confPath);
+    dk.getCodes(function() {
+        debugger
+        if (!dk.codes.size()) {
+            throw new Error('game.logic: no codes found.');
+        }
+    });
+
     function doMatch() {
         var g, bidder, respondent, data_b, data_r;
         
@@ -66,7 +78,6 @@ module.exports = function(node, channel, gameRoom) {
         node.say('RESPONDENT', respondent.id, data_r);
         console.log('Matching completed.');
     }
-
 
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
@@ -104,11 +115,51 @@ module.exports = function(node, channel, gameRoom) {
             }
         });
 
+        // Update the Payoffs
+        node.on.data('response', function(msg) {
+	    var resWin, bidWin, p, response;
+            response = msg.data;
+
+	    if (!response) {
+                // TODO handle error.
+                return;
+            }
+
+	    if (response.response === 'ACCEPT') {
+
+		resWin = parseInt(response.value);
+		bidWin = 100 - resWin;
+		
+		// Respondent payoff.
+		p = dk.codes.id.get(msg.from);
+                if (!p) {
+                    console.log('AAAH not P!');
+                    return;
+                }
+
+		p.win = (!p.win) ? resWin : p.win + resWin;
+		node.log('Added to respondent ' + msg.from + ' ' +
+                         response.value + ' ECU');
+		
+		// Bidder payoff
+		p = dk.codes.id.get(response.from);
+                
+                if (!p) {
+                    console.log('AAAH not P2!');
+                    return;
+                }
+
+		p.win = (!p.win) ? bidWin : p.win + bidWin;
+		node.log('Added to bidder ' + p.clientId + ' ' + p.win + ' ECU');
+	    }
+	});
+
         console.log('init');
     });
 
      // Event handler registered in the init function are always valid.
     stager.setOnGameOver(function() {
+        console.log('************** GAMEOVER ' + gameRoom.name + '****************');
         // TODO: update database.
         channel.destroyGameRoom(gameRoom.name);
     });
@@ -133,7 +184,28 @@ module.exports = function(node, channel, gameRoom) {
     }
     
     function endgame() {
+        var code, exitcode, accesscode;
         console.log('endgame');
+
+        node.game.pl.each(function(p) {
+            code = dk.codes.id.get(p.id);
+            if (!code) {
+                console.log('ERROR: no code in endgame:', p.id);
+                return;
+            }
+            
+            accesscode = code.AccessCode;
+	    exitcode = code.ExitCode;
+	    code.win = (p.win || 0) / 1000;
+	    dk.checkOut(accesscode, exitcode, code.win);
+	    node.say('WIN', p.id, p.win);
+	});
+	console.log('FINAL PAYOFF PER PLAYER');
+	console.log('***********************');
+	console.log(node.game.pl.keep(['mtid', 'win']).fetch());
+	console.log('***********************');
+	
+	console.log('Game ended');
     } 
     
     function notEnoughPlayers() {
@@ -180,7 +252,7 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     // Building the game plot.
-    var REPEAT = 3;
+    var REPEAT = 1;
 
     // Here we define the sequence of stages of the game (game plot).
     stager
@@ -214,7 +286,11 @@ module.exports = function(node, channel, gameRoom) {
         // and printed to screen, and the game will continue.
         debug: true,
         // Controls the amount of information printed to screen.
-        verbosity: 0
+        verbosity: 0,
+        // nodeGame enviroment variables.
+        env: {
+            auto: false
+        }
     };
 
 };

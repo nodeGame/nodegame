@@ -99,7 +99,6 @@ module.exports = function(node, channel) {
 
         // This must be done manually for now (maybe change).
         node.on.mreconnect(function(p) {
-            debugger
             node.game.ml.add(p);
         });
 

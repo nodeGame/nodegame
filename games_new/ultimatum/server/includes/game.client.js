@@ -325,7 +325,7 @@ function ultimatum() {
 }
 
 function postgame(){
-    W.loadFrame('/ultimatum/html/postgame.html', function(){
+    W.loadFrame('/ultimatum/html/postgame.html', function() {
 	node.env('auto', function(){
 	    node.timer.randomEmit('DONE');
 	});
@@ -334,7 +334,7 @@ function postgame(){
 }
 
 function endgame(){
-    W.loadFrame('/ultimatum/html/ended.html', function(){
+    W.loadFrame('/ultimatum/html/ended.html', function() {
 	node.on('WIN', function(msg) {
 	    W.write('Your earning in the game is: ' + msg.data);
 	});
@@ -452,7 +452,7 @@ stager.addStage({
 // Now that all the stages have been added,
 // we can build the game plot
 
-var REPEAT = 3;
+var REPEAT = 1;
 
 stager.init()
     .next('instructions')
@@ -478,6 +478,6 @@ game.settings = {
     publishLevel: 2
 };
 game.env = {
-    auto: false
+    auto: true
 };
 game.verbosity = 100;

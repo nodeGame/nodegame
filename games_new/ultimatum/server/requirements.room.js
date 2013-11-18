@@ -13,7 +13,6 @@ module.exports = function(node, channel, room) {
     
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, 'descil.conf.js');
-    console.log(confPath);
     var dk = require('descil-mturk')(confPath);
 
     // Creates a stager object to define the game stages.
@@ -24,14 +23,23 @@ module.exports = function(node, channel, room) {
     function init() {
         var that = this;
 
+        console.log('********Requirements Room Created*****************');
+        
         // Load code database
         dk.getCodes(function() {
             if (!dk.codes.size()) {
                 throw new Errors('requirements.room: no codes found.');
             }
         });
-	
+
+	node.on.preconnect(function(player) {
+            console.log('Player connected to Requirements room.');
+            node.game.pl.add(player);
+            node.remoteCommand('start', player.id);
+	});
+
 	node.on.pconnect(function(player) {
+            console.log('Player connected to Requirements room.');
             node.remoteCommand('start', player.id);
 	});
 
@@ -80,27 +88,13 @@ module.exports = function(node, channel, room) {
 
 
         node.on.pdisconnect(function(player) {
-	    var mtid = player.mti;
-	    
-            if (!mtid) {
-                return;
-            }
-	    
-         // if (dk.codeExists(mtid || '')) {
-	 //     dk.decrementUsage(mtid);
-	 //     console.log('Code ' +  mtid + ' in use ' + dk.codeUsage(mtid) + ' times');
-         // }
-         // else {
-         //     console.log('Received pdiconnect with no valid mtid: ' + mtid);
-         //     return;
-         // }
+            
 	});
 	
-	// User was redirected to the error page.
-	node.on.data('errors', function(msg) {
-            console.log('errors');
+        // Results of the requirements check.
+	node.on.data('requirements', function(msg) {
+            console.log('requirements');
             console.log(msg.data);
-	    // dk.dropOut(msg.data.player.accessCode);
 	});
 
         // In case a user is using the feedback form display the action.
@@ -126,9 +120,7 @@ module.exports = function(node, channel, room) {
     stager
         .init()
         .loop('requirements');
-    
-
-    
+       
     // Return the game.
     game = {};
     

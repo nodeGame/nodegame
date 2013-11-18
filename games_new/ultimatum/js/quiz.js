@@ -24,9 +24,9 @@ var QUIZ = (function() {
         return checked != answers[a.name];
     }
 
-    function checkAnswers () {
+    function checkAnswers(submitButton) {
         var correct, counter = 0;
-        J.each(document.forms, function(a){
+        J.each(document.forms, function(a) {
             if (!results[a.name]) results[a.name] = [];
             correct = checkAnswer(a);
             
@@ -46,6 +46,7 @@ var QUIZ = (function() {
         document.getElementById('answers_counter').innerHTML = counter + ' / ' + document.forms.length;
         
         if (counter === document.forms.length) {
+            submitButton.disabled = true;
             node.set('QUIZ', results);
             node.timer.randomEmit('DONE', 3000);
         }
