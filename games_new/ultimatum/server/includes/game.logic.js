@@ -7,7 +7,7 @@
  * Extensively documented tutorial.
  *
  * Info:
- * Matching, and stepping can be done in different ways. It can be 
+ * Matching, and stepping can be done in different ways. It can be
  * centralized, and the logic tells the clients when to step, or
  * clients can synchronize themselves and step automatically.
  *
@@ -64,18 +64,18 @@ module.exports = function(node, channel, gameRoom) {
 
     function doMatch() {
         var g, bidder, respondent, data_b, data_r;
-        
+
         g = node.game.pl.shuffle();
         bidder = g.first();
         respondent = g.last();
-        
+
         data_b = {
-	    role: 'bidder',
-	    other: respondent.id
+            role: 'bidder',
+            other: respondent.id
         };
         data_r = {
-	    role: 'respondent',
-	    other: bidder.id
+            role: 'respondent',
+            other: bidder.id
         };
         // Send a message to each player with their role
         // and the id of the other player.
@@ -109,7 +109,7 @@ module.exports = function(node, channel, gameRoom) {
                 // Player was not authorized, redirect to a warning page.
                 node.redirect('/ultimatum/unauth.htm', p.id);
             }
-            
+
         });
 
         // Register player disconnection, and wait for him...
@@ -117,7 +117,7 @@ module.exports = function(node, channel, gameRoom) {
             disconnected[p.id] = {
                 id: p.id,
                 stage: p.stage
-            }
+            };
         });
 
         // Update the Payoffs
@@ -170,12 +170,16 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     // Functions
-    
+
+    function precache() {
+        console.log('Pre-Cache');
+    }
+
     function instructions() {
         debugger
         console.log('Instructions');
     }
-    
+
     function quiz() {
         debugger
         console.log('Quiz');
@@ -186,14 +190,15 @@ module.exports = function(node, channel, gameRoom) {
         console.log('Ultimatum');
         doMatch();
     }
-    
+
     function questionnaire() {
         console.log('questionnaire');
     }
-    
+
     function endgame() {
         var code, exitcode, accesscode;
         console.log('endgame');
+<<<<<<< HEAD
 
         console.log('FINAL PAYOFF PER PLAYER');
 	console.log('***********************');
@@ -219,6 +224,10 @@ module.exports = function(node, channel, gameRoom) {
 	console.log('Game ended');
     } 
     
+=======
+    }
+
+>>>>>>> 6bcb333b1fbf16272e5167600e0020a5a4c871db
     function notEnoughPlayers() {
         console.log('Warning: not enough players!!');
 
@@ -231,32 +240,38 @@ module.exports = function(node, channel, gameRoom) {
 
     // Set default step rule.
     stager.setDefaultStepRule(stepRules.OTHERS_SYNC_STEP);
-    
+
     // Adding the stages. We can later on define the rules and order that
     // will determine their execution.
     stager.addStage({
+        id: 'precache',
+        cb: precache,
+        minPlayers: [ 2, notEnoughPlayers ]
+    });
+
+    stager.addStage({
         id: 'instructions',
         cb: instructions,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
         id: 'quiz',
         cb: quiz,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
         id: 'ultimatum',
         cb: ultimatum,
-        minPlayers: [ 2, notEnoughPlayers ],
+        minPlayers: [ 2, notEnoughPlayers ]
     });
 
     stager.addStage({
         id: 'questionnaire',
         cb: questionnaire
     });
-    
+
     stager.addStage({
         id: 'endgame',
         cb: endgame
@@ -268,6 +283,7 @@ module.exports = function(node, channel, gameRoom) {
     // Here we define the sequence of stages of the game (game plot).
     stager
         .init()
+        .next('precache')
         .next('instructions')
         .next('quiz')
         .repeat('ultimatum', REPEAT)
