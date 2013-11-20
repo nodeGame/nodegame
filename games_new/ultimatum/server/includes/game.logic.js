@@ -229,6 +229,8 @@ module.exports = function(node, channel, gameRoom) {
         this.countdown = setTimeout(function() {
             console.log('Countdown fired. Going to Step: questionnaire.');
             node.remoteCommand('resume', 'ALL');
+            // if syncStepping = false
+            //node.remoteCommand('goto_step', 4);
             node.game.gotoStep(new GameStage('4'));
         }, 30000);
     }
