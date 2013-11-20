@@ -198,7 +198,6 @@ module.exports = function(node, channel, gameRoom) {
     function endgame() {
         var code, exitcode, accesscode;
         console.log('endgame');
-<<<<<<< HEAD
 
         console.log('FINAL PAYOFF PER PLAYER');
 	console.log('***********************');
@@ -223,11 +222,7 @@ module.exports = function(node, channel, gameRoom) {
 	
 	console.log('Game ended');
     } 
-    
-=======
-    }
 
->>>>>>> 6bcb333b1fbf16272e5167600e0020a5a4c871db
     function notEnoughPlayers() {
         console.log('Warning: not enough players!!');
 
