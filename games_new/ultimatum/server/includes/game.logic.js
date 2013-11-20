@@ -230,8 +230,8 @@ module.exports = function(node, channel, gameRoom) {
             console.log('Countdown fired. Going to Step: questionnaire.');
             node.remoteCommand('resume', 'ALL');
             // if syncStepping = false
-            //node.remoteCommand('goto_step', 4);
-            node.game.gotoStep(new GameStage('4'));
+            //node.remoteCommand('goto_step', 5);
+            node.game.gotoStep(new GameStage('5'));
         }, 30000);
     }
 
