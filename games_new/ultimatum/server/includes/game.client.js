@@ -131,8 +131,8 @@ function instructions() {
     //
     /////////////////////////////////////////////
     W.loadFrame('/ultimatum/html/instructions.html', function() {
-	var bb = W.getElementById('read');
-	bb.onclick = function() {
+	var b = W.getElementById('read');
+	b.onclick = function() {
 	    node.done();
 	};
 
@@ -335,8 +335,8 @@ function postgame(){
 
 function endgame(){
     W.loadFrame('/ultimatum/html/ended.html', function() {
-	node.on('WIN', function(msg) {
-	    W.write('Your earning in the game is: ' + msg.data);
+	node.on.data('WIN', function(msg) {
+	    W.write('Your bonus in this game is: ' + msg.data || 0);
 	});
     });
     
@@ -452,7 +452,7 @@ stager.addStage({
 // Now that all the stages have been added,
 // we can build the game plot
 
-var REPEAT = 1;
+var REPEAT = 30;
 
 stager.init()
     .next('instructions')

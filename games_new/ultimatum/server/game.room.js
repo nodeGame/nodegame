@@ -16,11 +16,17 @@ module.exports = function(node, channel, room) {
     
     // Load the code database.
     var dk = require('descil-mturk')(confPath);
-    dk.getCodes(function() {
+//    dk.getCodes(function() {
+//        if (!dk.codes.size()) {
+//            throw new Error('game.room: no codes found.');
+//        }
+//    });
+    dk.readCodes(function() {
         if (!dk.codes.size()) {
-            throw new Error('game.room: no codes found.');
+            throw new Errors('requirements.room: no codes found.');
         }
     });
+
 
     // Loads the database layer. If you do not use an external database
     // you do not need these lines.
@@ -61,7 +67,6 @@ module.exports = function(node, channel, room) {
     // This is executed before the client the PCONNECT listener.
     channel.player.authorization(function(header, cookies, room) {
         var code;
-
         console.log('game.room: checking auth.');
 
         // Weird thing.
@@ -106,7 +111,7 @@ module.exports = function(node, channel, room) {
     // Event listeners registered here are valid for all the stages of the game.
     stager.setOnInit(function() {
         var counter = 0;
-        var POOL_SIZE = 3;
+        var POOL_SIZE = 2;
         var GROUP_SIZE = 2;
 
         // references...

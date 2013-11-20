@@ -50,10 +50,15 @@ module.exports = function(node, channel, gameRoom) {
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, '..', 'descil.conf.js');
     var dk = require('descil-mturk')(confPath);
-    dk.getCodes(function() {
-        debugger
+//    dk.getCodes(function() {
+//        debugger
+//        if (!dk.codes.size()) {
+//            throw new Error('game.logic: no codes found.');
+//        }
+//    });
+    dk.readCodes(function() {
         if (!dk.codes.size()) {
-            throw new Error('game.logic: no codes found.');
+            throw new Errors('requirements.room: no codes found.');
         }
     });
 
@@ -117,7 +122,7 @@ module.exports = function(node, channel, gameRoom) {
 
         // Update the Payoffs
         node.on.data('response', function(msg) {
-	    var resWin, bidWin, p, response;
+	    var resWin, bidWin, code, response;
             response = msg.data;
 
 	    if (!response) {
@@ -126,31 +131,31 @@ module.exports = function(node, channel, gameRoom) {
             }
 
 	    if (response.response === 'ACCEPT') {
-
 		resWin = parseInt(response.value);
 		bidWin = 100 - resWin;
 		
 		// Respondent payoff.
-		p = dk.codes.id.get(msg.from);
-                if (!p) {
-                    console.log('AAAH not P!');
+		code = dk.codes.id.get(msg.from);
+                if (!code) {
+                    console.log('AAAH code not found!');
                     return;
                 }
 
-		p.win = (!p.win) ? resWin : p.win + resWin;
-		node.log('Added to respondent ' + msg.from + ' ' +
+		code.win = (!code.win) ? resWin : code.win + resWin;
+		console.log('Added to respondent ' + msg.from + ' ' +
                          response.value + ' ECU');
 		
 		// Bidder payoff
-		p = dk.codes.id.get(response.from);
+		code = dk.codes.id.get(response.from);
                 
-                if (!p) {
-                    console.log('AAAH not P2!');
+                if (!code) {
+                    console.log('AAAH code not found for respondent 2!');
                     return;
                 }
 
-		p.win = (!p.win) ? bidWin : p.win + bidWin;
-		node.log('Added to bidder ' + p.clientId + ' ' + p.win + ' ECU');
+		code.win = (!code.win) ? bidWin : code.win + bidWin;
+		console.log('Added to bidder ' + response.from + ' ' +
+                         bidWin + ' ECU');
 	    }
 	});
 
@@ -167,14 +172,17 @@ module.exports = function(node, channel, gameRoom) {
     // Functions
     
     function instructions() {
+        debugger
         console.log('Instructions');
     }
     
     function quiz() {
+        debugger
         console.log('Quiz');
     }
 
     function ultimatum() {
+        debugger
         console.log('Ultimatum');
         doMatch();
     }
@@ -187,7 +195,11 @@ module.exports = function(node, channel, gameRoom) {
         var code, exitcode, accesscode;
         console.log('endgame');
 
+        console.log('FINAL PAYOFF PER PLAYER');
+	console.log('***********************');
+	
         node.game.pl.each(function(p) {
+            debugger
             code = dk.codes.id.get(p.id);
             if (!code) {
                 console.log('ERROR: no code in endgame:', p.id);
@@ -196,13 +208,12 @@ module.exports = function(node, channel, gameRoom) {
             
             accesscode = code.AccessCode;
 	    exitcode = code.ExitCode;
-	    code.win = (p.win || 0) / 1000;
+	    code.win = (code.win || 0) / 1000;
 	    dk.checkOut(accesscode, exitcode, code.win);
-	    node.say('WIN', p.id, p.win);
+	    node.say('WIN', p.id, code.win);
+            console.log(p.id, ': ' +  code.win);
 	});
-	console.log('FINAL PAYOFF PER PLAYER');
-	console.log('***********************');
-	console.log(node.game.pl.keep(['mtid', 'win']).fetch());
+	
 	console.log('***********************');
 	
 	console.log('Game ended');
@@ -210,11 +221,11 @@ module.exports = function(node, channel, gameRoom) {
     
     function notEnoughPlayers() {
         console.log('Warning: not enough players!!');
+
         this.countdown = setTimeout(function() {
-            console.log('Countdown fired. Game terminated.');
-            // TODO needs to update the player in the registry too.
-            node.redirect('/ultimatum/gameterminated.html', 'ALL');
-            node.game.gameover();
+            console.log('Countdown fired. Going to Step: questionnaire.');
+            node.remoteCommand('resume', 'ALL');
+            node.game.gotoStep(new GameStage('4'));
         }, 30000);
     }
 
@@ -252,7 +263,7 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     // Building the game plot.
-    var REPEAT = 1;
+    var REPEAT = 30;
 
     // Here we define the sequence of stages of the game (game plot).
     stager

@@ -26,7 +26,12 @@ module.exports = function(node, channel, room) {
         console.log('********Requirements Room Created*****************');
         
         // Load code database
-        dk.getCodes(function() {
+//        dk.getCodes(function() {
+//            if (!dk.codes.size()) {
+//                throw new Errors('requirements.room: no codes found.');
+//            }
+//        });
+        dk.readCodes(function() {
             if (!dk.codes.size()) {
                 throw new Errors('requirements.room: no codes found.');
             }
