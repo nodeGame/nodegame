@@ -48,6 +48,25 @@ function waiting2start() {
     node.on.data('waitingRoom', function(msg) {
         updateConnected(msg.data);
     });
+
+    //////////////////////////////////////////////
+    // nodeGame hint:
+    //
+    // node.getJSON is a utility which retrieves JSON data from the server at
+    // the given URI or URIs (if an array of strings is given).
+    //
+    // The second parameter is called once for every URI with the data
+    // retrieved.
+    //
+    // A third optional parameter is called after all the data has been
+    // acquired.
+    //
+    /////////////////////////////////////////////
+    node.getJSON(['/ultimatum/package.json'], function(data) {
+        W.writeln('Game version: ' + data.version);
+    }, function() {
+        console.log('getJSON finished');
+    } );
 }
 
 // Setting the game plot
