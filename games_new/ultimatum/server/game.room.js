@@ -102,9 +102,15 @@ module.exports = function(node, channel, room) {
         return true;
     });
 
-
-    channel.player.clientIdGenerator(function(headers, cookies, ids, info) {
-        return cookies.token;
+    // Assigns Player Ids based on cookie token.
+    channel.player.clientIdGenerator(function(headers, cookies, validCookie, 
+                                              ids, info) {
+        
+        // Return the id only if token was validated.
+        // More checks could be done here to ensure that token is unique in ids.
+        if (cookies.token && validCookie) {
+            return cookies.token;
+        }
     });
 
     // Creating an init function.
@@ -120,26 +126,13 @@ module.exports = function(node, channel, room) {
 
         console.log('********Waiting Room Created*****************');
 
-        // This callback is executed whenever a previously disconnected
-        // players reconnects.
-        node.on.preconnect(function(p) {
-            console.log('Oh...somebody reconnected in the waiting room!', p);
-            node.game.pl.add(p);
-        });
-
-        // This must be done manually for now (maybe will change in the future).
-        node.on.mreconnect(function(p) {
-            node.game.ml.add(p);
-        });
-
-        // This callback is executed when a player connects to the channel.
-        node.on.pconnect(function(p) {
+        function connectingPlayer(p) {
             var gameRoom, wRoom, tmpPlayerList;
             var nPlayers, i, len;
             console.log('-----------Player connected ' + p.id);
             
             node.remoteAlert('Your code has been marked as in use. Do not ' +
-                             'leave this page, otherwise you will not be ' +
+                             'leave this page, otherwise you might not be ' +
                              'able to join the experiment again.', p.id);
 
             // PlayerList object of waiting players.
@@ -211,6 +204,39 @@ module.exports = function(node, channel, room) {
                     });
                 });
             }
+        }
+
+        // This callback is executed whenever a previously disconnected
+        // players reconnects.
+        node.on.preconnect(function(p) {
+            console.log('Oh...somebody reconnected in the waiting room!', p);
+            // Notify other player he is back.
+            node.socket.send(node.msg.create({
+                target: 'PCONNECT',
+                data: p,
+                to: 'ALL'
+            }));
+            node.game.pl.add(p);
+            connectingPlayer(p);
+        });
+
+        // This must be done manually for now (maybe will change in the future).
+        node.on.mreconnect(function(p) {
+            node.game.ml.add(p);
+        });
+
+        // This callback is executed when a player connects to the channel.
+        node.on.pconnect(connectingPlayer);
+
+        // This callback is executed when a player connects to the channel.
+        node.on.pdisconnect(function(p) {
+            
+            // Client really disconnected (not moved into another game room).
+            if (channel.registry.clients.disconnected.get(p.id)) {
+                // Free up the code.
+                dk.decrementUsage(p.id);
+            }
+            
         });
     });
     

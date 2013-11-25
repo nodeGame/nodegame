@@ -18,14 +18,16 @@ var ServerNode = require('nodegame-server').ServerNode;
 
 // Overrides some of the default options for ServerNode.
 var options = {
+    // Additional conf directory.
     confDir: './conf',
     // logDir: './log', // not working at the moment
     servernode: function(servernode) {
         // Special configuration for the ServerNode object.
-        // TODO: check if the verbosity property here correctly
-        // affects the verbosity of the games in channels
-        servernode.verbosity = 100;
+        
+        // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games_new');
+        // Sets the debug mode, exceptions will be thrown (Default is false).
+        servernode.debug = true;
         return true;
     },
     http: function(http) {

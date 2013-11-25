@@ -19,6 +19,11 @@
  * ---
  */
 
+var WatchJS = require("watchjs")
+var watch = WatchJS.watch;
+var unwatch = WatchJS.unwatch;
+var callWatchers = WatchJS.callWatchers;
+
 var path = require('path');
 
 var Database = require('nodegame-db').Database;
@@ -46,7 +51,7 @@ var PLAYING_STAGE = 2;
 // - channel: the ServerChannel object in which this logic will be running.
 // - gameRoom: the GameRoom object in which this logic will be running. 
 module.exports = function(node, channel, gameRoom) {
- 
+
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, '..', 'descil.conf.js');
     var dk = require('descil-mturk')(confPath);
@@ -104,6 +109,7 @@ module.exports = function(node, channel, gameRoom) {
                     to: 'ALL'
                 }));
                 delete disconnected[p.id];
+                //node.game.pl.add(p);
             }
             else {
                 // Player was not authorized, redirect to a warning page.
@@ -176,17 +182,14 @@ module.exports = function(node, channel, gameRoom) {
     }
 
     function instructions() {
-        debugger
         console.log('Instructions');
     }
 
     function quiz() {
-        debugger
         console.log('Quiz');
     }
 
     function ultimatum() {
-        debugger
         console.log('Ultimatum');
         doMatch();
     }
@@ -203,7 +206,6 @@ module.exports = function(node, channel, gameRoom) {
 	console.log('***********************');
 	
         node.game.pl.each(function(p) {
-            debugger
             code = dk.codes.id.get(p.id);
             if (!code) {
                 console.log('ERROR: no code in endgame:', p.id);
