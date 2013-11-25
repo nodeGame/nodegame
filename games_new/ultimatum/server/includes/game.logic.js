@@ -52,6 +52,9 @@ var PLAYING_STAGE = 2;
 // - gameRoom: the GameRoom object in which this logic will be running. 
 module.exports = function(node, channel, gameRoom) {
 
+    // Client game to send to reconnecting players.
+    var client = channel.require(__dirname + '/game.client', { ngc: ngc });
+
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, '..', 'descil.conf.js');
     var dk = require('descil-mturk')(confPath);
@@ -93,37 +96,68 @@ module.exports = function(node, channel, gameRoom) {
     stager.setOnInit(function() {
         console.log('********************** ultimatum room ' + counter++ + ' **********************');
 
-        var disconnected;
-        disconnected = {};
+        // Register player disconnection, and wait for him...
+        node.on.pdisconnect(function(p) {
+            dk.updateCode(p.id, {
+                disconnected: true,
+                stage: p.stage
+            });
+        });
 
+        // Player reconnecting.
         // Reconnections must be handled by the game developer.
         node.on.preconnect(function(p) {
+            var code;
             console.log('Oh...somebody reconnected!', p);
-            if (disconnected[p.id]) {
-                // Delete countdown to terminate the game.
-                clearTimeout(this.countdown);
-                // Notify other player he is back.
+            code = dk.codeExists(p.id);
+
+            if (!code) {
+                console.log('game.logic: reconnecting player not found in ' +
+                            'code db: ' + p.id);
+                return;
+            }
+            if (!code.disconnected) {
+                console.log('game.logic: reconnecting player that was not ' +
+                            'marked disconnected: ' + p.id);
+                return;
+            }
+            
+            // Mark code as connected.
+            code.disconnected = false;
+
+            // Delete countdown to terminate the game.
+            clearTimeout(this.countdown);
+
+            // Notify other player he is back.
+            // TODO: add it automatically if we return TRUE? It must be done
+            // both in the alias and the real event handler
+            node.game.pl.each(function(p) {
                 node.socket.send(node.msg.create({
                     target: 'PCONNECT',
                     data: p,
-                    to: 'ALL'
+                    to: p.id
                 }));
-                delete disconnected[p.id];
-                //node.game.pl.add(p);
-            }
-            else {
-                // Player was not authorized, redirect to a warning page.
-                node.redirect('/ultimatum/unauth.htm', p.id);
-            }
+            });
 
-        });
+            // It is not added automatically.
+            // TODO: add it automatically if we return TRUE? It must be done
+            // both in the alias and the real event handler
+            node.game.pl.add(p);
 
-        // Register player disconnection, and wait for him...
-        node.on.pdisconnect(function(p) {
-            disconnected[p.id] = {
-                id: p.id,
-                stage: p.stage
-            };
+            // We could slice the game plot, and send just what we need
+            // however here we resend all the stages, and within the 'facecat'
+            // stage we send just some of the faces
+            console.log('** Player reconnected: ' + p.id + ' **');
+	    // Setting metadata, settings, and plot.
+            node.remoteSetup('game_metadata',  p.id, client.metadata);
+	    node.remoteSetup('game_settings', p.id, client.settings);
+	    node.remoteSetup('plot', p.id, client.plot);
+
+            // Start the game on the client.
+            node.remoteCommand('start', p.id);
+            
+            // Send the player to current stage.
+            node.remoteCommand('goto_step', p.id, node.player.stage);
         });
 
         // Update the Payoffs

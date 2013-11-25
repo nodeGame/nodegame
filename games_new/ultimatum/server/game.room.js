@@ -65,38 +65,48 @@ module.exports = function(node, channel, room) {
     
     // Creating an authorization function for the players.
     // This is executed before the client the PCONNECT listener.
+    // Here direct messages to the client can be sent only using
+    // his socketId property, since no clientId has been created yet.
     channel.player.authorization(function(header, cookies, room) {
-        var code;
-        console.log('game.room: checking auth.');
+        var code, player, token;
+        playerId = cookies.player;
+        token = cookies.token;
 
+        console.log('game.room: checking auth.');
+        
         // Weird thing.
-        if ('string' !== typeof cookies.player) {
-            console.log('no player: ', cookies.player)
+        if ('string' !== typeof playerId) {
+            console.log('no player: ', player)
             return false;
         }
 
         // Weird thing.
-        if ('string' !== typeof cookies.token) {
-            console.log('no token: ', cookies.token)
+        if ('string' !== typeof token) {
+            console.log('no token: ', token)
             return false;
         }
         
-        code = dk.codeExists(cookies.token);
+        code = dk.codeExists(token);
         
         // Code not existing.
 	if (!code) {
-            console.log('not existing token: ', cookies.token);
+            console.log('not existing token: ', token);
             return false;
         }
         
         // Code in use.
 	if (code.usage) {
-            console.log('token already in use: ', cookies.token);
-            return false;
+            if (code.disconnected) {
+                return true;
+            }
+            else {
+                console.log('token already in use: ', token);
+                return false;
+            }
 	}
-        
+
         // Mark the code as in use.
-        dk.incrementUsage(cookies.token);
+        dk.incrementUsage(token);
 
         // Client Authorized
         return true;
