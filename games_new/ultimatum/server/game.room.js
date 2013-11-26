@@ -141,9 +141,9 @@ module.exports = function(node, channel, room) {
             var nPlayers, i, len;
             console.log('-----------Player connected ' + p.id);
             
-            node.remoteAlert('Your code has been marked as in use. Do not ' +
-                             'leave this page, otherwise you might not be ' +
-                             'able to join the experiment again.', p.id);
+//            node.remoteAlert('Your code has been marked as in use. Do not ' +
+//                             'leave this page, otherwise you might not be ' +
+//                             'able to join the experiment again.', p.id);
 
             // PlayerList object of waiting players.
             wRoom = room.clients.player;
@@ -221,11 +221,17 @@ module.exports = function(node, channel, room) {
         node.on.preconnect(function(p) {
             console.log('Oh...somebody reconnected in the waiting room!', p);
             // Notify other player he is back.
-            node.socket.send(node.msg.create({
-                target: 'PCONNECT',
-                data: p,
-                to: 'ALL'
-            }));
+            // TODO: add it automatically if we return TRUE? It must be done
+            // both in the alias and the real event handler
+            // TODO: Cannot use to: ALL, because this includes the reconnecting
+            // player.
+            node.game.pl.each(function(p) {
+                node.socket.send(node.msg.create({
+                    target: 'PCONNECT',
+                    data: p,
+                    to: p.id
+                }));
+            });
             node.game.pl.add(p);
             connectingPlayer(p);
         });

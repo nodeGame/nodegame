@@ -21,20 +21,13 @@ module.exports = game;
 // Functions
 
 function waiting2start() {
-    var span_connected, span_dots, span_msg;
+    var span_connected, span_dots_container, span_msg;
     span_connected = document.getElementById('span_connected');
-    span_dots = document.getElementById('span_dots');
+    span_dots_container = document.getElementById('span_dots_container');
     span_msg = document.getElementById('span_msg');
     
-    // Refreshing the dots...
-    setInterval(function() {
-        if (span_dots.innerHTML !== '......') {
-            span_dots.innerHTML = span_dots.innerHTML + '.';  
-        }
-        else {
-            span_dots.innerHTML = '..';
-        }
-    }, 1000);
+    // Add Loading dots...
+    W.addLoadingDots(span_dots_container);
 
     function updateConnected(data) {
     	span_connected.innerHTML = data.nPlayers + ' / ' + data.poolSize;  

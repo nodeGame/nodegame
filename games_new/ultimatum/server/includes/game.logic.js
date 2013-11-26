@@ -46,6 +46,8 @@ var counter = 0;
 var MIN_PLAYERS = 2;
 var PLAYING_STAGE = 2;
 
+var DUMP_DIR = path.resolve(__dirname, '..', '/data');
+
 // Here we export the logic function. Receives three parameters:
 // - node: the NodeGameClient object.
 // - channel: the ServerChannel object in which this logic will be running.
@@ -131,33 +133,47 @@ module.exports = function(node, channel, gameRoom) {
             // Notify other player he is back.
             // TODO: add it automatically if we return TRUE? It must be done
             // both in the alias and the real event handler
-            node.game.pl.each(function(p) {
+            node.game.pl.each(function(player) {
+                debugger
                 node.socket.send(node.msg.create({
                     target: 'PCONNECT',
                     data: p,
-                    to: p.id
+                    to: player.id
                 }));
             });
+            
+            // Send currently connected players to reconnecting.
+            node.socket.send(node.msg.create({
+                target: 'PLIST',
+                data: node.game.pl.db,
+                to: p.id
+            }));
+
+            // We could slice the game plot, and send just what we need
+            // however here we resend all the stages, and move their game plot.
+            console.log('** Player reconnected: ' + p.id + ' **');
+	    // Setting metadata, settings, and plot.
+            node.remoteSetup('game_metadata',  p.id, client.metadata);
+	    node.remoteSetup('game_settings', p.id, client.settings);
+	    node.remoteSetup('plot', p.id, client.plot);
+            node.remoteSetup('env', p.id, client.env);
+
+            // Start the game on the reconnecting client.
+            node.remoteCommand('start', p.id);
+            // Pause the game on the reconnecting client, will be resumed later.
+            node.remoteCommand('pause', p.id);
 
             // It is not added automatically.
             // TODO: add it automatically if we return TRUE? It must be done
             // both in the alias and the real event handler
             node.game.pl.add(p);
 
-            // We could slice the game plot, and send just what we need
-            // however here we resend all the stages, and within the 'facecat'
-            // stage we send just some of the faces
-            console.log('** Player reconnected: ' + p.id + ' **');
-	    // Setting metadata, settings, and plot.
-            node.remoteSetup('game_metadata',  p.id, client.metadata);
-	    node.remoteSetup('game_settings', p.id, client.settings);
-	    node.remoteSetup('plot', p.id, client.plot);
+            // Will send all the players to current stage
+            // (also those who were there already).
+            node.game.gotoStep(node.player.stage);
 
-            // Start the game on the client.
-            node.remoteCommand('start', p.id);
-            
-            // Send the player to current stage.
-            node.remoteCommand('goto_step', p.id, node.player.stage);
+            // Unpause ALL players
+            node.remoteCommand('resume', 'ALL');
         });
 
         // Update the Payoffs
@@ -205,6 +221,7 @@ module.exports = function(node, channel, gameRoom) {
      // Event handler registered in the init function are always valid.
     stager.setOnGameOver(function() {
         console.log('************** GAMEOVER ' + gameRoom.name + '****************');
+        
         // TODO: update database.
         channel.destroyGameRoom(gameRoom.name);
     });
