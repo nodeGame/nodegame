@@ -12,6 +12,8 @@
 
 // NOTICE: for now do not call node.done() immediately in the callback.
 
+var settings = require('./game.shared');
+var REPEAT = settings.REPEAT;
 
 var ngc = module.parent.exports.ngc;
 var Stager = ngc.Stager;
@@ -228,7 +230,7 @@ function ultimatum() {
         node.on.data('BIDDER', function(msg) {
             console.log('RECEIVED BIDDER!');
             other = msg.data.other;
-
+            node.set('ROLE', 'BIDDER');
 
             //////////////////////////////////////////////
             // nodeGame hint:
@@ -515,8 +517,6 @@ stager.addStage({
 
 // Now that all the stages have been added,
 // we can build the game plot
-
-var REPEAT = 30;
 
 stager.init()
     .next('precache')

@@ -19,11 +19,6 @@
  * ---
  */
 
-var WatchJS = require("watchjs")
-var watch = WatchJS.watch;
-var unwatch = WatchJS.unwatch;
-var callWatchers = WatchJS.callWatchers;
-
 var path = require('path');
 
 var Database = require('nodegame-db').Database;
@@ -40,13 +35,20 @@ var J = ngc.JSUS;
 
 var stager = new Stager();
 
+var settings = require('./game.shared');
+var REPEAT = settings.REPEAT;
+
 // Variable registered outside of the export function are shared among all
 // instances of game logics.
 var counter = 0;
 var MIN_PLAYERS = 2;
 var PLAYING_STAGE = 2;
 
-var DUMP_DIR = path.resolve(__dirname, '..', '/data');
+var DUMP_DIR = path.resolve(__dirname, '..', 'data') + '/';
+var DUMP_DIR_JSON = DUMP_DIR + 'json/';
+var DUMP_DIR_CSV = DUMP_DIR + 'csv/';
+
+console.log(DUMP_DIR_CSV);
 
 // Here we export the logic function. Receives three parameters:
 // - node: the NodeGameClient object.
@@ -271,6 +273,14 @@ module.exports = function(node, channel, gameRoom) {
             console.log(p.id, ': ' +  code.win);
 	});
 	
+        // Saving results to FS.
+        debugger
+        node.fs.saveMemoryIndexes('csv', DUMP_DIR_CSV);
+        node.fs.saveMemoryIndexes('json', DUMP_DIR_JSON);
+        debugger
+        node.fs.saveMemory('csv', DUMP_DIR + 'memory.csv');
+        node.fs.saveMemory('json', DUMP_DIR + 'memory.nddb');
+        
 	console.log('***********************');
 	
 	console.log('Game ended');
@@ -328,7 +338,6 @@ module.exports = function(node, channel, gameRoom) {
     });
 
     // Building the game plot.
-    var REPEAT = 30;
 
     // Here we define the sequence of stages of the game (game plot).
     stager
