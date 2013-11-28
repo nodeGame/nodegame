@@ -1,12 +1,13 @@
 function Monitor(node) {
-    
+
     var stager = new node.Stager();
-      
+
     stager.setOnInit(function() {
         console.log('INIT MONITOR!');
-	node.window.setup('MONITOR');
+        //node.window.setup('MONITOR');
+        node.widgets.append('ChannelList');
     });
-    
+
     stager.addStage({
         id: 'monitoring',
         cb: function() {
@@ -18,14 +19,14 @@ function Monitor(node) {
         .loop('monitoring');
 
     return {
-        io: {        
+        io: {
           reconnect: false
         },
         socket: {
-    	  type: 'SocketIo'
+            type: 'SocketIo'
         },
         events: {
-    	  dumpEvents: true
+            dumpEvents: true
         },
         game_metadata: {
             name: 'Monitor Screen',
