@@ -43,7 +43,6 @@
         var text, textElem;
 
         content = o.content;
-        textElem = document.createElement('span');
         if ('object' === typeof content) {
             switch (o.x) {
             case 0:
@@ -70,10 +69,15 @@
                 break;
             }
 
+            textElem = document.createElement('span');
             textElem.appendChild(document.createTextNode(text));
             textElem.onclick = function() {
                 alert(content.name);
             };
+
+            if (o.x >= 2) {  // number of clients/players/admins
+                textElem.title = 'Connected (+ Disconnected)';
+            }
         }
         else {
             textElem = document.createTextNode(content);
@@ -95,8 +99,7 @@
 
         // Create header:
         this.table.setHeader(['Name', '# Rooms',
-                              '# Clients, Connected (+ Disconnected)',
-                              '# Players', '# Admins']);
+                              '# Clients', '# Players', '# Admins']);
     }
 
     ChannelList.prototype.getRoot = function() {
