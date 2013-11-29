@@ -40,14 +40,39 @@
 
     function renderCell(o) {
         var content;
-        var textElem;
+        var text, textElem;
 
         content = o.content;
         textElem = document.createElement('span');
         if ('object' === typeof content) {
-            textElem.appendChild(document.createTextNode(content.name));
+            switch (o.x) {
+            case 0:
+                text = content.name;
+                break;
+
+            case 1:
+                text = '' + content.nGameRooms;
+                break;
+
+            case 2:
+                text = content.nConnClients +
+                       ' (+' + content.nDisconnClients + ')';
+                break;
+
+            case 3:
+                text = content.nConnPlayers +
+                       ' (+' + content.nDisconnPlayers + ')';
+                break;
+
+            case 4:
+                text = content.nConnAdmins +
+                       ' (+' + content.nDisconnAdmins + ')';
+                break;
+            }
+
+            textElem.appendChild(document.createTextNode(text));
             textElem.onclick = function() {
-                alert(content);
+                alert(content.name);
             };
         }
         else {
@@ -69,8 +94,9 @@
         });
 
         // Create header:
-        this.table.setHeader(['Name', '# Rooms', '# Clients', '# Players',
-                              '# Admins']);
+        this.table.setHeader(['Name', '# Rooms',
+                              '# Clients, Connected (+ Disconnected)',
+                              '# Players', '# Admins']);
     }
 
     ChannelList.prototype.getRoot = function() {
@@ -84,8 +110,13 @@
         node.socket.send(node.msg.create({
             target: 'SERVERCOMMAND',
             text:   'INFO',
-            data:   'CHANNELS'
+            data: {
+                type:      'CHANNELS',
+                extraInfo: true
+            }
         }));
+
+        this.table.parse();
 
         return root;
     };
@@ -101,14 +132,17 @@
     };
 
     ChannelList.prototype.writeChannels = function(channels) {
-        var channelKey;
+        var chanKey, chanObj;
 
         this.table.clear(true);
 
         // Create a row for each channel:
-        for (channelKey in channels) {
-            if (channels.hasOwnProperty(channelKey)) {
-                this.table.addRow([channels[channelKey]]);
+        for (chanKey in channels) {
+            if (channels.hasOwnProperty(chanKey)) {
+                chanObj = channels[chanKey];
+
+                this.table.addRow(
+                        [chanObj, chanObj, chanObj, chanObj, chanObj]);
             }
         }
 
