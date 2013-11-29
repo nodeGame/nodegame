@@ -39,15 +39,20 @@
     };
 
     function renderCell(o) {
-        var channel;
+        var content;
         var textElem;
 
-        channel = o.content;
+        content = o.content;
         textElem = document.createElement('span');
-        textElem.appendChild(document.createTextNode(channel.name));
-        textElem.onclick = function() {
-            alert(channel);
-        };
+        if ('object' === typeof content) {
+            textElem.appendChild(document.createTextNode(content.name));
+            textElem.onclick = function() {
+                alert(content);
+            };
+        }
+        else {
+            textElem = document.createTextNode(content);
+        }
 
         return textElem;
     }
@@ -62,6 +67,10 @@
                 returnAt: 'first'
             }
         });
+
+        // Create header:
+        this.table.setHeader(['Name', '# Rooms', '# Clients', '# Players',
+                              '# Admins']);
     }
 
     ChannelList.prototype.getRoot = function() {
@@ -96,6 +105,7 @@
 
         this.table.clear(true);
 
+        // Create a row for each channel:
         for (channelKey in channels) {
             if (channels.hasOwnProperty(channelKey)) {
                 this.table.addRow([channels[channelKey]]);
