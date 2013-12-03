@@ -23,13 +23,15 @@ function Requirements() {
 
     function myInit() {
         console.log('INIT');
-        W.setup('SOLO_PLAYER');
+        W.setupFrame('SOLO_PLAYER');
     }
 
     function requirements() {
-
+        
+        var nLoads = 0;
 	node.window.loadFrame('/ultimatum/html/room/testing.html', function() {
             var div, token;
+
             div = W.getElementById('widgets_div');
             token = J.getQueryString('id');
 

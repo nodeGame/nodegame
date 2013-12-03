@@ -1,5 +1,5 @@
 /**
- * # Requierements Room for Ultimatum Game
+ * # Requirements Room for Ultimatum Game
  * Copyright(c) 2013 Stefano Balietti
  * MIT Licensed
  *
@@ -142,9 +142,3 @@ module.exports = function(node, channel, room) {
 
     return game;
 };
-
-
-
-
-
-

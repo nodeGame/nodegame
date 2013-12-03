@@ -48,7 +48,7 @@ stager.setOnInit(function() {
     // - state display widget,
     // - iframe of play,
     // - player.css
-    W.setup('PLAYER');
+    W.setupFrame('PLAYER');
 
     this.other = null;
 
@@ -161,7 +161,6 @@ function instructions() {
     //
     /////////////////////////////////////////////
     W.loadFrame('/ultimatum/html/instructions.html', function() {
-
 	var b = W.getElementById('read');
 	b.onclick = function() {
 	    node.done();

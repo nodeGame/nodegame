@@ -4,7 +4,7 @@
  * MIT Licensed
  *
  * Starts two channels, one to test the requirements,
- * and one to actually play a Face Categorization game.
+ * and one to actually play an Ultimatum game.
  *
  * http://www.nodegame.org
  * ---
@@ -44,21 +44,21 @@ var options = {
 var sn = new ServerNode(options);
 
 // Add the game channel.
-var facecat = sn.addChannel({
-    name: 'facecat',
-    admin: 'facecat/admin',
-    player: 'facecat',
+var burden = sn.addChannel({
+    name: 'burden',
+    admin: 'burden/admin',
+    player: 'burden',
     verbosity: 100,
     // If TRUE, players can invoke GET commands on admins.
     getFromAdmins: true,
     // Unauthorized clients will be redirected here. 
     // (defaults: "/pages/accessdenied.htm")
-    accessDeniedUrl: '/facecat/unauth.htm'
+    accessDeniedUrl: '/burden/unauth.htm'
 });
 
 // Creates the room that will spawn the games for the channel.
-var logicPath = path.resolve('./games_new/facecat/server/game.room.js');
-var gameRoom = facecat.createWaitingRoom({
+var logicPath = path.resolve('./games_new/burden/server/game.room.js');
+var gameRoom = burden.createWaitingRoom({
     logicPath: logicPath,
     name: 'gameRoom'
 });
@@ -74,7 +74,7 @@ var requirements = sn.addChannel({
 });
 
 // Creates the waiting room for the channel.
-var logicPath = path.resolve('./games_new/facecat/server/requirements.room.js');
+var logicPath = path.resolve('./games_new/burden/server/requirements.room.js');
 var reqRoom = requirements.createWaitingRoom({
     logicPath: logicPath
 });

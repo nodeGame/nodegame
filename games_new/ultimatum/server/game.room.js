@@ -23,7 +23,7 @@ module.exports = function(node, channel, room) {
 //    });
     dk.readCodes(function() {
         if (!dk.codes.size()) {
-            throw new Errors('requirements.room: no codes found.');
+            throw new Errors('ultimatum game.room: no codes found.');
         }
     });
 

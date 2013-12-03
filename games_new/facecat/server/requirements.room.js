@@ -1,5 +1,5 @@
 /**
- * # Requierements Room for Face categorization Game
+ * # Requirements Room for Face Categorization Game
  * Copyright(c) 2013 Stefano Balietti
  * MIT Licensed
  *
@@ -8,8 +8,14 @@
  * ---
  */
 module.exports = function(node, channel, room) {
-    var dk = require('descil-mturk');
-    var request = require('request');
+
+    var path = require('path');
+    
+    // Reads in descil-mturk configuration.
+    var confPath = path.resolve(__dirname, 'descil.conf.js');
+    var dk = require('descil-mturk')(confPath);
+
+    // Creates a stager object to define the game stages.
     var stager = new node.Stager();
 
     // Functions
@@ -17,14 +23,28 @@ module.exports = function(node, channel, room) {
     function init() {
         var that = this;
 
+        console.log('********Requirements Room Created*****************');
+        
         // Load code database
-        dk.getCodes(function() {
+//        dk.getCodes(function() {
+//            if (!dk.codes.size()) {
+//                throw new Errors('requirements.room: no codes found.');
+//            }
+//        });
+        dk.readCodes(function() {
             if (!dk.codes.size()) {
                 throw new Errors('requirements.room: no codes found.');
             }
         });
-	
+
+	node.on.preconnect(function(player) {
+            console.log('Player connected to Requirements room.');
+            node.game.pl.add(player);
+            node.remoteCommand('start', player.id);
+	});
+
 	node.on.pconnect(function(player) {
+            console.log('Player connected to Requirements room.');
             node.remoteCommand('start', player.id);
 	});
 
@@ -32,63 +52,48 @@ module.exports = function(node, channel, room) {
             var mtid, errUri, code;
             
             console.log('MTID');
-            return {
-                success: false,
-                msg: 'Code in use'
-            };
-
+            
             // M-Turk id
             mtid = msg.data;
-	    //code = dk.codeExists(mtid);
-            // here
-            code = {};
-
+	    
+            if ('string' !== typeof mtid) {
+                return {
+                    success: false,
+                    msg: 'Malformed or empty code received.'
+                };
+            }
+            
+            code = dk.codeExists(mtid);
+            
 	    if (!code) {
-		errUri = '/ultimatum/unauth.html?id=' + mtid + '&err0=1';	
-		// node.redirect(errUri, msg.data.id);
-		return;
-	    }
+		return {
+                    success: false,
+                    msg: 'Code not found: ' + mtid
+	        };
+            }
 
 	    if (code.usage) {
-		console.log('Code ' +  mtid + ' already in use ' + code.usage + ' times.');
-		errUri = '/ultiturk/unauthr.html?id=' + mtid + '&codeInUse=1';
-		// node.redirect(errUri, msg.data.id);
-		// dk.decrementUsage(mtid);
+                return {
+                    success: false,
+                    msg: 'Code already in use: ' + mtid
+	        };
 	    }
-	    else {
-		// PLAYER IS AUTHORIZED
-		//dk.incrementUsage(mtid);
-
-                // Check him in.
-		//dk.checkIn(mtid, function() {
-                    node.say('CHECKEDIN', player.id);
-                //});
-            }
+	    
+            return {
+                success: true,
+                msg: 'Code validated.'
+            };
         });
 
 
         node.on.pdisconnect(function(player) {
-	    var mtid = player.mti;
-	    
-            if (!mtid) {
-                return;
-            }
-	    
-         // if (dk.codeExists(mtid || '')) {
-	 //     dk.decrementUsage(mtid);
-	 //     console.log('Code ' +  mtid + ' in use ' + dk.codeUsage(mtid) + ' times');
-         // }
-         // else {
-         //     console.log('Received pdiconnect with no valid mtid: ' + mtid);
-         //     return;
-         // }
+            
 	});
 	
-	// User was redirected to the error page.
-	node.on.data('errors', function(msg) {
-            console.log('errors');
+        // Results of the requirements check.
+	node.on.data('requirements', function(msg) {
+            console.log('requirements');
             console.log(msg.data);
-	    // dk.dropOut(msg.data.player.accessCode);
 	});
 
         // In case a user is using the feedback form display the action.
@@ -114,14 +119,12 @@ module.exports = function(node, channel, room) {
     stager
         .init()
         .loop('requirements');
-    
-
-    
+       
     // Return the game.
     game = {};
     
     game.metadata = {
-        name: 'Server antechamber for Ultimaum-AMT',
+        name: 'Requirements check room for Face Categorization Game.',
         description: 'Validates players entry codes with an internal database.',
         version: '0.1'
     };
@@ -133,9 +136,3 @@ module.exports = function(node, channel, room) {
 
     return game;
 };
-
-
-
-
-
-

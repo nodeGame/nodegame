@@ -11,8 +11,17 @@
  */
 module.exports = function(node, channel) {
 
-    var dk = require('descil-mturk');
+    var path = require('path');    
     var J = require('JSUS').JSUS;
+
+    // Reads in descil-mturk configuration.
+    var confPath = path.resolve(__dirname, 'descil.conf.js');
+    var dk = require('descil-mturk')(confPath);
+    dk.readCodes(function() {
+        if (!dk.codes.size()) {
+            throw new Errors('facecat game.room: no codes found.');
+        }
+    });
 
     // 1. Setting up database connection.
     
@@ -62,10 +71,69 @@ module.exports = function(node, channel) {
         stepRules: node.stepRules
     });
 
-    var gameState = {};
-        
+    var gameState = {};       
 
     // Functions.
+
+    // Creating an authorization function for the players.
+    // This is executed before the client the PCONNECT listener.
+    // Here direct messages to the client can be sent only using
+    // his socketId property, since no clientId has been created yet.
+    channel.player.authorization(function(header, cookies, room) {
+        var code, player, token;
+        playerId = cookies.player;
+        token = cookies.token;
+
+        console.log('game.room: checking auth.');
+        
+        // Weird thing.
+        if ('string' !== typeof playerId) {
+            console.log('no player: ', player)
+            return false;
+        }
+
+        // Weird thing.
+        if ('string' !== typeof token) {
+            console.log('no token: ', token)
+            return false;
+        }
+        
+        code = dk.codeExists(token);
+        
+        // Code not existing.
+	if (!code) {
+            console.log('not existing token: ', token);
+            return false;
+        }
+        
+        // Code in use.
+	if (code.usage) {
+            if (code.disconnected) {
+                return true;
+            }
+            else {
+                console.log('token already in use: ', token);
+                return false;
+            }
+	}
+
+        // Mark the code as in use.
+        dk.incrementUsage(token);
+
+        // Client Authorized
+        return true;
+    });
+
+    // Assigns Player Ids based on cookie token.
+    channel.player.clientIdGenerator(function(headers, cookies, validCookie, 
+                                              ids, info) {
+        
+        // Return the id only if token was validated.
+        // More checks could be done here to ensure that token is unique in ids.
+        if (cookies.token && validCookie) {
+            return cookies.token;
+        }
+    });
 
     function init() {
 	
@@ -95,6 +163,8 @@ module.exports = function(node, channel) {
         node.on.pdisconnect(function(p) {   
             gameState[p.id].disconnected = true;
             gameState[p.id].stage = p.stage;
+            // Free up code.
+            dk.decrementUsage(p.id);
         });
 
         // This must be done manually for now (maybe change).
@@ -106,7 +176,6 @@ module.exports = function(node, channel) {
             var p;
             pState = gameState[p.id];
             if (!p) {
-                // node.redirect();
                 return;
             }
             if (!pState.disconnected) {
