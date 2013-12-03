@@ -56,7 +56,10 @@ function waiting2start() {
     //
     /////////////////////////////////////////////
     node.getJSON(['/ultimatum/package.json'], function(data) {
-        W.writeln('Game version: ' + data.version);
+        var root;
+        
+        root = W.getElementById('waitingForPlayers')
+        W.writeln('Game version: ' + data.version, root);
     }, function() {
         console.log('getJSON finished');
     } );
