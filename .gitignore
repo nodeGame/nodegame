@@ -45,3 +45,7 @@ Session.vim
 descil.conf.js
 
 games_new/burden
+games_new/meritocracy
+
+*.tar.gz
+
