@@ -10,8 +10,6 @@
  * ---
  */
 
-// NOTICE: for now do not call node.done() immediately in the callback.
-
 var settings = require('./game.shared');
 var REPEAT = settings.REPEAT;
 
@@ -302,7 +300,7 @@ function ultimatum() {
                     node.timer.randomEmit('DONE', 3000);
                 });
 
-            }, { cache: { loadMode: 'cache', storeMode: 'onStore' } });
+            }, { cache: { loadMode: 'cache', storeMode: 'onLoad' } });
 
         });
 
@@ -542,6 +540,6 @@ game.settings = {
     publishLevel: 2
 };
 game.env = {
-    auto: true
+    auto: false
 };
 game.verbosity = 100;

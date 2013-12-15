@@ -163,7 +163,7 @@ module.exports = function(node, channel, gameRoom) {
             // Start the game on the reconnecting client.
             node.remoteCommand('start', p.id);
             // Pause the game on the reconnecting client, will be resumed later.
-            node.remoteCommand('pause', p.id);
+            // node.remoteCommand('pause', p.id);
 
             // It is not added automatically.
             // TODO: add it automatically if we return TRUE? It must be done
@@ -173,9 +173,22 @@ module.exports = function(node, channel, gameRoom) {
             // Will send all the players to current stage
             // (also those who were there already).
             node.game.gotoStep(node.player.stage);
-
+            
+            setTimeout(function() {
+                // Pause the game on the reconnecting client, will be resumed later.
+                // node.remoteCommand('pause', p.id);
+                // Unpause ALL players
+                // TODO: add it automatically if we return TRUE? It must be done
+                // both in the alias and the real event handler
+                node.game.pl.each(function(player) {
+                    if (player.id !== p.id) {
+                        node.remoteCommand('resume', player.id);
+                    }
+                });
+                // The logic is also reset to the same game stage.
+            }, 100);
             // Unpause ALL players
-            node.remoteCommand('resume', 'ALL');
+            // node.remoteCommand('resume', 'ALL');
         });
 
         // Update the Payoffs

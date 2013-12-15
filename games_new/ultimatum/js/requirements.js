@@ -106,9 +106,17 @@ function Requirements() {
                 }, 'SERVER', token);
             }
 
-            req.addRequirements(req.nodeGameRequirements,
-                                cookieSupport,
-                                checkToken);
+            // Add all the requirements functions.
+            req.addRequirements(
+                // Tests nodeGame dependencies.
+                req.nodeGameRequirements,
+                // loadFrameTest will temporarily change the main frame
+                // reference. Trying to access DOM elements during the test
+                // might cause errors.
+                req.loadFrameTest,
+                cookieSupport,
+                checkToken
+            );
 
             req.checkRequirements();
 	});
