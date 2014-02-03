@@ -35,6 +35,17 @@ var options = {
         return true;
     },
     sio: function(sio) {
+
+
+//        sio.set('transports', [
+            // 'websocket'
+            //   , 'flashsocket'
+            //     , 'htmlfile'
+  //                  'xhr-polling'
+    //                 , 'jsonp-polling'
+                       //]);
+
+
         // Special configuration for Socket.Io goes here here.
         return true;
     }

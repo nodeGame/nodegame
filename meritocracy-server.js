@@ -35,6 +35,7 @@ var options = {
         return true;
     },
     sio: function(sio) {
+        // sio.set('log level', 3);
         // Special configuration for Socket.Io goes here here.
         return true;
     }
