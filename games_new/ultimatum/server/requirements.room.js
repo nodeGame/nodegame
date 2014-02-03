@@ -18,7 +18,7 @@ module.exports = function(node, channel, room) {
     // Creates a stager object to define the game stages.
     var stager = new node.Stager();
 
-    // Functions
+    // Functions.
 
     function init() {
         var that = this;
@@ -74,7 +74,7 @@ module.exports = function(node, channel, room) {
 	        };
             }
 
-	    if (code.usage) {
+	    if (code.usage && !code.disconnected) {
 		//console.log('Code ' +  mtid + ' already in use ' + code.usage + ' times.');
 		// errUri = '/ultiturk/unauthr.html?id=' + mtid + '&codeInUse=1';
 		// node.redirect(errUri, msg.data.id);

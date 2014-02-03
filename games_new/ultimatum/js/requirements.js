@@ -27,8 +27,8 @@ function Requirements() {
     }
 
     function requirements() {
+         var nLoads = 0;
         
-        var nLoads = 0;
 	node.window.loadFrame('/ultimatum/html/room/testing.html', function() {
             var div, token;
 

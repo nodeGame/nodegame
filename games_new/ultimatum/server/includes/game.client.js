@@ -1,6 +1,6 @@
 /**
  * # Client code for Ultimatum Game
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Handles bidding, and responds between two players.
@@ -128,7 +128,7 @@ stager.setOnGameOver(function() {
 //
 /////////////////////////////////////////////
 function precache() {
-    W.lockFrame('Loading...');
+    W.lockScreen('Loading...');
     W.preCache([
         '/ultimatum/html/instructions.html',
         '/ultimatum/html/quiz.html',
@@ -137,6 +137,7 @@ function precache() {
         '/ultimatum/html/postgame.html',
         '/ultimatum/html/ended.html'
     ], function() {
+        console.log('AAAAAA');
         // Pre-Caching done; proceed to the next stage.
         node.done();
     });
@@ -405,7 +406,7 @@ function clearFrame() {
 function notEnoughPlayers() {
     console.log('Not enough players');
     node.game.pause();
-    W.lockFrame('The other player disconnected. We are now waiting to see if ' +
+    W.lockScreen('The other player disconnected. We are now waiting to see if ' +
                 ' he or she reconnects. If not the game will be terminated.');
 }
 

@@ -1,13 +1,14 @@
 <!doctype html>
 <title>Requirements check Room</title>
-
-<!-- Loading  nodeGame libraries and CSS -->
-<script src="/socket.io/socket.io.js"></script> 
-<script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
-<link rel='stylesheet' href='/stylesheets/fullheight.css'></link>
-<link rel='stylesheet' href='/stylesheets/noscript.css'></link>
-<script src="/ultimatum/js/requirements.js" charset="utf-8"></script>
-<!-- end -->
+<head>
+  <!-- Loading  nodeGame libraries and CSS -->
+  <script src="/socket.io/socket.io.js"></script> 
+  <script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+  <link rel='stylesheet' href='/stylesheets/fullheight.css'></link>
+  <link rel='stylesheet' href='/stylesheets/noscript.css'></link>
+  <script src="/ultimatum/js/requirements.js" charset="utf-8"></script>
+  <!-- end -->
+</head>
 
 <body>
   <h2 id="h2title">Welcome!</h2>
@@ -45,10 +46,10 @@
 	  },
           game_metadata: game.metadata,
           plot: game.plot,
-          verbosity: 10,
+          verbosity: 10
       });
 
-      node.connect("/requirements");
+     node.connect("/requirements");
     
     };  
   </script>
