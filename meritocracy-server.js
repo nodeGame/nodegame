@@ -53,8 +53,9 @@ var meritocracy = sn.addChannel({
     // If TRUE, players can invoke GET commands on admins.
     getFromAdmins: true,
     // Unauthorized clients will be redirected here. 
-    // (defaults: "/pages/accessdenied.htm")
-    accessDeniedUrl: '/meritocracy/unauth.htm'
+    // (defaults: "/pages/accessdenied.htm").
+    // Notice: experiment is an alias, as defined in package.json.
+    accessDeniedUrl: '/experiment/unauth.htm'
 });
 
 // Creates the room that will spawn the games for the channel.
