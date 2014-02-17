@@ -27,7 +27,7 @@ var options = {
         // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games_new');
         // Sets the debug mode, exceptions will be thrown (Default is false).
-        servernode.debug = true;
+        servernode.debug = false;
         return true;
     },
     http: function(http) {
