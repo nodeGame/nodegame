@@ -1,6 +1,6 @@
 /**
  * # Face categorization game - Client
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Client receives links of images and it goes through them
@@ -24,7 +24,7 @@ game.globals = {};
 
 stager.setOnInit(function() {
     console.log('** INIT PLAYER! **');
-    W.setup('SOLO_PLAYER');
+    W.setupFrame('SOLO_PLAYER');
     this.counter = -1;
     this.faces = {};
     this.previousTags = {};
@@ -34,7 +34,7 @@ stager.setOnInit(function() {
 
 var REPEAT = 2;
 
-var facecat = function() {
+function facecat() {
     console.log('facecat');
     W.loadFrame('/facecat/html/facepage.htm', function() {
         var next, faceImg, td, dlcat, tagTr, tagInput, previousTags;
@@ -120,8 +120,9 @@ var facecat = function() {
         }
         
         function askForNext() {
-            var tags, faces, obj, i, len;
+            var tags, faces, obj, i, len, secondSet;
             faces = node.game.faces;
+            
             if (!faces.items || node.game.counter >= faces.items.length) {
                 node.get('NEXT', onNextFaces);
             }
@@ -235,7 +236,7 @@ function instructionsText() {
 function sample() {
     console.log('*** sample ! ***');
     var sampleDiv, instructions, next;
-        
+    
     next = W.getElementById("doneButton");
     next.disabled = false;
     instructions = W.getElementById("instructions");

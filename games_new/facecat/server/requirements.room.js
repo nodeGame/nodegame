@@ -1,6 +1,6 @@
 /**
- * # Requirements Room for Face Categorization Game
- * Copyright(c) 2013 Stefano Balietti
+ * # Requierements Room for Face Categorization Game
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Handles incoming connections, validates authorization tokens
@@ -11,9 +11,29 @@ module.exports = function(node, channel, room) {
 
     var path = require('path');
     
+    // Load shared settings.
+    var settings = require(__dirname + '/includes/game.settings.js');
+
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, 'descil.conf.js');
     var dk = require('descil-mturk')(confPath);
+    function codesNotFound() {
+        var nCodes = dk.codes.size();
+        console.log('Codes found: ', nCodes);
+        if (!nCodes) {
+            throw new Error('requirements.room: no codes found.');
+        }
+        // Add a ref to the node obj.
+        node.dk = dk;
+    }
+
+    if (settings.AUTH === 'MTURK') {
+        dk.getCodes(codesNotFound);
+    }
+    else {
+        dk.readCodes(codesNotFound);
+    }
+
 
     // Creates a stager object to define the game stages.
     var stager = new node.Stager();
@@ -24,18 +44,6 @@ module.exports = function(node, channel, room) {
         var that = this;
 
         console.log('********Requirements Room Created*****************');
-        
-        // Load code database
-//        dk.getCodes(function() {
-//            if (!dk.codes.size()) {
-//                throw new Errors('requirements.room: no codes found.');
-//            }
-//        });
-        dk.readCodes(function() {
-            if (!dk.codes.size()) {
-                throw new Errors('requirements.room: no codes found.');
-            }
-        });
 
 	node.on.preconnect(function(player) {
             console.log('Player connected to Requirements room.');
@@ -66,6 +74,8 @@ module.exports = function(node, channel, room) {
             code = dk.codeExists(mtid);
             
 	    if (!code) {
+		// errUri = '/ultimatum/unauth.html?id=' + mtid + '&err0=1';	
+		// node.redirect(errUri, msg.data.id);
 		return {
                     success: false,
                     msg: 'Code not found: ' + mtid
@@ -73,6 +83,10 @@ module.exports = function(node, channel, room) {
             }
 
 	    if (code.usage) {
+		//console.log('Code ' +  mtid + ' already in use ' + code.usage + ' times.');
+		// errUri = '/ultiturk/unauthr.html?id=' + mtid + '&codeInUse=1';
+		// node.redirect(errUri, msg.data.id);
+		// dk.decrementUsage(mtid);
                 return {
                     success: false,
                     msg: 'Code already in use: ' + mtid
@@ -81,7 +95,8 @@ module.exports = function(node, channel, room) {
 	    
             return {
                 success: true,
-                msg: 'Code validated.'
+                msg: 'Code validated.',
+                gameLink: '/facecat/'
             };
         });
 
@@ -124,15 +139,23 @@ module.exports = function(node, channel, room) {
     game = {};
     
     game.metadata = {
-        name: 'Requirements check room for Face Categorization Game.',
+        name: 'Requirements check room for Ultimaum-AMT',
         description: 'Validates players entry codes with an internal database.',
         version: '0.1'
     };
     
     // Throws errors if true.
-    game.debug = true;
+    game.debug = settings.DEBUG;
 
     game.plot = stager.getState();
 
+    game.nodename = 'rq';
+
     return game;
 };
+
+
+
+
+
+

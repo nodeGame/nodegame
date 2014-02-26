@@ -1,6 +1,6 @@
 /**
  * # Waiting Room for Face categorization Game
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Handles incoming connections, sets the Face Categorization game
@@ -11,20 +11,41 @@
  */
 module.exports = function(node, channel) {
 
-    var path = require('path');    
+    var path = require('path');
     var J = require('JSUS').JSUS;
+
+    // If NO authorization is found, local codes will be used,
+    // and assigned automatically.
+    var noAuthCounter = -1;
+
+    // Still dispatching.
+    var roomClosed = false;
+
+    // Load shared settings.
+    var settings = require(__dirname + '/includes/game.settings.js');
 
     // Reads in descil-mturk configuration.
     var confPath = path.resolve(__dirname, 'descil.conf.js');
     var dk = require('descil-mturk')(confPath);
-    dk.readCodes(function() {
-        if (!dk.codes.size()) {
-            throw new Errors('facecat game.room: no codes found.');
+    function codesNotFound() {
+        var nCodes = dk.codes.size();
+        console.log('Codes found: ', nCodes);
+        if (!nCodes) {
+            throw new Error('game.room: no codes found.');
         }
-    });
+        // Add a ref to the node obj.
+        node.dk = dk;
+    }
+
+    if (settings.AUTH === 'MTURK') {
+        dk.getCodes(codesNotFound);
+    }
+    else {
+        dk.readCodes(codesNotFound);
+    }
 
     // 1. Setting up database connection.
-    
+
     // Establish the connection to database to load face sets.
     var Database = require('nodegame-db').Database;
     var ngdb = new Database(node);
@@ -45,7 +66,7 @@ module.exports = function(node, channel) {
             mdbLoad.disconnect();
         });
     });
-    
+
     // Open the collection where the categories will be stored.
     var mdbWrite = ngdb.getLayer('MongoDB', {
         dbName: 'facerank_db',
@@ -71,7 +92,7 @@ module.exports = function(node, channel) {
         stepRules: node.stepRules
     });
 
-    var gameState = {};       
+    var gameState = {};
 
     // Functions.
 
@@ -81,11 +102,16 @@ module.exports = function(node, channel) {
     // his socketId property, since no clientId has been created yet.
     channel.player.authorization(function(header, cookies, room) {
         var code, player, token;
+
+        if (settings.AUTH === 'NO') {
+            return true;
+        }
+
         playerId = cookies.player;
         token = cookies.token;
 
         console.log('game.room: checking auth.');
-        
+
         // Weird thing.
         if ('string' !== typeof playerId) {
             console.log('no player: ', player)
@@ -97,15 +123,15 @@ module.exports = function(node, channel) {
             console.log('no token: ', token)
             return false;
         }
-        
+
         code = dk.codeExists(token);
-        
+
         // Code not existing.
 	if (!code) {
             console.log('not existing token: ', token);
             return false;
         }
-        
+
         // Code in use.
 	if (code.usage) {
             if (code.disconnected) {
@@ -117,17 +143,19 @@ module.exports = function(node, channel) {
             }
 	}
 
-        // Mark the code as in use.
-        dk.incrementUsage(token);
-
-        // Client Authorized
+        // Client Authorized.
         return true;
     });
 
     // Assigns Player Ids based on cookie token.
-    channel.player.clientIdGenerator(function(headers, cookies, validCookie, 
+    channel.player.clientIdGenerator(function(headers, cookies, validCookie,
                                               ids, info) {
-        
+        var code;
+        if (settings.AUTH === 'NO') {
+            code = dk.codes.db[++noAuthCounter].AccessCode;
+            return code;
+        }
+
         // Return the id only if token was validated.
         // More checks could be done here to ensure that token is unique in ids.
         if (cookies.token && validCookie) {
@@ -135,32 +163,52 @@ module.exports = function(node, channel) {
         }
     });
 
+    // Init Function. Will spawn everything.
     function init() {
-	
+
         console.log('** Waiting Room: Initing... **');
 
-        node.on.pconnect(function(p) {
+        function connectingPlayer(p) {
             console.log('** Player connected: ' + p.id + ' **');
 
+            // Increment Code.
+            dk.incrementUsage(p.id);
+
             // Creating a state for reconnections.
-            gameState[p.id] = {
-                set: counter++,
-                pic: 0
-            };
+            if (!gameState[p.id]) {
+                gameState[p.id] = {
+                    // The set of pictures to evaluate.
+                    setId: null,
+                    // The length of the set (needed to know when to send
+                    // a new one).
+                    setLength: null,
+                    // Current picture of the set being categorized.
+                    pic: 0,
+                    // Flag: is player reconnecting.
+                    resume: false,
+                    // Counter: how many sets already completed.
+                    completedSets: 0,
+                    // User has just finished a set and will need a new one
+                    newSetNeeded: true
+                };
+            }
 
 	    // Setting metadata, settings, and plot
             node.remoteSetup('game_metadata',  p.id, client.metadata);
 	    node.remoteSetup('game_settings', p.id, client.settings);
 	    node.remoteSetup('plot', p.id, client.plot);
-            
+
             // Setting up the global variables in the client, if necessary.
             // node.remoteSetup('env', ... );
-            
+
             // Start the game on the client.
             node.remoteCommand('start', p.id);
-        });
+        }
 
-        node.on.pdisconnect(function(p) {   
+
+        node.on.pconnect(connectingPlayer);
+
+        node.on.pdisconnect(function(p) {
             gameState[p.id].disconnected = true;
             gameState[p.id].stage = p.stage;
             // Free up code.
@@ -174,6 +222,8 @@ module.exports = function(node, channel) {
 
         node.on.preconnect(function(p) {
             var p;
+            debugger
+
             pState = gameState[p.id];
             if (!p) {
                 return;
@@ -182,64 +232,62 @@ module.exports = function(node, channel) {
                 // error
             }
             pState.disconnected = false;
+            // Player will continue from where he has left.
+            gameState[p.id].resume = true;
+
+            console.log('RESUME TRUE');
 
             // It is not added automatically.
             // TODO: add it automatically if we return TRUE? It must be done
             // both in the alias and the real event handler
             node.game.pl.add(p);
 
-            // We could slice the game plot, and send just what we need
-            // however here we resend all the stages, and within the 'facecat'
-            // stage we send just some of the faces
-            console.log('** Player connected: ' + p.id + ' **');
-	    // Setting metadata, settings, and plot.
-            node.remoteSetup('game_metadata',  p.id, client.metadata);
-	    node.remoteSetup('game_settings', p.id, client.settings);
-	    node.remoteSetup('plot', p.id, client.plot);
-
-            // Start the game on the client.
-            node.remoteCommand('start', p.id);
+            connectingPlayer(p);
         });
-        
+
         // Sends the faces (reply to a GET request from client).
         node.on('NEXT', function(msg) {
-            var set, state;
+            var set, state, secondSet;
             console.log('***** Received NEXT ******');
-
+            debugger
             state = gameState[msg.from];
+
             console.log(state);
-            // This is a reconnection.
-            if (state.pic !== 0) {
-                node.remoteAlert('A previous unfinished game session has ' +
-                                 'been detected. You will continue from ' +
-                                 'the last image you saw.', msg.from);
-            }
-            
-            // Set is finished.
-            if (state.pic === 30) {
-                if (!state.completedSets) { 
-                    // Update to the next available counter level.
-                    state.set = ++counter;
-                    state.completedSets = 1;
-                }
-                else {
-                    // Player has rated 60 paintings.
-                    node.remoteCommand('step', msg.from);
-                    return;
-                }
+
+            if (state.newSetNeeded) {
+                state.setId = ++counter;
+                state.newSetNeeded = false;
+                state.pic = 0;
             }
 
             // We need to clone it, otherwise it gets overwritten.
-            set = J.clone(sets[state.set]);
-            
-            if (state.pic > 0) {    
+            set = J.clone(sets[state.setId]);
+
+            // This is a reconnection.
+            if (state.resume) {
+                console.log('WTF');
+                node.remoteAlert('A previous unfinished game session has ' +
+                                 'been detected. You will continue from ' +
+                                 'the last image you saw.', msg.from);
+                state.resume = false;
+
+
                 // We slice to the last picture that has an evaluation
                 // Since pictures are 1-based, we do not need to do -1.
                 set.items = set.items.slice(state.pic);
             }
-            console.log(counter);
+            else if (state.completedSets) {
+                
+                // Player has rated 2 sets (about 60 paitings).
+                node.remoteCommand('step', msg.from);
+                return;
+            }
 
-            console.log(set ? set.items.length : 'no set');
+            // Update setLength in global state.
+            state.setLength = set.items.length;
+
+            console.log('COUNTER ', counter);
+            console.log('SET LENGTH ', set ? set.items.length : 'no set');
 
             return set;
         });
@@ -252,26 +300,33 @@ module.exports = function(node, channel) {
 
         // Client has categorized an image.
         node.on.data('cat',function(msg) {
+            var state;
             if (!msg.data) return;
             console.log('**** Received a CAT! ' + msg.data.round + '***');
+            
+            state = gameState[msg.from];
+            console.log(state)
             // Update the counter of the last categorized pic.
-            gameState[msg.from].pic = msg.data.round;
+            state.pic = msg.data.round;
+            if (state.pic === state.setLength) {
+                ++state.completedSets;
+                state.newSetNeeded = true;
+            }
             mdbWrite.store(msg.data);
-
         });
 
     }
 
+    stager.setOnInit(init);
+
     // Create one waiting stage where everything will happen.
     stager.addStage({
         id: 'waiting',
-        cb: function() { 
+        cb: function() {
             console.log('** Waiting Room: Opened! **');
             return true;
         }
     });
-
-    stager.setOnInit(init);
 
     stager.setOnGameOver(function() {
 	console.log('^^^^^^^^^^^^^^^^GAME OVER^^^^^^^^^^^^^^^^^^');
@@ -283,7 +338,7 @@ module.exports = function(node, channel) {
         nodename: 'wroom',
 	game_metadata: {
 	    name: 'wroom',
-	    version: '0.0.2'
+	    version: '0.1.0'
 	},
 	game_settings: {
 	    publishLevel: 0,

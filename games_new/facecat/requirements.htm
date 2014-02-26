@@ -1,55 +1,23 @@
 <!doctype html>
 <title>Requirements check Room</title>
-
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <!-- Loading  nodeGame libraries and CSS -->
 <script src="/socket.io/socket.io.js"></script> 
 <script src="/javascripts/nodegame-full.js" charset="utf-8"></script>
+<link rel="stylesheet" href="/ultimatum/html/css/bootstrap.min.css" />
 <link rel='stylesheet' href='/stylesheets/fullheight.css'></link>
 <link rel='stylesheet' href='/stylesheets/noscript.css'></link>
-<script src="/ultimatum/js/requirements.js" charset="utf-8"></script>
+<link rel='stylesheet' href='/stylesheets/player.css' />
 <!-- end -->
 
 <body>
   <h2 id="h2title">Welcome!</h2>
   <noscript>Your browser does not support JavaScript. You cannot take this HIT, if you don't have JavaScript enabled in your browser.</noscript>
-  <script>
-
-    window.onload = function () {
-
-      // Player ID from Mturk
-      var mtid, game;
-
-      mtid = JSUS.getQueryString('id');
-      game = new Requirements();
-
-      // Configuring nodegame.
-      node.setup('nodegame', {
-	  // HOST needs to be specified only 
-	  // if this file is located in another server
-	  // host: http://myserver.com,	  
-	  window: {
-	      promptOnleave: false,
-              noEscape: true // Defaults TRUE
-	  },
-	  env: {
-	      auto: false,
-              mtid: mtid
-	  },
-	  events: {
-	      dumpEvents: false, // output to console all fired events
-              history: false // keep a record of all fired events
-	  },
-	  socket: {
-	      type: 'SocketIo', // for remote connections
-	      reconnect: false
-	  },
-          game_metadata: game.metadata,
-          plot: game.plot,
-          verbosity: 10,
-      });
-
-      node.connect("/requirements");
-    
-    };  
-  </script>
+  <p id="unsupported">
+    If you can't visualize the page correctly or the if test fails, try to refresh the page.
+    <br />
+    If the problem persists, your browser is not supported or you do not have javascript enabled. In such case, do not take the HIT, or please return the HIT if you have already taken it.<br/> <br/> 
+  </p>
+  <div id="widgets_div"></div>
+  <script src="/meritocracy/js/requirements.js" charset="utf-8"></script>
 </body>

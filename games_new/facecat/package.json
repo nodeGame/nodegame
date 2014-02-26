@@ -21,13 +21,13 @@
     "nodegame": "0.2.0"
   }
 ,
-	"nodegame": {
-	   "logic": "./server/logic.js",
-	   "dependencies": {
-	     "not_used": "for now"
-	   },
-	   "widgets": {
-	     "moneytalk": "0.1.0"
-	   }
-	}
+  "nodegame": {
+    "logic": "./server/logic.js",
+    "dependencies": {
+       "not_used": "for now"
+    },
+    "widgets": {
+       "moneytalk": "0.1.0"
+    }
+  }  
 }

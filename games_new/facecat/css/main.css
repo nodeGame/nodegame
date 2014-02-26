@@ -85,3 +85,9 @@ ul#previousTags li:hover {
     text-decoration: underline;
     cursor: pointer;
 }
+
+button {
+    font-size: 18px;
+    width: 98%;
+    height: 40px;
+}

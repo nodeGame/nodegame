@@ -1,6 +1,6 @@
 /**
  * # Authorization codes example file
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * File must export an array of objects containing at the very least two
@@ -10,29 +10,19 @@
  * For real authorization codes use at least 32 random characters and digits.
  * ---
  */
-module.exports = [
-    
-    {
-        AccessCode: 'a_access',
-        ExitCode: 'a_exit'
-    },
-    {
-        AccessCode: 'b_access',
-        ExitCode: 'b_exit'
-    },
-    {
-        AccessCode: 'c_access',
-        ExitCode: 'c_exit'
-    },
-    {
-        AccessCode: 'd_access',
-        ExitCode: 'd_exit'
-    },
-    {
-        AccessCode: 'e_access',
-        ExitCode: 'e_exit'
-    }
 
-];
-    
+var nCodes, i, codes;
+
+nCodes = 100;
+codes = [];
+
+for (i = 0 ; i < nCodes; i ++) {
+    codes.push({
+        AccessCode: i + '_access',
+        ExitCode: i + '_exit'
+    });
+}
+        
+module.exports = codes;    
+
 
