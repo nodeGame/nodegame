@@ -47,6 +47,8 @@ descil.conf.js
 games_new/ultimatum
 games_new/burden*
 games_new/meritocracy
+games_new/facecat
+games_new/imagecat
 
 *.tar.gz
 
