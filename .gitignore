@@ -30,6 +30,8 @@ node_modules_old
 /nodegame_clients/pr.js
 /nodegame_clients/node_modules/peerreview/
 pr_server.js
+
+/games/
 /games/PR
 /games/TEST
 /games/PR2/
@@ -45,6 +47,7 @@ Session.vim
 
 descil.conf.js
 
+games_new/
 games_new/ultimatum
 games_new/burden*
 games_new/meritocracy
