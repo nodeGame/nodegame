@@ -18,8 +18,14 @@ nodeGame is a general framework to play any kind of game online, but it speciall
  - Works on mobile devices and tablets
  - Installation is required only for the server, clients just need their browser windows
  - Integrates smoothly with other libraries (e.g. jQuery, D3.js, etc.) and web services, such as Amazon Mechanical Turk
+ 
+## Important!
 
-## Quick start
+The NPM version and the github have diverged. The version on github is the latest, and it is not compatible to the version found on NPM. The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
+
+For further information refer to the documentation in nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki).
+
+## Quick start (Old Version)
 
 nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
 
@@ -34,14 +40,12 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
   - A waiting room: `localhost:8080/ultimatum/room.html`
   - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
   - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
-
-For further information refer to the documentation in nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki)
       
 ## Source codes
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
 
-### Building from sources
+### Building from sources (Latest Version)
 
 Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
 
@@ -76,8 +80,12 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     
     # start the ultimatum game
     $ node start/ultimatum-server
- 
-Continue from point _3._ of the section "Quick Start".    
+    
+    # open two browser tabs for two players at the address
+    # http://localhost:8080/ultimatum/
+    # open the admin console at
+    # http://localhost:8080/ultimatum/monitor.htm
+    # game is set to autoplay. See the wiki documentation to modify settings.
     
 ### Code contributions    
 
