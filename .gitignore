@@ -31,7 +31,6 @@ node_modules_old
 /nodegame_clients/node_modules/peerreview/
 pr_server.js
 
-/games/
 /games/PR
 /games/TEST
 /games/PR2/
@@ -39,8 +38,11 @@ pr_server.js
 /games/PR4/
 
 /games/facerank/
-/games/facerank/faces
-/games_new/facecat/faces
+/games/ultimatum/
+/games/ultiturk/
+/games/mygame/
+
+/game
 
 Session.vim
 

@@ -9,16 +9,15 @@ nodeGame is a general framework to play any kind of game online, but it speciall
 ## The Good parts
 
  - Open source and open standard (HTML5)
- - modular framework (games + widgets)
- - low / medium level of programming required
- - powerful API
- - real-time plotting with [d3.js](http://d3js.org)
- - integrated [NDDB](http://nodegame.github.com/NDDB/docs/nddb.js.html) Javascript database
- - server can run multiple games at the same time
- - customizable waiting rooms for online games
- - works on mobile devices and tablets
- - installation is required only for the server, clients just need their browser windows
- - integrates smoothly with other libraries and web services, such as Amazon Mturk
+ - Modular framework (server / client / window / widgets / games)
+ - Low / medium level of programming required
+ - Powerful API
+ - Integrated [NDDB](http://nodegame.github.com/NDDB/docs/nddb.js.html) Javascript database
+ - Server can run multiple games at the same time
+ - Customizable waiting rooms for online games
+ - Works on mobile devices and tablets
+ - Installation is required only for the server, clients just need their browser windows
+ - Integrates smoothly with other libraries (e.g. jQuery, D3.js, etc.) and web services, such as Amazon Mechanical Turk
 
 ## Quick start
 
@@ -37,13 +36,10 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
   - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
 
 For further information refer to the documentation in nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki)
-
       
 ## Source codes
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
-
-**IMPORTANT:** At the moment the master branch of the github repository has been refactored, and the current documentation is slightly outdated, and refers to the version available from `npm`.
 
 ### Building from sources
 
@@ -55,9 +51,31 @@ Before going any further make sure you've installed [git](http://git-scm.com) an
     # clone the repo
     $ git clone git://github.com/nodeGame/nodegame.git
       
-    # update the dependencies
+    # install the dependencies
     $ cd nodegame
+    $ mkdir node_modules; cd node_modules
+    $ git clone git://github.com/nodeGame/nodegame-client
+    $ git clone git://github.com/nodeGame/nodegame-server
+    $ git clone git://github.com/nodeGame/nodegame-window
+    $ git clone git://github.com/nodeGame/nodegame-widgets
+    $ git clone git://github.com/nodeGame/JSUS
+    $ git clone git://github.com/nodeGame/NDDB
+    
+    # install sub-dependencies
+    $ cd nodegame-client
+    $ npm install        
+    $ cd ../../nodegame-server
     $ npm install
+    
+    $ rebuild js files
+    $ node bin/make build-client -a -o nodegame-full
+    
+    $ install ultimatum game
+    $ cd ../../
+    $ node clone git://github.com/nodeGame/ultimatum games/
+    
+    # start the ultimatum game
+    $ node start/ultimatum-server
  
 Continue from point _3._ of the section "Quick Start".    
     
@@ -67,7 +85,7 @@ Code contributions are welcome, please keep in mind default [Code Conventions](h
 
 ## License
 
-Copyright (C) 2012 Stefano Balietti
+Copyright (C) 2014 Stefano Balietti
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
