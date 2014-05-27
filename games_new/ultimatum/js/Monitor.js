@@ -3,9 +3,25 @@ function Monitor(node) {
     var stager = new node.Stager();
 
     stager.setOnInit(function() {
-        console.log('INIT MONITOR!');
-        //node.window.setup('MONITOR');
-        node.widgets.append('ChannelList');
+        var button;
+        var channelList, roomList, clientList;
+
+        // Add refresh button:
+        button = document.createElement('button');
+        button.innerHTML = 'Refresh';
+        button.onclick = function() {
+            // Tell widgets to refresh themselves:
+            channelList.refresh();
+            roomList.refresh();
+            clientList.refresh();
+        };
+        document.body.appendChild(button);
+
+        // Add widgets:
+        channelList = node.widgets.append('ChannelList');
+        roomList    = node.widgets.append('RoomList');
+        clientList  = node.widgets.append('ClientList');
+        gameList    = node.widgets.append('GameList');
     });
 
     stager.addStage({

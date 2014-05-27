@@ -36,6 +36,7 @@ pr_server.js
 /games/PR3/
 /games/PR4/
 
+/games/facerank/
 /games/facerank/faces
 /games_new/facecat/faces
 
@@ -49,6 +50,7 @@ games_new/burden*
 games_new/meritocracy
 games_new/facecat
 games_new/imagecat
+games_new/facerank
 
 *.tar.gz
 

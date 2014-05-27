@@ -1,6 +1,6 @@
 /**
  * # RoomList widget for nodeGame
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
  * Shows current, previous and next state.
@@ -15,7 +15,7 @@
     node.widgets.register('RoomList', RoomList);
 
     var JSUS = node.JSUS,
-    Table = node.window.Table;
+        Table = node.window.Table;
 
     // ## Defaults
 
@@ -50,20 +50,21 @@
                 text = content.name;
                 break;
 
-            //case 1:
-            //    text = content.nConnClients +
-            //           ' (+' + content.nDisconnClients + ')';
-            //    break;
-            //
-            //case 2:
-            //    text = content.nConnPlayers +
-            //           ' (+' + content.nDisconnPlayers + ')';
-            //    break;
-            //
-            //case 3:
-            //    text = content.nConnAdmins +
-            //           ' (+' + content.nDisconnAdmins + ')';
-            //    break;
+            case 1:
+                text = content.id;
+                break;
+
+            case 2:
+                text = '' + content.nClients;
+                break;
+            
+            case 3:
+                text = '' + content.nPlayers;
+                break;
+            
+            case 4:
+                text = '' + content.nAdmins;
+                break;
 
             default:
                 text = 'N/A';
@@ -72,7 +73,8 @@
 
             textElem.appendChild(document.createTextNode(text));
             textElem.onclick = function() {
-                alert(content.name);
+                // Signal the ClientList to switch rooms:
+                node.emit('USEROOM', content.id);
             };
         }
         else {
@@ -95,7 +97,7 @@
         });
 
         // Create header:
-        this.table.setHeader(['Name',
+        this.table.setHeader(['Name', 'ID',
                               '# Clients', '# Players', '# Admins']);
     }
 
@@ -107,24 +109,29 @@
         this.channelName = channelName;
     };
 
-    RoomList.prototype.append = function(root, ids) {
-        if ('string' !== typeof this.channelName) {
-            throw new Error('RoomList.append: channel must be set');
-        }
-
-        root.appendChild(this.table.table);
+    RoomList.prototype.refresh = function() {
+        if ('string' !== typeof this.channelName) return;
 
         // Ask server for room list:
         node.socket.send(node.msg.create({
             target: 'SERVERCOMMAND',
             text:   'INFO',
             data: {
-                type: 'ROOMS',
+                type:    'ROOMS',
                 channel: this.channelName
             }
         }));
 
         this.table.parse();
+    };
+
+    RoomList.prototype.append = function(root, ids) {
+        this.root = root;
+
+        root.appendChild(this.table.table);
+
+        // Query server:
+        this.refresh();
 
         return root;
     };
@@ -134,9 +141,17 @@
 
         that = this;
 
+        // Listen for server reply:
         node.on.data('INFO_ROOMS', function(msg) {
-console.log('***', msg.data);
             that.writeRooms(msg.data);
+        });
+
+        // Listen for events from ChannelList saying to switch channels:
+        node.on('USECHANNEL', function(channel) {
+            that.setChannel(channel);
+
+            // Query server:
+            that.refresh();
         });
     };
 
@@ -151,7 +166,7 @@ console.log('***', msg.data);
                 roomObj = rooms[roomName];
 
                 this.table.addRow(
-                        [roomObj]);
+                        [roomObj, roomObj, roomObj, roomObj, roomObj]);
             }
         }
 

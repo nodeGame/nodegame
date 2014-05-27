@@ -4,7 +4,7 @@
  * MIT Licensed
  *
  * Starts two channels, one to test the requirements,
- * and one to actually play an Ultimatum game.
+ * and one to actually play a Face Categorization game.
  *
  * http://www.nodegame.org
  * ---
@@ -27,7 +27,7 @@ var options = {
         // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games_new');
         // Sets the debug mode, exceptions will be thrown (Default is false).
-        servernode.debug = true;
+        servernode.debug = true;        
         return true;
     },
     http: function(http) {
@@ -35,17 +35,6 @@ var options = {
         return true;
     },
     sio: function(sio) {
-
-
-//        sio.set('transports', [
-            // 'websocket'
-            //   , 'flashsocket'
-            //     , 'htmlfile'
-  //                  'xhr-polling'
-    //                 , 'jsonp-polling'
-                       //]);
-
-
         // Special configuration for Socket.Io goes here here.
         return true;
     }
@@ -55,21 +44,34 @@ var options = {
 var sn = new ServerNode(options);
 
 // Add the game channel.
-var ultimatum = sn.addChannel({
-    name: 'ultimatum',
-    admin: 'ultimatum/admin',
-    player: 'ultimatum',
-    verbosity: 100,
-    // If TRUE, players can invoke GET commands on admins.
-    getFromAdmins: true,
+var facerank = sn.addChannel({
+    // Options in common to admin and player server.
+
+    name: 'facerank',
     // Unauthorized clients will be redirected here. 
     // (defaults: "/pages/accessdenied.htm")
-    accessDeniedUrl: '/ultimatum/unauth.htm'
+    accessDeniedUrl: '/facerank/unauth.htm',
+
+    // PlayerServer options.
+    player: {
+        endpoint: 'facerank',
+        // If TRUE, players can invoke GET commands on admins.
+        getFromAdmins: true,
+        notify: {
+            onConnect: false,
+            onStageUpdate: false,
+            onStageLevelUpdate: false,
+            onStageLoadedUpdate: false
+        }
+    },
+
+    // AdminServer options (all defaults).
+    admin: 'facerank/admin'
 });
 
 // Creates the room that will spawn the games for the channel.
-var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
-var gameRoom = ultimatum.createWaitingRoom({
+var logicPath = path.resolve('./games_new/facerank/server/game.room.js');
+var gameRoom = facerank.createWaitingRoom({
     logicPath: logicPath,
     name: 'gameRoom'
 });
@@ -85,10 +87,9 @@ var requirements = sn.addChannel({
 });
 
 // Creates the waiting room for the channel.
-var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
+var logicPath = path.resolve('./games_new/facerank/server/requirements.room.js');
 var reqRoom = requirements.createWaitingRoom({
-    logicPath: logicPath,
-    name: 'requirementsWR'
+    logicPath: logicPath
 });
 
 
