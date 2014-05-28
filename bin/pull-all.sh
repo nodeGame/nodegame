@@ -49,17 +49,17 @@ git pull || echo '  FAILED!'
 
 echo
 cd ../NDDB
-echo '* Pulling JSUS ...'
+echo '* Pulling NDDB ...'
 git pull || echo '  FAILED!'
 
 echo
 cd ../shelf.js
-echo '* Pulling JSUS ...'
+echo '* Pulling shelf.js ...'
 git pull || echo '  FAILED!'
 
 echo
 cd ../descil-mturk
-echo '* Pulling JSUS ...'
+echo '* Pulling descil-mturk ...'
 git pull || echo '  FAILED!'
 
 echo
