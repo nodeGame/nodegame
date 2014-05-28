@@ -37,7 +37,7 @@ cd bin; patch ../node_modules/express/node_modules/connect/lib/middleware/static
 node make build-client -a -o nodegame-full
 
 # install ultimatum game
-cd ../../
+cd ../../../
 git clone git@github.com:nodeGame/ultimatum games/ultimatum
 
 # start the ultimatum game
