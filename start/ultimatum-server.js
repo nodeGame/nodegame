@@ -51,46 +51,52 @@ var options = {
     }
 };
 
-// Start server, option parameter is optional.
+// Start server, options parameter is optional.
 var sn = new ServerNode(options);
 
-// Add the game channel.
-var ultimatum = sn.addChannel({
-    name: 'ultimatum',
-    admin: 'ultimatum/admin',
-    player: 'ultimatum',
-    verbosity: 100,
-    // If TRUE, players can invoke GET commands on admins.
-    getFromAdmins: true,
-    // Unauthorized clients will be redirected here. 
-    // (defaults: "/pages/accessdenied.htm")
-    accessDeniedUrl: '/ultimatum/unauth.htm'
-});
+sn.ready(function() {
+    // Get the absolute path to the game directory.
+    var ultimatumPath = sn.resolveGameDir('ultimatum');
+    if (!ultimatumPath) {
+        throw new Error('Ultimatum game not found.');
+    }
 
-// Creates the room that will spawn the games for the channel.
-var logicPath = path.resolve('./games_new/ultimatum/server/game.room.js');
-var gameRoom = ultimatum.createWaitingRoom({
-    logicPath: logicPath,
-    name: 'gameRoom'
-});
+    // Add the game channel.
+    var ultimatum = sn.addChannel({
+        name: 'ultimatum',
+        admin: 'ultimatum/admin',
+        player: 'ultimatum',
+        verbosity: 100,
+        // If TRUE, players can invoke GET commands on admins.
+        getFromAdmins: true,
+        // Unauthorized clients will be redirected here. 
+        // (defaults: "/pages/accessdenied.htm")
+        accessDeniedUrl: '/ultimatum/unauth.htm'
+    });
 
-// Add a requirements-check / feedback channel.
-var requirements = sn.addChannel({
-    name: 'requirements',
-    admin: 'requirements/admin',
-    player: 'requirements',
-    verbosity: 100,
-    // If TRUE, players can invoke GET commands on admins.
-    getFromAdmins: true
-});
+    // Creates the room that will spawn the games for the channel.
+    var gameRoom = ultimatum.createWaitingRoom({
+        logicPath:  ultimatumPath + 'server/game.room.js',
+        name: 'gameRoom'
+    });
 
-// Creates the waiting room for the channel.
-var logicPath = path.resolve('./games_new/ultimatum/server/requirements.room.js');
-var reqRoom = requirements.createWaitingRoom({
-    logicPath: logicPath,
-    name: 'requirementsWR'
-});
+    // Add a requirements-check / feedback channel.
+    var requirements = sn.addChannel({
+        name: 'requirements',
+        admin: 'requirements/admin',
+        player: 'requirements',
+        verbosity: 100,
+        // If TRUE, players can invoke GET commands on admins.
+        getFromAdmins: true
+    });
 
+    // Creates the waiting room for the channel.
+    var reqRoom = requirements.createWaitingRoom({
+        logicPath: ultimatumPath + 'server/requirements.room.js',
+        name: 'requirementsWR'
+    });
+
+});
 
 // Exports the whole ServerNode.
 module.exports = sn;

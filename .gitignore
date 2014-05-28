@@ -57,5 +57,15 @@ games_new/facecat
 games_new/imagecat
 games_new/facerank
 
+start/server.js
+start/server-pairs.js
+start/burden-server.js
+start/meritocracy-server.js
+start/server.js
+start/catserver.js
+start/rankserver.js
+start/server-pairs.js
+
+
 *.tar.gz
 
