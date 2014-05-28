@@ -4,6 +4,7 @@
 
 #set -e
 
+cd ..
 echo '* Pulling nodegame ...'
 git pull || echo '  FAILED!'
 
