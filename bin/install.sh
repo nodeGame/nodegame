@@ -4,7 +4,7 @@
 # MIT Licensed
 
 # clone the repo
-git clone -b merginben git@github.com:nodeGame/nodegame.git
+git clone git@github.com:nodeGame/nodegame.git
 cd nodegame
 
 # install the dependencies
