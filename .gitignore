@@ -38,8 +38,8 @@ pr_server.js
 /games/PR4/
 
 /games/facerank/
-/games/ultimatum/
 /games/ultiturk/
+/games/ultimatum*
 /games/mygame/
 
 /game
@@ -50,7 +50,7 @@ Session.vim
 descil.conf.js
 
 games_new/
-games_new/ultimatum
+games_new/ultimatum*
 games_new/burden*
 games_new/meritocracy
 games_new/facecat
