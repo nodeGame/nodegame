@@ -30,8 +30,11 @@ cd ../nodegame-mongodb; npm install
 cd ../nodegame-client; npm install
 cd ../nodegame-server; npm install
 
+# patching express connect
+cd bin; patch ../node_modules/express/node_modules/connect/lib/middleware/static.js < ng.connect.static.js.patch
+
 # rebuild js files
-node bin/make build-client -a -o nodegame-full
+node make build-client -a -o nodegame-full
 
 # install ultimatum game
 cd ../../

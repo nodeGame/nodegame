@@ -52,6 +52,8 @@ All source codes of all repositories of nodeGame and related projects are availa
 ### Building from sources (Latest Version)
 
 Make sure you have installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then you can execute the installation file `bin/install.sh`. Once you have downloaded the file, in GNU/Linux operating systems you can simply use: `sh install.sh`.
+
+To keep your development version code base up to date you can use the script in `bin/pull-all.sh`. 
     
 ### Code contributions    
 
