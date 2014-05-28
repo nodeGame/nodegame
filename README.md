@@ -21,9 +21,13 @@ nodeGame is a general framework to play any kind of game online, but it speciall
  
 ## Important!
 
-The NPM version and the github have diverged. The version on github is the latest, and it is not compatible to the version found on NPM. The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
+The NPM version and the github have diverged. 
+The latest and recommended vesion is on github. Is a development version with incomplete documentation.
+The version found on NPM is considerably older, it lacks many featurs, but it is relatively stable and contains consistent documentation. 
 
-For further information refer to the documentation in nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki).
+The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
+
+For further information refer to the documentation in the nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki).
 
 ## Quick start (Old Version)
 
@@ -47,45 +51,7 @@ All source codes of all repositories of nodeGame and related projects are availa
 
 ### Building from sources (Latest Version)
 
-Before going any further make sure you've installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then open your Command Line and follow the instructions below.
-
-    # cd into the directory where you want the repo to reside
-    $ cd Desktop
-      
-    # clone the repo
-    $ git clone git://github.com/nodeGame/nodegame.git
-      
-    # install the dependencies
-    $ cd nodegame
-    $ mkdir node_modules; cd node_modules
-    $ git clone git://github.com/nodeGame/nodegame-client
-    $ git clone git://github.com/nodeGame/nodegame-server
-    $ git clone git://github.com/nodeGame/nodegame-window
-    $ git clone git://github.com/nodeGame/nodegame-widgets
-    $ git clone git://github.com/nodeGame/JSUS
-    $ git clone git://github.com/nodeGame/NDDB
-    
-    # install sub-dependencies
-    $ cd nodegame-client
-    $ npm install        
-    $ cd ../../nodegame-server
-    $ npm install
-    
-    $ rebuild js files
-    $ node bin/make build-client -a -o nodegame-full
-    
-    $ install ultimatum game
-    $ cd ../../
-    $ node clone git://github.com/nodeGame/ultimatum games/
-    
-    # start the ultimatum game
-    $ node start/ultimatum-server
-    
-    # open two browser tabs for two players at the address
-    # http://localhost:8080/ultimatum/
-    # open the admin console at
-    # http://localhost:8080/ultimatum/monitor.htm
-    # game is set to autoplay. See the wiki documentation to modify settings.
+Make sure you have installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then you can execute the installation file `bin/install.sh`. Once you have downloaded the file, in GNU/Linux operating systems you can simply use: `sh install.sh`.
     
 ### Code contributions    
 
