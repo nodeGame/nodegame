@@ -22,7 +22,7 @@ nodeGame is a general framework to play any kind of game online, but it speciall
 ## Important!
 
 The NPM version and the github have diverged. 
-The latest and recommended vesion is on github. Is a development version with incomplete documentation.
+The latest and recommended vesion is on github. It is, however, a development version with incomplete documentation.
 The version found on NPM is considerably older, it lacks many featurs, but it is relatively stable and contains consistent documentation. 
 
 The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
