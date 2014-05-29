@@ -21,6 +21,7 @@ git clone git@github.com:nodeGame/nodegame-db
 git clone git@github.com:nodeGame/nodegame-mongodb
 npm install smoosh
 npm install ya-csv
+npm install commander
 
 
 # install sub-dependencies
