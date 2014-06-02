@@ -28,6 +28,7 @@ var options = {
         servernode.gamesDirs.push('./games');
         // Sets the debug mode, exceptions will be thrown (Default is false).
         servernode.debug = true;
+
         return true;
     },
     http: function(http) {
@@ -35,18 +36,16 @@ var options = {
         return true;
     },
     sio: function(sio) {
-
-
-//        sio.set('transports', [
-            // 'websocket'
-            //   , 'flashsocket'
-            //     , 'htmlfile'
-  //                  'xhr-polling'
-    //                 , 'jsonp-polling'
-                       //]);
-
-
         // Special configuration for Socket.Io goes here here.
+
+        // sio.set('transports', [
+        //   'websocket'
+        // , 'flashsocket'
+        // , 'htmlfile'
+        // , 'xhr-polling'
+        // , 'jsonp-polling'
+        // ]);
+
         return true;
     }
 };
