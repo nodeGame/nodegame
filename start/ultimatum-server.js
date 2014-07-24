@@ -76,7 +76,7 @@ sn.ready(function() {
     // Creates the room that will spawn the games for the channel.
     var gameRoom = ultimatum.createWaitingRoom({
         logicPath:  ultimatumPath + 'server/game.room.js',
-        name: 'gameRoom'
+        name: 'waitRoom'
     });
 
     // Add a requirements-check / feedback channel.
