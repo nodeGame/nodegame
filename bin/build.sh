@@ -11,6 +11,7 @@ node bin/make build -a
 
 # nodegame/node_modules/nodegame-server
 cd ../nodegame-server
+node bin/make build-css
 node bin/make build-client -a -o nodegame-full
 
 # nodegame
