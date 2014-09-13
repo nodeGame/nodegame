@@ -8,7 +8,7 @@ git clone git@github.com:nodeGame/nodegame.git
 cd nodegame
 
 # install the dependencies
-mkdir node_modules; cd node_modules
+mkdir -p node_modules; cd node_modules
 git clone git@github.com:nodeGame/nodegame-client
 git clone git@github.com:nodeGame/nodegame-server
 git clone git@github.com:nodeGame/nodegame-window
@@ -27,7 +27,7 @@ npm install docker
 # add symbolic links to given dependencies that are in nodegame/node_modules
 # (e.g. JSUS, NDDB)
 function link_deps {
-    mkdir node_modules
+    mkdir -p node_modules
     (
         cd node_modules
         for dep in "$@"
@@ -56,9 +56,10 @@ link_deps JSUS NDDB shelf.js nodegame-widgets
 npm install
 
 # patching express connect
-cd bin; patch ../node_modules/express/node_modules/connect/lib/middleware/static.js < ng.connect.static.js.patch
+patch node_modules/express/node_modules/connect/lib/middleware/static.js < bin/ng.connect.static.js.patch
 
 # rebuild js files
+cd bin;
 node make build-client -a -o nodegame-full
 
 # install ultimatum game
