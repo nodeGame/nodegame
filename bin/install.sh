@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # nodeGame install from sources script
 # Copyright(c) 2014 Stefano Balietti
 # MIT Licensed
@@ -8,7 +8,7 @@ git clone git@github.com:nodeGame/nodegame.git
 cd nodegame
 
 # install the dependencies
-mkdir node_modules; cd node_modules
+mkdir -p node_modules; cd node_modules
 git clone git@github.com:nodeGame/nodegame-client
 git clone git@github.com:nodeGame/nodegame-server
 git clone git@github.com:nodeGame/nodegame-window
@@ -24,23 +24,49 @@ npm install ya-csv
 npm install commander
 npm install docker
 
+# add symbolic links to given dependencies that are in nodegame/node_modules
+# (e.g. JSUS, NDDB)
+function link_deps {
+    mkdir -p node_modules
+    (
+        cd node_modules
+        for dep in "$@"
+        do  ln -s "../../$dep" .
+        done
+    )
+}
 
-# install sub-dependencies
-cd JSUS; npm install
-cd ../descil-mturk; npm install
-cd ../nodegame-mongodb; npm install
-cd ../nodegame-client; npm install
-cd ../nodegame-server; npm install
+# install sub-dependencies; link to tracked dependencies
+cd JSUS
+npm install
+
+cd ../descil-mturk
+link_deps JSUS NDDB
+npm install
+
+cd ../nodegame-mongodb
+npm install
+
+cd ../nodegame-client
+link_deps JSUS NDDB shelf.js
+npm install
+
+cd ../nodegame-server
+link_deps JSUS NDDB shelf.js nodegame-widgets
+npm install
 
 # patching express connect
-cd bin; patch ../node_modules/express/node_modules/connect/lib/middleware/static.js < ng.connect.static.js.patch
+patch node_modules/express/node_modules/connect/lib/middleware/static.js < bin/ng.connect.static.js.patch
 
 # rebuild js files
+cd bin;
 node make build-client -a -o nodegame-full
 
 # install ultimatum game
 cd ../../../
 git clone git@github.com:nodeGame/ultimatum games/ultimatum
+
+# TODO: Check docker installation.
 
 # start the ultimatum game
 # node start/ultimatum-server
