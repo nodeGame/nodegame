@@ -28,15 +28,14 @@ npm install docker
 
 :: Add symbolic links to given dependencies that are in nodegame/node_modules
 :: (e.g. JSUS, NDDB)
-function link_deps {
-    mkdir node_modules
-    (
-        cd node_modules
-        for dep in "$@"
-        do  ln -s "../../$dep" .
-        done
-    )
-}
+
+:link_deps
+mkdir node_modules
+cd node_modules
+for /l %%x in (1, 1, %argCount%) do (
+    mklink "../../%%x" "."
+)
+GOTO:EOF
 
 :: Install sub-dependencies; link to tracked dependencies.
 cd JSUS
