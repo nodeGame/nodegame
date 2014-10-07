@@ -3,22 +3,22 @@
 # Copyright(c) 2014 Stefano Balietti
 # MIT Licensed
 
-# Clone the main repo.
-git clone https://github.com/nodeGame/nodegame.git
+# Clone the repo.
+git clone git@github.com:nodeGame/nodegame.git
 cd nodegame
 
 # Install the dependencies.
 mkdir -p node_modules; cd node_modules
-git clone https://github.com/nodeGame/nodegame-client.git
-git clone https://github.com/nodeGame/nodegame-server.git
-git clone https://github.com/nodeGame/nodegame-window.git
-git clone https://github.com/nodeGame/nodegame-widgets.git
-git clone https://github.com/nodeGame/JSUS.git
-git clone https://github.com/nodeGame/NDDB.git
-git clone https://github.com/nodeGame/shelf.js.git
-git clone https://github.com/nodeGame/descil-mturk.git
-git clone https://github.com/nodeGame/nodegame-db.git
-git clone https://github.com/nodeGame/nodegame-mongodb.git
+git clone git@github.com:nodeGame/nodegame-client
+git clone git@github.com:nodeGame/nodegame-server
+git clone git@github.com:nodeGame/nodegame-window
+git clone git@github.com:nodeGame/nodegame-widgets
+git clone git@github.com:nodeGame/JSUS
+git clone git@github.com:nodeGame/NDDB
+git clone git@github.com:nodeGame/shelf.js
+git clone git@github.com:nodeGame/descil-mturk
+git clone git@github.com:nodeGame/nodegame-db
+git clone git@github.com:nodeGame/nodegame-mongodb
 npm install smoosh
 npm install ya-csv
 npm install commander
@@ -64,11 +64,11 @@ node make build-client -a -o nodegame-full
 
 # Install ultimatum game.
 cd ../../../
-git clone https://github.com/nodeGame/ultimatum games/ultimatum.git
+git clone git@github.com:nodeGame/ultimatum games/ultimatum
 
 # Executes the following commands to try out the ultimatum game.
 
-# Start the ultimatum game.
+# Start the ultimatum game
 # node start/ultimatum-server
 
 # Open two browser tabs for two players at the address:

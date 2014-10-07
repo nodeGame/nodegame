@@ -56,7 +56,7 @@ link_deps JSUS NDDB shelf.js nodegame-widgets
 npm install
 
 # Patching express connect.
-patch node_modules/express/node_modules/connect/lib/middleware/static.js < bin/ng.connect.static.js.patch
+robocopy bin/ng.connect.static.js.copy node_modules/express/node_modules/connect/lib/middleware/static.js
 
 # Rebuild js files.
 cd bin;
