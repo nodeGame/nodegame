@@ -1,14 +1,16 @@
-#!/bin/bash
-# nodeGame install from sources script
-# Copyright(c) 2014 Stefano Balietti
-# MIT Licensed
+:: nodeGame install from sources script for Windows
+:: Copyright(c) 2014 Stefano Balietti
+:: MIT Licensed
 
-# Clone the main repo.
+:: Enable local extensions (more similar to Bash).
+setlocal enableextensions enabledelayedexpansion
+
+:: Clone the main repo.
 git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
 
-# Install the dependencies.
-mkdir -p node_modules; cd node_modules
+:: Install the dependencies.
+mkdir node_modules; cd node_modules
 git clone https://github.com/nodeGame/nodegame-client.git
 git clone https://github.com/nodeGame/nodegame-server.git
 git clone https://github.com/nodeGame/nodegame-window.git
@@ -24,8 +26,8 @@ npm install ya-csv
 npm install commander
 npm install docker
 
-# Add symbolic links to given dependencies that are in nodegame/node_modules
-# (e.g. JSUS, NDDB)
+:: Add symbolic links to given dependencies that are in nodegame/node_modules
+:: (e.g. JSUS, NDDB)
 function link_deps {
     mkdir -p node_modules
     (
@@ -36,7 +38,7 @@ function link_deps {
     )
 }
 
-# Install sub-dependencies; link to tracked dependencies.
+:: Install sub-dependencies; link to tracked dependencies.
 cd JSUS
 npm install
 
@@ -55,24 +57,24 @@ cd ../nodegame-server
 link_deps JSUS NDDB shelf.js nodegame-widgets
 npm install
 
-# Patching express connect.
+:: Patching express connect.
 robocopy bin/ng.connect.static.js.copy node_modules/express/node_modules/connect/lib/middleware/static.js
 
-# Rebuild js files.
+:: Rebuild js files.
 cd bin;
 node make build-client -a -o nodegame-full
 
-# Install ultimatum game.
+:: Install ultimatum game.
 cd ../../../
 git clone https://github.com/nodeGame/ultimatum games/ultimatum.git
 
-# Executes the following commands to try out the ultimatum game.
+:: Executes the following commands to try out the ultimatum game.
 
-# Start the ultimatum game.
-# node start/ultimatum-server
+:: Start the ultimatum game.
+:: node start/ultimatum-server
 
-# Open two browser tabs for two players at the address:
-# http://localhost:8080/ultimatum/
-# Open the admin console at:
-# http://localhost:8080/ultimatum/monitor.htm
-# See the wiki documentation to modify settings.
+:: Open two browser tabs for two players at the address:
+:: http://localhost:8080/ultimatum/
+:: Open the admin console at:
+:: http://localhost:8080/ultimatum/monitor.htm
+:: See the wiki documentation to modify settings.
