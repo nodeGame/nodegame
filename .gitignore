@@ -69,3 +69,5 @@ start/server-pairs.js
 
 *.tar.gz
 
+games/trustgame/
+start/trustgame-server.js

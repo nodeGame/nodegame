@@ -3,7 +3,7 @@ module.exports = configure;
 var path = require('path');
 
 function configure (loggers) {
-	
+
 //	var config = {
 //		levels: {
 //		    silly: 0,
@@ -24,10 +24,10 @@ function configure (loggers) {
 //		    error: 'red'
 //		  }
 //	};
-		
+
 //	var rootDir = path.resolve(__dirname, '..');
 //	var logDir = rootDir + '/log/';
-//	
+//
 //	loggers.add('ultimatumchannel', {
 //	    console: {
 //	    	level: 'silly',
@@ -41,6 +41,6 @@ function configure (loggers) {
 //	    	maxFiles: 10,
 //	    },
 //	});
-//		
+//
 	return true;
 }
