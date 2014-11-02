@@ -64,7 +64,7 @@ node make build-client -a -o nodegame-full
 
 # Install ultimatum game.
 cd ../../../
-git clone https://github.com/nodeGame/ultimatum games/ultimatum.git
+git clone https://github.com/nodeGame/ultimatum games/ultimatum
 
 # Executes the following commands to try out the ultimatum game.
 

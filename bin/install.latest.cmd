@@ -22,33 +22,34 @@ git clone https://github.com/nodeGame/shelf.js.git
 git clone https://github.com/nodeGame/descil-mturk.git
 git clone https://github.com/nodeGame/nodegame-db.git
 git clone https://github.com/nodeGame/nodegame-mongodb.git
+
+:: The most recent nodejs installer has a bug, this line fixes it.
+:: Solution taken from http://stackoverflow.com/q/25093276
+if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm"
+
 call npm install smoosh
 call npm install ya-csv
 call npm install commander
 call npm install docker
 
-:: Temporary Fix
-call npm install resolve
-call npm install wrench
-
 :: Install sub-dependencies; link to tracked dependencies.
 
 cd JSUS
-:: call npm install
+call npm install
 
 cd ../descil-mturk
-:: call:linkDeps JSUS NDDB
+call:linkDeps JSUS NDDB
 call npm install
 
 cd ../nodegame-mongodb
 call npm install
 
 cd ../nodegame-client
-:: call:linkDeps JSUS NDDB shelf.js
+call:linkDeps JSUS NDDB shelf.js
 call npm install
 
 cd ../nodegame-server
-:: call:linkDeps JSUS NDDB shelf.js nodegame-widgets
+call:linkDeps JSUS NDDB shelf.js nodegame-widgets
 call npm install
 
 :: Patching express connect (copy + rename).
@@ -74,15 +75,18 @@ git clone https://github.com/nodeGame/ultimatum.git games/ultimatum
 :: http://localhost:8080/ultimatum/monitor.htm
 :: See the wiki documentation to modify settings.
 
-:: Not used for now.
+exit /b
+:: End of script. Following labels used for calls only.
 
 :: Add symbolic links to given dependencies that are in nodegame/node_modules
 :: (e.g. JSUS, NDDB)
+:linkDeps
+mkdir node_modules
+cd node_modules
 
-:: :linkDeps
-:: mkdir node_modules
-:: cd node_modules
-:: for /l %%x in (1, 1, %argCount%) do (
-::     mklink "../../%%x" "."
-:: )
-:: GOTO:EOF
+:linkDepsHelper
+mklink /J "./%1" "../../%1"
+shift
+if not [%1]==[] GOTO:linkDepsHelper
+cd ../
+GOTO:EOF

@@ -8,7 +8,6 @@ git clone https://github.com/nodeGame/nodegame.git
 cd nodegame;
 
 # Install the dependencies.
-# mkdir -p node_modules; cd node_modules
 npm install nodegame-client
 npm install nodegame-server
 npm install nodegame-window
