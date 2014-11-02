@@ -1,6 +1,6 @@
 # nodeGame
 
-nodeGame is a free, open source, real-time: javascript framework for online, multiplayer games in the browser.
+nodeGame is a free, open source, real-time javascript framework for online, multiplayer games in the browser.
 
 ---
 
@@ -37,11 +37,11 @@ You can download the development version of nodeGame using the install script fo
 
 To keep your development version code base up to date you can use the script in `bin/pull-all.sh` (Mac/Linux only).
 
-### Code contributions
+## Code contributions
 
 Code contributions are welcome, please keep in mind default [Code Conventions](http://javascript.crockford.com/code.html).
 Take special care in deleting all trailing white spaces, removeing any `debugger` statement left in the code, and always add an empty line at the end of each file.
-All comments are automatically process using the [docker](http://jbt.github.io/docker/src/docker.js.html).
+All comments are automatically processed using [docker](http://jbt.github.io/docker/src/docker.js.html).
 
 ## License
 
