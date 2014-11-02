@@ -1,6 +1,6 @@
 # nodeGame
 
-nodeGame is a free, open source, event-driven javascript framework for online, multiplayer games in the browser.
+nodeGame is a free, open source, real-time: javascript framework for online, multiplayer games in the browser.
 
 ---
 
@@ -19,45 +19,29 @@ nodeGame is a general framework to play any kind of game online, but it speciall
  - Installation is required only for the server, clients just need their browser windows
  - Integrates smoothly with other libraries (e.g. jQuery, D3.js, etc.) and web services, such as Amazon Mechanical Turk
 
-## Important!
+## Quick Start (stable version)
 
-The NPM version and the github have diverged.
-The latest and recommended vesion is on github. It is, however, a development version with incomplete documentation.
-The version found on NPM is considerably older, it lacks many featurs, but it is relatively stable and contains consistent documentation.
+nodeGame comes with a default game taken from the academic literature of game theory. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
 
-The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
+  1. Download the latest version of [node.js](http://nodejs.org) for your platform
+  2. Download the latest version of [git](http://www.git-scm.com) for your platform
+  3. Download and run the install scripts for [Mac/Linux](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.stable.sh) or [Windows](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.stable.cmd)
+  4. Open a terminal and browse to the `nodegame/` folder
+  5. Start the server with the command: `node start/ultimatum-server`
+  6. Open two or more browser tabs pointing to `localhost:8080/ultimatum`
+  7. Open a browser tab pointing to `localhost:8080/ultimatum/monitor.htm`
+  
+## Source codes (development version)
 
-For further information refer to the documentation in the nodeGame [wiki](https://github.com/nodeGame/nodegame/wiki).
+You can download the development version of nodeGame using the install script for [Mac/Linux](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.latest.sh) or [Windows](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.latest.cmd)
 
-## Quick start (Old Version)
-
-nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
-
-  1. Download node.js (from http://nodejs.org/)
-  2. From the console type: `npm install nodegame`
-  3. Browse to the nodegame folder and start the server: `node server.js`
-  4. Browse to the `./games/ultimatum/server/` folder and start the game logic: `node logic.js`
-  5. Open three or more browser windows pointing to `localhost:8080/ultimatum/index.html`
-
-### There is more...
-
-  - A waiting room: `localhost:8080/ultimatum/room.html`
-  - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
-  - Real time plotting of the results: `localhost:8080/ultimatum/results.html`
-
-## Source codes
-
-All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
-
-### Building from sources (Latest Version)
-
-Make sure you have installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then you can execute the installation file `bin/install.sh`. Once you have downloaded the file, in GNU/Linux operating systems you can simply use: `sh install.sh`.
-
-To keep your development version code base up to date you can use the script in `bin/pull-all.sh`.
+To keep your development version code base up to date you can use the script in `bin/pull-all.sh` (Mac/Linux only).
 
 ### Code contributions
 
 Code contributions are welcome, please keep in mind default [Code Conventions](http://javascript.crockford.com/code.html).
+Take special care in deleting all trailing white spaces, removeing any `debugger` statement left in the code, and always add an empty line at the end of each file.
+All comments are automatically process using the [docker](http://jbt.github.io/docker/src/docker.js.html).
 
 ## License
 
