@@ -41,7 +41,7 @@ pr_server.js
 /games/ultiturk/
 /games/ultimatum*
 /games/mygame/
-
+/games/trustgame/
 /game
 
 Session.vim
@@ -65,7 +65,7 @@ start/server.js
 start/catserver.js
 start/rankserver.js
 start/server-pairs.js
-
+start/trustgame-server.js
 
 *.tar.gz
 

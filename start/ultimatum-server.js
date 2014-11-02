@@ -1,5 +1,5 @@
 /**
- * # Launcher file for nodeGame Server
+ * # Configuration file for Ultimatum Game
  * Copyright(c) 2014 Stefano Balietti
  * MIT Licensed
  *
@@ -10,14 +10,11 @@
  * ---
  */
 
-// Load the Node.js path object.
-var path = require('path');
-
 // Load the ServerNode class.
 var ServerNode = require('nodegame-server').ServerNode;
 
 // Overrides some of the default options for ServerNode.
-var options = {
+var config = {
     // Additional conf directory.
     confDir: './conf',
     // logDir: './log', // not working at the moment
@@ -27,8 +24,7 @@ var options = {
         // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games');
         // Sets the debug mode, exceptions will be thrown (Default is false).
-        servernode.debug = true;
-
+        servernode.debug = false;
         return true;
     },
     http: function(http) {
@@ -36,24 +32,18 @@ var options = {
         return true;
     },
     sio: function(sio) {
+        // sio.set('log level', 3);
         // Special configuration for Socket.Io goes here here.
-
-        // sio.set('transports', [
-        //   'websocket'
-        // , 'flashsocket'
-        // , 'htmlfile'
-        // , 'xhr-polling'
-        // , 'jsonp-polling'
-        // ]);
-
         return true;
     }
 };
 
-// Start server, options parameter is optional.
-var sn = new ServerNode(options);
+// Start server, config parameter is optional.
+var sn = new ServerNode(config);
+sn.debug = true;
 
 sn.ready(function() {
+
     // Get the absolute path to the game directory.
     var ultimatumPath = sn.resolveGameDir('ultimatum');
     if (!ultimatumPath) {
