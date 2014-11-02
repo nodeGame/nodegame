@@ -9,7 +9,7 @@
  */
 module.exports = configure;
 
-function configure(sio, servernode) {	
+function configure(sio, servernode) {
     // Nothing extra to configure.
     // Default configuration set already in:
     // node_modules/nodegame-server/conf/sio.js

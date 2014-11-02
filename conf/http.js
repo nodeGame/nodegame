@@ -9,7 +9,7 @@
  */
 module.exports = configure;
 
-function configure(app, servernode) {	
+function configure(app, servernode) {
     // Nothing extra to configure.
     // Default configuration set already in:
     // node_modules/nodegame-server/conf/http.js

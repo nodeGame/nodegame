@@ -20,7 +20,7 @@ var config = {
     // logDir: './log', // not working at the moment
     servernode: function(servernode) {
         // Special configuration for the ServerNode object.
-        
+
         // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games');
         // Sets the debug mode, exceptions will be thrown (Default is false).
@@ -58,7 +58,7 @@ sn.ready(function() {
         verbosity: 100,
         // If TRUE, players can invoke GET commands on admins.
         getFromAdmins: true,
-        // Unauthorized clients will be redirected here. 
+        // Unauthorized clients will be redirected here.
         // (defaults: "/pages/accessdenied.htm")
         accessDeniedUrl: '/ultimatum/unauth.htm'
     });

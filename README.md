@@ -18,12 +18,12 @@ nodeGame is a general framework to play any kind of game online, but it speciall
  - Works on mobile devices and tablets
  - Installation is required only for the server, clients just need their browser windows
  - Integrates smoothly with other libraries (e.g. jQuery, D3.js, etc.) and web services, such as Amazon Mechanical Turk
- 
+
 ## Important!
 
-The NPM version and the github have diverged. 
+The NPM version and the github have diverged.
 The latest and recommended vesion is on github. It is, however, a development version with incomplete documentation.
-The version found on NPM is considerably older, it lacks many featurs, but it is relatively stable and contains consistent documentation. 
+The version found on NPM is considerably older, it lacks many featurs, but it is relatively stable and contains consistent documentation.
 
 The instruction for _Quick start_ refers to the old version. If you want to try the new version follow the instructions under _Source codes_.
 
@@ -34,7 +34,7 @@ For further information refer to the documentation in the nodeGame [wiki](https:
 nodeGame comes with a default game installed. It is called the [Ultimatum](http://en.wikipedia.org/wiki/Ultimatum_game) game. To play it follows the steps:
 
   1. Download node.js (from http://nodejs.org/)
-  2. From the console type: `npm install nodegame` 
+  2. From the console type: `npm install nodegame`
   3. Browse to the nodegame folder and start the server: `node server.js`
   4. Browse to the `./games/ultimatum/server/` folder and start the game logic: `node logic.js`
   5. Open three or more browser windows pointing to `localhost:8080/ultimatum/index.html`
@@ -43,8 +43,8 @@ nodeGame comes with a default game installed. It is called the [Ultimatum](http:
 
   - A waiting room: `localhost:8080/ultimatum/room.html`
   - A Monitor interface: `localhost:8080/ultimatum/monitor.html`
-  - Real time plotting of the results: `localhost:8080/ultimatum/results.html` 
-      
+  - Real time plotting of the results: `localhost:8080/ultimatum/results.html`
+
 ## Source codes
 
 All source codes of all repositories of nodeGame and related projects are available at the web page: https://github.com/nodeGame
@@ -53,9 +53,9 @@ All source codes of all repositories of nodeGame and related projects are availa
 
 Make sure you have installed [git](http://git-scm.com) and [node.js](http://nodejs.org) on your machine. Then you can execute the installation file `bin/install.sh`. Once you have downloaded the file, in GNU/Linux operating systems you can simply use: `sh install.sh`.
 
-To keep your development version code base up to date you can use the script in `bin/pull-all.sh`. 
-    
-### Code contributions    
+To keep your development version code base up to date you can use the script in `bin/pull-all.sh`.
+
+### Code contributions
 
 Code contributions are welcome, please keep in mind default [Code Conventions](http://javascript.crockford.com/code.html).
 

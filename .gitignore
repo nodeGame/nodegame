@@ -69,3 +69,5 @@ start/trustgame-server.js
 
 *.tar.gz
 
+games/trustgame/
+start/trustgame-server.js
