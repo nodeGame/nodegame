@@ -5,12 +5,8 @@
 /tests/
 /server
 /examples/test/*
-/stuff/f
-/log
 /client/releases/*
 jquery
-
-/log/
 
 *.tmp*
 *.csv
