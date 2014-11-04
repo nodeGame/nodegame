@@ -71,3 +71,10 @@ start/trustgame-server.js
 
 games/trustgame/
 start/trustgame-server.js
+
+
+log/messages
+log/clients
+log/servernode
+log/channel
+log/channels

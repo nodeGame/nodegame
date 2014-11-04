@@ -15,9 +15,13 @@ var ServerNode = require('nodegame-server').ServerNode;
 
 // Overrides some of the default options for ServerNode.
 var config = {
+
     // Additional conf directory.
     confDir: './conf',
-    // logDir: './log', // not working at the moment
+
+    // Log Dir.
+    logDir: './log', 
+
     servernode: function(servernode) {
         // Special configuration for the ServerNode object.
 
