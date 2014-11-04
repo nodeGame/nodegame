@@ -27,7 +27,7 @@ nodeGame comes with a default game taken from the academic literature of game th
   2. Download the latest version of [git](http://www.git-scm.com) for your platform
   3. Download and run the install scripts for [Mac/Linux](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.stable.sh) or [Windows](https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/install.stable.cmd)
   4. Open a terminal and browse to the `nodegame/` folder
-  5. Start the server with the command: `node start/ultimatum-server`
+  5. Start the server with the command: `node launcher.js`
   6. Open two or more browser tabs pointing to `localhost:8080/ultimatum`
   7. Open a browser tab pointing to `localhost:8080/ultimatum/monitor.htm`
   
