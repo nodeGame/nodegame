@@ -1,7 +1,7 @@
 {
     "name": "nodegame"
   , "description": "Pre-configured nodegame-server with game examples"
-  , "version": "0.9.1"
+  , "version": "0.9.2"
   , "main" : "server.js"
   , "homepage": "http://nodegame.org"
   , "author": "Stefano Balietti <futur.dorko@gmail.com>"
