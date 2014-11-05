@@ -69,6 +69,11 @@ games/trustgame/
 start/trustgame-server.js
 
 
+log/messages.log
+log/clients.log
+log/servernode.log
+log/channel.log
+log/channels.log
 log/messages
 log/clients
 log/servernode
