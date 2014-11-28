@@ -66,7 +66,8 @@ node make build-client -a -o nodegame-full
 cd ../../../
 git clone git@github.com:nodeGame/ultimatum games/ultimatum
 
-# Executes the following commands to try out the ultimatum game.
+
+# Execute the following commands to try out the ultimatum game.
 
 # Start the ultimatum game
 # node start/ultimatum-server
