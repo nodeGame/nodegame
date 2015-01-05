@@ -16,4 +16,4 @@ node bin/make build-client -a -o nodegame-full
 
 # nodegame
 cd ../..
-node start/ultimatum-server.js
+node launcher.js
