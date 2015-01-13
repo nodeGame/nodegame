@@ -1,6 +1,6 @@
 #!/bin/bash
 # nodeGame install from sources script
-# Copyright(c) 2014 Stefano Balietti
+# Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
 # Clone the repo.
@@ -26,7 +26,7 @@ npm install commander
 npm install docker
 
 # Add symbolic links to given dependencies that are in nodegame/node_modules
-# (e.g. JSUS, NDDB)
+# (e.g. JSUS, NDDB).
 function link_deps {
     mkdir -p node_modules
     (
@@ -71,7 +71,7 @@ git clone git@github.com:nodeGame/ultimatum games/ultimatum
 
 # Execute the following commands to try out the ultimatum game.
 
-# Start the ultimatum game.
+# Start the ultimatum game:
 # node start/ultimatum-server
 
 # Open two browser tabs for two players at the address:
