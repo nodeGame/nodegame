@@ -29,8 +29,8 @@ do
     [ $len1 != $len2 ] && echo "Removed trailing whitespace in '$file'."
     len1=$len2
 
-    # Special checks for JavaScript:
-    if [[ $file == *.js ]]
+    # Special checks for JavaScript sources:
+    if [[ $file == *.js && $file != public/* && $file != docs/* ]]
     then
         # Check for tabs.
         if grep -q $'\t' "$file"
