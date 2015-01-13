@@ -5,7 +5,7 @@
 
 # Clone the main repo.
 git clone https://github.com/nodeGame/nodegame.git
-cd nodegame;
+cd nodegame
 
 # Install the dependencies.
 npm install nodegame-client
@@ -24,18 +24,19 @@ npm install commander
 npm install docker
 
 # Entering nodegame-server directory
-cd node_modules/nodegame-server/;
+cd node_modules/nodegame-server
  
 # Patching express connect.
-patch node_modules/express/node_modules/connect/lib/middleware/static.js < bin/ng.connect.static.js.patch;
+patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
+  bin/ng.connect.static.js.patch
  
 # Rebuild js files.
-cd bin/;
-node make build-client -a -o nodegame-full;
+cd bin
+node make build-client -a -o nodegame-full
 
 # Install ultimatum game.
-cd ../../../;
-git clone https://github.com/nodeGame/ultimatum games/ultimatum;
+cd ../../..
+git clone https://github.com/nodeGame/ultimatum games/ultimatum
 
 
 # Execute the following commands to try out the ultimatum game.

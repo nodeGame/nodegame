@@ -8,7 +8,8 @@ git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
 
 # Install the dependencies.
-mkdir -p node_modules; cd node_modules
+mkdir -p node_modules
+cd node_modules
 git clone https://github.com/nodeGame/nodegame-client.git
 git clone https://github.com/nodeGame/nodegame-server.git
 git clone https://github.com/nodeGame/nodegame-window.git
@@ -36,7 +37,7 @@ function link_deps {
     )
 }
 
-# Install sub-dependencies; link to tracked dependencies.
+# Install sub-dependencies, link to tracked dependencies.
 cd JSUS
 npm install
 
@@ -56,14 +57,15 @@ link_deps JSUS NDDB shelf.js nodegame-widgets
 npm install
 
 # Patching express connect.
-patch node_modules/express/node_modules/connect/lib/middleware/static.js < bin/ng.connect.static.js.patch
+patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
+  bin/ng.connect.static.js.patch
 
 # Rebuild js files.
-cd bin;
+cd bin
 node make build-client -a -o nodegame-full
 
 # Install ultimatum game.
-cd ../../../
+cd ../../..
 git clone https://github.com/nodeGame/ultimatum games/ultimatum
 
 
