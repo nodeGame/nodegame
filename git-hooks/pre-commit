@@ -65,7 +65,7 @@ do
 done < <(git diff --cached --name-only --diff-filter=ACM -z)
 
 # Build documentation if possible.
-if [ -x bin/make.js && -d docs ]
+if [ -x bin/make.js -a -d docs ]
 then
     node bin/make.js doc
     git add -u docs/
