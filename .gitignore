@@ -23,8 +23,6 @@ node_modules/
 
 node_modules_old
 
-/nodegame_clients/pr.js
-/nodegame_clients/node_modules/peerreview/
 pr_server.js
 
 /games/PR
@@ -33,12 +31,14 @@ pr_server.js
 /games/PR3/
 /games/PR4/
 
-/games/facerank/
-/games/ultiturk/
-/games/ultimatum*
-/games/mygame/
-/games/trustgame/
-/games/burdenshare/
+games/facerank/
+games/ultiturk/
+games/ultimatum*
+games/mygame/
+games/trustgame/
+games/burdenshare/
+games/meritocracy
+
 
 Session.vim
 
