@@ -30,7 +30,7 @@ var options = {
         // Adds a new game directory (Default is nodegame-server/games).
         servernode.gamesDirs.push('./games');
         // Sets the debug mode, exceptions will be thrown (Default is false).
-        servernode.debug = true;
+        // servernode.debug = true;
 
         return true;
     },
