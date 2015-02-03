@@ -30,7 +30,7 @@ do
     len1=$len2
 
     # Special checks for JavaScript sources:
-    if [[ $file == *.js && $file != public/* && $file != docs/* ]]
+    if [[ $file == *.js && $file != public/* && $file != docs/* && $file != build/* ]]
     then
         # Check for tabs.
         if grep -q $'\t' "$file"
@@ -55,7 +55,7 @@ do
         # Check for lines wider than 80 characters (newline is a char too).
         if grep -q '.\{82,\}' "$file"
         then
-            echo "ABORT: Found line longer than 80 characters in '$file'!"
+            echo "ABORT: Found wider line than 80 characters in '$file'!"
             exit 1
         fi
     fi
