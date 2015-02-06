@@ -54,7 +54,7 @@ do
 
         # Check for lines wider than 80 characters.
         lines=$(grep -n '.\{81,\}' "$file" | cut -d: -f1 | paste -sd',')
-        if [ -n lines ]
+        if [ -n "$lines" ]
         then
             echo "ABORT: More than 80 characters in '$file' on line(s) $lines!"
             exit 1
