@@ -3,6 +3,17 @@
 # Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
+# Check node.js version, must be higher than 0.8.
+node_version=$(node --version)  # e.g. "v0.10.20"
+node_version=${node_version#v}  # e.g. "0.10.20"
+node_major=$(cut -d. -f1 <<< $node_version)
+node_minor=$(cut -d. -f2 <<< $node_version)
+if (( node_major <= 0 && node_minor < 9 ))
+then
+    echo "Found node.js version $node_version, but at least 0.9 required."
+    exit 1
+fi
+
 # Clone the main repo.
 git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
