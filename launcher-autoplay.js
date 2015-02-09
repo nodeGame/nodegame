@@ -1,12 +1,11 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2014 Stefano Balietti
+ * Copyright(c) 2015 Stefano Balietti
  * MIT Licensed
  *
  * Sets conf, log, and games directory and start the server.
  *
  * http://www.nodegame.org
- * ---
  */
 
 // Load the Node.js path object.

@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+#
+# Expect script for starting the server and running an autoplay session.
+
+# Start server, wait until it's ready.
+set server_pid [spawn node launcher-autoplay.js]
+set server_id $spawn_id
+set timeout 600
+expect {
+    timeout { puts "\nERROR: Server is not finishing!"; exit 1 }
+
+    "lgc100> game over."
+}
+
+# Stop server.
+exec kill $server_pid
+wait -i $server_id
+
+exit 0
