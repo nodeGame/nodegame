@@ -17,4 +17,6 @@ exec kill $server_pid
 close -i $server_id
 wait -i $server_id
 
+puts "\nThe server ran successfully."
+
 exit 0
