@@ -31,12 +31,12 @@ pr_server.js
 /games/PR3/
 /games/PR4/
 
-games/facerank/
-games/ultiturk/
+games/facerank
+games/ultiturk
 games/ultimatum*
-games/mygame/
-games/trustgame/
-games/burdenshare/
+games/mygame
+games/trustgame
+games/burdenshare
 games/meritocracy
 
 
