@@ -1,0 +1,12 @@
+language: node_js
+node_js: 0.10
+install:
+# Install expect.
+  - sudo apt-get install expect
+# Install package dependencies.
+  - npm install
+  - cd games
+  - git clone https://github.com/nodeGame/ultimatum.git
+  - cd ..
+script:
+  - expect test/runtest.exp
