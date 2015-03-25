@@ -18,7 +18,7 @@ fi
 
 # Add symbolic links to given dependencies that are in nodegame/node_modules
 # (e.g. JSUS, NDDB).
-function link_deps {
+link_deps() {
     mkdir -p node_modules
     (
         cd node_modules
@@ -29,7 +29,7 @@ function link_deps {
 }
 
 
-# List of all sub-modules on GitHub to clone:
+# List of all sub-modules on GitHub to clone.
 gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
 "JSUS NDDB shelf.js descil-mturk nodegame-db nodegame-mongodb"
 
@@ -42,7 +42,9 @@ cp git-hooks/* .git/hooks/
 # Install the dependencies.
 mkdir -p node_modules
 cd node_modules
-for module in $gitmodules; do git clone "git@github.com:nodeGame/${module}.git"; done
+for module in $gitmodules
+do  git clone "git@github.com:nodeGame/${module}.git"
+done
 npm install smoosh
 npm install ya-csv
 npm install commander
