@@ -8,6 +8,8 @@
  * http://www.nodegame.org
  */
 
+// TODO: specify game as command-line argument.
+
 // Load the Node.js path object.
 var path = require('path');
 
