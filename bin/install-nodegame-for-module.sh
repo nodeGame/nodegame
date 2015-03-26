@@ -57,9 +57,22 @@ link_deps() {
 }
 
 
-# Clone the repo.
-git clone https://github.com/nodeGame/nodegame.git
-cd nodegame
+# Clone the nodegame repo and enter its directory.
+if [ ! -d nodegame ]
+then
+    git clone https://github.com/nodeGame/nodegame.git
+    cd nodegame
+else
+    # If the nodegame directory already exists and is not empty, git will
+    # refuse to clone into it.
+    # Instead, it has to be set up manually.
+    # http://stackoverflow.com/a/18999726/3347292
+    cd nodegame
+    git init
+    git remote add origin https://github.com/nodeGame/nodegame.git
+    git fetch
+    git checkout -t origin/master
+fi
 
 # Install the dependencies.
 mkdir -p node_modules
