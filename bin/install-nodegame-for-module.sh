@@ -5,7 +5,7 @@
 
 
 # List of all sub-modules on GitHub to clone.
-gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
+gitmodules="nodegame-window nodegame-widgets nodegame-client nodegame-server "\
 "JSUS NDDB shelf.js descil-mturk nodegame-db nodegame-mongodb"
 npmmodules="smoosh ya-csv commander docker"
 

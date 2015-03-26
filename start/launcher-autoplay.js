@@ -8,7 +8,12 @@
  * http://www.nodegame.org
  */
 
-// TODO: specify game as command-line argument.
+if (process.argv.length < 3) {
+    // TODO: make better
+    console.log("Not enough arguments! Game name needed.");
+    process.exit(1);
+}
+var gameName = process.argv[2];
 
 // Load the Node.js path object.
 var path = require('path');
@@ -17,7 +22,7 @@ var path = require('path');
 var ServerNode = require('nodegame-server').ServerNode;
 
 // Load the test settings.
-var testSettings = require('./settings.js');
+var testSettings = require('../games/' + gameName + '/test/settings.js');
 
 // Overrides some of the default options for ServerNode.
 var options = {
@@ -59,7 +64,7 @@ sn.ready(function() {
     phantoms = [];
     for (i = 0; i < n; ++i) {
         console.log('Connecting autoplay-bot #', i+1, '/', n);
-        phantoms[i] = sn.channels.ultimatum.connectPhantom();
+        phantoms[i] = sn.channels[gameName].connectPhantom();
     }
 
     // TODO: Listen for room creation instead of timeout.
@@ -71,7 +76,7 @@ sn.ready(function() {
     //}, 5000);
 
     handleGameover = function() {
-        console.log('Ultimatum game has run successfully.');
+        console.log(gameName + ' game has run successfully.');
         process.exit();
     };
 
