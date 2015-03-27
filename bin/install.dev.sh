@@ -95,6 +95,9 @@ done
 cd ..
 git clone git@github.com:nodeGame/ultimatum games/ultimatum
 cp git-hooks/* games/ultimatum/.git/hooks/
+cd games/ultimatum
+npm install
+cd ../..
 
 
 # Execute the following commands to try out the ultimatum game.
