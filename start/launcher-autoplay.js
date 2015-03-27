@@ -9,8 +9,8 @@
  */
 
 if (process.argv.length < 3) {
-    // TODO: make better
-    console.log("Not enough arguments! Game name needed.");
+    console.log("Missing game-name argument! Usage:");
+    console.log("$ " + process.argv[0] + " " + process.argv[1] + " <gamename>");
     process.exit(1);
 }
 var gameName = process.argv[2];
