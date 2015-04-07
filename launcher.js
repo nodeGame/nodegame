@@ -40,6 +40,9 @@ var options = {
     sio: function(sio) {
         // Special configuration for Socket.Io goes here here.
 
+        // sio.set('transports', ['xhr-polling']);
+        // sio.set('transports', ['jsonp-polling']);
+
         // sio.set('transports', [
         //   'websocket'
         // , 'flashsocket'
