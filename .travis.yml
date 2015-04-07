@@ -9,4 +9,5 @@ install:
   - git clone https://github.com/nodeGame/ultimatum.git
   - cd ..
 script:
+# TODO: launcher-autoplay has moved!
   - expect test/runtest.exp

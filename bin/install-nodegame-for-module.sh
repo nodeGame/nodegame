@@ -5,8 +5,8 @@
 
 
 # List of all sub-modules on GitHub to clone.
-gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
-"JSUS NDDB shelf.js descil-mturk nodegame-db nodegame-mongodb"
+gitmodules="nodegame-window nodegame-widgets JSUS NDDB shelf.js "\
+"nodegame-client nodegame-server descil-mturk nodegame-db nodegame-mongodb"
 npmmodules="smoosh ya-csv commander docker"
 
 # Usage information.
@@ -15,6 +15,8 @@ Usage: $(basename $0) [-g <git-modules>] [-n <npm-modules>]
 Defaults:
  git-modules: "$gitmodules"
  npm-modules: "$npmmodules"
+It is recommended to give the git-modules in the same order as defined
+in this script.
 EOT
 
 
@@ -57,12 +59,35 @@ link_deps() {
 }
 
 
-# Clone the repo.
-git clone https://github.com/nodeGame/nodegame.git
-cd nodegame
+# Return on failure immediately.
+set -e
+
+# Clone the nodegame repo and enter its directory.
+if [ ! -d nodegame ]
+then
+    git clone https://github.com/nodeGame/nodegame.git
+    cd nodegame
+else
+    # If the nodegame directory already exists and is not empty, git will
+    # refuse to clone into it.
+    # Instead, it has to be set up manually.
+    # http://stackoverflow.com/a/18999726/3347292
+    cd nodegame
+    git init
+    git remote add origin https://github.com/nodeGame/nodegame.git
+    git fetch
+    git checkout -t origin/master
+fi
 
 # Install the dependencies.
 mkdir -p node_modules
+
+# NPM dependencies.
+for module in $npmmodules
+do  npm install "$module"
+done
+
+# GitHub dependencies.
 cd node_modules
 for module in $gitmodules
 do  git clone "http://github.com/nodeGame/${module}.git"
@@ -93,6 +118,5 @@ do  git clone "http://github.com/nodeGame/${module}.git"
     esac
     cd ..
 done
-for module in $npmmodules
-do  npm install "$module"
-done
+
+echo "Installation of nodeGame for module completed."
