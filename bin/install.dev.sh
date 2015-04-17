@@ -34,6 +34,9 @@ gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
 "JSUS NDDB shelf.js descil-mturk nodegame-db nodegame-mongodb"
 
 
+# Return on failure immediately.
+set -e
+
 # Clone the repo, copy Git hooks.
 git clone git@github.com:nodeGame/nodegame.git
 cd nodegame
