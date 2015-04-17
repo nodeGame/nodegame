@@ -8,43 +8,43 @@ setlocal enableextensions enabledelayedexpansion
 
 :: The most recent nodejs installer has a bug, this line fixes it.
 :: Solution taken from http://stackoverflow.com/q/25093276
-if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm"
+if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
 
 :: Clone the main repo.
-git clone https://github.com/nodeGame/nodegame.git
+git clone https://github.com/nodeGame/nodegame.git || exit /b
 
-cd nodegame
+cd nodegame || exit /b
 
 :: Install the dependencies.
-call npm install nodegame-client
-call npm install nodegame-server
-call npm install nodegame-window
-call npm install nodegame-widgets
-call npm install JSUS
-call npm install NDDB
-call npm install shelf.js
-call npm install descil-mturk
-call npm install nodegame-db
-call npm install nodegame-mongodb
-call npm install smoosh
-call npm install ya-csv
-call npm install commander
+call npm install nodegame-client || exit /b
+call npm install nodegame-server || exit /b
+call npm install nodegame-window || exit /b
+call npm install nodegame-widgets || exit /b
+call npm install JSUS || exit /b
+call npm install NDDB || exit /b
+call npm install shelf.js || exit /b
+call npm install descil-mturk || exit /b
+call npm install nodegame-db || exit /b
+call npm install nodegame-mongodb || exit /b
+call npm install smoosh || exit /b
+call npm install ya-csv || exit /b
+call npm install commander || exit /b
 :: docker not installed
 
 
 :: Entering nodegame-server directory
-cd node_modules/nodegame-server/
+cd node_modules/nodegame-server/ || exit /b
  
 :: Patching express connect.
-xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js
+xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
  
 :: Rebuild js files.
-cd bin/
-node make build-client -a -o nodegame-full
+cd bin/ || exit /b
+node make build-client -a -o nodegame-full || exit /b
 
 :: Install ultimatum game.
-cd ../../../
-git clone https://github.com/nodeGame/ultimatum games/ultimatum
+cd ../../../ || exit /b
+git clone https://github.com/nodeGame/ultimatum games/ultimatum || exit /b
 
 
 :: Execute the following commands to try out the ultimatum game.

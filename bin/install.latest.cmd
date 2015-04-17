@@ -6,63 +6,64 @@
 setlocal enableextensions enabledelayedexpansion
 
 :: Clone the main repo.
-git clone https://github.com/nodeGame/nodegame.git
+git clone https://github.com/nodeGame/nodegame.git || exit /b
 
-cd nodegame
+cd nodegame || exit /b
 
 :: Install the dependencies.
-mkdir node_modules & cd node_modules
-git clone https://github.com/nodeGame/nodegame-client.git
-git clone https://github.com/nodeGame/nodegame-server.git
-git clone https://github.com/nodeGame/nodegame-window.git
-git clone https://github.com/nodeGame/nodegame-widgets.git
-git clone https://github.com/nodeGame/JSUS.git
-git clone https://github.com/nodeGame/NDDB.git
-git clone https://github.com/nodeGame/shelf.js.git
-git clone https://github.com/nodeGame/descil-mturk.git
-git clone https://github.com/nodeGame/nodegame-db.git
-git clone https://github.com/nodeGame/nodegame-mongodb.git
+mkdir node_modules || exit /b
+cd node_modules || exit /b
+git clone https://github.com/nodeGame/nodegame-client.git || exit /b
+git clone https://github.com/nodeGame/nodegame-server.git || exit /b
+git clone https://github.com/nodeGame/nodegame-window.git || exit /b
+git clone https://github.com/nodeGame/nodegame-widgets.git || exit /b
+git clone https://github.com/nodeGame/JSUS.git || exit /b
+git clone https://github.com/nodeGame/NDDB.git || exit /b
+git clone https://github.com/nodeGame/shelf.js.git || exit /b
+git clone https://github.com/nodeGame/descil-mturk.git || exit /b
+git clone https://github.com/nodeGame/nodegame-db.git || exit /b
+git clone https://github.com/nodeGame/nodegame-mongodb.git || exit /b
 
 :: The most recent nodejs installer has a bug, this line fixes it.
 :: Solution taken from http://stackoverflow.com/q/25093276
-if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm"
+if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
 
-call npm install smoosh
-call npm install ya-csv
-call npm install commander
-call npm install docker
+call npm install smoosh || exit /b
+call npm install ya-csv || exit /b
+call npm install commander || exit /b
+call npm install docker || exit /b
 
 :: Install sub-dependencies; link to tracked dependencies.
 
-cd JSUS
-call npm install
+cd JSUS || exit /b
+call npm install || exit /b
 
-cd ../descil-mturk
-call:linkDeps JSUS NDDB
-call npm install
+cd ../descil-mturk || exit /b
+call:linkDeps JSUS NDDB || exit /b
+call npm install || exit /b
 
-cd ../nodegame-mongodb
-call npm install
+cd ../nodegame-mongodb || exit /b
+call npm install || exit /b
 
-cd ../nodegame-client
-call:linkDeps JSUS NDDB shelf.js
-call npm install
+cd ../nodegame-client || exit /b
+call:linkDeps JSUS NDDB shelf.js || exit /b
+call npm install || exit /b
 
-cd ../nodegame-server
-call:linkDeps JSUS NDDB shelf.js nodegame-widgets
-call npm install
+cd ../nodegame-server || exit /b
+call:linkDeps JSUS NDDB shelf.js nodegame-widgets || exit /b
+call npm install || exit /b
 
 :: Patching express connect (copy + rename).
-xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js
+xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
 
 :: Rebuild js files.
-cd bin
-node make build-client -a -o nodegame-full
+cd bin || exit /b
+node make build-client -a -o nodegame-full || exit /b
 
 :: Install ultimatum game.
-cd ../../../
+cd ../../../ || exit /b
 
-git clone https://github.com/nodeGame/ultimatum.git games/ultimatum
+git clone https://github.com/nodeGame/ultimatum.git games/ultimatum || exit /b
 
 
 :: Execute the following commands to try out the ultimatum game.
@@ -83,12 +84,12 @@ exit /b
 :: Add symbolic links to given dependencies that are in nodegame/node_modules
 :: (e.g. JSUS, NDDB)
 :linkDeps
-mkdir node_modules
-cd node_modules
+mkdir node_modules || exit /b
+cd node_modules || exit /b
 
 :linkDepsHelper
-mklink /J "./%1" "../../%1"
+mklink /J "./%1" "../../%1" || exit /b
 shift
 if not [%1]==[] GOTO:linkDepsHelper
-cd ../
+cd ../ || exit /b
 GOTO:EOF
