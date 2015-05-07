@@ -92,7 +92,7 @@ done
 # GitHub dependencies.
 cd node_modules
 for module in $gitmodules
-do  git clone "http://github.com/nodeGame/${module}.git"
+do  git clone "https://github.com/nodeGame/${module}.git"
     # Get sub-dependencies, link to tracked dependencies.
     cd "$module"
     case $module in
