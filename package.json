@@ -18,7 +18,7 @@
       "mkdirp": "0.3.2",
       "NDDB": ">= 0.5.9",
       "request": "2.11.4",
-      "nodegame-requirements"q:
+      "nodegame-requirements": "*"
     }
   , "engines": { "node": ">= 0.6.11" }
   , "licenses": [
