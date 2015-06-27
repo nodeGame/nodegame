@@ -1,5 +1,5 @@
 :: nodeGame install from sources script for Windows
-:: Copyright(c) 2014 Stefano Balietti
+:: Copyright(c) 2015 Stefano Balietti
 :: MIT Licensed
 
 :: Enable local extensions (more similar to Bash).
