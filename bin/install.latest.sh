@@ -14,6 +14,9 @@ then
     exit 1
 fi
 
+# Return on failure immediately.
+set -e
+
 # Clone the main repo.
 git clone https://github.com/nodeGame/nodegame.git
 cd nodegame

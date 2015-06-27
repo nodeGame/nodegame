@@ -16,4 +16,4 @@ node bin/make build-client -a -o nodegame-full
 
 # nodegame
 cd ../..
-node launcher.js
+node $1 launcher.js
