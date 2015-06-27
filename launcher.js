@@ -8,9 +8,6 @@
  * http://www.nodegame.org
  */
 
-// Load the Node.js path object.
-var path = require('path');
-
 // Load the ServerNode class.
 var ServerNode = require('nodegame-server').ServerNode;
 
