@@ -8,7 +8,7 @@
 # The order is important because of dependencies (see installation
 # of modules below).
 gitmodules="nodegame-window nodegame-widgets JSUS NDDB shelf.js "\
-"nodegame-client nodegame-server descil-mturk nodegame-db nodegame-mongodb"\
+"nodegame-client nodegame-server descil-mturk nodegame-db nodegame-mongodb "\
 "nodegame-requirements nodegame-monitor"
 npmmodules="smoosh ya-csv commander docker"
 
