@@ -17,6 +17,8 @@ git clone https://github.com/nodeGame/nodegame-client.git || exit /b
 git clone https://github.com/nodeGame/nodegame-server.git || exit /b
 git clone https://github.com/nodeGame/nodegame-window.git || exit /b
 git clone https://github.com/nodeGame/nodegame-widgets.git || exit /b
+git clone https://github.com/nodeGame/nodegame-requirements.git || exit /b
+git clone https://github.com/nodeGame/nodegame-monitor.git || exit /b
 git clone https://github.com/nodeGame/JSUS.git || exit /b
 git clone https://github.com/nodeGame/NDDB.git || exit /b
 git clone https://github.com/nodeGame/shelf.js.git || exit /b
@@ -50,7 +52,7 @@ call:linkDeps JSUS NDDB shelf.js || exit /b
 call npm install || exit /b
 
 cd ../nodegame-server || exit /b
-call:linkDeps JSUS NDDB shelf.js nodegame-widgets || exit /b
+call:linkDeps JSUS NDDB shelf.js nodegame-widgets nodegame-monitor || exit /b
 call npm install || exit /b
 
 :: Patching express connect (copy + rename).

@@ -28,6 +28,8 @@ git clone https://github.com/nodeGame/nodegame-client.git
 git clone https://github.com/nodeGame/nodegame-server.git
 git clone https://github.com/nodeGame/nodegame-window.git
 git clone https://github.com/nodeGame/nodegame-widgets.git
+git clone https://github.com/nodeGame/nodegame-requirements.git
+git clone https://github.com/nodeGame/nodegame-monitor.git
 git clone https://github.com/nodeGame/JSUS.git
 git clone https://github.com/nodeGame/NDDB.git
 git clone https://github.com/nodeGame/shelf.js.git
@@ -67,7 +69,7 @@ link_deps JSUS NDDB shelf.js
 npm install
 
 cd ../nodegame-server
-link_deps JSUS NDDB shelf.js nodegame-widgets
+link_deps JSUS NDDB shelf.js nodegame-widgets nodegame-monitor
 npm install
 
 # Patching express connect.
