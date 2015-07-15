@@ -27,6 +27,10 @@ var options = {
         servernode.gamesDirs.push('./games');
         // Sets the debug mode, exceptions will be thrown (Default is false).
         servernode.debug = true;
+        // Can get information from /?q=
+        servernode.enableInfoQuery = true;
+        // Basepath (without trailing slash).
+        // servernode.basepath = '/mybasepath';
 
         return true;
     },

@@ -1,13 +1,12 @@
 .project
 .settings
 .idea
+Session.vim
 
 /tests/
-/server
 /examples/test/*
-/client/releases/*
-jquery
 
+*.tar.gz
 *.tmp*
 *.csv
 *.swp
@@ -20,62 +19,14 @@ _*
 
 npm-debug.log
 node_modules/
-
 node_modules_old
-
-pr_server.js
-
-/games/PR
-/games/TEST
-/games/PR2/
-/games/PR3/
-/games/PR4/
-
-games/facerank
-games/ultiturk
-games/ultimatum*
-games/mygame
-games/trustgame
-games/burdenshare
-games/meritocracy
-
-
-Session.vim
-
 
 descil.conf.js
 
+games/
 games_new/
-games_new/ultimatum*
-games_new/burden*
-games_new/meritocracy
-games_new/facecat
-games_new/imagecat
-games_new/facerank
-
-start/server.js
-start/server-pairs.js
-start/burden-server.js
-start/meritocracy-server.js
-start/server.js
-start/catserver.js
-start/rankserver.js
-start/server-pairs.js
-start/trustgame-server.js
-
-*.tar.gz
-
-games/trustgame/
-start/trustgame-server.js
+start/
+log/*.log
 
 
-log/messages.log
-log/clients.log
-log/servernode.log
-log/channel.log
-log/channels.log
-log/messages
-log/clients
-log/servernode
-log/channel
-log/channels
+
