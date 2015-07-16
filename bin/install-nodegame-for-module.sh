@@ -111,10 +111,10 @@ do  git clone "https://github.com/nodeGame/${module}.git"
     nodegame-server)
         link_deps JSUS NDDB shelf.js nodegame-widgets
         npm install
-        # Patch express connect.
-        patch \
-          node_modules/express/node_modules/connect/lib/middleware/static.js < \
-          bin/ng.connect.static.js.patch
+        # Patch express connect. (not needed in express 4).
+        # patch \
+        #  node_modules/express/node_modules/connect/lib/middleware/static.js < \
+        #  bin/ng.connect.static.js.patch
         # Rebuild js files.
         node bin/make.js build-client -a -o nodegame-full
         ;;
