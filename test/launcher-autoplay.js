@@ -49,7 +49,9 @@ var options = {
     },
     sio: function(sio) {
         // Special configuration for Socket.Io goes here here.
-        sio.set('transports', testSettings.sioTransports);
+        if (testSettings.sioTransports) {
+            sio.set('transports', testSettings.sioTransports);
+        }
         return true;
     }
 };
