@@ -31,8 +31,8 @@ link_deps() {
 
 # List of all sub-modules on GitHub to clone.
 gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
-"JSUS NDDB shelf.js descil-mturk nodegame-db nodegame-mongodb"
-
+"nodegame-requirements nodegame-monitor JSUS NDDB shelf.js descil-mturk "\
+"nodegame-db nodegame-mongodb"
 
 # Return on failure immediately.
 set -e
@@ -81,9 +81,9 @@ npm install docker
     link_deps JSUS NDDB shelf.js nodegame-widgets
     npm install
 
-    # Patch express connect.
-    patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
-      bin/ng.connect.static.js.patch
+    # Patch express connect. (not needed in express 4).
+    # patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
+    #  bin/ng.connect.static.js.patch
 
     # Rebuild js files.
     node bin/make.js build-client -a -o nodegame-full
@@ -105,11 +105,11 @@ cd ../..
 
 # Execute the following commands to try out the ultimatum game.
 
-# Start the ultimatum game:
-# node start/ultimatum-server
+# Start the server:
+# node launcher
 
 # Open two browser tabs for two players at the address:
 # http://localhost:8080/ultimatum/
-# Open the admin console at:
-# http://localhost:8080/ultimatum/monitor.htm
+# Open the admin interface at:
+# http://localhost:8080/ultimatum/monitor/
 # See the wiki documentation to modify settings.

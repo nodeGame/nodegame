@@ -55,8 +55,8 @@ cd ../nodegame-server || exit /b
 call:linkDeps JSUS NDDB shelf.js nodegame-widgets nodegame-monitor || exit /b
 call npm install || exit /b
 
-:: Patching express connect (copy + rename).
-xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
+:: Patching express connect (copy + rename). (not needed in express 4).
+:: xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
 
 :: Rebuild js files.
 cd bin || exit /b
@@ -70,14 +70,14 @@ git clone https://github.com/nodeGame/ultimatum.git games/ultimatum || exit /b
 
 :: Execute the following commands to try out the ultimatum game.
 
-:: Start the ultimatum game.
-:: node start/ultimatum-server
+:: Start the server.
+:: node launcher
 
 
 :: Open two browser tabs for two players at the address:
 :: http://localhost:8080/ultimatum/
 :: Open the admin console at:
-:: http://localhost:8080/ultimatum/monitor.htm
+:: http://localhost:8080/ultimatum/monitor/
 :: See the wiki documentation to modify settings.
 
 exit /b
