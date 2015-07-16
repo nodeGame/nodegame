@@ -1,8 +1,7 @@
 {
     "name": "nodegame"
-  , "description": "Pre-configured nodegame-server with game examples"
-  , "version": "0.9.2"
-  , "main" : "server.js"
+  , "description": "Starter package for nodegame: install scripts, configurations and development files."
+  , "version": "1.0.0"
   , "homepage": "http://nodegame.org"
   , "author": "Stefano Balietti <futur.dorko@gmail.com>"
   , "contributors": [
@@ -10,24 +9,11 @@
     ]
   , "repository": {
         "type": "git"
-      , "url": "https://github.com/Shakty/nodegame.git"
+      , "url": "https://github.com/nodeGame/nodegame.git"
     }
-  , "dependencies": {
-      "descil-mturk": ">= 0.0.1",
-      "commander": "1.0.0",
-      "mkdirp": "0.3.2",
-      "NDDB": ">= 0.5.9",
-      "request": "2.11.4",
-      "nodegame-requirements": "*"
-    }
-  , "engines": { "node": ">= 0.6.11" }
-  , "licenses": [
-    { "type": "MIT" }
-  ]
-  , "bin": {
-    "nodegame": "./bin/nodegame"
-  }
+  , "engines": { "node": ">= 0.10.0" }
+  , "license": "MIT"
   , "scripts": {
-    "start": "node server.js"
+    "start": "node launcher.js"
   }
 }
