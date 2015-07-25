@@ -12,6 +12,9 @@
       , "url": "https://github.com/nodeGame/nodegame.git"
     }
   , "engines": { "node": ">= 0.10.0" }
+  , "dependencies" : {
+         "commander": "*"
+    }            
   , "license": "MIT"
   , "scripts": {
     "start": "node launcher.js"
