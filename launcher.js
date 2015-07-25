@@ -257,13 +257,9 @@ sn.ready(function() {
             if (runTests) {
                 command = gameDir + 'node_modules/.bin/mocha';
                 if (fs.existsSync(command)) {
-                    var testProcess, settings;
-                    settings = 'module.exports = { numPlayers: ' +
-                        nClients + ' };';
-                    fs.writeFileSync(gameDir + 'test/settings.js', 
-                                     settings, 
-                                     { mode: 0666 }
-                                    );
+
+                    // Write and backup settings file.
+                    writeSettingsFile(gameDir);
 
                     command += ' ' + gameDir + 'test/ --colors';
                     testProcess = exec(command, function(err, stdout, stderr) {
@@ -307,6 +303,19 @@ function printIgnoredOptions() {
 function printErr(err) {
     console.log('    Check the input parameters.');
     console.log('    Error: ' + err);
+}
+
+function writeSettingsFile(gameDir) {
+    var testProcess, settings, settingsFile, bak;
+    settings = 'module.exports = { numPlayers: ' + nClients + ' };';
+    settingsFile = gameDir + 'test/settings.js';
+    // Make a backup of existing settings file, if found.
+    if (fs.existsSync(settingsFile)) {
+        bak = fs.readFileSync(settingsFile).toString();
+        fs.writeFileSync(settingsFile + '.bak', bak,  { mode: 0666 } );
+    }
+    // Write updated settings file.
+    fs.writeFileSync(gameDir + 'test/settings.js', settings, { mode: 0666 } );
 }
 
 // Exports the ServerNode instance.
