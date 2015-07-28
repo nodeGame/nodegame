@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Pull recent versions of all included Git repos.
 
@@ -15,18 +15,18 @@ MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
 # Change the current working directory to the parent directory of the script,
 # i.e. the nodegame directory. Using the below command instead of simply
 # "cd .." makes sure that it does not matter from where the script is executed
-cd "$(dirname ${BASH_SOURCE[0]})/.."
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 echo_and_pull nodegame
 
-for GAME in ${GAMES[@]}; do
+for GAME in "${GAMES[@]}"; do
 (
   cd games/"${GAME}"
   echo_and_pull "${GAME}"
 )
 done
 
-for MODULE in ${MODULES[@]}; do
+for MODULE in "${MODULES[@]}"; do
 (
   cd node_modules/"${MODULE}"
   echo_and_pull "${MODULE}"
