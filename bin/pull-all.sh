@@ -1,67 +1,36 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Pull recent versions of all included Git repos.
 
-#set -e
+echo_and_pull() {
+  echo -e "\n* Pulling $1 ..."
+  git pull || echo '  FAILED!'
+}
 
-cd ..
-echo '* Pulling nodegame ...'
-git pull || echo '  FAILED!'
+GAMES=(ultimatum)
+MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
+  nodegame-requirements nodegame-monitor JSUS NDDB shelf.js descil-mturk
+  nodegame-db nodegame-mongodb)
 
-echo
-cd games/ultimatum
-echo '* Pulling ultimatum ...'
-git pull || echo '  FAILED!'
+# Change the current working directory to the parent directory of the script,
+# i.e. the nodegame directory. Using the below command instead of simply
+# "cd .." makes sure that it does not matter from where the script is executed
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-echo
-cd ../../node_modules/nodegame-server
-echo '* Pulling nodegame-server ...'
-git pull || echo '  FAILED!'
+echo_and_pull nodegame
 
-echo
-cd ../nodegame-client
-echo '* Pulling nodegame-client ...'
-git pull || echo '  FAILED!'
+for GAME in "${GAMES[@]}"; do
+(
+  cd games/"${GAME}"
+  echo_and_pull "${GAME}"
+)
+done
 
-echo
-cd ../nodegame-widgets
-echo '* Pulling nodegame-widgets ...'
-git pull || echo '  FAILED!'
+for MODULE in "${MODULES[@]}"; do
+(
+  cd node_modules/"${MODULE}"
+  echo_and_pull "${MODULE}"
+)
+done
 
-echo
-cd ../nodegame-window
-echo '* Pulling nodegame-window ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../nodegame-mongodb
-echo '* Pulling nodegame-mongodb ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../nodegame-db
-echo '* Pulling nodegame-db ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../JSUS
-echo '* Pulling JSUS ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../NDDB
-echo '* Pulling NDDB ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../shelf.js
-echo '* Pulling shelf.js ...'
-git pull || echo '  FAILED!'
-
-echo
-cd ../descil-mturk
-echo '* Pulling descil-mturk ...'
-git pull || echo '  FAILED!'
-
-echo
-echo '* Done.'
+echo -e "\n* Done."
