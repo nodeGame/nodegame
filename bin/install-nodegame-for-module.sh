@@ -107,10 +107,14 @@ do  git clone "https://github.com/nodeGame/${module}.git"
     nodegame-client)
         link_deps JSUS NDDB shelf.js
         npm install
+        git fetch
+        git checkout rebase_master
         ;;
     nodegame-server)
         link_deps JSUS NDDB shelf.js nodegame-widgets
         npm install
+        git fetch
+        git checkout rebase_master
         # Patch express connect. (not needed in express 4).
         # patch \
         #  node_modules/express/node_modules/connect/lib/middleware/static.js < \
