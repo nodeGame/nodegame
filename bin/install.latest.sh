@@ -10,7 +10,7 @@ node_major=$(cut -d. -f1 <<< $node_version)
 node_minor=$(cut -d. -f2 <<< $node_version)
 if (( node_major <= 0 && node_minor < 10 ))
 then
-    echo "Found node.js version $node_version, but at least 0.10 required."
+    echo "node.js version >= 0.10 required."
     exit 1
 fi
 

@@ -1,5 +1,7 @@
 language: node_js
-node_js: 0.10
+node_js:
+  - '0.10'
+  - '0.12'
 install:
 # Install expect.
   - sudo apt-get install expect
