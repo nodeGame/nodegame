@@ -3,8 +3,52 @@
 # Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
+# Default command paths.
+node_path=node
+npm_path=npm
+
+print_usage() {
+    echo "Usage: install.stable.sh [--node-path=...] [--npm-path=...]"
+    echo -n "  The path options select the location "
+    echo "of the respective executables."
+}
+
+# Check options.
+getopt_tmp=`getopt -o h --long help,node-path:,npm-path: -- "$@"`
+eval set -- "$getopt_tmp"
+while true ; do
+    case "$1" in
+        -h|--help)
+            print_usage
+            exit 0
+            shift ;;
+        --node-path)
+            node_path="$2"
+            shift 2 ;;
+        --npm-path) 
+            npm_path="$2"
+            shift 2 ;;
+        --) shift ; break ;;
+        *) echo "Error parsing options!" ; exit 1 ;;
+    esac
+done
+
+# Check existence of executables.
+command -v $node_path > /dev/null || {
+    echo "Invalid node path at '$node_path'."
+    echo
+    print_usage
+    exit 1
+}
+command -v $npm_path > /dev/null || {
+    echo "Invalid npm path at '$npm_path'."
+    echo
+    print_usage
+    exit 1
+}
+
 # Check node.js version, must be higher than 0.8.
-node_version=$(node --version)  # e.g. "v0.10.20"
+node_version=$($node_path --version)  # e.g. "v0.10.20"
 node_version=${node_version#v}  # e.g. "0.10.20"
 node_major=$(cut -d. -f1 <<< $node_version)
 node_minor=$(cut -d. -f2 <<< $node_version)
@@ -22,20 +66,20 @@ git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
 
 # Install the dependencies.
-npm install nodegame-client
-npm install nodegame-server
-npm install nodegame-window
-npm install nodegame-widgets
-npm install JSUS
-npm install NDDB
-npm install shelf.js
-npm install descil-mturk
-npm install nodegame-db
-npm install nodegame-mongodb
-npm install smoosh
-npm install ya-csv
-npm install commander
-npm install docker
+$npm_path install nodegame-client
+$npm_path install nodegame-server
+$npm_path install nodegame-window
+$npm_path install nodegame-widgets
+$npm_path install JSUS
+$npm_path install NDDB
+$npm_path install shelf.js
+$npm_path install descil-mturk
+$npm_path install nodegame-db
+$npm_path install nodegame-mongodb
+$npm_path install smoosh
+$npm_path install ya-csv
+$npm_path install commander
+$npm_path install docker
 
 # Entering nodegame-server directory.
 cd node_modules/nodegame-server
@@ -46,7 +90,7 @@ patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
  
 # Rebuild js files.
 cd bin
-node make build-client -a -o nodegame-full
+$node_path make build-client -a -o nodegame-full
 
 # Install ultimatum game.
 cd ../../..

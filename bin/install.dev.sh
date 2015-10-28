@@ -3,9 +3,52 @@
 # Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
+# Default command paths.
+node_path=node
+npm_path=npm
+
+print_usage() {
+    echo "Usage: install.dev.sh [--node-path=...] [--npm-path=...]"
+    echo -n "  The path options select the location "
+    echo "of the respective executables."
+}
+
+# Check options.
+getopt_tmp=`getopt -o h --long help,node-path:,npm-path: -- "$@"`
+eval set -- "$getopt_tmp"
+while true ; do
+    case "$1" in
+        -h|--help)
+            print_usage
+            exit 0
+            shift ;;
+        --node-path)
+            node_path="$2"
+            shift 2 ;;
+        --npm-path) 
+            npm_path="$2"
+            shift 2 ;;
+        --) shift ; break ;;
+        *) echo "Error parsing options!" ; exit 1 ;;
+    esac
+done
+
+# Check existence of executables.
+command -v $node_path > /dev/null || {
+    echo "Invalid node path at '$node_path'."
+    echo
+    print_usage
+    exit 1
+}
+command -v $npm_path > /dev/null || {
+    echo "Invalid npm path at '$npm_path'."
+    echo
+    print_usage
+    exit 1
+}
 
 # Check node.js version, must be higher than 0.8.
-node_version=$(node --version)  # e.g. "v0.10.20"
+node_version=$($node_path --version)  # e.g. "v0.10.20"
 node_version=${node_version#v}  # e.g. "0.10.20"
 node_major=$(cut -d. -f1 <<< $node_version)
 node_minor=$(cut -d. -f2 <<< $node_version)
@@ -48,45 +91,45 @@ cd node_modules
 for module in $gitmodules
 do  git clone "git@github.com:nodeGame/${module}.git"
 done
-npm install smoosh
-npm install ya-csv
-npm install commander
-npm install docker
+$npm_path install smoosh
+$npm_path install ya-csv
+$npm_path install commander
+$npm_path install docker
 
 # Install sub-dependencies, link to tracked dependencies.
 (
     cd JSUS
-    npm install
+    $npm_path install
 )
 
 (
     cd descil-mturk
     link_deps JSUS NDDB
-    npm install
+    $npm_path install
 )
 
 (
     cd nodegame-mongodb
-    npm install
+    $npm_path install
 )
 
 (
     cd nodegame-client
     link_deps JSUS NDDB shelf.js
-    npm install
+    $npm_path install
 )
 
 (
     cd nodegame-server
     link_deps JSUS NDDB shelf.js nodegame-widgets
-    npm install
+    $npm_path install
 
     # Patch express connect. (not needed in express 4).
     # patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
     #  bin/ng.connect.static.js.patch
 
     # Rebuild js files.
-    node bin/make.js build-client -a -o nodegame-full
+    $node_path bin/make.js build-client -a -o nodegame-full
 )
 
 # Copy Git hooks.
@@ -99,7 +142,7 @@ cd ..
 git clone git@github.com:nodeGame/ultimatum games/ultimatum
 cp git-hooks/* games/ultimatum/.git/hooks/
 cd games/ultimatum
-npm install
+$npm_path install
 cd ../..
 
 
