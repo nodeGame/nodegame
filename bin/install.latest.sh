@@ -15,6 +15,13 @@ print_usage() {
 
 # Check options.
 getopt_tmp=`getopt -o h --long help,node-path:,npm-path: -- "$@"`
+if [ $? -ne 0 ]
+then
+    echo
+    print_usage
+    exit 1
+fi
+
 eval set -- "$getopt_tmp"
 while true ; do
     case "$1" in
