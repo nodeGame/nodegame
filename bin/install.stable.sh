@@ -54,7 +54,7 @@ command -v $npm_path > /dev/null || {
     exit 1
 }
 
-# Check node.js version, must be higher than 0.8.
+# Check node.js version, must be at least 0.10.
 node_version=$($node_path --version)  # e.g. "v0.10.20"
 node_version=${node_version#v}  # e.g. "0.10.20"
 node_major=$(cut -d. -f1 <<< $node_version)
@@ -62,6 +62,18 @@ node_minor=$(cut -d. -f2 <<< $node_version)
 if (( node_major <= 0 && node_minor < 10 ))
 then
     echo "node.js version >= 0.10 required."
+    exit 1
+fi
+
+# Check npm version, must be at least 1.3.
+npm_version=$($npm_path --version)
+npm_major=$(cut -d. -f1 <<< $npm_version)
+npm_minor=$(cut -d. -f2 <<< $npm_version)
+if (( npm_major < 1 || npm_major == 1 && npm_minor < 3 ))
+then
+    echo "npm version >= 1.3 required."
+    echo
+    print_usage
     exit 1
 fi
 
