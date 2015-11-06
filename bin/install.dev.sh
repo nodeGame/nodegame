@@ -105,15 +105,15 @@ cd nodegame
 cp git-hooks/* .git/hooks/
 
 # Install the dependencies.
+$npm_path install smoosh
+$npm_path install ya-csv
+$npm_path install commander
+$npm_path install docker
 mkdir -p node_modules
 cd node_modules
 for module in $gitmodules
 do  git clone "git@github.com:nodeGame/${module}.git"
 done
-$npm_path install smoosh
-$npm_path install ya-csv
-$npm_path install commander
-$npm_path install docker
 
 # Install sub-dependencies, link to tracked dependencies.
 (
