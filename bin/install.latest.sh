@@ -87,6 +87,10 @@ git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
 
 # Install the dependencies.
+$npm_path install smoosh
+$npm_path install ya-csv
+$npm_path install commander
+$npm_path install docker
 mkdir -p node_modules
 cd node_modules
 git clone https://github.com/nodeGame/nodegame-client.git
@@ -101,10 +105,6 @@ git clone https://github.com/nodeGame/shelf.js.git
 git clone https://github.com/nodeGame/descil-mturk.git
 git clone https://github.com/nodeGame/nodegame-db.git
 git clone https://github.com/nodeGame/nodegame-mongodb.git
-$npm_path install smoosh
-$npm_path install ya-csv
-$npm_path install commander
-$npm_path install docker
 
 # Add symbolic links to given dependencies that are in nodegame/node_modules
 # (e.g. JSUS, NDDB).
