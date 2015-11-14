@@ -94,7 +94,7 @@ link_deps() {
 # List of all sub-modules on GitHub to clone.
 gitmodules="nodegame-client nodegame-server nodegame-window nodegame-widgets "\
 "nodegame-requirements nodegame-monitor JSUS NDDB shelf.js descil-mturk "\
-"nodegame-db nodegame-mongodb"
+"nodegame-db nodegame-mongodb nodegame-generator"
 
 # Return on failure immediately.
 set -e
@@ -136,6 +136,14 @@ done
     cd nodegame-client
     link_deps JSUS NDDB shelf.js
     $npm_path install
+)
+
+(
+    cd nodegame-generator
+    link_deps JSUS
+    $npm_path install
+    # Link to executable from nodegame/bin.
+    ln -s ../node_modules/nodegame-generator/bin/nodegame ../../bin/
 )
 
 (

@@ -95,17 +95,21 @@ $npm_path install shelf.js
 $npm_path install descil-mturk
 $npm_path install nodegame-db
 $npm_path install nodegame-mongodb
+$npm_path install nodegame-generator
 $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander
 $npm_path install docker
 
+# Link to nodegame-generator executable.
+ln -s ../node_modules/nodegame-generator/bin/nodegame bin/
+
 # Entering nodegame-server directory.
 cd node_modules/nodegame-server
  
 # Patching express connect.
-patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
-  bin/ng.connect.static.js.patch
+#patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
+#  bin/ng.connect.static.js.patch
  
 # Rebuild js files.
 cd bin
