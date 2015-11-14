@@ -122,4 +122,11 @@ do  git clone "https://github.com/nodeGame/${module}.git"
     cd ..
 done
 
+# Link installed modules into parent directory.
+cd ..
+mkdir -p ../node_modules
+for dir in node_modules/*
+do  ln -s ../nodegame/$dir ../node_modules/
+done
+
 echo "Installation of nodeGame for module completed."
