@@ -3,6 +3,20 @@
 # Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
+# Current dir.
+install_dir=${PWD##*/}
+
+# Assumes to be executed inside the node_modules dir.
+create_generator_conf() {
+    echo
+    echo "Saving nodegame-generator configuration"
+    echo -e "{
+    \"author\": \"\",
+    \"email\": \"\",
+    \"gamesFolder\": \"/$install_dir/nodegame/games/\"
+}" > nodegame-generator/conf/generator.conf.json
+}
+
 # Default command paths.
 node_path=node
 npm_path=npm
@@ -108,6 +122,9 @@ git clone https://github.com/nodeGame/nodegame-db.git
 git clone https://github.com/nodeGame/nodegame-mongodb.git
 git clone https://github.com/nodeGame/nodegame-generator.git
 
+# Create conf script in nodegame-generator.
+create_generator_conf
+
 # Add symbolic links to given dependencies that are in nodegame/node_modules
 # (e.g. JSUS, NDDB).
 function link_deps {
@@ -147,7 +164,7 @@ $npm_path install
 
 # Patching express connect. (not needed in express 4)
 # patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
-#  bin/ng.connect.static.js.patch
+# bin/ng.connect.static.js.patch
 
 # Rebuild js files.
 cd bin
