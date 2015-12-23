@@ -10,8 +10,10 @@ setlocal enableextensions enabledelayedexpansion
 :: Solution taken from http://stackoverflow.com/q/25093276
 if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
 
-:: Clone the main repo.
-git clone https://github.com/nodeGame/nodegame.git || exit /b
+:: Get the stable repo.
+call npm install nodegame || exit /b
+move node_modules/nodegame .
+rmdir node_modules
 
 cd nodegame || exit /b
 
@@ -32,6 +34,7 @@ call npm install nodegame-monitor || exit /b
 call npm install smoosh || exit /b
 call npm install ya-csv || exit /b
 call npm install commander || exit /b
+call npm install ultimatum-game || exit /b
 :: docker not installed
 
 
@@ -47,7 +50,7 @@ node make build-client -a -o nodegame-full || exit /b
 
 :: Install ultimatum game.
 cd ../../../ || exit /b
-git clone https://github.com/nodeGame/ultimatum games/ultimatum || exit /b
+move node_modules/ultimatum-game games/ultimatum || exit /b
 
 
 :: Execute the following commands to try out the ultimatum game.
