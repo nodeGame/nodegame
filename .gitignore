@@ -23,8 +23,7 @@ node_modules_old
 
 descil.conf.js
 
-games/
-!games/README.md
+games/ultimatum
 games_new/
 start/
 log/*.log
