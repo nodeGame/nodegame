@@ -3,6 +3,20 @@
 # Copyright(c) 2015 Stefano Balietti
 # MIT Licensed
 
+# Current dir.
+install_dir=${PWD##*/}
+
+# Assumes to be executed inside the node_modules dir.
+create_generator_conf() {
+    echo
+    echo "Saving nodegame-generator configuration"
+    echo -e "{
+    \"author\": \"\",
+    \"email\": \"\",
+    \"gamesFolder\": \"/$install_dir/nodegame/games/\"
+}" > nodegame-generator/conf/generator.conf.json
+}
+
 # Default command paths.
 node_path=node
 npm_path=npm
@@ -80,8 +94,13 @@ fi
 # Return on failure immediately.
 set -e
 
-# Clone the main repo.
-git clone https://github.com/nodeGame/nodegame.git
+# Install the main repo.
+npm install nodegame
+
+# Move nodegame modules outsite node_modules dir.
+mv node_modules/nodegame ./
+rm node_modules -r
+
 cd nodegame
 
 # Install the dependencies.
@@ -102,15 +121,21 @@ $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander
 $npm_path install docker
+$npm_path install ultimatum-game
+
+cd node_modules
+
+# Create conf script in nodegame-generator.
+create_generator_conf
 
 # Link to nodegame-generator executable.
-ln -s ../node_modules/nodegame-generator/bin/nodegame bin/
+ln -s nodegame-generator/bin/nodegame ../bin/
 
 # Entering nodegame-server directory.
-cd node_modules/nodegame-server
- 
+cd nodegame-server
+
 # Patching express connect.
-#patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
+# patch node_modules/express/node_modules/connect/lib/middleware/static.js < \
 #  bin/ng.connect.static.js.patch
  
 # Rebuild js files.
@@ -119,16 +144,16 @@ $node_path make build-client -a -o nodegame-full
 
 # Install ultimatum game.
 cd ../../..
-git clone https://github.com/nodeGame/ultimatum games/ultimatum
+mv node_modules/ultimatum-game games/ultimatum
 
 
 # Execute the following commands to try out the ultimatum game.
 
-# Start the ultimatum game:
-# node start/ultimatum-server
+# Start the server:
+# node launcher
 
 # Open two browser tabs for two players at the address:
 # http://localhost:8080/ultimatum/
-# Open the admin console at:
-# http://localhost:8080/ultimatum/monitor.htm
+# Open the admin interface at:
+# http://localhost:8080/ultimatum/monitor/
 # See the wiki documentation to modify settings.
