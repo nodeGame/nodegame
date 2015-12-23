@@ -96,6 +96,8 @@ $npm_path install descil-mturk
 $npm_path install nodegame-db
 $npm_path install nodegame-mongodb
 $npm_path install nodegame-generator
+$npm_path install nodegame-requirements
+$npm_path install nodegame-monitor
 $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander

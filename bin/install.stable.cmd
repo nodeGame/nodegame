@@ -26,6 +26,9 @@ call npm install shelf.js || exit /b
 call npm install descil-mturk || exit /b
 call npm install nodegame-db || exit /b
 call npm install nodegame-mongodb || exit /b
+call npm install nodegame-generator || exit /b
+call npm install nodegame-requirements || exit /b
+call npm install nodegame-monitor || exit /b
 call npm install smoosh || exit /b
 call npm install ya-csv || exit /b
 call npm install commander || exit /b
@@ -35,8 +38,8 @@ call npm install commander || exit /b
 :: Entering nodegame-server directory
 cd node_modules/nodegame-server/ || exit /b
  
-:: Patching express connect.
-xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
+:: Patching express connect. (not needed in new version).
+:: xcopy /Y bin\static.js node_modules\express\node_modules\connect\lib\middleware\static.js || exit /b
  
 :: Rebuild js files.
 cd bin/ || exit /b
