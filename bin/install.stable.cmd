@@ -12,8 +12,8 @@ if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
 
 :: Get the stable repo.
 call npm install nodegame || exit /b
-move node_modules/nodegame .
-rmdir node_modules
+move node_modules/nodegame . || exit /b
+rmdir node_modules || exit /b
 
 cd nodegame || exit /b
 
