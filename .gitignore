@@ -24,6 +24,8 @@ node_modules_old
 descil.conf.js
 
 games/ultimatum
+games/artex
+games/MiniSvo
 games_new/
 start/
 log/*.log

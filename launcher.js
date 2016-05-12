@@ -1,9 +1,9 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2015 Stefano Balietti
+ * Copyright(c) 2016 Stefano Balietti
  * MIT Licensed
  *
- * Sets conf, log, and games directory and start the server.
+ * Load configuration options and start the server
  *
  * http://www.nodegame.org
  */
@@ -33,6 +33,15 @@ var nClients, clientType, killServer;
 
 // Warn message.
 var ignoredOptions;
+
+// Helper variables.
+
+// Split input parameters.
+function list(val) {
+  return val.split(',');
+}
+
+// Go!
 
 ignoredOptions = [];
 
@@ -73,7 +82,8 @@ program
             'Enables the debug mode')
     .option('-i, --infoQuery',
             'Enables getting information via query-string ?q=')
-
+    .option('-b, --build <components>',
+            'Rebuilds the specified components', list)
 
     // Connect phantoms. 
 
@@ -94,7 +104,7 @@ program
 
 
 if (program.confFile) {
-    if (!fs.existSync(progam.ConfFile)) {
+    if (!fs.existsSync(progam.ConfFile)) {
         return printErr('--confFile ' + program.confFile + ' not found.');
     }
     options = require(program.confFile);
@@ -158,25 +168,82 @@ else {
 
     // Validate other options.
     if (program.confDir) {
-        if (!fs.existSync(program.confDir)) {
+        if (!fs.existsSync(program.confDir)) {
             return printErr('--confDir ' + program.confDir + ' not found.');
         }
         confDir = program.confDir;
     }
     if (program.logDir) {
-        if (!fs.existSync(program.logDir)) {
+        if (!fs.existsSync(program.logDir)) {
             return printErr('--logDir ' + program.logDir + ' not found.');
         }
         logDir = program.logDir;
     }
     if (program.gamesDir) {
-        if (!fs.existSync(program.gamesDir)) {
+        if (!fs.existsSync(program.gamesDir)) {
             return printErr('--gamesDir ' + program.gamesDir + ' not found.');
         }
         gamesDir = program.gamesDir;
     }
     if (program.debug) debug = true;
     if (program.infoQuery) infoQuery = true;
+}
+
+// Rebuild server files as needed.
+
+if (program.build) {
+    (function() {
+        var i, len, opts, modules;
+        var dir, J, info, module, out;
+
+        out = 'nodegame-full.js';
+        J = require('JSUS').JSUS;
+        modules = {
+            window: 'window',
+            client: 'client',
+            widgets: 'widgets',
+            JSUS: 'JSUS',
+            NDDB: 'NDDB'
+        };
+        info = require(J.resolveModuleDir('nodegame-server', __dirname) +
+                             'bin/info.js');
+
+        len = program.build.length; 
+        if (!len || (len === 1 && program.build[0] === 'all')) {
+             // Client will be done anyway.
+            program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
+        }
+        else {
+            i = -1, len = program.build.length;
+            for ( ; ++i < len ; ) {
+                module = program.build[i];
+                if (!modules[module]) {
+                    throw new Error('unknown build component: ' + module);
+                }
+                // Will be done last anyway.
+                if (i === 'client') continue;
+                else if (i === 'NDDB') {
+                    console.log('NDDB does not require build.');
+                    continue;
+                }
+                
+                opts = { all: true, clean: true };                
+
+                info.build[module](opts);
+                console.log('');
+            }
+            // Do client last.
+            info.build.client({
+                clean: true,
+                all: true,
+                output: out
+            });
+            J.copyFile(info.modulesDir.client + 'build/' + out,
+                       info.serverDir.build + out);
+            console.log(info.serverDir.build + out + ' rebuilt.');
+            console.log('');
+        }
+    })(program.build);    
 }
 
 // Validate general options.
