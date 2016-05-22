@@ -1,0 +1,4 @@
+# nodeGame Changelog
+
+# 1.5.0
+-  Added -b option to launcher. Builds specified components before starting the server. Available options: JSUS, window, widgets, client, all.
