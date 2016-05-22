@@ -221,8 +221,8 @@ if (program.build) {
                     throw new Error('unknown build component: ' + module);
                 }
                 // Will be done last anyway.
-                if (i === 'client') continue;
-                else if (i === 'NDDB') {
+                if (module === 'client') continue;
+                else if (module === 'NDDB') {
                     console.log('NDDB does not require build.');
                     continue;
                 }
