@@ -10,6 +10,7 @@
 
 // Modules.
 var fs = require('fs');
+var path = require('path');
 var exec = require('child_process').exec;
 
 // Load commander.
@@ -82,8 +83,11 @@ program
             'Enables the debug mode')
     .option('-i, --infoQuery',
             'Enables getting information via query-string ?q=')
-    .option('-b, --build <components>',
+    .option('-b, --build [components]',
             'Rebuilds the specified components', list)
+    .option('-s, --ssl [path-to-ssl-dir]',
+            'Starts the server with SSL encryption')
+
 
     // Connect phantoms. 
 
@@ -209,44 +213,81 @@ if (program.build) {
                              'bin/info.js');
 
         len = program.build.length; 
-        if (!len || (len === 1 && program.build[0] === 'all')) {
+        if (!len) {
+            program.build = [ 'client' ];
+        }
+        else if (len === 1 && program.build[0] === 'all') {
              // Client will be done anyway.
             program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
         }
-        else {
-            i = -1, len = program.build.length;
-            for ( ; ++i < len ; ) {
-                module = program.build[i];
-                if (!modules[module]) {
-                    throw new Error('unknown build component: ' + module);
-                }
-                // Will be done last anyway.
-                if (module === 'client') continue;
-                else if (module === 'NDDB') {
-                    console.log('NDDB does not require build.');
-                    continue;
-                }
-                
-                opts = { all: true, clean: true };                
-
-                info.build[module](opts);
-                console.log('');
+        
+        // Starting build.
+        i = -1, len = program.build.length;
+        for ( ; ++i < len ; ) {
+            module = program.build[i];
+            if (!modules[module]) {
+                throw new Error('unknown build component: ' + module);
             }
-            // Do client last.
-            info.build.client({
-                clean: true,
-                all: true,
-                output: out
-            });
-            J.copyFile(info.modulesDir.client + 'build/' + out,
-                       info.serverDir.build + out);
-            console.log(info.serverDir.build + out + ' rebuilt.');
+            // Will be done last anyway.
+            if (module === 'client') continue;
+            else if (module === 'NDDB') {
+                console.log('NDDB does not require build.');
+                continue;
+            }
+            
+            opts = { all: true, clean: true };                
+
+            info.build[module](opts);
             console.log('');
         }
-    })(program.build);    
+        // Do client last.
+        info.build.client({
+            clean: true,
+            all: true,
+            output: out
+        });
+        J.copyFile(info.modulesDir.client + 'build/' + out,
+                   info.serverDir.build + out);
+        console.log(info.serverDir.build + out + ' rebuilt.');
+        console.log('');
+        
+    })(program.build);
 }
 
 // Validate general options.
+
+if ('boolean' === typeof program.ssl) {
+    options.ssl = true;
+}
+else if ('string' === typeof program.ssl) {
+    program.ssl = (function(dir) {
+        var ssl;
+        dir = path.resolve(dir) + '/';
+        if (!fs.existsSync(dir)) {
+            printErr('ssl directory not found: ' + dir);
+            return;
+        }
+        
+        key = dir + 'private.key';
+        if (!fs.existsSync(key)) {
+            printErr('ssl private key not found: ' + key);
+            return;           
+        }
+        cert = dir + 'certificate.pem';
+        if (!fs.existsSync(cert)) {
+            printErr('ssl certificate not found: ' + cert);
+            return;          
+        }
+
+        ssl = {};
+        ssl.key = fs.readFileSync(key, 'utf8');
+        ssl.cert = fs.readFileSync(cert, 'utf8');
+
+        return ssl;
+
+    })(program.ssl);
+    if (!program.ssl) return;
+}
 
 if (program.nClients) {
     if (!program.phantoms) ignoredOptions.push('--nClients');

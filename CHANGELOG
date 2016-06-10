@@ -1,4 +1,5 @@
 # nodeGame Changelog
 
-# 1.5.0
--  Added -b option to launcher. Builds specified components before starting the server. Available options: JSUS, window, widgets, client, all.
+# 2.0.0 (current)
+- Added -s option to launcher. Starts the server in SSL mode. Can be empty (loads nodegame-server/ssl/), or a path to a SSL directory.
+- Added -b option to launcher. Builds specified components before starting the server. Available options: JSUS, window, widgets, client, all.
