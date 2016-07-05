@@ -420,10 +420,10 @@ function writeSettingsFile(gameDir) {
     // Make a backup of existing settings file, if found.
     if (fs.existsSync(settingsFile)) {
         bak = fs.readFileSync(settingsFile).toString();
-        fs.writeFileSync(settingsFile + '.bak', bak,  { mode: 0666 } );
+        fs.writeFileSync(settingsFile + '.bak', bak,  { mode: 0o666 } );
     }
     // Write updated settings file.
-    fs.writeFileSync(gameDir + 'test/settings.js', settings, { mode: 0666 } );
+    fs.writeFileSync(gameDir + 'test/settings.js', settings, { mode: 0o666 } );
 }
 
 // Exports the ServerNode instance.
