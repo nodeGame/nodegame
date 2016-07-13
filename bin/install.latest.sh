@@ -1,6 +1,6 @@
 #!/bin/bash
 # nodeGame install from sources script
-# Copyright(c) 2015 Stefano Balietti
+# Copyright(c) 2016 Stefano Balietti
 # MIT Licensed
 
 # Current dir.
@@ -56,6 +56,9 @@ done
 
 # Check existence of executables.
 command -v $node_path > /dev/null || {
+    node_path=nodejs
+    command -v $node_path > /dev/null
+} || {
     echo "Invalid node path at '$node_path'."
     echo
     print_usage
@@ -104,7 +107,6 @@ cd nodegame
 $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander
-$npm_path install docker
 $npm_path install sorted-object
 mkdir -p node_modules
 cd node_modules

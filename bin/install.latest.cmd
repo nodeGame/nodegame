@@ -1,5 +1,5 @@
 :: nodeGame install from sources script for Windows
-:: Copyright(c) 2015 Stefano Balietti
+:: Copyright(c) 2016 Stefano Balietti
 :: MIT Licensed
 
 :: Enable local extensions (more similar to Bash).
@@ -33,7 +33,6 @@ if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
 call npm install smoosh || exit /b
 call npm install ya-csv || exit /b
 call npm install commander || exit /b
-call npm install docker || exit /b
 
 :: Install sub-dependencies; link to tracked dependencies.
 

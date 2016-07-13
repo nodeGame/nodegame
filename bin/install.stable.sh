@@ -1,6 +1,6 @@
 #!/bin/bash
 # nodeGame install from sources script
-# Copyright(c) 2015 Stefano Balietti
+# Copyright(c) 2016 Stefano Balietti
 # MIT Licensed
 
 # Current dir.
@@ -120,7 +120,6 @@ $npm_path install nodegame-monitor
 $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander
-$npm_path install docker
 $npm_path install ultimatum-game
 
 cd node_modules
