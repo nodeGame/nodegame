@@ -56,6 +56,9 @@ done
 
 # Check existence of executables.
 command -v $node_path > /dev/null || {
+    node_path=nodejs
+    command -v $node_path > /dev/null
+} || {
     echo "Invalid node path at '$node_path'."
     echo
     print_usage
