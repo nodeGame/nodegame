@@ -14,7 +14,9 @@
   , "engines": { "node": ">= 0.10.0" }
   , "dependencies" : {
          "commander": "*",
-         "fs-extra": "*"
+         "fs-extra": "*",
+         "ya-csv": "*",
+         "smoosh": "0.4.0"
     }            
   , "license": "MIT"
   , "scripts": {
