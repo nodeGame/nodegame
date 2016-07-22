@@ -124,6 +124,7 @@ $npm_path install smoosh
 $npm_path install ya-csv
 $npm_path install commander
 $npm_path install ultimatum-game
+$npm_path install nodegame-game-template
 
 cd node_modules
 

@@ -103,14 +103,9 @@ set -e
 git clone https://github.com/nodeGame/nodegame.git
 cd nodegame
 
-# Install the dependencies.
+# Install npm dependencies.
 $npm_path install
-#$npm_path install smoosh
-#$npm_path install ya-csv
-#$npm_path install commander
-#$npm_path install fs-extra
-#$npm_path install sorted-object
-mkdir -p node_modules
+# Install git dependencies.
 cd node_modules
 git clone https://github.com/nodeGame/nodegame-client.git
 git clone https://github.com/nodeGame/nodegame-server.git

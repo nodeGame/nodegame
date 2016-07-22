@@ -9,8 +9,7 @@
 # of modules below).
 gitmodules="nodegame-window nodegame-widgets JSUS NDDB shelf.js "\
 "nodegame-client nodegame-server descil-mturk nodegame-db nodegame-mongodb "\
-"nodegame-requirements nodegame-monitor"
-npmmodules="smoosh ya-csv commander docker"
+"nodegame-requirements nodegame-monitor nodegame-game-template"
 
 # Usage information.
 read -r -d '' usage_info <<EOT
@@ -83,12 +82,8 @@ else
 fi
 
 # Install the dependencies.
-mkdir -p node_modules
 
 # NPM dependencies.
-#for module in $npmmodules
-#do  npm install "$module"
-#done
 npm install
 
 # GitHub dependencies.
