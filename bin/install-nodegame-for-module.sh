@@ -86,9 +86,10 @@ fi
 mkdir -p node_modules
 
 # NPM dependencies.
-for module in $npmmodules
-do  npm install "$module"
-done
+#for module in $npmmodules
+#do  npm install "$module"
+#done
+npm install
 
 # GitHub dependencies.
 cd node_modules
