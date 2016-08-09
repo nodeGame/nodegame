@@ -91,12 +91,12 @@ program
 
     // Connect phantoms. 
 
-    .option('-p, --phantoms [channel]',
+    .option('-p, --phantoms <channel>',
             'Connect phantoms to the specified channel')
-    .option('-n, --nClients [n]',
-            'Sets the number of clients phantoms to connect')
-    .option('-t, --clientType [t]',
-            'Sets the client type of connecting phantoms')
+    .option('-n, --nClients <n>',
+            'Sets the number of clients phantoms to connect (default: 4)')
+    .option('-t, --clientType <t>',
+            'Sets the client type of connecting phantoms (default: autoplay)')
     .option('-T, --runTests',
             'Run tests after all phantoms have reached game over ' +
             '(overwrites settings.js in test/ folder')

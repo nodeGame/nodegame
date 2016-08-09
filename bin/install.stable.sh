@@ -120,11 +120,9 @@ $npm_path install nodegame-mongodb
 $npm_path install nodegame-generator
 $npm_path install nodegame-requirements
 $npm_path install nodegame-monitor
-$npm_path install smoosh
-$npm_path install ya-csv
-$npm_path install commander
-$npm_path install ultimatum-game
 $npm_path install nodegame-game-template
+$npm_path install ultimatum-game
+
 
 cd node_modules
 
@@ -132,7 +130,7 @@ cd node_modules
 create_generator_conf
 
 # Link to nodegame-generator executable.
-ln -s nodegame-generator/bin/nodegame ../bin/
+ln -s ../node_modules/nodegame-generator/bin/nodegame ../bin/
 
 # Entering nodegame-server directory.
 cd nodegame-server
