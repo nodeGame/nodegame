@@ -1,37 +1,41 @@
 #!/bin/bash
 #
 # Hook script to clean up code and build docs.
+# Only .js files are checked.
 # Called by "git commit" with no arguments.
 # The hook should exit with non-zero status if it wants to stop the commit.
 
 # Loop over staged files and clean them up.
 while IFS= read -rd '' file
 do
-    echo "Checking: '$file'"
-
-    len1=`wc -c < "$file"`
-
-    # Remove trailing whitespace on lines.
-    sed -i 's/\s\+$//' "$file"
-    len2=`wc -c < "$file"`
-    [ $len1 != $len2 ] && echo "Removed trailing whitespace in '$file'."
-    len1=$len2
-
-    # Remove leading and trailing blank lines, ensure that file ends in newline.
-    sed -i '/./,$!d;:a;/^\n*$/{$d;N;};/\n$/ba;$a\' "$file"
-    len2=`wc -c < "$file"`
-    [ $len1 != $len2 ] && echo "Removed surrounding empty lines in '$file'."
-    len1=$len2
-
-    # Remove trailing empty lines.
-    sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "$file"
-    len2=`wc -c < "$file"`
-    [ $len1 != $len2 ] && echo "Removed trailing whitespace in '$file'."
-    len1=$len2
 
     # Special checks for JavaScript sources:
-    if [[ $file == *.js && $file != public/* && $file != docs/* && $file != build/* ]]
+    if [[ $file == *.js && $file != *.min.js && $file != public/* && $file != docs/* && $file != build/* ]]
     then
+
+        echo "Checking: '$file'"
+
+        len1=`wc -c < "$file"`
+
+        # Remove trailing whitespace on lines.
+        sed -i 's/\s\+$//' "$file"
+        len2=`wc -c < "$file"`
+        [ $len1 != $len2 ] && echo "Removed trailing whitespace in '$file'."
+        len1=$len2
+
+        # Remove leading and trailing blank lines, ensure that file ends in newline.
+        sed -i '/./,$!d;:a;/^\n*$/{$d;N;};/\n$/ba;$a\' "$file"
+        len2=`wc -c < "$file"`
+        [ $len1 != $len2 ] && echo "Removed surrounding empty lines in '$file'."
+        len1=$len2
+
+        # Remove trailing empty lines.
+        sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "$file"
+        len2=`wc -c < "$file"`
+        [ $len1 != $len2 ] && echo "Removed trailing whitespace in '$file'."
+        len1=$len2
+
+
         # Check for tabs.
         if grep -q $'\t' "$file"
         then
