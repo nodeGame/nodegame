@@ -44,13 +44,13 @@ do
         fi
 
         # Remove debugger statements which are alone on a line.
-        sed -i '/^\s*debugger;$/d' "$file"
+        sed -i '/^\s*debugger;\{0,1\}$/d' "$file"
         len2=`wc -c < "$file"`
         [ $len1 != $len2 ] && echo "Removed debugger statements in '$file'."
         len1=$len2
 
         # Check for debugger statements which are not alone on a line.
-        if grep -q 'debugger;' "$file"
+        if grep -q 'debugger' "$file"
         then
             echo "ABORT: Found complicated debugger statement in '$file'!"
             exit 1
