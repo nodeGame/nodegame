@@ -8,11 +8,13 @@
  * http://www.nodegame.org
  */
 
+"use strict";
+
 // Modules.
 var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
-
+var J = require('JSUS').JSUS;
 // Load commander.
 var program = require('commander');
 
@@ -28,9 +30,12 @@ var sn;
 // ServerNode options.
 var options;
 
+// Conf file for all variables.
+var confFile;
+
 // Other local options.
-var confDir, logDir, debug, infoQuery;
-var nClients, clientType, killServer;
+var confDir, logDir, gamesDir, debug, infoQuery, runTests;
+var nClients, clientType, killServer, auth, wait;
 
 // Warn message.
 var ignoredOptions;
@@ -73,11 +78,11 @@ program
 
     // Specify inline options (more limited than a conf file, but practical).
 
-    .option('-c, --confDir [confDir]',
+    .option('-c, --confDir <confDir>',
             'Sets the configuration directory')
-    .option('-l, --logDir [logDir]',
+    .option('-l, --logDir <logDir>',
             'Sets the log directory')
-    .option('-g, --gamesDir [gamesDir]',
+    .option('-g, --gamesDir <gamesDir>',
             'Sets the games directory')
     .option('-d, --debug',
             'Enables the debug mode')
@@ -89,7 +94,7 @@ program
             'Starts the server with SSL encryption')
 
 
-    // Connect phantoms. 
+    // Connect phantoms.
 
     .option('-p, --phantoms <channel>',
             'Connect phantoms to the specified channel')
@@ -102,6 +107,11 @@ program
             '(overwrites settings.js in test/ folder')
     .option('-k, --killServer',
             'Kill server after all phantoms have reached game over')
+    .option('-a --auth [option]',
+            'Phantoms pass through /auth/. Option: createNew|nextAvailable|' +
+            'code|id:code&pwd:password. Default: nextAvailable.')
+    .option('-w --wait [milliseconds]',
+            'Waits before connecting the next phantom. Default: 1000')
 
 
     .parse(process.argv);
@@ -129,13 +139,13 @@ else {
 
         // Additional conf directory.
         confDir: confDir,
-        
+
         // Log Dir
         logDir: logDir,
-        
+
         servernode: function(servernode) {
             // Special configuration for the ServerNode object.
-            
+
             // Adds a new game directory (Default is nodegame-server/games).
             servernode.gamesDirs.push(gamesDir);
             // Sets the debug mode, exceptions will be thrown.
@@ -201,7 +211,7 @@ if (program.build) {
         var dir, J, info, module, out;
 
         out = 'nodegame-full.js';
-        J = require('JSUS').JSUS;
+
         modules = {
             window: 'window',
             client: 'client',
@@ -212,7 +222,7 @@ if (program.build) {
         info = require(J.resolveModuleDir('nodegame-server', __dirname) +
                              'bin/info.js');
 
-        len = program.build.length; 
+        len = program.build.length;
         if (!len) {
             program.build = [ 'client' ];
         }
@@ -220,7 +230,7 @@ if (program.build) {
              // Client will be done anyway.
             program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
         }
-        
+
         // Starting build.
         i = -1, len = program.build.length;
         for ( ; ++i < len ; ) {
@@ -234,8 +244,8 @@ if (program.build) {
                 console.log('NDDB does not require build.');
                 continue;
             }
-            
-            opts = { all: true, clean: true };                
+
+            opts = { all: true, clean: true };
 
             info.build[module](opts);
             console.log('');
@@ -250,7 +260,7 @@ if (program.build) {
                    info.serverDir.build + out);
         console.log(info.serverDir.build + out + ' rebuilt.');
         console.log('');
-        
+
     })(program.build);
 }
 
@@ -267,16 +277,16 @@ else if ('string' === typeof program.ssl) {
             printErr('ssl directory not found: ' + dir);
             return;
         }
-        
+
         key = dir + 'private.key';
         if (!fs.existsSync(key)) {
             printErr('ssl private key not found: ' + key);
-            return;           
+            return;
         }
         cert = dir + 'certificate.pem';
         if (!fs.existsSync(cert)) {
             printErr('ssl certificate not found: ' + cert);
-            return;          
+            return;
         }
 
         ssl = {};
@@ -311,6 +321,68 @@ if (program.killServer) {
     if (!program.phantoms) ignoredOptions.push('--killServer');
     else killServer = true;
 }
+if (program.wait) {
+    if (!program.phantoms) {
+        ignoredOptions.push('--wait');
+    }
+    else {
+        if (true === program.wait) {
+            wait = 1000;
+        }
+        else {
+            wait = J.isInt(program.wait, 0);
+            if (false === wait) {
+                printErr('--wait must be a positive number or undefined. ' +
+                         'Found:' + program.wait);
+                process.exit();
+            }
+        }
+    }
+}
+if (program.auth) {
+    if (!program.phantoms) {
+        ignoredOptions.push('--auth');
+    }
+    else if ('string' === typeof program.auth) {
+
+        auth = (function(idIdx, pwdIdx) {
+            var auth;
+            idIdx = program.auth.indexOf('id:');
+            if (idIdx === 0) {
+                pwdIdx = program.auth.indexOf('&pwd:');
+                if (pwdIdx !== -1) {
+                    auth = {
+                        id: program.auth.substr(3, (pwdIdx-3)),
+                        pwd: program.auth.substr(pwdIdx+5)
+                    }
+                }
+                else {
+                    printErr('--auth must be a client id or id and ' +
+                             'pwd in the form "id:123&pwd:456"')
+                    process.exit();
+                }
+            }
+            else if (program.auth === 'new') {
+                auth = 'createNew';
+            }
+            else if (program.auth === 'next') {
+                auth = 'nextAvailable';
+            }
+            else {
+                auth = program.auth;
+            }
+            return auth;
+        })();
+    }
+    else if ('boolean' === typeof program.auth) {
+        auth = 'nextAvailable';
+    }
+    else if ('number' === typeof program.auth ||
+             'object' === typeof program.auth) {
+
+        auth = program.auth;
+    }
+}
 
 // Print warnings, if any.
 printIgnoredOptions();
@@ -319,7 +391,9 @@ printIgnoredOptions();
 sn = new ServerNode(options);
 
 sn.ready(function() {
-    var i, phantoms, handleGameover;
+    var channel;
+    var i, config, phantoms;
+    var startPhantom, handleGameover;
     var gameName, gameDir, queryString;
     var numFinished;
 
@@ -327,32 +401,21 @@ sn.ready(function() {
     if (!program.phantoms) return;
 
     gameName = program.phantoms;
-    if (!sn.channels[gameName]) {
+    channel = sn.channels[gameName];
+    if (!channel) {
         printErr('channel ' + gameName + ' was not found.');
         if (killServer) process.exit();
         return;
     }
+
+    if (auth && !channel.gameInfo.auth.enabled) {
+        printErr('auth option enabled, but channel does not support it.');
+        process.exit();
+    }
+
     gameDir = sn.channels[gameName].getGameDir();
-    
-    if (clientType) {
-        queryString = '?clientType=' + clientType;
-    }
 
-    phantoms = [];
-    for (i = 0; i < nClients; ++i) {
-        console.log('Connecting phantom #', i+1, '/', nClients);
-        phantoms[i] = sn.channels[gameName].connectPhantom({
-            queryString: queryString
-        });
-    }
-
-    // TODO: Listen for room creation instead of timeout.
-    //setTimeout(function() {
-    //    var node;
-    //    node = sn.channels.ultimatum.gameRooms["ultimatum1"].node;
-    //    node.events.ee.ng.on(
-    //        'GAME_OVER', function() {console.log('The game is over now.');});
-    //}, 5000);
+    if (clientType) queryString = '?clientType=' + clientType;
 
     if (killServer || runTests) {
         handleGameover = function() {
@@ -384,18 +447,45 @@ sn.ready(function() {
             }
             else if (killServer) process.exit();
         };
+    }
 
-        // Wait for all PhantomJS processes to exit, then stop the server.
-        numFinished = 0;
-        for (i = 0; i < nClients; ++i) {
+    
+    config = { queryString: queryString, auth: auth };
+    startPhantom = function(i) {
+        phantoms[i] = channel.connectPhantom(config);
+        if ('undefined' !== typeof handleGameOver) {
+            // Wait for all PhantomJS processes to exit, then stop the server.
             phantoms[i].on('exit', function(code) {
                 numFinished ++;
-                if (numFinished == nClients) {
+                if (numFinished === nClients) {
                     handleGameover();
                 }
             });
         }
+    };
+
+    phantoms = [], numFinished = 0;
+    for (i = 0; i < nClients; ++i) {
+        console.log('Connecting phantom #', i+1, '/', nClients);
+        if (i > 0 && wait) {
+            (function(i) { 
+                setTimeout(function() { startPhantom(i); }, wait * i);
+            })(i);
+        }
+        else {
+            startPhantom(i);
+        }
     }
+
+    // TODO: Listen for room creation instead of timeout.
+    //setTimeout(function() {
+    //    var node;
+    //    node = sn.channels.ultimatum.gameRooms["ultimatum1"].node;
+    //    node.events.ee.ng.on(
+    //        'GAME_OVER', function() {console.log('The game is over now.');});
+    //}, 5000);
+
+
 });
 
 // ## Helper functions.
