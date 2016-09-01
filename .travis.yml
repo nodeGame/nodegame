@@ -1,4 +1,4 @@
-sudo: false
+udo: false
 language: node_js
 node_js:
   - 0.12
@@ -12,6 +12,7 @@ before_install:
 
 install:
 # Share node_modules with nodeGame.
+  - mkdir -p nodegame node_modules
 # If "install-nodegame-for-module.sh" is called before "npm install",
 # it gives an error.
   - npm install
@@ -22,7 +23,7 @@ script:
 # Add specific tests here.
 
 # Test Ultimatum game.
-  - cd games
+  - cd nodegame/games
   - git clone https://github.com/nodeGame/ultimatum.git
   - cd ultimatum
   - ./bin/run-standalone-test.sh
