@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 2.1.0
+- Fixed launcher.
+
 # 2.0.2
 - Fixed install.stable script.
 - Fixing launcher options. 
