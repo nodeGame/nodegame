@@ -225,6 +225,7 @@ if (program.build) {
             JSUS: 'JSUS',
             NDDB: 'NDDB'
         };
+
         info = require(J.resolveModuleDir('nodegame-server', __dirname) +
                              'bin/info.js');
 
@@ -233,7 +234,7 @@ if (program.build) {
             program.build = [ 'client' ];
         }
         else if (len === 1 && program.build[0] === 'all') {
-             // Client will be done anyway.
+            // Client will be done anyway.
             program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
         }
 
