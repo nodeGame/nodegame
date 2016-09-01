@@ -15,6 +15,8 @@ var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
 var J = require('JSUS').JSUS;
+var NDDB;
+
 // Load commander.
 var program = require('commander');
 
@@ -36,6 +38,9 @@ var confFile;
 // Other local options.
 var confDir, logDir, gamesDir, debug, infoQuery, runTests;
 var nClients, clientType, killServer, auth, wait;
+var codesDb;
+
+var cert, key;
 
 // Warn message.
 var ignoredOptions;
@@ -108,8 +113,9 @@ program
     .option('-k, --killServer',
             'Kill server after all phantoms have reached game over')
     .option('-a --auth [option]',
-            'Phantoms pass through /auth/. Option: createNew|nextAvailable|' +
-            'code|id:code&pwd:password. Default: nextAvailable.')
+            'Phantoms pass through /auth/. Options: createNew|new|' +
+            'nextAvailable|next|code|id:code&pwd:password|file:path/to/file. ' +
+            'Default: "new".')
     .option('-w --wait [milliseconds]',
             'Waits before connecting the next phantom. Default: 1000')
 
@@ -118,7 +124,7 @@ program
 
 
 if (program.confFile) {
-    if (!fs.existsSync(progam.ConfFile)) {
+    if (!fs.existsSync(program.ConfFile)) {
         return printErr('--confFile ' + program.confFile + ' not found.');
     }
     options = require(program.confFile);
@@ -208,7 +214,7 @@ else {
 if (program.build) {
     (function() {
         var i, len, opts, modules;
-        var dir, J, info, module, out;
+        var info, module, out;
 
         out = 'nodegame-full.js';
 
@@ -354,11 +360,11 @@ if (program.auth) {
                     auth = {
                         id: program.auth.substr(3, (pwdIdx-3)),
                         pwd: program.auth.substr(pwdIdx+5)
-                    }
+                    };
                 }
                 else {
                     printErr('--auth must be a client id or id and ' +
-                             'pwd in the form "id:123&pwd:456"')
+                             'pwd in the form "id:123&pwd:456"');
                     process.exit();
                 }
             }
@@ -368,6 +374,16 @@ if (program.auth) {
             else if (program.auth === 'next') {
                 auth = 'nextAvailable';
             }
+            else if (program.auth.indexOf('file:') === 0) {
+                NDDB = require('NDDB').NDDB;
+                codesDb = new NDDB();
+                codesDb.loadSync(program.auth.substr(5));
+                if (!codesDb.size()) {
+                    printErr('--auth no auth codes found: program.auth');
+                    process.exit();
+                }
+                codesDb = codesDb.db;
+            }
             else {
                 auth = program.auth;
             }
@@ -375,7 +391,7 @@ if (program.auth) {
         })();
     }
     else if ('boolean' === typeof program.auth) {
-        auth = 'nextAvailable';
+        auth = 'createNew';
     }
     else if ('number' === typeof program.auth ||
              'object' === typeof program.auth) {
@@ -392,7 +408,7 @@ sn = new ServerNode(options);
 
 sn.ready(function() {
     var channel;
-    var i, config, phantoms;
+    var i, phantoms;
     var startPhantom, handleGameover;
     var gameName, gameDir, queryString;
     var numFinished;
@@ -419,7 +435,7 @@ sn.ready(function() {
 
     if (killServer || runTests) {
         handleGameover = function() {
-            var command;
+            var command, testProcess;
 
             console.log();
             console.log(gameName + ' game has run successfully.');
@@ -450,10 +466,27 @@ sn.ready(function() {
     }
 
     
-    config = { queryString: queryString, auth: auth };
     startPhantom = function(i) {
+        var str, config;
+        str = 'Connecting phantom #' + (i+1) + '/' + nClients;
+        if (codesDb) {
+            config = { queryString: queryString, auth: codesDb[i] };
+        }
+        else {
+            config = { queryString: queryString, auth: auth };
+        }
+        if (config.auth) {
+            if (config.auth.id) {
+                str += ' id: ' + config.auth.id;
+                if (config.auth.pwd) str += ' pwd: ' + config.auth.pwd;
+            }
+            else {
+                str += ' ' + config.auth;
+            }
+        }
+        console.log(str);
         phantoms[i] = channel.connectPhantom(config);
-        if ('undefined' !== typeof handleGameOver) {
+        if ('undefined' !== typeof handleGameover) {
             // Wait for all PhantomJS processes to exit, then stop the server.
             phantoms[i].on('exit', function(code) {
                 numFinished ++;
@@ -466,7 +499,6 @@ sn.ready(function() {
 
     phantoms = [], numFinished = 0;
     for (i = 0; i < nClients; ++i) {
-        console.log('Connecting phantom #', i+1, '/', nClients);
         if (i > 0 && wait) {
             (function(i) { 
                 setTimeout(function() { startPhantom(i); }, wait * i);
@@ -504,7 +536,7 @@ function printErr(err) {
 }
 
 function writeSettingsFile(gameDir) {
-    var testProcess, settings, settingsFile, bak;
+    var settings, settingsFile, bak;
     settings = 'module.exports = { numPlayers: ' + nClients + ' };';
     settingsFile = gameDir + 'test/settings.js';
     // Make a backup of existing settings file, if found.
