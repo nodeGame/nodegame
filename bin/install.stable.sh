@@ -102,7 +102,7 @@ npm install nodegame
 
 # Move nodegame modules outsite node_modules dir.
 mv node_modules/nodegame ./
-rm node_modules -r
+rm -r node_modules
 
 cd nodegame
 
