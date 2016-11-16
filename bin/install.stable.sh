@@ -4,7 +4,8 @@
 # MIT Licensed
 
 # Current dir.
-install_dir=${PWD##*/}
+#install_dir=${PWD##*/} # was.
+install_dir=${PWD}
 
 # Assumes to be executed inside the node_modules dir.
 create_generator_conf() {
@@ -13,7 +14,7 @@ create_generator_conf() {
     echo -e "{
     \"author\": \"\",
     \"email\": \"\",
-    \"gamesFolder\": \"/$install_dir/nodegame/games/\"
+    \"gamesFolder\": \"$install_dir/nodegame/games/\"
 }" > nodegame-generator/conf/generator.conf.json
 }
 
