@@ -9,8 +9,8 @@ echo_and_pull() {
 
 GAMES=(ultimatum)
 MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
-  nodegame-requirements nodegame-monitor JSUS NDDB shelf.js descil-mturk
-  nodegame-db nodegame-mongodb)
+  nodegame-requirements nodegame-game-template nodegame-monitor JSUS NDDB
+  shelf.js descil-mturk nodegame-db nodegame-mongodb nodegame-generator)
 
 # Change the current working directory to the parent directory of the script,
 # i.e. the nodegame directory. Using the below command instead of simply
