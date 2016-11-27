@@ -31,6 +31,7 @@ call npm install nodegame-mongodb || exit /b
 call npm install nodegame-generator || exit /b
 call npm install nodegame-requirements || exit /b
 call npm install nodegame-monitor || exit /b
+call npm install nodegame-game-template || exit /b
 call npm install smoosh || exit /b
 call npm install ya-csv || exit /b
 call npm install commander || exit /b

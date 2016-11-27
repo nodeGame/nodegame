@@ -17,6 +17,7 @@ git clone https://github.com/nodeGame/nodegame-client.git || exit /b
 git clone https://github.com/nodeGame/nodegame-server.git || exit /b
 git clone https://github.com/nodeGame/nodegame-window.git || exit /b
 git clone https://github.com/nodeGame/nodegame-widgets.git || exit /b
+git clone https://github.com/nodeGame/nodegame-game-template.git || exit /b
 git clone https://github.com/nodeGame/nodegame-requirements.git || exit /b
 git clone https://github.com/nodeGame/nodegame-monitor.git || exit /b
 git clone https://github.com/nodeGame/JSUS.git || exit /b

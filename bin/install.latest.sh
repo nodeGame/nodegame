@@ -113,6 +113,7 @@ git clone https://github.com/nodeGame/nodegame-server.git
 git clone https://github.com/nodeGame/nodegame-window.git
 git clone https://github.com/nodeGame/nodegame-widgets.git
 git clone https://github.com/nodeGame/nodegame-requirements.git
+git clone https://github.com/nodeGame/nodegame-game-template.git
 git clone https://github.com/nodeGame/nodegame-monitor.git
 git clone https://github.com/nodeGame/JSUS.git
 git clone https://github.com/nodeGame/NDDB.git
