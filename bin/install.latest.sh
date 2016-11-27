@@ -174,6 +174,8 @@ $node_path make build-client -a -o nodegame-full
 # Install ultimatum game.
 cd ../../..
 git clone https://github.com/nodeGame/ultimatum games/ultimatum
+cd games/ultimatum
+link_deps fs-extra
 
 
 # Execute the following commands to try out the ultimatum game.

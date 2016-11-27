@@ -11,7 +11,16 @@ git clone https://github.com/nodeGame/nodegame.git || exit /b
 cd nodegame || exit /b
 
 :: Install the dependencies.
-mkdir node_modules || exit /b
+
+:: The most recent nodejs installer has a bug, this line fixes it.
+:: Solution taken from http://stackoverflow.com/q/25093276
+if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
+
+:: Install non-nodeGame dependencies.
+call npm install || exit /b
+
+:: Fetch nodeGame modules.
+
 cd node_modules || exit /b
 git clone https://github.com/nodeGame/nodegame-client.git || exit /b
 git clone https://github.com/nodeGame/nodegame-server.git || exit /b
@@ -26,14 +35,6 @@ git clone https://github.com/nodeGame/shelf.js.git || exit /b
 git clone https://github.com/nodeGame/descil-mturk.git || exit /b
 git clone https://github.com/nodeGame/nodegame-db.git || exit /b
 git clone https://github.com/nodeGame/nodegame-mongodb.git || exit /b
-
-:: The most recent nodejs installer has a bug, this line fixes it.
-:: Solution taken from http://stackoverflow.com/q/25093276
-if not exist "%APPDATA%\npm" mkdir "%APPDATA%\npm" || exit /b
-
-call npm install smoosh || exit /b
-call npm install ya-csv || exit /b
-call npm install commander || exit /b
 
 :: Install sub-dependencies; link to tracked dependencies.
 
@@ -67,12 +68,13 @@ cd ../../../ || exit /b
 
 git clone https://github.com/nodeGame/ultimatum.git games/ultimatum || exit /b
 
+cd games/ultimatum || exit /b
+call:linkDeps fs-extra || exit /b
 
 :: Execute the following commands to try out the ultimatum game.
 
 :: Start the server.
 :: node launcher
-
 
 :: Open two browser tabs for two players at the address:
 :: http://localhost:8080/ultimatum/
