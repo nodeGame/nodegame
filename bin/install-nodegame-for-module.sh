@@ -105,7 +105,7 @@ do  git clone "https://github.com/nodeGame/${module}.git"
         npm install
         ;;
     nodegame-server)
-        link_deps JSUS NDDB shelf.js nodegame-widgets
+        link_deps JSUS NDDB shelf.js
         npm install
         # Patch express connect. (not needed in express 4).
         # patch \
