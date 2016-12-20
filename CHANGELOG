@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 3.5
+- Printing version on startup (launcher).
+
 # 3.2
 - Updated client and server.
 - Updated install script.
