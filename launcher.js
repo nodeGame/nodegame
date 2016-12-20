@@ -15,6 +15,7 @@ var fs = require('fs');
 var path = require('path');
 var exec = require('child_process').exec;
 var J = require('JSUS').JSUS;
+
 var NDDB;
 
 // Load commander.
@@ -403,6 +404,8 @@ if (program.auth) {
 
 // Print warnings, if any.
 printIgnoredOptions();
+
+console.log('nodeGame v.' + require('./package.json').version);
 
 // Start server, options parameter is optional.
 sn = new ServerNode(options);
