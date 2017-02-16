@@ -30,6 +30,7 @@ games/stopgo
 games/artex
 games/MiniSvo
 games/car-sharing
+games/DCL
 games_new/
 start/
 log/*.log
