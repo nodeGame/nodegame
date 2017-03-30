@@ -278,8 +278,9 @@ if ('boolean' === typeof program.ssl) {
     options.ssl = true;
 }
 else if ('string' === typeof program.ssl) {
-    program.ssl = (function(dir) {
+    options.ssl = (function(dir) {
         var ssl;
+
         dir = path.resolve(dir) + '/';
         if (!fs.existsSync(dir)) {
             printErr('ssl directory not found: ' + dir);
@@ -304,7 +305,7 @@ else if ('string' === typeof program.ssl) {
         return ssl;
 
     })(program.ssl);
-    if (!program.ssl) return;
+    if (!options.ssl) return;
 }
 
 if (program.nClients) {
