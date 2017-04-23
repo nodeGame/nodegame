@@ -1,7 +1,7 @@
 /**
  * # servernode.js
  *
- * Copyright(c) 2013 Stefano Balietti
+ * Copyright(c) 2017 Stefano Balietti <ste@nodegame.org>
  * MIT Licensed
  *
  * Configuration file for ServerNode in nodegame-server.
@@ -10,8 +10,11 @@
 module.exports = configure;
 
 function configure(servernode) {
-    // Nothing extra to configure.
+    // Extra configuration goes here, e.g.:
+    // servernode.port = 80;
+
     // Default configuration set already in:
     // node_modules/nodegame-server/conf/servernode.js
+
     return true;
 }
