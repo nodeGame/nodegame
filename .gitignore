@@ -16,6 +16,7 @@ Session.vim
 *~
 *.nddb
 _*
+LOG
 
 npm-debug.log
 node_modules/
@@ -25,6 +26,7 @@ descil.conf.js
 
 imgscore
 
+games/dictator
 games/meritocracy
 games/ultimatum
 games/stopgo
