@@ -75,7 +75,7 @@ program
     .description('Checkouts desired branch on all nodegame modules')
     .option('-v, --verbose', 'More verbose output')
     .action(function(env, options) {
-        let gitCheckout = function(repo, branch, verbose = true) {
+        let gitCheckout = function(repo, branch, verbose = false) {
             let mydir = NODE_MODULES_DIR + repo;
             let child = execFile(
                 'git',
@@ -83,12 +83,11 @@ program
                 { cwd: mydir },
                 (error, stdout, stderr) => {
                     if (error) {
-                        let err = `${repo} an error occurred:`;
-                        console.error(stderr);
-                        throw error;
+                        logList(repo + ' ' + stderr.trim());
                     }
-                    if (verbose) {
-                        console.log(`${repo}: ${stdout}`);
+                    else if (verbose) {
+                        logList('module ' + repo + ': ' +
+                                stdout.trim());
                     }
                 });
         }
