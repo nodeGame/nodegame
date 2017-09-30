@@ -17,9 +17,6 @@ const fs = require('fs');
 const execFile = require('child_process').execFile;
 const readline = require('readline');
 
-
-
-
 // nodeGame version.
 // var version = require('./package.json').version;
 var version = "4.0.0";
@@ -38,10 +35,19 @@ const N_MODULES = NODEGAME_MODULES.length;
 const GAMES_AVAILABLE_DIR = ROOT_DIR + 'games_available/';
 const GAMES_ENABLED_DIR = ROOT_DIR + 'games/';
 
-
 const logList = txt => {
     console.log('  - ' + txt);
 };
+
+// Print cool nodegame logo.
+
+// Print node version (npm too?).
+
+// Check if nodegame-4.0.0 exists (abort)
+
+// Check if node_modules exists (prompt continue?)
+
+// Install.
 
 // Create spinner.
 console.log('Installing nodeGame v.' + version);
@@ -59,9 +65,19 @@ let child = execFile(
             // Stop spinner.
             sp.stop();
             if (verbose) logList(stdout.trim());            
-            console.log('\nInstallation complete\n');       
+            console.log('\nInstallation complete\n');
+
+            // Move nodegame folder outside node_modules.
+            // Move node_modules inside nodegame-vXXX
+            // Move games inside games_available directory.
+            // Enabled ultimatum.
+            // Print final Information.
         }
     });
+
+
+// Helper stuff.
+////////////////
 
 // Kudos: cli-spinner package.
 
@@ -137,5 +153,3 @@ function Spinner(text) {
         readline.cursorTo(stream, 0);
     };    
 };
-
-//////////////////////////////////////////////////////////////////////
