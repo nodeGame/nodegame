@@ -12,6 +12,8 @@
 
 // Modules.
 
+const isWin = /^win/.test(process.platform);
+
 const path = require('path');
 const fs = require('fs');
 const execFile = require('child_process').execFile;
@@ -113,8 +115,9 @@ function doInstall() {
     sp.start();
 
     let child = execFile(
-            /^win/.test(process.platform) ? 'npm.cmd' : 'npm',
+        isWin ? 'npm.cmd' : 'npm',
         [ 'install', 'nodegame-test' ],
+        { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
             if (error) {
                 logList(stderr.trim());
@@ -243,13 +246,12 @@ function Spinner(text) {
         "⢄⢂⢁⡁⡈⡐⡠",
         "⢹⢺⢼⣸⣇⡧⡗⡏",
         "⣾⣽⣻⢿⡿⣟⣯⣷",
-        "⠁⠂⠄⡀⢀⠠⠐⠈",
-        "🌑🌒🌓🌔🌕🌝🌖🌗🌘🌚"
+        "⠁⠂⠄⡀⢀⠠⠐⠈"
     ];
 
     this.text = text || '';
 
-    this.chars = this.spinners[4].split('');
+    this.chars = this.spinners[isWin ? 0 : 4].split('');
 
     this.delay = 60;
 
