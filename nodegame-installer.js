@@ -18,12 +18,14 @@ const execFile = require('child_process').execFile;
 const readline = require('readline');
 
 // nodeGame version.
-// var version = require('./package.json').version;
-var version = "v4.0.0";
+const VERSION = "v4.0.0";
 
-const ROOT_DIR = process.cwd() + '/';
-const NODE_MODULES_DIR = ROOT_DIR + 'node_modules/';
-const INSTALL_DIR =  ROOT_DIR + 'nodegame-' + version;
+const NODEGAME_AND_VERSION = 'nodegame-' + VERSION;
+
+const ROOT_DIR = process.cwd()
+const NODE_MODULES_DIR = path.resolve(ROOT_DIR, 'node_modules');
+const INSTALL_DIR =  path.resolve(ROOT_DIR, NODEGAME_AND_VERSION);
+
 const NODEGAME_MODULES = [
     'nodegame-server', 'nodegame-client',
     'nodegame-window', 'nodegame-widgets',
@@ -33,19 +35,24 @@ const NODEGAME_MODULES = [
 ];
 const N_MODULES = NODEGAME_MODULES.length;
 
-const GAMES_AVAILABLE_DIR = ROOT_DIR + 'games_available/';
-const GAMES_ENABLED_DIR = ROOT_DIR + 'games/';
+const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
+                                         'games_available');
+const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
 
 const logList = txt => {
     console.log('  - ' + txt);
 };
 
-// Print cool nodegame logo.
+var verbose = false;
 
+printFinalInfo();
+return;
+
+// Print cool nodegame logo.
 
 console.log();
 console.log('  ***********************************************  ');
-console.log('  **    WELCOME TO NODEGAME ' + version + ' INSTALLER   **  ');
+console.log('  **    WELCOME TO NODEGAME ' + VERSION + ' INSTALLER   **  ');
 console.log('  ***********************************************  ');
 console.log();
 console.log('  nodeGame is a free and open source javascript');
@@ -58,7 +65,8 @@ console.log('  website: http://nodegame.org');
 console.log('  license: MIT');
 console.log('  mail:    info@nodegame.org');
 console.log('  twitter: @nodegameorg');
-console.log('  forum:   https://groups.google.com/forum/?fromgroups#!forum/nodegame');
+console.log('  forum:   https://groups.google.com/' +
+            'forum/?fromgroups#!forum/nodegame');
 
 // Print node and nodeGame version (npm too?).
 
@@ -67,7 +75,7 @@ console.log('  ----------------------------------------------');
 console.log();
 
 console.log('  node version:      ' + process.version);
-console.log('  nodeGame version:  ' + version);
+console.log('  nodeGame version:  ' + VERSION);
 console.log('  install directory: ' + INSTALL_DIR);
 console.log();
 
@@ -89,11 +97,14 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
             doInstall();
         }
         else {
-            console.error('  Installation aborted.');  
-            console.log();          
+            console.error('  Installation aborted.');
+            console.log();
         }
     });
     return;
+}
+else {
+    doInstall();
 }
 
 // Install.
@@ -103,7 +114,7 @@ function doInstall() {
     console.log('  Downloading and installing nodeGame packages.');
     var sp = new Spinner('  This might take a few minutes %s  ');
     sp.start();
-    
+
     let child = execFile(
         'npm',
         [ 'install', 'nodegame-test' ],
@@ -114,14 +125,28 @@ function doInstall() {
             else {
                 // Stop spinner.
                 sp.stop();
-                if (verbose) logList(stdout.trim());            
-                console.log('\nInstallation complete\n');
+
+                if (verbose) logList(stdout.trim());
+                console.log();
+                console.log('  Done! Now some finishing magics...');
 
                 // Move nodegame folder outside node_modules.
-                // Move node_modules inside nodegame-vXXX
-                // Move games inside games_available directory.
-                // Enabled ultimatum.
+
+                fs.renameSync(path.resolve(NODE_MODULES_DIR,
+                                           'nodegame'),
+                              INSTALL_DIR);
+
+                fs.renameSync(NODE_MODULES_DIR,
+                              path.resolve(INSTALL_DIR,
+                                           'node_modules'));
+
+                // Move games from node_modules.
+
+                copyGameFromNodeModules('ultimatum-game');
+
                 // Print final Information.
+
+                printFinalInfo();
             }
     });
 }
@@ -129,6 +154,51 @@ function doInstall() {
 // Helper stuff.
 ////////////////
 
+
+function printFinalInfo() {
+    console.log();
+    console.log('  Installation complete!');
+    console.log('  ----------------------------------------------');
+
+    console.log('  Enter the installation directory:');
+    console.log('    cd ' + NODEGAME_AND_VERSION);
+    console.log();
+
+    console.log('  Start the server:');
+    console.log('    node launcher.js');
+    console.log();
+
+    console.log('  Open two browser tabs at the address:');
+    console.log('    http://localhost:8080/ultimatum');
+    console.log();
+
+    console.log('  Open another tab with the monitor interface:');
+    console.log('    http://localhost:8080/ultimatum/monitor');
+    console.log();
+
+    console.log('  Create a new game:');
+    console.log('    bin/nodegame create-game mygame');
+    console.log();
+
+    console.log('  Please cite as:');
+    console.log('  ----------------------------------------------');
+    console.log('    Balietti (2017) "nodeGame: Real-time, synchronous, ');
+    console.log('    online experiments in the browser." ' +
+                'Behavior Research Methods');
+    console.log();
+}
+
+function copyGameFromNodeModules(game, enable = true) {
+    // Move game from node_modules into  games_available directory.
+    fs.renameSync(path.resolve(INSTALL_DIR, 'node_modules', game),
+                  path.resolve(GAMES_AVAILABLE_DIR, game));
+
+    if (!enable) return;
+
+    // Enable game.
+    fs.symlinkSync(path.resolve(GAMES_AVAILABLE_DIR, game),
+                   path.resolve(GAMES_ENABLED_DIR, game));
+}
 
 function confirm(msg, callback) {
     var rl = readline.createInterface({
@@ -190,7 +260,7 @@ function Spinner(text) {
         this.clearLine(this.stream);
         this.stream.write(msg);
     };
-    
+
     this.stream = process.stdout;
 
     this.start = function() {
@@ -209,11 +279,11 @@ function Spinner(text) {
     this.stop = function(clear) {
         clearInterval(this.id);
         this.id = undefined;
-        if (clear) this.clearLine(this.stream);        
+        if (clear) this.clearLine(this.stream);
     };
 
     this.clearLine = function(stream) {
         readline.clearLine(stream, 0);
         readline.cursorTo(stream, 0);
-    };    
+    };
 };
