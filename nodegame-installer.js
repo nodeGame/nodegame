@@ -45,9 +45,6 @@ const logList = txt => {
 
 var verbose = false;
 
-printFinalInfo();
-return;
-
 // Print cool nodegame logo.
 
 console.log();
@@ -112,11 +109,11 @@ else {
 function doInstall() {
     // Create spinner.
     console.log('  Downloading and installing nodeGame packages.');
-    var sp = new Spinner('  This might take a few minutes %s  ');
+    let sp = new Spinner('  This might take a few minutes %s  ');
     sp.start();
 
     let child = execFile(
-        'npm',
+            /^win/.test(process.platform) ? 'npm.cmd' : 'npm',
         [ 'install', 'nodegame-test' ],
         (error, stdout, stderr) => {
             if (error) {
@@ -133,7 +130,7 @@ function doInstall() {
                 // Move nodegame folder outside node_modules.
 
                 fs.renameSync(path.resolve(NODE_MODULES_DIR,
-                                           'nodegame'),
+                                           'nodegame-test'),
                               INSTALL_DIR);
 
                 fs.renameSync(NODE_MODULES_DIR,

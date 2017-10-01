@@ -39,6 +39,8 @@ games_available/
 start/
 log/*.log
 
+bin/nodegame
+
 manifest.yml
 
 private
