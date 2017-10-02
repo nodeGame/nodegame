@@ -177,7 +177,7 @@ function doInstall() {
 				     author: "",
 				     email: "",
 				     gamesFolder: GAMES_AVAILABLE_DIR
-				 }));
+				 }, 4));
 		
 		// Move games from node_modules.
 
