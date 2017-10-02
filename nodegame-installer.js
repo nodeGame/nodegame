@@ -27,6 +27,7 @@ const NODEGAME_AND_VERSION = 'nodegame-' + VERSION;
 const ROOT_DIR = process.cwd()
 const NODE_MODULES_DIR = path.resolve(ROOT_DIR, 'node_modules');
 const INSTALL_DIR =  path.resolve(ROOT_DIR, NODEGAME_AND_VERSION);
+const INSTALL_DIR_MODULES = path.resolve(INSTALL_DIR, 'node_modules');
 
 const NODEGAME_MODULES = [
     'nodegame-server', 'nodegame-client',
@@ -46,6 +47,8 @@ const logList = txt => {
 };
 
 var verbose = false;
+
+var nodeModulesExisting = false;
 
 // Print cool nodegame logo.
 
@@ -78,10 +81,22 @@ console.log('  nodeGame version:  ' + VERSION);
 console.log('  install directory: ' + INSTALL_DIR);
 console.log();
 
+// Check node version is >
+
+var nodeVersion = process.versions.node.split('.');
+if (parseInt(nodeVersion[0], 10) < 4) {
+    console.error('  Error: node version >= 4.x is required.');
+    console.error('  Please upgrade your Node.Js installation, ' +
+                'visit: http://nodejs.org');
+    console.log();
+    return;
+}
+
 // Check if nodegame-4.0.0 exists (abort)
 
 if (fs.existsSync(INSTALL_DIR)) {
     console.error('  Error: installation directory already existing.');
+    console.log();
     return;
 }
 
@@ -92,6 +107,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
     confirm('  Continue? [y/n] ', function(ok) {
         if (ok) {
             process.stdin.destroy();
+            nodeModulesExisting = true;
             console.log();
             doInstall();
         }
@@ -136,11 +152,34 @@ function doInstall() {
                                            'nodegame-test'),
                               INSTALL_DIR);
 
-                fs.renameSync(NODE_MODULES_DIR,
-                              path.resolve(INSTALL_DIR,
-                                           'node_modules'));
+                // Old npms put already all modules under nodegame.
+                if (!fs.existsSync(INSTALL_DIR_MODULES)) {  
+                    fs.renameSync(NODE_MODULES_DIR,
+                                  INSTALL_DIR_MODULES);
+                }
+                else if (!nodeModulesExisting) {
+                    fs.rmdirSync(NODE_MODULES_DIR);
+                }
 
-                // Move games from node_modules.
+                // nodeGame generator: make link and store conf.
+
+                makeLink(path.resolve(INSTALL_DIR_MODULES,
+                                      'nodegame-generator',
+                                      'bin', 'nodegame'),
+                         path.resolve(INSTALL_DIR, 'bin', 'nodegame'));
+		
+			 
+                fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
+					      'nodegame-generator',
+					      'conf',
+					      'generator.conf.json'),
+				 JSON.stringify({
+				     author: "",
+				     email: "",
+				     gamesFolder: GAMES_AVAILABLE_DIR
+				 }));
+		
+		// Move games from node_modules.
 
                 copyGameFromNodeModules('ultimatum-game');
 
@@ -188,7 +227,14 @@ function printFinalInfo() {
     console.log();
 }
 
-function copyGameFromNodeModules(game, enable = true) {
+
+function makeLink(from, to) {
+    fs.symlinkSync(from, to, isWin ? 'junction' : 'file');
+}
+
+function copyGameFromNodeModules(game, enable) {
+    enable = 'undefined' === typeof enable ? true : enable;
+
     // Move game from node_modules into  games_available directory.
     fs.renameSync(path.resolve(INSTALL_DIR, 'node_modules', game),
                   path.resolve(GAMES_AVAILABLE_DIR, game));
@@ -196,9 +242,8 @@ function copyGameFromNodeModules(game, enable = true) {
     if (!enable) return;
 
     // Enable game.
-    fs.symlinkSync(path.resolve(GAMES_AVAILABLE_DIR, game),
-                   path.resolve(GAMES_ENABLED_DIR, game),
-                   isWin ? 'junction' : 'file');
+    makeLink(path.resolve(GAMES_AVAILABLE_DIR, game),
+             path.resolve(GAMES_ENABLED_DIR, game));
 }
 
 function confirm(msg, callback) {
