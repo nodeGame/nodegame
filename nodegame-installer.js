@@ -197,7 +197,8 @@ function copyGameFromNodeModules(game, enable = true) {
 
     // Enable game.
     fs.symlinkSync(path.resolve(GAMES_AVAILABLE_DIR, game),
-                   path.resolve(GAMES_ENABLED_DIR, game));
+                   path.resolve(GAMES_ENABLED_DIR, game),
+                   isWin ? 'junction' : 'file');
 }
 
 function confirm(msg, callback) {
@@ -216,6 +217,8 @@ function confirm(msg, callback) {
 // Kudos: cli-spinner package.
 
 function Spinner(text) {
+    var that;
+    that = this;
 
     this.spinners = [
         "|/-\\",
@@ -262,6 +265,8 @@ function Spinner(text) {
 
     this.stream = process.stdout;
 
+    this.enabled = this.stream.isTTY && !process.env.CI;
+    
     this.start = function() {
         var current = 0;
         var self = this;
@@ -278,11 +283,15 @@ function Spinner(text) {
     this.stop = function(clear) {
         clearInterval(this.id);
         this.id = undefined;
-        if (clear) this.clearLine(this.stream);
+        if (clear && this.enabled) this.clearLine(this.stream);
     };
 
     this.clearLine = function(stream) {
+        if (!this.enabled) return;
         readline.clearLine(stream, 0);
         readline.cursorTo(stream, 0);
+
+        // that.stream.clearLine();
+        // that.stream.cursorTo(0);
     };
 };
