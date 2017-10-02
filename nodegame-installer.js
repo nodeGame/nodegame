@@ -264,8 +264,6 @@ function Spinner(text) {
     };
 
     this.stream = process.stdout;
-
-    this.enabled = this.stream.isTTY && !process.env.CI;
     
     this.start = function() {
         var current = 0;
@@ -287,11 +285,7 @@ function Spinner(text) {
     };
 
     this.clearLine = function(stream) {
-        if (!this.enabled) return;
         readline.clearLine(stream, 0);
         readline.cursorTo(stream, 0);
-
-        // that.stream.clearLine();
-        // that.stream.cursorTo(0);
     };
 };
