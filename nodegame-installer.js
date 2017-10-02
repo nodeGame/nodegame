@@ -166,7 +166,8 @@ function doInstall() {
                 makeLink(path.resolve(INSTALL_DIR_MODULES,
                                       'nodegame-generator',
                                       'bin', 'nodegame'),
-                         path.resolve(INSTALL_DIR, 'bin', 'nodegame'));
+                         path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
+			 'file');
 		
 			 
                 fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
@@ -228,8 +229,14 @@ function printFinalInfo() {
 }
 
 
-function makeLink(from, to) {
-    fs.symlinkSync(from, to, isWin ? 'junction' : 'file');
+function makeLink(from, to, type) {
+    if (isWin) {
+        if (type === 'file') fs.linkSync(from, to, 'file');
+        else fs.symlinkSync(from, to, 'junction');
+    }
+    else {
+        fs.symlinkSync(from, to);
+    }
 }
 
 function copyGameFromNodeModules(game, enable) {
