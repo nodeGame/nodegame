@@ -429,6 +429,9 @@ if (program.build) {
 
     })(program.build);
 }
+else {
+    startServer();
+}
 
 // ## Helper functions.
 
