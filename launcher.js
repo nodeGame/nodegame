@@ -1,6 +1,6 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2016 Stefano Balietti
+ * Copyright(c) 2017 Stefano Balietti
  * MIT Licensed
  *
  * Load configuration options and start the server
@@ -50,7 +50,7 @@ var ignoredOptions;
 
 // Split input parameters.
 function list(val) {
-  return val.split(',');
+    return val.split(',');
 }
 
 // Go!
@@ -77,12 +77,12 @@ killServer = false;
 program
     .version(version)
 
-    // Specify a configuration file (other inline-options will be ignored).
+// Specify a configuration file (other inline-options will be ignored).
 
     .option('-C, --config [confFile]',
             'Specifies a configuration file to load')
 
-    // Specify inline options (more limited than a conf file, but practical).
+// Specify inline options (more limited than a conf file, but practical).
 
     .option('-c, --confDir <confDir>',
             'Sets the configuration directory')
@@ -100,7 +100,7 @@ program
             'Starts the server with SSL encryption')
 
 
-    // Connect phantoms.
+// Connect phantoms.
 
     .option('-p, --phantoms <channel>',
             'Connect phantoms to the specified channel')
@@ -142,7 +142,7 @@ if (program.confFile) {
 }
 else {
 
-   options = {
+    options = {
 
         // Additional conf directory.
         confDir: confDir,
@@ -208,68 +208,6 @@ else {
     }
     if (program.debug) debug = true;
     if (program.infoQuery) infoQuery = true;
-}
-
-// Rebuild server files as needed.
-
-if (program.build) {
-    (function() {
-        var i, len, opts, modules;
-        var info, module, out;
-
-        out = 'nodegame-full.js';
-
-        modules = {
-            window: 'window',
-            client: 'client',
-            widgets: 'widgets',
-            JSUS: 'JSUS',
-            NDDB: 'NDDB'
-        };
-
-        info = require(J.resolveModuleDir('nodegame-server', __dirname) +
-                             'bin/info.js');
-
-        len = program.build.length;
-        if (!len) {
-            program.build = [ 'client' ];
-        }
-        else if (len === 1 && program.build[0] === 'all') {
-            // Client will be done anyway.
-            program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
-        }
-
-        // Starting build.
-        i = -1, len = program.build.length;
-        for ( ; ++i < len ; ) {
-            module = program.build[i];
-            if (!modules[module]) {
-                throw new Error('unknown build component: ' + module);
-            }
-            // Will be done last anyway.
-            if (module === 'client') continue;
-            else if (module === 'NDDB') {
-                console.log('NDDB does not require build.');
-                continue;
-            }
-
-            opts = { all: true, clean: true };
-
-            info.build[module](opts);
-            console.log('');
-        }
-        // Do client last.
-        info.build.client({
-            clean: true,
-            all: true,
-            output: out
-        });
-        J.copyFile(info.modulesDir.client + 'build/' + out,
-                   info.serverDir.build + out);
-        console.log(info.serverDir.build + out + ' rebuilt.');
-        console.log('');
-
-    })(program.build);
 }
 
 // Validate general options.
@@ -403,129 +341,223 @@ if (program.auth) {
     }
 }
 
-// Print warnings, if any.
-printIgnoredOptions();
+// Rebuild server files as needed.
 
-console.log('nodeGame v.' + require('./package.json').version);
+if (program.build) {
+    (function() {
+        var i, len, opts, modules;
+        var info, module, out;
+        var cssAlso, cssOnly;
 
-// Start server, options parameter is optional.
-sn = new ServerNode(options);
+        len = program.build.length;
+        if (!len) {
+            program.build = [ 'client' ];
+        }
+        else if (len === 1) {
+            if (program.build[0] === 'all') {
+                // Client will be done anyway.
+                program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
+            }
+            else if (program.build[0] === 'css') {
+                cssOnly = true;
+            }
+        }
+        
+        info = J.resolveModuleDir('nodegame-server', __dirname);
+        info = require(path.resolve(info, 'bin', 'info.js'));
+        
+        if (!cssOnly) {
+            out = 'nodegame-full.js';
 
-sn.ready(function() {
-    var channel;
-    var i, phantoms;
-    var startPhantom, handleGameover;
-    var gameName, gameDir, queryString;
-    var numFinished;
-
-    // If there are not bots to add returns.
-    if (!program.phantoms) return;
-
-    gameName = program.phantoms;
-    channel = sn.channels[gameName];
-    if (!channel) {
-        printErr('channel ' + gameName + ' was not found.');
-        if (killServer) process.exit();
-        return;
-    }
-
-    if (auth && !channel.gameInfo.auth.enabled) {
-        printErr('auth option enabled, but channel does not support it.');
-        process.exit();
-    }
-
-    gameDir = sn.channels[gameName].getGameDir();
-
-    if (clientType) queryString = '?clientType=' + clientType;
-
-    if (killServer || runTests) {
-        handleGameover = function() {
-            var command, testProcess;
-
-            console.log();
-            console.log(gameName + ' game has run successfully.');
-            console.log();
-
-            if (runTests) {
-                command = gameDir + 'node_modules/.bin/mocha';
-                if (fs.existsSync(command)) {
-
-                    // Write and backup settings file.
-                    writeSettingsFile(gameDir);
-
-                    command += ' ' + gameDir + 'test/ --colors';
-                    testProcess = exec(command, function(err, stdout, stderr) {
-                        if (stdout) console.log(stdout);
-                        if (stderr) console.log(stderr);
-                        testProcess.kill();
-                        if (killServer) process.exit();
-                    });
+            modules = {
+                window: 'window',
+                client: 'client',
+                widgets: 'widgets',
+                JSUS: 'JSUS',
+                NDDB: 'NDDB',
+                css: 'css'
+            };
+            
+            // Starting build.
+            i = -1, len = program.build.length;
+            for ( ; ++i < len ; ) {
+                module = program.build[i];
+                if (!modules[module]) {
+                    throw new Error('unknown build component: ' + module);
                 }
-                else {
-                    printErr('Cannot run tests, mocha executable not found: ',
-                            command);
+                // Will be done last anyway.
+                if (module === 'client') {
+                    continue;
                 }
-            }
-            else if (killServer) process.exit();
-        };
-    }
+                else if (module === 'NDDB') {
+                    console.log('NDDB does not require build.');
+                    continue;
+                }
+                else if (module === 'css') {
+                    cssAlso = true;
+                    continue;
+                }
 
-    
-    startPhantom = function(i) {
-        var str, config;
-        str = 'Connecting phantom #' + (i+1) + '/' + nClients;
-        if (codesDb) {
-            config = { queryString: queryString, auth: codesDb[i] };
-        }
-        else {
-            config = { queryString: queryString, auth: auth };
-        }
-        if (config.auth) {
-            if (config.auth.id) {
-                str += ' id: ' + config.auth.id;
-                if (config.auth.pwd) str += ' pwd: ' + config.auth.pwd;
+                opts = { all: true, clean: true };
+
+                info.build[module](opts);
+                console.log('');
             }
-            else {
-                str += ' ' + config.auth;
-            }
+            // Do client last.
+            info.build.client({
+                clean: true,
+                all: true,
+                output: out
+            });
+            J.copyFile(info.modulesDir.client + 'build/' + out,
+                       info.serverDir.build + out);
+            console.log(info.serverDir.build + out + ' rebuilt.');
+            console.log('');
         }
-        console.log(str);
-        phantoms[i] = channel.connectPhantom(config);
-        if ('undefined' !== typeof handleGameover) {
-            // Wait for all PhantomJS processes to exit, then stop the server.
-            phantoms[i].on('exit', function(code) {
-                numFinished ++;
-                if (numFinished === nClients) {
-                    handleGameover();
+        
+        if (cssAlso || cssOnly) {
+            info.build.css(info.serverDir.css, function(err) {
+                if (!err) {
+                    console.log();
+                    startServer();
                 }
             });
         }
-    };
-
-    phantoms = [], numFinished = 0;
-    for (i = 0; i < nClients; ++i) {
-        if (i > 0 && wait) {
-            (function(i) { 
-                setTimeout(function() { startPhantom(i); }, wait * i);
-            })(i);
-        }
         else {
-            startPhantom(i);
+            startServer();
         }
-    }
 
-    // TODO: Listen for room creation instead of timeout.
-    //setTimeout(function() {
-    //    var node;
-    //    node = sn.channels.ultimatum.gameRooms["ultimatum1"].node;
-    //    node.events.ee.ng.on(
-    //        'GAME_OVER', function() {console.log('The game is over now.');});
-    //}, 5000);
-
-
-});
+    })(program.build);
+}
 
 // ## Helper functions.
+
+function startServer() {
+    // Print warnings, if any.
+    printIgnoredOptions();
+
+    console.log('nodeGame v.' + require('./package.json').version);
+
+    // Start server, options parameter is optional.
+    sn = new ServerNode(options);
+
+    sn.ready(function() {
+        var channel;
+        var i, phantoms;
+        var startPhantom, handleGameover;
+        var gameName, gameDir, queryString;
+        var numFinished;
+
+        // If there are not bots to add returns.
+        if (!program.phantoms) return;
+
+        gameName = program.phantoms;
+        channel = sn.channels[gameName];
+        if (!channel) {
+            printErr('channel ' + gameName + ' was not found.');
+            if (killServer) process.exit();
+            return;
+        }
+
+        if (auth && !channel.gameInfo.auth.enabled) {
+            printErr('auth option enabled, but channel does not support it.');
+            process.exit();
+        }
+
+        gameDir = sn.channels[gameName].getGameDir();
+
+        if (clientType) queryString = '?clientType=' + clientType;
+
+        if (killServer || runTests) {
+            handleGameover = function() {
+                var command, testProcess;
+
+                console.log();
+                console.log(gameName + ' game has run successfully.');
+                console.log();
+
+                if (runTests) {
+                    command = gameDir + 'node_modules/.bin/mocha';
+                    if (fs.existsSync(command)) {
+
+                        // Write and backup settings file.
+                        writeSettingsFile(gameDir);
+
+                        command += ' ' + gameDir + 'test/ --colors';
+                        testProcess = exec(command,
+                                           function(err, stdout, stderr) {
+                                               if (stdout) console.log(stdout);
+                                               if (stderr) console.log(stderr);
+                                               testProcess.kill();
+                                               if (killServer) process.exit();
+                                           });
+                    }
+                    else {
+                        printErr('Cannot run tests, mocha not found: ',
+                                 command);
+                    }
+                }
+                else if (killServer) process.exit();
+            };
+        }
+
+        
+        startPhantom = function(i) {
+            var str, config;
+            str = 'Connecting phantom #' + (i+1) + '/' + nClients;
+            if (codesDb) {
+                config = { queryString: queryString, auth: codesDb[i] };
+            }
+            else {
+                config = { queryString: queryString, auth: auth };
+            }
+            if (config.auth) {
+                if (config.auth.id) {
+                    str += ' id: ' + config.auth.id;
+                    if (config.auth.pwd) str += ' pwd: ' + config.auth.pwd;
+                }
+                else {
+                    str += ' ' + config.auth;
+                }
+            }
+            console.log(str);
+            phantoms[i] = channel.connectPhantom(config);
+            if ('undefined' !== typeof handleGameover) {
+                // Wait for all PhantomJS processes to exit, then stop server.
+                phantoms[i].on('exit', function(code) {
+                    numFinished ++;
+                    if (numFinished === nClients) {
+                        handleGameover();
+                    }
+                });
+            }
+        };
+
+        phantoms = [], numFinished = 0;
+        for (i = 0; i < nClients; ++i) {
+            if (i > 0 && wait) {
+                (function(i) { 
+                    setTimeout(function() { startPhantom(i); }, wait * i);
+                })(i);
+            }
+            else {
+                startPhantom(i);
+            }
+        }
+
+        // TODO: Listen for room creation instead of timeout.
+        //setTimeout(function() {
+        //    var node;
+        //    node = sn.channels.ultimatum.gameRooms["ultimatum1"].node;
+        //    node.events.ee.ng.on(
+        //    'GAME_OVER', function() {console.log('The game is over now.');});
+        //}, 5000);
+
+
+    });
+
+    return sn;
+}
 
 function printIgnoredOptions() {
     if (ignoredOptions.length) {

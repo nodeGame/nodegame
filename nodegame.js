@@ -35,7 +35,7 @@ const NODEGAME_MODULES = [
     'nodegame-window', 'nodegame-widgets',
     'nodegame-monitor', 'nodegame-game-template',
     'nodegame-requirements', 'nodegame-generator',
-    'JSUS', 'NDDB'
+    'NDDB', 'JSUS'
 ];
 const N_MODULES = NODEGAME_MODULES.length;
 
