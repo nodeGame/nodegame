@@ -26,6 +26,8 @@ const logList = txt => {
 var verbose = false;
 var nodeModulesExisting = false;
 var isDev = false;
+var doSSH = false;
+var noSpinner = false;
 
 // Installer default version.
 const INSTALLER_VERSION = "4.0.4";
@@ -40,11 +42,12 @@ if (requestedVersion) {
         isDev = true;
         version = INSTALLER_VERSION;
         requestedVersion = '@' + version;
+        doSSH = process.argv[3] === "--ssh";
     }
     else {
         if (requestedVersion.charAt(0) !== '@') {
             console.error('  Error: version must start with @, e.g. @' +
-                         INSTALLER_VERSION);
+                          INSTALLER_VERSION);
             return;
         }
         version = requestedVersion.substr(1);
@@ -58,6 +61,8 @@ else {
     version = INSTALLER_VERSION;    
     requestedVersion = '@' + version;
 }
+
+if (process.argv.indexOf('--no-spinner') !== -1) noSpinner = true;
 
 // nodeGame version.
 const VERSION = isDev ? "v" + version + '-dev' : "v" + version;
@@ -73,9 +78,11 @@ const NODEGAME_MODULES = [
     'nodegame-server', 'nodegame-client',
     'nodegame-window', 'nodegame-widgets',
     'nodegame-monitor', 'nodegame-game-template',
-    'nodegame-requirements', 'nodegame-generator', 'nodegame-monitor',
-    'nodegame-db', 'nodegame-mondodb',
-    'JSUS', 'NDDB'
+    'nodegame-requirements', 'nodegame-generator',
+    // No need to replace these now.
+    // 'nodegame-db', 'nodegame-mondodb',
+    'JSUS', 'NDDB',
+    'ultimatum-game'
 ];
 const N_MODULES = NODEGAME_MODULES.length;
 
@@ -84,15 +91,15 @@ const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
 const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
 
 // Print cool nodegame logo.
-
 console.log();
 console.log('  ***********************************************  ');
-console.log('  **    WELCOME TO NODEGAME ' + VERSION + ' INSTALLER   **  ');
+console.log('  **   WELCOME TO NODEGAME INSTALLER  v' + INSTALLER_VERSION +
+            '   **  ');
 console.log('  ***********************************************  ');
 console.log();
-console.log('  nodeGame is a free and open source javascript');
-console.log('  framework for online, multiplayer, real-time ');
-console.log('  games and experiments in the browser.');
+console.log('  nodeGame is a free and open source javascript framework for ');
+console.log('  online, multiplayer, real-time games and experiments in ' +
+            'the browser.');
 
 console.log();
 console.log('  creator: Stefano Balietti');
@@ -100,6 +107,7 @@ console.log('  website: http://nodegame.org');
 console.log('  license: MIT');
 console.log('  mail:    info@nodegame.org');
 console.log('  twitter: @nodegameorg');
+console.log('  bugs:    https://github.com/nodeGame/nodegame/issues');
 console.log('  forum:   https://groups.google.com/' +
             'forum/?fromgroups#!forum/nodegame');
 
@@ -114,13 +122,12 @@ console.log('  nodeGame version:  ' + VERSION);
 console.log('  install directory: ' + INSTALL_DIR);
 console.log();
 
-// Check node version is >
-
+// Check node version is.
 var nodeVersion = process.versions.node.split('.');
 if (parseInt(nodeVersion[0], 10) < 4) {
     console.error('  Error: node version >= 4.x is required.');
     console.error('  Please upgrade your Node.Js installation, ' +
-                'visit: http://nodejs.org');
+                  'visit: http://nodejs.org');
     console.log();
     return;
 }
@@ -153,7 +160,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
     return;
 }
 else {
-    doInstall();
+    doInstall();    
 }
 
 // Install.
@@ -161,67 +168,48 @@ else {
 function doInstall() {
     // Create spinner.
     console.log('  Downloading and installing nodeGame packages.');
-    let sp = new Spinner('  This might take a few minutes %s  ');
-    sp.start();
+
+    if (!noSpinner) {
+        let sp = new Spinner('  This might take a few minutes %s  ');
+        sp.start();
+    }
+    else {
+        console.log('  This might take a few minutes...');
+    }
 
     let child = execFile(
         isWin ? 'npm.cmd' : 'npm',        
         [ 'install', 'nodegame-test' + requestedVersion ],
         { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
+            // Stop spinner.
+            if (!noSpinner) sp.stop();
+
             if (error) {
+                console.log();
+                console.log();
+                console.log('  Oops! The following error/s occurred: ');
+                console.log();
                 logList(stderr.trim());
+                console.log();
+                return;
             }
             else {
-                // Stop spinner.
-                sp.stop();
-
                 if (verbose) logList(stdout.trim());
                 console.log();
                 console.log('  Done! Now some finishing magics...');
-
-                // Move nodegame folder outside node_modules.
-                fs.renameSync(path.resolve(NODE_MODULES_DIR,
-                                           'nodegame-test'),
-                              INSTALL_DIR);
-
-                // Old npms put already all modules under nodegame.
-                if (!fs.existsSync(INSTALL_DIR_MODULES)) {
-                    fs.renameSync(NODE_MODULES_DIR,
-                                  INSTALL_DIR_MODULES);
+                try {
+                    someMagic();
                 }
-                else if (!nodeModulesExisting) {
-                    fs.rmdirSync(NODE_MODULES_DIR);
-                }
-
-                // nodeGame generator: make link and store conf.
-
-                makeLink(path.resolve(INSTALL_DIR_MODULES,
-                                      'nodegame-generator',
-                                      'bin', 'nodegame'),
-                         path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
-			 'file');
-
-
-                fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
-					      'nodegame-generator',
-					      'conf',
-					      'generator.conf.json'),
-				 JSON.stringify({
-				     author: "",
-				     email: "",
-				     gamesFolder: GAMES_AVAILABLE_DIR
-				 }, 4));
-
-		// Move games from node_modules.
-
-                copyGameFromNodeModules('ultimatum-game');
-
-                // Print final Information.
-
-                printFinalInfo();
+                catch(e) {
+                    console.error('  Oops! The following error/s occurred: ');
+                    console.log();
+                    console.error(e);
+                    installationFailed();
+                    return;
+                }                               
             }
-    });
+        });
 }
 
 // Helper stuff.
@@ -233,19 +221,20 @@ function printFinalInfo() {
     console.log('  Installation complete!');
     console.log('  ----------------------------------------------');
 
-    console.log('  Enter the installation directory:');
+    console.log('  Enter the installation directory and start the server:');
     console.log('    cd ' + NODEGAME_AND_VERSION);
-    console.log();
-
-    console.log('  Start the server:');
     console.log('    node launcher.js');
     console.log(); 
 
-    console.log('  Open two browser tabs at the address:');
+    console.log('  Open a browser tab at the address:');
     console.log('    http://localhost:8080/ultimatum');
-    console.log();
+    console.log(); 
 
-    console.log('  Open another tab with the monitor interface:');
+    console.log('  Open another tab with an autoplay player:');
+    console.log('    http://localhost:8080/ultimatum?clientType=autoplay');
+    console.log();
+    
+    console.log('  Check the monitor interface:');
     console.log('    http://localhost:8080/ultimatum/monitor');
     console.log();
 
@@ -255,12 +244,105 @@ function printFinalInfo() {
 
     console.log('  Please cite as:');
     console.log('  ----------------------------------------------');
-    console.log('    Balietti (2017) "nodeGame: Real-time, synchronous, ');
-    console.log('    online experiments in the browser." ' +
-                'Behavior Research Methods 49(5) pp. 1696–1715');
+    console.log('    Balietti (2017) "nodeGame: Real-Time, Synchronous, ' +
+                'Online Experiments ');
+    console.log('    in the Browser." Behavior Research Methods ' +
+                '49(5) pp. 1696–1715');
     console.log();
 }
 
+function someMagic() {    
+    // Move nodegame folder outside node_modules.
+    fs.renameSync(path.resolve(NODE_MODULES_DIR,
+                               'nodegame-test'),
+                  INSTALL_DIR);
+
+    // Old npms put already all modules under nodegame.
+    if (!fs.existsSync(INSTALL_DIR_MODULES)) {
+        fs.renameSync(NODE_MODULES_DIR,
+                      INSTALL_DIR_MODULES);
+    }
+    else if (!nodeModulesExisting) {
+        fs.rmdirSync(NODE_MODULES_DIR);
+    }
+
+    // nodeGame generator: make link and store conf.
+
+    makeLink(path.resolve(INSTALL_DIR_MODULES,
+                          'nodegame-generator',
+                          'bin', 'nodegame'),
+             path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
+	     'file');
+
+
+    fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
+				  'nodegame-generator',
+				  'conf',
+				  'generator.conf.json'),
+		     JSON.stringify({
+			 author: "",
+			 email: "",
+			 gamesFolder: GAMES_AVAILABLE_DIR
+		     }, 4));
+
+
+    if (isDev) {
+        getAllGitModules(function() {
+            // Move games from node_modules.
+            copyGameFromNodeModules('ultimatum-game');
+            // Print final Information.
+            printFinalInfo();
+        });
+    }
+    else {
+        // Move games from node_modules.
+        copyGameFromNodeModules('ultimatum-game');
+        // Print final Information.
+        printFinalInfo();
+    }
+}
+
+function getAllGitModules(cb) {
+    let counter = NODEGAME_MODULES.length;
+    if (verbose) console.log('  Converting modules into git repos.');
+    for (let i = 0; i < NODEGAME_MODULES.length; i++) {
+        (function(i) {
+            let module = NODEGAME_MODULES[i];
+            let modulePath = path.resolve(INSTALL_DIR_MODULES, module);
+            removeDirRecursive(modulePath);
+            setTimeout(function() {
+                getGitModule(module, INSTALL_DIR_MODULES, function(err) {
+                    if (err) {
+                        throw new Error(err);
+                    }
+                    counter--;
+                    if (counter == 0 && cb) cb();
+                });
+            }, 100);
+        })(i);
+    }
+}
+
+function getGitModule(module, cwd, cb) {
+    let repo = doSSH ? 'git@github.com:' : 'https://github.com/';
+    repo += 'nodeGame/' + module + '.git';
+    if (verbose) console.log('  Cloning git module: ' + module);
+    let child = execFile(        
+        'git',
+        [ 'clone', repo ],
+        { cwd: cwd },
+        (error, stdout, stderr) => {
+            if (error) {
+                logList('Could not clone: ' + module);
+                logList(stderr.trim());
+                console.log();
+            }
+            else if (verbose) {
+                logList(stdout.trim());
+            }
+            if (cb) cb(error);
+        });
+}
 
 function makeLink(from, to, type) {
     if (isWin) {
@@ -296,6 +378,46 @@ function confirm(msg, callback) {
         rl.close();
         callback(/^y|yes|ok|true$/i.test(input));
     });
+}
+
+function removeDirRecursive(dir) {
+    if (dir === '/') {
+        throw new Error('   removeDirRecursive error: cannot remove "/"');
+    }
+    if (dir.indexOf(INSTALL_DIR_MODULES) === -1) {
+        console.error('   removeDirRecursive error: there seems to be ' +
+                      'an error with the path to remove: ');
+        console.error(dir);
+    }
+    if (fs.existsSync(dir)) {
+        fs.readdirSync(dir).forEach(function(file, index){
+            let curPath = path.join(dir, file);
+            //  Recurse.
+            if (fs.lstatSync(curPath).isDirectory()) {
+                removeDirRecursive(curPath);
+            }
+            else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(dir);
+    }
+};
+
+function installationFailed() {
+    
+    console.log();
+    
+    console.error('  Installation did not complete successfully.');
+    console.log('  ----------------------------------------------');
+    console.log();
+    
+    console.error('  If you think this might be a bug, please report it. ' +
+                  'You can either:');
+    console.error('    - open an issue at: ' +
+                  'https://github.com/nodeGame/nodegame/issues');
+    console.error('    - send an email at info@nodegame.org');
+    console.log();
 }
 
 
