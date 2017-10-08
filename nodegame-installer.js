@@ -182,7 +182,7 @@ function doInstall() {
     console.log('  Downloading and installing nodeGame packages.');
 
     if (!noSpinner) {
-        let sp = new Spinner('  This might take a few minutes %s  ');
+        var sp = new Spinner('  This might take a few minutes %s  ');
         sp.start();
     }
     else {
