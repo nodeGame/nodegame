@@ -19,8 +19,48 @@ const fs = require('fs');
 const execFile = require('child_process').execFile;
 const readline = require('readline');
 
+const logList = txt => {
+    console.log('  - ' + txt);
+};
+
+var verbose = false;
+var nodeModulesExisting = false;
+var isDev = false;
+
+// Installer default version.
+const INSTALLER_VERSION = "4.0.4";
+
+// The actual version being installed, user can change it.
+var version;
+
+var requestedVersion = process.argv[2];
+
+if (requestedVersion) {
+    if (requestedVersion === 'dev') {
+        isDev = true;
+        version = INSTALLER_VERSION;
+        requestedVersion = '@' + version;
+    }
+    else {
+        if (requestedVersion.charAt(0) !== '@') {
+            console.error('  Error: version must start with @, e.g. @' +
+                         INSTALLER_VERSION);
+            return;
+        }
+        version = requestedVersion.substr(1);
+        if (version.length < 1 || version.length > 5) {
+            console.error('  Error: invalid version number: ', version);
+            return;
+        }
+    }
+}
+else {
+    version = INSTALLER_VERSION;    
+    requestedVersion = '@' + version;
+}
+
 // nodeGame version.
-const VERSION = "v4.0.0";
+const VERSION = isDev ? "v" + version + '-dev' : "v" + version;
 
 const NODEGAME_AND_VERSION = 'nodegame-' + VERSION;
 
@@ -33,7 +73,8 @@ const NODEGAME_MODULES = [
     'nodegame-server', 'nodegame-client',
     'nodegame-window', 'nodegame-widgets',
     'nodegame-monitor', 'nodegame-game-template',
-    'nodegame-requirements', 'nodegame-generator',
+    'nodegame-requirements', 'nodegame-generator', 'nodegame-monitor',
+    'nodegame-db', 'nodegame-mondodb',
     'JSUS', 'NDDB'
 ];
 const N_MODULES = NODEGAME_MODULES.length;
@@ -41,14 +82,6 @@ const N_MODULES = NODEGAME_MODULES.length;
 const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
                                          'games_available');
 const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
-
-const logList = txt => {
-    console.log('  - ' + txt);
-};
-
-var verbose = false;
-
-var nodeModulesExisting = false;
 
 // Print cool nodegame logo.
 
@@ -92,6 +125,7 @@ if (parseInt(nodeVersion[0], 10) < 4) {
     return;
 }
 
+
 // Check if nodegame-4.0.0 exists (abort)
 
 if (fs.existsSync(INSTALL_DIR)) {
@@ -131,8 +165,8 @@ function doInstall() {
     sp.start();
 
     let child = execFile(
-        isWin ? 'npm.cmd' : 'npm',
-        [ 'install', 'nodegame-test' ],
+        isWin ? 'npm.cmd' : 'npm',        
+        [ 'install', 'nodegame-test' + requestedVersion ],
         { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
             if (error) {
@@ -147,13 +181,12 @@ function doInstall() {
                 console.log('  Done! Now some finishing magics...');
 
                 // Move nodegame folder outside node_modules.
-
                 fs.renameSync(path.resolve(NODE_MODULES_DIR,
                                            'nodegame-test'),
                               INSTALL_DIR);
 
                 // Old npms put already all modules under nodegame.
-                if (!fs.existsSync(INSTALL_DIR_MODULES)) {  
+                if (!fs.existsSync(INSTALL_DIR_MODULES)) {
                     fs.renameSync(NODE_MODULES_DIR,
                                   INSTALL_DIR_MODULES);
                 }
@@ -168,8 +201,8 @@ function doInstall() {
                                       'bin', 'nodegame'),
                          path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
 			 'file');
-		
-			 
+
+
                 fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
 					      'nodegame-generator',
 					      'conf',
@@ -179,7 +212,7 @@ function doInstall() {
 				     email: "",
 				     gamesFolder: GAMES_AVAILABLE_DIR
 				 }, 4));
-		
+
 		// Move games from node_modules.
 
                 copyGameFromNodeModules('ultimatum-game');
@@ -206,7 +239,7 @@ function printFinalInfo() {
 
     console.log('  Start the server:');
     console.log('    node launcher.js');
-    console.log();
+    console.log(); 
 
     console.log('  Open two browser tabs at the address:');
     console.log('    http://localhost:8080/ultimatum');
@@ -224,7 +257,7 @@ function printFinalInfo() {
     console.log('  ----------------------------------------------');
     console.log('    Balietti (2017) "nodeGame: Real-time, synchronous, ');
     console.log('    online experiments in the browser." ' +
-                'Behavior Research Methods');
+                'Behavior Research Methods 49(5) pp. 1696–1715');
     console.log();
 }
 
@@ -316,7 +349,7 @@ function Spinner(text) {
     };
 
     this.stream = process.stdout;
-    
+
     this.start = function() {
         var current = 0;
         var self = this;
