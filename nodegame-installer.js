@@ -33,34 +33,31 @@ var noSpinner = false;
 const INSTALLER_VERSION = "4.0.4";
 
 // The actual version being installed, user can change it.
-var version;
+var version = INSTALLER_VERSION;
+// User requested version;
+var requestedVersion = requestedVersion = '@' + version;
 
-var requestedVersion = process.argv[2];
-
-if (requestedVersion) {
-    if (requestedVersion === 'dev') {
-        isDev = true;
-        version = INSTALLER_VERSION;
-        requestedVersion = '@' + version;
-        doSSH = process.argv[3] === "--ssh";
-    }
-    else {
-        if (requestedVersion.charAt(0) !== '@') {
-            console.error('  Error: version must start with @, e.g. @' +
-                          INSTALLER_VERSION);
-            return;
+for (let i = 0; i < process.argv.length; i++) {
+    if (process.argv[i].charAt(0) === '@') {
+        requestedVersion = process.argv[i].substr(1);
+        
+        if (requestedVersion === 'dev') {
+            isDev = true;
+            version = INSTALLER_VERSION;
+            requestedVersion = '@' + version;
+            doSSH = process.argv[3] === "--ssh";
         }
-        version = requestedVersion.substr(1);
-        if (version.length < 1 || version.length > 5) {
-            console.error('  Error: invalid version number: ', version);
-            return;
+        else {
+            version = requestedVersion.substr(1);
+            if (version.length < 1 || version.length > 5) {
+                console.error('  Error: invalid version number: ', version);
+                return;
+            }
         }
+        break;
     }
 }
-else {
-    version = INSTALLER_VERSION;    
-    requestedVersion = '@' + version;
-}
+
 
 if (process.argv.indexOf('--no-spinner') !== -1) noSpinner = true;
 
@@ -71,7 +68,22 @@ const NODEGAME_AND_VERSION = 'nodegame-' + VERSION;
 
 const ROOT_DIR = process.cwd()
 const NODE_MODULES_DIR = path.resolve(ROOT_DIR, 'node_modules');
-const INSTALL_DIR =  path.resolve(ROOT_DIR, NODEGAME_AND_VERSION);
+
+
+let installDir = process.argv.indexOf('--install-dir');
+if (installDir !== -1) {
+    installDir = process.argv[installDir+1];
+    if (!installDir) {
+        console.error('  --install-dir found, but no install dir provided.');
+        return;
+    }
+    installDir = path.join(ROOT_DIR, installDir);
+}
+else {
+    installDir = NODEGAME_AND_VERSION;
+}
+
+const INSTALL_DIR =  path.resolve(ROOT_DIR, installDir);
 const INSTALL_DIR_MODULES = path.resolve(INSTALL_DIR, 'node_modules');
 
 const NODEGAME_MODULES = [
