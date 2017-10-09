@@ -28,6 +28,8 @@ var nodeModulesExisting = false;
 var isDev = false;
 var doSSH = false;
 var noSpinner = false;
+var branch;
+var warnings;
 
 // Installer default version.
 const INSTALLER_VERSION = "4.0.4";
@@ -40,17 +42,31 @@ var requestedVersion = requestedVersion = '@' + version;
 for (let i = 0; i < process.argv.length; i++) {
     if (process.argv[i].charAt(0) === '@') {
         requestedVersion = process.argv[i].substr(1);
-        
+
         if (requestedVersion === 'dev') {
             isDev = true;
             version = INSTALLER_VERSION;
             requestedVersion = '@' + version;
-            doSSH = process.argv[3] === "--ssh";
+            if (process.argv.indexOf('--ssh') !== -1) doSSH = true;
+            branch = process.argv.indexOf('--branch');
+            if (branch !== -1) {
+                branch = process.argv[branch+1];
+                if (!branch) {
+                    console.error('  --branch option found, ' +
+                                  'but no value provided.');
+                    console.log();
+                    return;
+                }
+            }
+            else {
+                branch = undefined;
+            }
         }
         else {
             version = requestedVersion.substr(1);
             if (version.length < 1 || version.length > 5) {
                 console.error('  Error: invalid version number: ', version);
+                console.log();
                 return;
             }
         }
@@ -74,7 +90,8 @@ let installDir = process.argv.indexOf('--install-dir');
 if (installDir !== -1) {
     installDir = process.argv[installDir+1];
     if (!installDir) {
-        console.error('  --install-dir found, but no install dir provided.');
+        console.error('  --install-dir option found, but no value provided.');
+        console.log();
         return;
     }
     installDir = path.join(ROOT_DIR, installDir);
@@ -102,37 +119,14 @@ const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
                                          'games_available');
 const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
 
-// Print cool nodegame logo.
-console.log();
-console.log('  ***********************************************  ');
-console.log('  **   WELCOME TO NODEGAME INSTALLER  v' + INSTALLER_VERSION +
-            '   **  ');
-console.log('  ***********************************************  ');
-console.log();
-console.log('  nodeGame is a free and open source javascript framework for ');
-console.log('  online, multiplayer, real-time games and experiments in ' +
-            'the browser.');
+// Printing Info.
 
-console.log();
-console.log('  creator: Stefano Balietti');
-console.log('  website: http://nodegame.org');
-console.log('  license: MIT');
-console.log('  mail:    info@nodegame.org');
-console.log('  twitter: @nodegameorg');
-console.log('  bugs:    https://github.com/nodeGame/nodegame/issues');
-console.log('  forum:   https://groups.google.com/' +
-            'forum/?fromgroups#!forum/nodegame');
+// Print cool nodegame logo.
+printNodeGameInfo();
 
 // Print node and nodeGame version (npm too?).
+printInstallInfo();
 
-console.log();
-console.log('  ----------------------------------------------');
-console.log();
-
-console.log('  node version:      ' + process.version);
-console.log('  nodeGame version:  ' + VERSION);
-console.log('  install directory: ' + INSTALL_DIR);
-console.log();
 
 // Check node version is.
 var nodeVersion = process.versions.node.split('.');
@@ -172,7 +166,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
     return;
 }
 else {
-    doInstall();    
+    doInstall();
 }
 
 // Install.
@@ -191,7 +185,7 @@ function doInstall() {
     }
 
     let child = execFile(
-        isWin ? 'npm.cmd' : 'npm',        
+        isWin ? 'npm.cmd' : 'npm',
         [ 'install', 'nodegame-test' + requestedVersion ],
         { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
@@ -215,12 +209,36 @@ function doInstall() {
                     someMagic();
                 }
                 catch(e) {
+                    execFile(
+                        'ls',
+                        [ '-la'  ],
+                        (error, stdout, stderr) => {
+                            if (error) {
+                                logList(stderr.trim());
+                                console.log();
+                            }
+                            else {
+                                logList(stdout.trim());
+                            }
+                        });
+                    execFile(
+                        'ls',
+                        [ '../node_modules/', '-la'  ],
+                        (error, stdout, stderr) => {
+                            if (error) {
+                                logList(stderr.trim());
+                                console.log();
+                            }
+                            else {
+                                logList(stdout.trim());
+                            }
+                        });
                     console.error('  Oops! The following error/s occurred: ');
                     console.log();
                     console.error(e);
                     installationFailed();
                     return;
-                }                               
+                }
             }
         });
 }
@@ -228,25 +246,63 @@ function doInstall() {
 // Helper stuff.
 ////////////////
 
+function printNodeGameInfo() {
+    console.log();
+    console.log('  ***********************************************  ');
+    console.log('  **   WELCOME TO NODEGAME INSTALLER  v' + INSTALLER_VERSION +
+                '   **  ');
+    console.log('  ***********************************************  ');
+    console.log();
+    console.log('  nodeGame is a free and open source javascript ' +
+                'framework for ');
+    console.log('  online, multiplayer, real-time games and experiments in ' +
+                'the browser.');
+
+    console.log();
+    console.log('  creator: Stefano Balietti');
+    console.log('  website: http://nodegame.org');
+    console.log('  license: MIT');
+    console.log('  mail:    info@nodegame.org');
+    console.log('  twitter: @nodegameorg');
+    console.log('  bugs:    https://github.com/nodeGame/nodegame/issues');
+    console.log('  forum:   https://groups.google.com/' +
+                'forum/?fromgroups#!forum/nodegame');
+}
+
+function printInstallInfo() {
+    let str;
+    console.log();
+    console.log('  ----------------------------------------------');
+    console.log();
+
+    console.log('  node version:      ' + process.version);
+    str = '  nodeGame version:  ' + VERSION;
+    if (branch) str += ' (' + branch + ')';
+    console.log(str);
+    console.log('  install directory: ' + INSTALL_DIR);
+    console.log();
+}
 
 function printFinalInfo() {
     console.log();
-    console.log('  Installation complete!');
+    let str = '  Installation complete!';
+    if (warnings) str += ' (with warnings)';
+    console.log(str);
     console.log('  ----------------------------------------------');
 
     console.log('  Enter the installation directory and start the server:');
     console.log('    cd ' + NODEGAME_AND_VERSION);
     console.log('    node launcher.js');
-    console.log(); 
+    console.log();
 
     console.log('  Open a browser tab at the address:');
     console.log('    http://localhost:8080/ultimatum');
-    console.log(); 
+    console.log();
 
     console.log('  Open another tab with an autoplay player:');
     console.log('    http://localhost:8080/ultimatum?clientType=autoplay');
     console.log();
-    
+
     console.log('  Check the monitor interface:');
     console.log('    http://localhost:8080/ultimatum/monitor');
     console.log();
@@ -264,7 +320,8 @@ function printFinalInfo() {
     console.log();
 }
 
-function someMagic() {    
+
+function someMagic() {
     // Move nodegame folder outside node_modules.
     fs.renameSync(path.resolve(NODE_MODULES_DIR,
                                'nodegame-test'),
@@ -325,9 +382,7 @@ function getAllGitModules(cb) {
             removeDirRecursive(modulePath);
             setTimeout(function() {
                 getGitModule(module, INSTALL_DIR_MODULES, function(err) {
-                    if (err) {
-                        throw new Error(err);
-                    }
+                    if (err) throw new Error(err);
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
@@ -336,18 +391,36 @@ function getAllGitModules(cb) {
     }
 }
 
-function getGitModule(module, cwd, cb) {
+function getGitModule(module, cwd, cb, noBranch) {
     let repo = doSSH ? 'git@github.com:' : 'https://github.com/';
     repo += 'nodeGame/' + module + '.git';
     if (verbose) console.log('  Cloning git module: ' + module);
-    let child = execFile(        
+    let params = !noBranch && branch ?
+        [ 'clone', '-b', branch, repo ] : [ 'clone', repo ];
+    let child = execFile(
         'git',
-        [ 'clone', repo ],
+        params,
         { cwd: cwd },
         (error, stdout, stderr) => {
             if (error) {
-                logList('Could not clone: ' + module);
-                logList(stderr.trim());
+                // If it could not checkout a branch, it could just
+                // be that the branch does not exists, so just warning.
+                if (!noBranch && branch &&
+                    stderr.indexOf('Remote branch') !== -1 &&
+                    stderr.indexOf('not found in upstream') !== -1) {
+
+                    error = null;
+                    let warnStr = '  Warning! module ' + module +
+                        ' branch not found: ' + branch;
+                    console.log(warnStr);
+                    warnings = true;
+                    getGitModule(module, cwd, cb, true);
+                    return;
+                }
+                else {
+                    logList('Could not clone: ' + module);
+                    logList(stderr.trim());                 
+                }
                 console.log();
             }
             else if (verbose) {
@@ -418,13 +491,13 @@ function removeDirRecursive(dir) {
 };
 
 function installationFailed() {
-    
+
     console.log();
-    
+
     console.error('  Installation did not complete successfully.');
     console.log('  ----------------------------------------------');
     console.log();
-    
+
     console.error('  If you think this might be a bug, please report it. ' +
                   'You can either:');
     console.error('    - open an issue at: ' +
