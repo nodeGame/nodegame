@@ -98,6 +98,11 @@ if (installDir !== -1) {
     }
     installDir = path.join(ROOT_DIR, installDir);
 
+    console.log(installDir);
+    console.log(NODE_MODULES_DIR);
+    console.log(installDir === NODE_MODULES_DIR);
+
+    console.log('------------------------------------');
     
     if (installDir === NODE_MODULES_DIR) doNotMoveInstall = true;    
 }
