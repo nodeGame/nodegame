@@ -28,8 +28,11 @@ var nodeModulesExisting = false;
 var isDev = false;
 var doSSH = false;
 var noSpinner = false;
+var doNotMoveInstall = false;
 var branch;
 var warnings;
+
+const MAIN_MODULE = 'nodegame-test';
 
 // Installer default version.
 const INSTALLER_VERSION = "4.0.4";
@@ -85,7 +88,6 @@ const NODEGAME_AND_VERSION = 'nodegame-' + VERSION;
 const ROOT_DIR = process.cwd()
 const NODE_MODULES_DIR = path.resolve(ROOT_DIR, 'node_modules');
 
-
 let installDir = process.argv.indexOf('--install-dir');
 if (installDir !== -1) {
     installDir = process.argv[installDir+1];
@@ -95,13 +97,20 @@ if (installDir !== -1) {
         return;
     }
     installDir = path.join(ROOT_DIR, installDir);
+
+    
+    if (installDir === NODE_MODULES_DIR) doNotMoveInstall = true;    
 }
 else {
     installDir = NODEGAME_AND_VERSION;
 }
 
-const INSTALL_DIR =  path.resolve(ROOT_DIR, installDir);
-const INSTALL_DIR_MODULES = path.resolve(INSTALL_DIR, 'node_modules');
+const INSTALL_DIR = doNotMoveInstall ?
+      path.resolve(NODE_MODULES_DIR, MAIN_MODULE) :
+      path.resolve(ROOT_DIR, installDir);
+
+const INSTALL_DIR_MODULES = doNotMoveInstall ?
+      NODE_MODULES_DIR : path.resolve(INSTALL_DIR, 'node_modules');
 
 const NODEGAME_MODULES = [
     'nodegame-server', 'nodegame-client',
@@ -186,7 +195,7 @@ function doInstall() {
 
     let child = execFile(
         isWin ? 'npm.cmd' : 'npm',
-        [ 'install', 'nodegame-test' + requestedVersion ],
+        [ 'install', MAIN_MODULE + requestedVersion ],
         { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
             // Stop spinner.
@@ -209,30 +218,30 @@ function doInstall() {
                     someMagic();
                 }
                 catch(e) {
-                    execFile(
-                        'ls',
-                        [ '-la'  ],
-                        (error, stdout, stderr) => {
-                            if (error) {
-                                logList(stderr.trim());
-                                console.log();
-                            }
-                            else {
-                                logList(stdout.trim());
-                            }
-                        });
-                    execFile(
-                        'ls',
-                        [ '../node_modules/', '-la'  ],
-                        (error, stdout, stderr) => {
-                            if (error) {
-                                logList(stderr.trim());
-                                console.log();
-                            }
-                            else {
-                                logList(stdout.trim());
-                            }
-                        });
+//                     execFile(
+//                         'ls',
+//                         [ '-la'  ],
+//                         (error, stdout, stderr) => {
+//                             if (error) {
+//                                 logList(stderr.trim());
+//                                 console.log();
+//                             }
+//                             else {
+//                                 logList(stdout.trim());
+//                             }
+//                         });
+//                     execFile(
+//                         'ls',
+//                         [ '../node_modules/', '-la'  ],
+//                         (error, stdout, stderr) => {
+//                             if (error) {
+//                                 logList(stderr.trim());
+//                                 console.log();
+//                             }
+//                             else {
+//                                 logList(stdout.trim());
+//                             }
+//                         });
                     console.error('  Oops! The following error/s occurred: ');
                     console.log();
                     console.error(e);
@@ -279,8 +288,11 @@ function printInstallInfo() {
     str = '  nodeGame version:  ' + VERSION;
     if (branch) str += ' (' + branch + ')';
     console.log(str);
-    console.log('  install directory: ' + INSTALL_DIR);
+    str = '  install directory: ' + INSTALL_DIR;
+    if (doNotMoveInstall) str += ' (npm structure kept)';
+    console.log(str);
     console.log();
+    console.log();    
 }
 
 function printFinalInfo() {
@@ -322,18 +334,29 @@ function printFinalInfo() {
 
 
 function someMagic() {
-    // Move nodegame folder outside node_modules.
-    fs.renameSync(path.resolve(NODE_MODULES_DIR,
-                               'nodegame-test'),
-                  INSTALL_DIR);
 
-    // Old npms put already all modules under nodegame.
-    if (!fs.existsSync(INSTALL_DIR_MODULES)) {
-        fs.renameSync(NODE_MODULES_DIR,
+    if (!doNotMoveInstall) {
+        // Move nodegame folder outside node_modules.
+        fs.renameSync(path.resolve(NODE_MODULES_DIR, MAIN_MODULE), INSTALL_DIR);
+
+//         var items = fs.readdirSync(NODE_MODULES_DIR);
+//         for (var i=0; i<items.length; i++) {
+//             console.log(items[i]);
+//         }
+//     
+//         var items = fs.readdirSync(INSTALL_DIR_MODULES);
+//         for (var i=0; i<items.length; i++) {
+//             console.log(items[i]);
+//         }
+    
+        // Old npms put already all modules under nodegame.
+        if (!fs.existsSync(INSTALL_DIR_MODULES)) {
+            fs.renameSync(NODE_MODULES_DIR,
                       INSTALL_DIR_MODULES);
-    }
-    else if (!nodeModulesExisting) {
-        fs.rmdirSync(NODE_MODULES_DIR);
+        }
+        else if (!nodeModulesExisting) {
+            fs.rmdirSync(NODE_MODULES_DIR);
+        }
     }
 
     // nodeGame generator: make link and store conf.
@@ -444,7 +467,7 @@ function copyGameFromNodeModules(game, enable) {
     enable = 'undefined' === typeof enable ? true : enable;
 
     // Move game from node_modules into  games_available directory.
-    fs.renameSync(path.resolve(INSTALL_DIR, 'node_modules', game),
+    fs.renameSync(path.resolve(INSTALL_DIR_MODULES, game),
                   path.resolve(GAMES_AVAILABLE_DIR, game));
 
     if (!enable) return;
