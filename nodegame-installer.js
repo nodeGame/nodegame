@@ -103,8 +103,8 @@ if (installDir !== -1) {
     console.log(installDir === NODE_MODULES_DIR);
 
     console.log('------------------------------------');
-    
-    if (installDir === NODE_MODULES_DIR) doNotMoveInstall = true;    
+
+    if (installDir === NODE_MODULES_DIR) doNotMoveInstall = true;
 }
 else {
     installDir = NODEGAME_AND_VERSION;
@@ -294,10 +294,10 @@ function printInstallInfo() {
     if (branch) str += ' (' + branch + ')';
     console.log(str);
     str = '  install directory: ' + INSTALL_DIR;
-    if (doNotMoveInstall) str += ' (npm structure kept)';
+    if (doNotMoveInstall) str += ' (npm structure)';
     console.log(str);
     console.log();
-    console.log();    
+    console.log();
 }
 
 function printFinalInfo() {
@@ -308,7 +308,12 @@ function printFinalInfo() {
     console.log('  ----------------------------------------------');
 
     console.log('  Enter the installation directory and start the server:');
-    console.log('    cd ' + NODEGAME_AND_VERSION);
+    if (doNotMoveInstall) {
+        console.log('    cd ' + NODEGAME_AND_VERSION);
+    }
+    else {
+        console.log('    cd ' + path.join('node_modules', MAIN_MODULE));
+    }
     console.log('    node launcher.js');
     console.log();
 
@@ -348,12 +353,12 @@ function someMagic() {
 //         for (var i=0; i<items.length; i++) {
 //             console.log(items[i]);
 //         }
-//     
+//
 //         var items = fs.readdirSync(INSTALL_DIR_MODULES);
 //         for (var i=0; i<items.length; i++) {
 //             console.log(items[i]);
 //         }
-    
+
         // Old npms put already all modules under nodegame.
         if (!fs.existsSync(INSTALL_DIR_MODULES)) {
             fs.renameSync(NODE_MODULES_DIR,
@@ -405,12 +410,26 @@ function getAllGitModules(cb) {
     if (verbose) console.log('  Converting modules into git repos.');
     for (let i = 0; i < NODEGAME_MODULES.length; i++) {
         (function(i) {
+            var nodeModulesCopy;
             let module = NODEGAME_MODULES[i];
             let modulePath = path.resolve(INSTALL_DIR_MODULES, module);
-            removeDirRecursive(modulePath);
+            let nodeModulesPath = path.resolve(modulePath, 'node_modules');
+
+            // Keep node_modules, if any.
+            if (fs.existsSync(nodeModulesPath)) {
+                nodeModulesCopy = path.resolve(NODE_MODULES_DIR,
+                                               ('_node_modules-' + module));
+                fs.renameSync(nodeModulesPath, nodeModulesCopy);
+            }
+            removeDirRecursiveSync(modulePath);
+
             setTimeout(function() {
                 getGitModule(module, INSTALL_DIR_MODULES, function(err) {
-                    if (err) throw new Error(err);
+                    if (err) throw new Error(err);                    
+                    // Put back node_modules, if it was copied before.
+                    if (nodeModulesCopy) {
+                        fs.rename(nodeModulesCopy, nodeModulesPath);
+                    }
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
@@ -447,7 +466,7 @@ function getGitModule(module, cwd, cb, noBranch) {
                 }
                 else {
                     logList('Could not clone: ' + module);
-                    logList(stderr.trim());                 
+                    logList(stderr.trim());
                 }
                 console.log();
             }
@@ -494,12 +513,12 @@ function confirm(msg, callback) {
     });
 }
 
-function removeDirRecursive(dir) {
+function removeDirRecursiveSync(dir) {
     if (dir === '/') {
-        throw new Error('   removeDirRecursive error: cannot remove "/"');
+        throw new Error('   removeDirRecursiveSync error: cannot remove "/"');
     }
     if (dir.indexOf(INSTALL_DIR_MODULES) === -1) {
-        console.error('   removeDirRecursive error: there seems to be ' +
+        console.error('   removeDirRecursiveSync error: there seems to be ' +
                       'an error with the path to remove: ');
         console.error(dir);
     }
@@ -508,7 +527,7 @@ function removeDirRecursive(dir) {
             let curPath = path.join(dir, file);
             //  Recurse.
             if (fs.lstatSync(curPath).isDirectory()) {
-                removeDirRecursive(curPath);
+                removeDirRecursiveSync(curPath);
             }
             else { // delete file
                 fs.unlinkSync(curPath);
