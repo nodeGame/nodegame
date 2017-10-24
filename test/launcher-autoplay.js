@@ -1,6 +1,6 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2015 Stefano Balietti
+ * Copyright(c) 2017 Stefano Balietti
  * MIT Licensed
  *
  * Sets conf, log, and games directory and start the server.
@@ -14,6 +14,8 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 var gameName = process.argv[2];
+var gameFolder = process.argv[3] || gameName;
+
 
 // Load the Node.js path object.
 var path = require('path');
@@ -22,7 +24,7 @@ var path = require('path');
 var ServerNode = require('nodegame-server').ServerNode;
 
 // Load the test settings.
-var testSettings = require('../games/' + gameName + '/test/settings.js');
+var testSettings = require('../games/' + gameFolder + '/test/settings.js');
 
 // Overrides some of the default options for ServerNode.
 var options = {
