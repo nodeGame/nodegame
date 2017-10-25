@@ -35,7 +35,7 @@ var warnings;
 const MAIN_MODULE = 'nodegame-test';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.0.4";
+const INSTALLER_VERSION = "4.0.7";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -417,18 +417,29 @@ function getAllGitModules(cb) {
 
             // Keep node_modules, if any.
             if (fs.existsSync(nodeModulesPath)) {
+                
+                // Remove nodegame modules (if any) will be get by git.
+                fs.readdirSync(nodeModulesPath).forEach(function(file, index) {
+                    if (inArray(file, NODEGAME_MODULES)) {
+                        let modulePath = path.join(nodeModulesPath, file);
+                        removeDirRecursiveSync(modulePath);
+                    }
+                });
+                
                 nodeModulesCopy = path.resolve(NODE_MODULES_DIR,
                                                ('_node_modules-' + module));
                 fs.renameSync(nodeModulesPath, nodeModulesCopy);
             }
-            removeDirRecursiveSync(modulePath);
 
+            // Remove npm folder.
+            removeDirRecursiveSync(modulePath);
+            
             setTimeout(function() {
                 getGitModule(module, INSTALL_DIR_MODULES, function(err) {
                     if (err) throw new Error(err);                    
                     // Put back node_modules, if it was copied before.
                     if (nodeModulesCopy) {
-                        fs.rename(nodeModulesCopy, nodeModulesPath);
+                        fs.renameSync(nodeModulesCopy, nodeModulesPath);
                     }
                     counter--;
                     if (counter == 0 && cb) cb();
@@ -489,16 +500,25 @@ function makeLink(from, to, type) {
 
 function copyGameFromNodeModules(game, enable) {
     enable = 'undefined' === typeof enable ? true : enable;
+    let gameDir = path.resolve(GAMES_AVAILABLE_DIR, game);
 
     // Move game from node_modules into  games_available directory.
-    fs.renameSync(path.resolve(INSTALL_DIR_MODULES, game),
-                  path.resolve(GAMES_AVAILABLE_DIR, game));
+    fs.renameSync(path.resolve(INSTALL_DIR_MODULES, game), gameDir);
 
+    // Make sure that the test command works.
+    let tmpPath = path.join(gameDir, 'node_modules');
+    if (!fs.existsSync(tmpPath)) fs.mkdirSync(tmpPath);
+    tmpPath = path.join(tmpPath, '.bin');
+    if (!fs.existsSync(tmpPath)) fs.mkdirSync(tmpPath);
+    tmpPath = path.join(tmpPath, 'mocha');
+    if (!fs.existsSync(tmpPath)) {        
+        makeLink(path.join(INSTALL_DIR_MODULES, '.bin/mocha'), tmpPath);
+    }
+    
     if (!enable) return;
 
-    // Enable game.
-    makeLink(path.resolve(GAMES_AVAILABLE_DIR, game),
-             path.resolve(GAMES_ENABLED_DIR, game));
+    // Enable gapath.resolve(GAMES_AVAILABLE_DIR, game).
+    makeLink(gameDir, path.resolve(GAMES_ENABLED_DIR, game));
 }
 
 function confirm(msg, callback) {
@@ -629,3 +649,14 @@ function Spinner(text) {
         readline.cursorTo(stream, 0);
     };
 };
+
+function inArray(needle, haystack) {
+    var func, i, len;
+    len = haystack.length;
+    for (i = 0; i < len; i++) {
+        if (needle === haystack[i]) {
+            return needle;
+        }
+    }
+    return false;
+}
