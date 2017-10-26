@@ -1,28 +1,23 @@
-udo: false
+sudo: false
 language: node_js
 node_js:
-  - 4.5
+  - 6
+  - 7
+  - 8
 
 before_install:
 # Get installer script.
-  - cd bin
-  - chmod a+x install-nodegame-for-module.sh
-  - cd ..
+  - wget https://github.com/nodeGame/nodegame-test/raw/master/nodegame-installer.js
+  - chmod a+x nodegame-installer.js
 
 install:
-# Share node_modules with nodeGame.
-  - mkdir -p nodegame node_modules
-# If "install-nodegame-for-module.sh" is called before "npm install",
-# it gives an error.
-  - npm install
-  - bin/install-nodegame-for-module.sh -g "nodegame-window nodegame-widgets JSUS NDDB shelf.js nodegame-client nodegame-server descil-mturk nodegame-requirements nodegame-monitor nodegame-db nodegame-mongodb"
-
+  - node nodegame-installer.js @dev --install-dir node_modules --no-spinner --branch v4
+  - npm install -g should
+  - npm install -g mocha
 
 script:
-# Add specific tests here.
+# Add extra tests here.
 
 # Test Ultimatum game.
-  - cd nodegame/games
-  - git clone https://github.com/nodeGame/ultimatum.git
-  - cd ultimatum
-  - ./bin/run-standalone-test.sh
+  - cd node_modules/nodegame-test/games/ultimatum-game
+  - ./bin/run-standalone-test-v4.sh
