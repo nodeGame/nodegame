@@ -30,7 +30,6 @@ const err = txt => {
     console.error('  ' + txt);
 };
 
-
 if (process.argv.indexOf('--help') !== -1) {
     printHelp();
     return;
@@ -91,7 +90,6 @@ for (let i = 0; i < process.argv.length; i++) {
         break;
     }
 }
-
 
 if (process.argv.indexOf('--no-spinner') !== -1) noSpinner = true;
 if (process.argv.indexOf('--yes') !== -1) yes = true;
@@ -161,9 +159,7 @@ if (parseInt(nodeVersion[0], 10) < 4) {
     return;
 }
 
-
 // Check if install dir exists (abort).
-
 if (fs.existsSync(INSTALL_DIR)) {
     err('Error: installation directory already existing.');
     log();
@@ -171,12 +167,12 @@ if (fs.existsSync(INSTALL_DIR)) {
 }
 
 // Check if node_modules exists (prompt continue?)
-
 if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
     err('Warning: node_modules directory already existing.');
     if (!yes) {
         confirm('  Continue? [y/n] ', function(ok) {
+            console.log('noooo!');;
             if (ok) {
                 process.stdin.destroy();
                 log();
@@ -186,18 +182,26 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
                 err('Installation aborted.');
                 log();
             }
-        });
+        })
+        console.log('oooo!');;
         return;
     }
-    else {
+    else {        
+        console.log('PPPPPP!');
         log('Continue? [y/n] --yes');
         log();
     }
 }
 
-doInstall();
+console.log('HEEEre!');
 
 // Install.
+doInstall();
+
+
+
+// Helper functions.
+///////////////////////////////////////////////////////////////////////////////
 
 function doInstall() {
     var sp;
