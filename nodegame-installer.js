@@ -30,12 +30,19 @@ const err = txt => {
     console.error('  ' + txt);
 };
 
+
+if (process.argv.indexOf('--help') !== -1) {
+    printHelp();
+    return;
+}
+
 var verbose = false;
 var nodeModulesExisting = false;
 var isDev = false;
 var doSSH = false;
 var noSpinner = false;
 var doNotMoveInstall = false;
+var yes;
 var branch;
 var warnings;
 
@@ -87,6 +94,7 @@ for (let i = 0; i < process.argv.length; i++) {
 
 
 if (process.argv.indexOf('--no-spinner') !== -1) noSpinner = true;
+if (process.argv.indexOf('--yes') !== -1) yes = true;
 
 // nodeGame version.
 const VERSION = isDev ? "v" + version + '-dev' : "v" + version;
@@ -165,24 +173,29 @@ if (fs.existsSync(INSTALL_DIR)) {
 // Check if node_modules exists (prompt continue?)
 
 if (fs.existsSync(NODE_MODULES_DIR)) {
+    nodeModulesExisting = true;
     err('Warning: node_modules directory already existing.');
-    confirm('  Continue? [y/n] ', function(ok) {
-        if (ok) {
-            process.stdin.destroy();
-            nodeModulesExisting = true;
-            log();
-            doInstall();
-        }
-        else {
-            err('Installation aborted.');
-            log();
-        }
-    });
-    return;
+    if (!yes) {
+        confirm('  Continue? [y/n] ', function(ok) {
+            if (ok) {
+                process.stdin.destroy();
+                log();
+                doInstall();
+            }
+            else {
+                err('Installation aborted.');
+                log();
+            }
+        });
+        return;
+    }
+    else {
+        log('Continue? [y/n] --yes');
+        log();
+    }
 }
-else {
-    doInstall();
-}
+
+doInstall();
 
 // Install.
 
@@ -406,7 +419,7 @@ function getAllGitModules(cb) {
 
             // Keep node_modules, if any.
             if (fs.existsSync(nodeModulesPath)) {
-                
+
                 // Remove nodegame modules (if any) will be get by git.
                 fs.readdirSync(nodeModulesPath).forEach(function(file, index) {
                     if (inArray(file, NODEGAME_MODULES)) {
@@ -414,7 +427,7 @@ function getAllGitModules(cb) {
                         removeDirRecursiveSync(modulePath);
                     }
                 });
-                
+
                 nodeModulesCopy = path.resolve(NODE_MODULES_DIR,
                                                ('_node_modules-' + module));
                 fs.renameSync(nodeModulesPath, nodeModulesCopy);
@@ -422,10 +435,10 @@ function getAllGitModules(cb) {
 
             // Remove npm folder.
             removeDirRecursiveSync(modulePath);
-            
+
             setTimeout(function() {
                 getGitModule(module, INSTALL_DIR_MODULES, function(err) {
-                    if (err) throw new Error(err);                    
+                    if (err) throw new Error(err);
                     // Put back node_modules, if it was copied before.
                     if (nodeModulesCopy) {
                         fs.renameSync(nodeModulesCopy, nodeModulesPath);
@@ -500,10 +513,10 @@ function copyGameFromNodeModules(game, enable) {
     tmpPath = path.join(tmpPath, '.bin');
     if (!fs.existsSync(tmpPath)) fs.mkdirSync(tmpPath);
     tmpPath = path.join(tmpPath, 'mocha');
-    if (!fs.existsSync(tmpPath)) {        
+    if (!fs.existsSync(tmpPath)) {
         makeLink(path.join(INSTALL_DIR_MODULES, '.bin/mocha'), tmpPath);
     }
-    
+
     if (!enable) return;
 
     // Enable gapath.resolve(GAMES_AVAILABLE_DIR, game).
@@ -516,7 +529,7 @@ function confirm(msg, callback) {
         output: process.stdout
     });
 
-    rl.question(msg, function (input) {
+    rl.question(msg, function(input) {
         rl.close();
         callback(/^y|yes|ok|true$/i.test(input));
     });
@@ -562,6 +575,21 @@ function installationFailed() {
     log();
 }
 
+
+function printHelp() {
+
+    log();
+    log('@<version>              Install a specific version (>=3.5.1)');
+    log('@dev                    Install from git repos, when available');
+    log('--branch <name>         Checkout this branch on all git repos');
+    log('--yes                   Answer yes to all questions');
+    log('--install-dir <dirname> Set the name of the installation directory;');
+    log('                        if equals to node_modules, the npm structure');
+    log('                        stays unchanged');
+    log('--no-spinner            Does not start the spinner');
+    log('--help                  Print this help');
+    log();
+}
 
 // Kudos: cli-spinner package.
 
