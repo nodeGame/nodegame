@@ -16,6 +16,7 @@ Session.vim
 *~
 *.nddb
 _*
+LOG
 
 npm-debug.log
 node_modules/
@@ -25,6 +26,7 @@ descil.conf.js
 
 imgscore
 
+games/dictator
 games/meritocracy
 games/ultimatum
 games/stopgo
@@ -33,8 +35,11 @@ games/MiniSvo
 games/car-sharing
 games/DCL
 games_new/
+games_available/
 start/
 log/*.log
+
+bin/nodegame
 
 manifest.yml
 

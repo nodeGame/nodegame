@@ -45,10 +45,10 @@ var yes;
 var branch;
 var warnings;
 
-const MAIN_MODULE = 'nodegame';
+const MAIN_MODULE = 'nodegame-test';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.0.0";
+const INSTALLER_VERSION = "4.0.8";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -170,7 +170,6 @@ if (fs.existsSync(INSTALL_DIR)) {
 if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
     err('Warning: node_modules directory already existing.');
-    console.log('YES is: ', yes);
     if (!yes) {
         confirm('  Continue? [y/n] ', function(ok) {
             if (ok) {

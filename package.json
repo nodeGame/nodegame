@@ -1,10 +1,10 @@
 {
     "name": "nodegame"
-    , "description": "Starter package for nodegame: install scripts, configurations and development files."
-    , "version": "3.5.1"
-    , "homepage": "http://nodegame.org"
-    , "author": "Stefano Balietti <futur.dorko@gmail.com>"
-    , "contributors": [
+  , "description": "Starter package for nodegame: install scripts, configurations and development files."
+  , "version": "4.0.0"
+  , "homepage": "http://nodegame.org"
+  , "author": "Stefano Balietti <futur.dorko@gmail.com>"
+  , "contributors": [
         { "name": "Stefano Balietti", "email": "futur.dorko@gmail.com" }
     ]
     , "repository": {
