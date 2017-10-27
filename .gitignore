@@ -26,6 +26,18 @@ descil.conf.js
 
 imgscore
 
+log/*.log
+
+
+games_available/dictator
+games_available/meritocracy
+games_available/ultimatum
+games_available/stopgo
+games_available/artex
+games_available/MiniSvo
+games_available/car-sharing
+games_available/DCL
+
 games/dictator
 games/meritocracy
 games/ultimatum
@@ -34,10 +46,9 @@ games/artex
 games/MiniSvo
 games/car-sharing
 games/DCL
+
 games_new/
-games_available/
 start/
-log/*.log
 
 bin/nodegame
 

@@ -45,10 +45,10 @@ var yes;
 var branch;
 var warnings;
 
-const MAIN_MODULE = 'nodegame-test';
+const MAIN_MODULE = 'nodegame';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.0.8";
+const INSTALLER_VERSION = "4.0.0";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
