@@ -172,7 +172,6 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
     err('Warning: node_modules directory already existing.');
     if (!yes) {
         confirm('  Continue? [y/n] ', function(ok) {
-            console.log('noooo!');;
             if (ok) {
                 process.stdin.destroy();
                 log();
@@ -183,17 +182,13 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
                 log();
             }
         })
-        console.log('oooo!');;
         return;
     }
     else {        
-        console.log('PPPPPP!');
         log('Continue? [y/n] --yes');
         log();
     }
 }
-
-console.log('HEEEre!');
 
 // Install.
 doInstall();
