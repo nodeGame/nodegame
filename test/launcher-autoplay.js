@@ -16,10 +16,6 @@ if (process.argv.length < 3) {
 var gameName = process.argv[2];
 var gameFolder = process.argv[3] || gameName;
 
-console.log(process.argv);
-console.log('---------------------------');
-
-
 // Load the Node.js path object.
 var path = require('path');
 
