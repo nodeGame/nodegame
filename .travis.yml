@@ -12,6 +12,7 @@ before_install:
 
 install:
   ## Remove package json, otherwise npm does not install nodegame as dependency.
+  - npm install --only=dev
   - rm package.json
   - node nodegame-installer.js @dev --install-dir node_modules --no-spinner --branch v4 --yes
 

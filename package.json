@@ -30,7 +30,11 @@
         "JSUS": "*",
         "NDDB": "*",
         "ultimatum-game": "*"
-    }            
+    }       
+    , "devDependencies": {
+        "mocha": ">= 0.3.0",
+        "should": "4.4.1"
+    }
     , "license": "MIT"
     , "scripts": {
         "start": "node launcher.js"

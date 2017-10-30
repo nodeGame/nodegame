@@ -56,29 +56,18 @@ var version = INSTALLER_VERSION;
 var requestedVersion = requestedVersion = '@' + version;
 
 for (let i = 0; i < process.argv.length; i++) {
-    if (process.argv[i].charAt(0) === '@') {
+    let option = process.argv[i];
+    
+    if (option.charAt(0) === '@') {
         requestedVersion = process.argv[i].substr(1);
 
         if (requestedVersion === 'dev') {
             isDev = true;
             version = INSTALLER_VERSION;
             requestedVersion = '@' + version;
-            if (process.argv.indexOf('--ssh') !== -1) doSSH = true;
-            branch = process.argv.indexOf('--branch');
-            if (branch !== -1) {
-                branch = process.argv[branch+1];
-                if (!branch) {
-                    err('--branch option found, ' +
-                        'but no value provided.');
-                    log();
-                    return;
-                }
-            }
-            else {
-                branch = undefined;
-            }
+
         }
-        else {
+        else {            
             version = requestedVersion;
             if (version.length < 1 || version.length > 5) {
                 err('Error: invalid version number: ', version);
@@ -87,12 +76,31 @@ for (let i = 0; i < process.argv.length; i++) {
             }
             requestedVersion = '@' + requestedVersion;
         }
-        break;
     }
+    else if (option === '--no-spinner') {
+        noSpinner = true;
+    }
+    else if (option === '--yes') {
+        yes = true;
+    }
+    else if (option === '--branch') {
+        branch = process.argv[i+1];
+        if (!branch) {
+            err('--branch option found, but no value provided.');
+            log();
+            return;
+        }
+    
+    }
+    else if (option === '--ssh') {
+        doSSH = true;
+    }    
 }
 
-if (process.argv.indexOf('--no-spinner') !== -1) noSpinner = true;
-if (process.argv.indexOf('--yes') !== -1) yes = true;
+if ((doSSH || branch) && !isDev) {
+    err('Error: --branch and --doSSH options are available only with @dev');
+    return;
+}
 
 // nodeGame version.
 const VERSION = isDev ? "v" + version + '-dev' : "v" + version;
