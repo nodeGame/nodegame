@@ -7,17 +7,16 @@ node_js:
 
 before_install:
 # Get installer script.
-  - wget https://github.com/nodeGame/nodegame-test/raw/master/nodegame-installer.js
+  - wget https://raw.githubusercontent.com/nodeGame/nodegame/master/bin/nodegame-installer.js
   - chmod a+x nodegame-installer.js
 
 install:
-  - node nodegame-installer.js @dev --install-dir node_modules --no-spinner --branch v4
-  - npm install -g should
-  - npm install -g mocha
+  - npm install --only=dev
+  - node nodegame-installer.js @dev --install-dir node_modules --no-spinner --branch v4 --yes
 
 script:
 # Add extra tests here.
 
 # Test Ultimatum game.
-  - cd node_modules/nodegame-test/games/ultimatum-game
+  - cd node_modules/nodegame/games/ultimatum-game
   - ./bin/run-standalone-test-v4.sh
