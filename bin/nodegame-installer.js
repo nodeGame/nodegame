@@ -27,7 +27,10 @@ const log = txt => {
     else console.log('  ' + txt);
 };
 const err = txt => {
-    console.error('  ' + txt);
+    console.error('  Error: ' + txt);
+};
+const warn = txt => {
+    console.error('  Warning: ' + txt);
 };
 
 if (process.argv.indexOf('--help') !== -1) {
@@ -70,7 +73,7 @@ for (let i = 0; i < process.argv.length; i++) {
         else {            
             version = requestedVersion;
             if (version.length < 1 || version.length > 5) {
-                err('Error: invalid version number: ', version);
+                err('invalid version number: ', version);
                 log();
                 return;
             }
@@ -98,7 +101,7 @@ for (let i = 0; i < process.argv.length; i++) {
 }
 
 if ((doSSH || branch) && !isDev) {
-    err('Error: --branch and --doSSH options are available only with @dev');
+    err('--branch and --doSSH options are available only with @dev');
     return;
 }
 
@@ -160,8 +163,8 @@ printInstallInfo();
 // Check node version is.
 var nodeVersion = process.versions.node.split('.');
 if (parseInt(nodeVersion[0], 10) < 4) {
-    err('Error: node version >= 4.x is required.');
-    err('Please upgrade your Node.Js installation, ' +
+    err('node version >= 4.x is required.\n' +
+        'Please upgrade your Node.Js installation, ' +
         'visit: http://nodejs.org');
     log();
     return;
@@ -169,7 +172,7 @@ if (parseInt(nodeVersion[0], 10) < 4) {
 
 // Check if install dir exists (abort).
 if (fs.existsSync(INSTALL_DIR)) {
-    err('Error: installation directory already existing.');
+    err('installation directory already existing.');
     log();
     return;
 }
@@ -177,7 +180,7 @@ if (fs.existsSync(INSTALL_DIR)) {
 // Check if node_modules exists (prompt continue?)
 if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
-    err('Warning: node_modules directory already existing.');
+    warn('node_modules directory already existing.');
     if (!yes) {
         confirm('  Continue? [y/n] ', function(ok) {
             if (ok) {
@@ -186,7 +189,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
                 doInstall();
             }
             else {
-                err('Installation aborted.');
+                log('Installation aborted.');
                 log();
             }
         })
@@ -199,8 +202,8 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
 }
 
 // Install.
-doInstall();
-
+if (isDev) checkGitExists(doInstall);
+else doInstall();
 
 
 // Helper functions.
@@ -268,7 +271,7 @@ function doInstall() {
                     //                                 logList(stdout.trim());
                     //                             }
                     //                         });
-                    err('Oops! The following error/s occurred: ');
+                    log('Oops! The following error/s occurred: ');
                     log();
                     console.error(e);
                     installationFailed();
@@ -278,8 +281,22 @@ function doInstall() {
         });
 }
 
-// Helper stuff.
-////////////////
+function checkGitExists(cb) {
+    let child = execFile(
+        'git',
+        [ '--version' ],
+        { cwd: ROOT_DIR },
+        (error, stdout, stderr) => {
+            if (error) {
+                err('git not found, cannot install @dev version.');
+                log('Install git from: https://git-scm.com/ and retry.');
+                installationFailed();
+            }
+            else {
+                if (cb) cb();               
+            }
+        });
+}
 
 function printNodeGameInfo() {
     log();
@@ -365,7 +382,6 @@ function printFinalInfo() {
 function someMagic() {
 
     if (!doNotMoveInstall) {
-        debugger
         // Move nodegame folder outside node_modules.
         fs.renameSync(path.resolve(NODE_MODULES_DIR, MAIN_MODULE), INSTALL_DIR);
 
@@ -550,7 +566,7 @@ function removeDirRecursiveSync(dir) {
         throw new Error('   removeDirRecursiveSync error: cannot remove "/"');
     }
     if (dir.indexOf(INSTALL_DIR_MODULES) === -1) {
-        err(' removeDirRecursiveSync error: there seems to be ' +
+        err('removeDirRecursiveSync error: there seems to be ' +
             'an error with the path to remove: ');
         console.error(dir);
     }
@@ -573,15 +589,15 @@ function installationFailed() {
 
     log();
 
-    err('Installation did not complete successfully.');
+    log('Installation did not complete successfully.');
     log('----------------------------------------------');
     log();
 
-    err('If you think this might be a bug, please report it. ' +
+    log('If you think this might be a bug, please report it. ' +
         'You can either:');
-    err('  - open an issue at: ' +
+    log('  - open an issue at: ' +
         'https://github.com/nodeGame/nodegame/issues');
-    err('  - send an email to info@nodegame.org');
+    log('  - send an email to info@nodegame.org');
     log();
 }
 
@@ -590,8 +606,9 @@ function printHelp() {
 
     log();
     log('@<version>              Install a specific version (>=3.5.1)');
-    log('@dev                    Install from git repos, when available');
-    log('--branch <name>         Checkout this branch on all git repos');
+    log('@dev                    Install latest nodeGame from git repos');
+    log('    --branch <name>         Checkout this branch on all git repos');
+    log('    --ssh                   Use ssh to get all git repos');
     log('--yes                   Answer yes to all questions');
     log('--install-dir <dirname> Set the name of the installation directory;');
     log('                        if equals to node_modules, the npm structure');

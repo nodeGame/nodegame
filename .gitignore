@@ -37,6 +37,9 @@ games_available/artex
 games_available/MiniSvo
 games_available/car-sharing
 games_available/DCL
+games_available/rules
+games_available/prisonersgame
+
 
 games/dictator
 games/meritocracy
@@ -46,6 +49,8 @@ games/artex
 games/MiniSvo
 games/car-sharing
 games/DCL
+games/rules
+games/prisonersgame
 
 games_new/
 start/
