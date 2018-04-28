@@ -39,8 +39,9 @@ games_available/car-sharing
 games_available/DCL
 games_available/rules
 games_available/prisonersgame
+games_available/testergame
 
-
+games/testergame
 games/dictator
 games/meritocracy
 games/ultimatum
