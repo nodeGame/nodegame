@@ -51,7 +51,7 @@ var warnings;
 const MAIN_MODULE = 'nodegame';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.0.1";
+const INSTALLER_VERSION = "4.0.4";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
