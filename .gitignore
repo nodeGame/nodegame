@@ -29,6 +29,7 @@ imgscore
 log/*.log
 
 
+games_available/ultimatum-game
 games_available/dictator
 games_available/meritocracy
 games_available/ultimatum
@@ -41,6 +42,7 @@ games_available/rules
 games_available/prisonersgame
 games_available/testergame
 
+games/ultimatum-game
 games/testergame
 games/dictator
 games/meritocracy

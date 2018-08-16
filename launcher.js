@@ -439,7 +439,9 @@ function startServer() {
     // Print warnings, if any.
     printIgnoredOptions();
 
-    console.log('nodeGame v.' + require('./package.json').version);
+    console.log('nodeGame v.' + version);
+    // Add nodeGame version (might be higher than server version) to options.
+    options.nodeGameVersion = version;
 
     // Start server, options parameter is optional.
     sn = new ServerNode(options);
