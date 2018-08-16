@@ -21,7 +21,7 @@ it specially designed to conduct _social experiments_.
  - Powerful and customizible waiting rooms
  - Monitor interface
  - Works on mobile devices and tablets
- - Bots and Phantoms
+ - Bots (for playing) and Phantoms (for testing)
  - Installation is required only for the server, clients just need their browser windows
  - Integrates smoothly with other libraries (e.g. jQuery, D3.js, etc.)
    and web services, such as Amazon Mechanical Turk
