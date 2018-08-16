@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2017 Stefano Balietti
+ * Copyright(c) 2018 Stefano Balietti
  * MIT Licensed
  *
  *
@@ -140,6 +140,7 @@ const NODEGAME_MODULES = [
     'nodegame-window', 'nodegame-widgets',
     'nodegame-monitor', 'nodegame-game-template',
     'nodegame-requirements', 'nodegame-generator',
+    'nodegame-mturk',
     // No need to replace these now.
     // 'nodegame-db', 'nodegame-mondodb',
     'JSUS', 'NDDB',
