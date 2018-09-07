@@ -33,12 +33,17 @@ const warn = txt => {
     console.error('  Warning: ' + txt);
 };
 
+const MAIN_MODULE = 'nodegame';
+
+// All stable versions.
+const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.3' ];
+// Installer default version.
+const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
+
 if (process.argv.indexOf('--help') !== -1) {
     printHelp();
     return;
 }
-
-const versions = [ '3.5.1', '4.0.0', '4.0.4', '4.1.3' ];
 
 var verbose = false;
 var nodeModulesExisting = false;
@@ -49,11 +54,6 @@ var doNotMoveInstall = false;
 var yes;
 var branch;
 var warnings;
-
-const MAIN_MODULE = 'nodegame';
-
-// Installer default version.
-const INSTALLER_VERSION = "4.1.2";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -627,9 +627,10 @@ function installationFailed() {
 
 
 function printHelp() {
-
     log();
     log('@<version>              Install a specific version (>=3.5.1)');
+    log('                            Stable versions: ' +
+                                     STABLE_VERSIONS.join(' '));
     log('@dev                    Install latest nodeGame from git repos');
     log('    --branch <name>         Checkout this branch on all git repos');
     log('    --ssh                   Use ssh to get all git repos');
