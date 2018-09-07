@@ -51,7 +51,7 @@ var warnings;
 const MAIN_MODULE = 'nodegame';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.0.4";
+const INSTALLER_VERSION = "4.1.0";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -355,10 +355,10 @@ function printFinalInfo() {
     log();
 
     log('Open a browser tab at the address:');
-    log('  http://localhost:8080/ultimatum');
+    log('  http://localhost:8080/');
     log();
 
-    log('Open another tab with an autoplay player:');
+    log('Start a bot from the waiting room interface, or open another tab:');
     log('  http://localhost:8080/ultimatum?clientType=autoplay');
     log();
 
@@ -531,7 +531,7 @@ function copyGameFromNodeModules(game, enable) {
     enable = 'undefined' === typeof enable ? true : enable;
     let gameDir = path.resolve(GAMES_AVAILABLE_DIR, game);
 
-    // Move game from node_modules into  games_available directory.
+    // Move game from node_modules into games_available directory.
     fs.renameSync(path.resolve(INSTALL_DIR_MODULES, game), gameDir);
 
     // Make sure that the test command works.
@@ -546,7 +546,7 @@ function copyGameFromNodeModules(game, enable) {
 
     if (!enable) return;
 
-    // Enable gapath.resolve(GAMES_AVAILABLE_DIR, game).
+    // Enable it.
     makeLink(gameDir, path.resolve(GAMES_ENABLED_DIR, game));
 }
 
