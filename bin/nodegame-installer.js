@@ -51,7 +51,7 @@ var warnings;
 const MAIN_MODULE = 'nodegame';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.1.0";
+const INSTALLER_VERSION = "4.1.1";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -243,7 +243,7 @@ function doInstall() {
             else {
                 if (verbose) logList(stdout.trim());
                 log();
-                log('Done! Now some finishing magics...');
+                log('Done! Now some final magic...');
                 try {
                     someMagic();
                 }
@@ -396,14 +396,37 @@ function someMagic() {
         }
     }
 
-    // nodeGame generator: make link and store conf.
+    if (isDev) {
+        getAllGitModules(function() {
+            // Move games from node_modules.
+            copyGameFromNodeModules('ultimatum-game');
 
+            // Generator.
+            fixGenerator();
+
+            // Print final Information.
+            printFinalInfo();
+        });
+    }
+    else {
+        // Move games from node_modules.
+        copyGameFromNodeModules('ultimatum-game');
+
+        // Generator.
+        fixGenerator();
+
+        // Print final Information.
+        printFinalInfo();
+    }
+}
+
+function fixGenerator() {
+    // nodeGame generator: make link and store conf.
     makeLink(path.resolve(INSTALL_DIR_MODULES,
                           'nodegame-generator',
                           'bin', 'nodegame'),
              path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
 	     'file');
-
 
     fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
 				  'nodegame-generator',
@@ -412,24 +435,8 @@ function someMagic() {
 		     JSON.stringify({
 			 author: "",
 			 email: "",
-			 gamesFolder: GAMES_AVAILABLE_DIR
+			 ngDir: INSTALL_DIR
 		     }, 4));
-
-
-    if (isDev) {
-        getAllGitModules(function() {
-            // Move games from node_modules.
-            copyGameFromNodeModules('ultimatum-game');
-            // Print final Information.
-            printFinalInfo();
-        });
-    }
-    else {
-        // Move games from node_modules.
-        copyGameFromNodeModules('ultimatum-game');
-        // Print final Information.
-        printFinalInfo();
-    }
 }
 
 function getAllGitModules(cb) {
