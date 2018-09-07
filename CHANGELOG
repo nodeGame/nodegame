@@ -1,5 +1,14 @@
 # nodeGame Changelog
 
+# 4.1.3
+- Improved installer
+- Msg anti-spoofing support
+- Fixed bug on Chrome with flickering scrollbar
+- More options on Monitor, including display of last error
+- Improved nodegame-mturk support
+- Fixed tests
+- Smaller fixes
+
 # 4.0.4
 - Improved monitor error logging.
 - Updated installer version.
