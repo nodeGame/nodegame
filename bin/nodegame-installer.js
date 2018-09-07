@@ -51,7 +51,7 @@ var warnings;
 const MAIN_MODULE = 'nodegame';
 
 // Installer default version.
-const INSTALLER_VERSION = "4.1.1";
+const INSTALLER_VERSION = "4.1.2";
 
 // The actual version being installed, user can change it.
 var version = INSTALLER_VERSION;
@@ -381,10 +381,19 @@ function printFinalInfo() {
 
 
 function someMagic() {
+    let mainNgDir = path.resolve(NODE_MODULES_DIR, MAIN_MODULE);
 
+    // Check if log and private directories have been created.
+    if (!fs.existsSync(path.resolve(mainNgDir, 'log'))) {
+        fs.mkdirSync(path.resolve(mainNgDir, 'log'));
+    }
+    if (!fs.existsSync(path.resolve(mainNgDir, 'private'))) {
+        fs.mkdirSync(path.resolve(mainNgDir, 'private'));
+    }
+        
     if (!doNotMoveInstall) {
         // Move nodegame folder outside node_modules.
-        fs.renameSync(path.resolve(NODE_MODULES_DIR, MAIN_MODULE), INSTALL_DIR);
+        fs.renameSync(mainNgDir, INSTALL_DIR);
 
         // Old npms put already all modules under nodegame.
         if (!fs.existsSync(INSTALL_DIR_MODULES)) {
