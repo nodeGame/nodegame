@@ -38,6 +38,8 @@ if (process.argv.indexOf('--help') !== -1) {
     return;
 }
 
+const versions = [ '3.5.1', '4.0.0', '4.0.4', '4.1.3' ];
+
 var verbose = false;
 var nodeModulesExisting = false;
 var isDev = false;
@@ -449,6 +451,7 @@ function fixGenerator() {
 }
 
 function getAllGitModules(cb) {
+    let gitPrecommitHook = path.resolve(INSTALL_DIR, 'git-hooks', 'pre-commit');
     let counter = NODEGAME_MODULES.length;
     if (verbose) log('Converting modules into git repos.');
     for (let i = 0; i < NODEGAME_MODULES.length; i++) {
@@ -486,6 +489,10 @@ function getAllGitModules(cb) {
                     if (nodeModulesCopy) {
                         fs.renameSync(nodeModulesCopy, nodeModulesPath);
                     }
+                    // Copy pre-commit hook.
+                    fs.copyFileSync(gitPrecommitHook,
+                                    path.resolve(modulePath, '.git', 'hooks',
+                                                 'pre-commit')); 
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
