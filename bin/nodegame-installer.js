@@ -40,8 +40,15 @@ const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.3' ];
 // Installer default version.
 const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
 
-if (process.argv.indexOf('--help') !== -1) {
+if (process.argv[2] === '--help') {
     printHelp();
+    return;
+}
+else if (process.argv[2] === '--list-versions') {
+    console.log('  List of stable versions:');
+    for (let i=0 ; i < STABLE_VERSIONS.length ; i++) { 
+        console.log('   - ' + STABLE_VERSIONS[i]);
+    }
     return;
 }
 
@@ -629,8 +636,6 @@ function installationFailed() {
 function printHelp() {
     log();
     log('@<version>              Install a specific version (>=3.5.1)');
-    log('                            Stable versions: ' +
-                                     STABLE_VERSIONS.join(' '));
     log('@dev                    Install latest nodeGame from git repos');
     log('    --branch <name>         Checkout this branch on all git repos');
     log('    --ssh                   Use ssh to get all git repos');
@@ -639,6 +644,7 @@ function printHelp() {
     log('                        if equals to node_modules, the npm structure');
     log('                        stays unchanged');
     log('--no-spinner            Does not start the spinner');
+    log('--list-versions         Lists stable versions');
     log('--help                  Print this help');
     log();
 }
