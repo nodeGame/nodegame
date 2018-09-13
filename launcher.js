@@ -1,6 +1,6 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2017 Stefano Balietti
+ * Copyright(c) 2011-2018 Stefano Balietti
  * MIT Licensed
  *
  * Load configuration options and start the server
@@ -409,8 +409,8 @@ if (program.build) {
                 all: true,
                 output: out
             });
-            J.copyFile(info.modulesDir.client + 'build/' + out,
-                       info.serverDir.build + out);
+            J.copyFile(path.resolve(info.modulesDir.client, 'build', out),
+                       path.resolve(info.serverDir.build, 'out');
             console.log(info.serverDir.build + out + ' rebuilt.');
             console.log('');
         }
@@ -482,7 +482,7 @@ function startServer() {
                 console.log();
 
                 if (runTests) {
-                    command = gameDir + 'node_modules/.bin/mocha';
+                    command = path.resolve(gameDir, 'node_modules', '.bin', 'mocha');
                     if (fs.existsSync(command)) {
 
                         // Write and backup settings file.
@@ -580,14 +580,14 @@ function printErr(err) {
 function writeSettingsFile(gameDir) {
     var settings, settingsFile, bak;
     settings = 'module.exports = { numPlayers: ' + nClients + ' };';
-    settingsFile = gameDir + 'test/settings.js';
+    settingsFile = path.resolve(gameDir, 'test', 'settings.js');
     // Make a backup of existing settings file, if found.
     if (fs.existsSync(settingsFile)) {
         bak = fs.readFileSync(settingsFile).toString();
         fs.writeFileSync(settingsFile + '.bak', bak);
     }
     // Write updated settings file.
-    fs.writeFileSync(gameDir + 'test/settings.js', settings);
+    fs.writeFileSync(path.resolve(gameDir, 'test', 'settings.js'), settings);
 }
 
 // Exports the ServerNode instance.
