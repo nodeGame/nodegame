@@ -410,7 +410,7 @@ if (program.build) {
                 output: out
             });
             J.copyFile(path.resolve(info.modulesDir.client, 'build', out),
-                       path.resolve(info.serverDir.build, 'out');
+                       path.resolve(info.serverDir.build, 'out'));
             console.log(info.serverDir.build + out + ' rebuilt.');
             console.log('');
         }
