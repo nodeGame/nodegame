@@ -35,7 +35,7 @@ const warn = txt => {
 const MAIN_MODULE = 'nodegame';
 
 // All stable versions.
-const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.3' ];
+const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.5' ];
 // Installer default version.
 const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
 
