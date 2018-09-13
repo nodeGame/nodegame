@@ -1,9 +1,8 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2018 Stefano Balietti
+ * Copyright(c) 2011-2018 Stefano Balietti
  * MIT Licensed
- *
  *
  * http://www.nodegame.org
  */
@@ -497,9 +496,9 @@ function getAllGitModules(cb) {
                         fs.renameSync(nodeModulesCopy, nodeModulesPath);
                     }
                     // Copy pre-commit hook.
-                    fs.copyFileSync(gitPrecommitHook,
-                                    path.resolve(modulePath, '.git', 'hooks',
-                                                 'pre-commit')); 
+                    copyFileSync(gitPrecommitHook,
+                                 path.resolve(modulePath, '.git', 'hooks',
+                                              'pre-commit')); 
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
@@ -734,4 +733,77 @@ function inArray(needle, haystack) {
         }
     }
     return false;
+}
+
+
+
+// Kudos. Adapted from:
+// https://github.com/coderaiser/
+// fs-copy-file-sync/blob/master/lib/fs-copy-file-sync.js
+function _copyFileSync(src, dest, flag) {
+    const SIZE = 65536;
+
+    const COPYFILE_EXCL = 1;
+    const COPYFILE_FICLONE = 2;
+    const COPYFILE_FICLONE_FORCE = 4;
+
+    const constants = {
+        COPYFILE_EXCL,
+        COPYFILE_FICLONE,
+        COPYFILE_FICLONE_FORCE,
+    };
+
+    const isNumber = (a) => typeof a === 'number';
+    const or = (a, b) => a | b;
+    const getValue = (obj) => (key) => obj[key];
+
+    const getMaxMask = (obj) => Object
+          .keys(obj)
+          .map(getValue(obj))
+          .reduce(or);
+
+    const MAX_MASK = getMaxMask(constants);
+    const isExcl = (flags) => flags & COPYFILE_EXCL;
+
+        
+    const writeFlag = isExcl(flag) ? 'wx' : 'w';
+    
+    const {
+        size,
+        mode,
+    } = fs.statSync(src);
+    
+    const fdSrc = fs.openSync(src, 'r');
+    const fdDest = fs.openSync(dest, writeFlag, mode);
+    
+    const length = size < SIZE ? size : SIZE;
+    
+    let pos = 0;
+    const peaceSize = size < SIZE ? 0 : size % SIZE;
+    const offset = 0;
+    
+    let buffer = Buffer.allocUnsafe(length);
+    for (let i = 0; length + pos + peaceSize <= size; i++, pos = length * i) {
+        fs.readSync(fdSrc, buffer, offset, length, pos);
+        fs.writeSync(fdDest, buffer, offset, length, pos);
+    }
+    
+    if (peaceSize) {
+        const length = peaceSize;
+        buffer = Buffer.allocUnsafe(length);
+        fs.readSync(fdSrc, buffer, offset, length, pos);
+        fs.writeSync(fdDest, buffer, offset, length, pos);
+    }
+    
+    fs.closeSync(fdSrc);
+    fs.closeSync(fdDest);
+}
+
+function copyFileSync(from, to) {
+    if ('function' === typeof fs.copyFileSync) {
+        fs.copyFileSync(from, to);
+    }
+    else {
+        _copyFileSync(from, to);
+    }
 }
