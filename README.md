@@ -1,12 +1,9 @@
-# nodeGame: Online Real-Time Synchronous Experiments
+# nodeGame
 
 Fast, scalable JavaScript for large-scale, online, multiplayer, real-time games
 and experiments.
 
 ---
-
-nodeGame is a general framework to play any kind of game online, but
-it specially designed to conduct _social experiments_.
 
 ## The Good parts
 
@@ -41,14 +38,12 @@ it follows the steps:
   3. Download [installer](http://nodegame.org/nodegame-installer.js), and install nodegame: `node nodegame-installer`
   4. Enter installation directory.
   5. Start the server with the command: `node launcher.js`
-  6. Open two or more browser tabs pointing to
-  `localhost:8080/ultimatum`
-  7. Open a browser tab pointing to
+  6. Open one tab pointing to `localhost:8080`
+  7. Select Ultimatum game
+  8. Open more tabs, or start a bot through the waiting room interface
+  7. Check the monitor interface at
   `localhost:8080/ultimatum/monitor`
   
-To keep your development version code base up to date you can use the
-script in `bin/pull-all.sh` (Mac/Linux only).
-
 ## Documentation
 
 Complete documentation is available in the nodeGame
