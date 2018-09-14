@@ -1,21 +1,26 @@
 {
-    "name": "nodegame"
-  , "description": "Starter package for nodegame: installer, configurations and development files."
-  , "version": "4.2.0"
-  , "homepage": "http://nodegame.org"
-  , "author": "Stefano Balietti <futur.dorko@gmail.com>"
-  , "contributors": [
-        { "name": "Stefano Balietti", "email": "futur.dorko@gmail.com" }
-    ]
-    , "repository": {
-        "type": "git"
-        , "url": "https://github.com/nodeGame/nodegame.git"
-    }
-    , "engines": { "node": ">= 0.10.0" }
-    , "dependencies" : {
+    "name": "nodegame",
+    "description": "Starter package for nodegame: installer, configurations and development files.",
+    "version": "4.2.1",
+    "homepage": "http://nodegame.org",
+    "author": "Stefano Balietti <futur.dorko@gmail.com>",
+    "contributors": [
+        {
+            "name": "Stefano Balietti",
+            "email": "futur.dorko@gmail.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nodeGame/nodegame.git"
+    },
+    "engines": {
+        "node": ">= 0.10.0"
+    },
+    "dependencies": {
         "commander": "*",
         "fs-extra": "*",
-        "smoosh": "0.4.0",	
+        "smoosh": "0.4.0",
         "nodegame-server": "*",
         "nodegame-client": "*",
         "nodegame-window": "*",
@@ -30,13 +35,13 @@
         "JSUS": "*",
         "NDDB": "*",
         "ultimatum-game": "*"
-    }       
-    , "devDependencies": {
+    },
+    "devDependencies": {
         "mocha": ">= 0.3.0",
         "should": "4.4.1"
-    }
-    , "license": "MIT"
-    , "scripts": {
+    },
+    "license": "MIT",
+    "scripts": {
         "start": "node launcher.js"
     }
 }
