@@ -7,7 +7,10 @@ let rl = readline.createInterface({
 
 var steps = [
     'Update version in package.json in nodegame',
+    'Update CHANGELOG file in nodegame',
     'Update version in nodegame-installer',
+    'Git push nodegame to master',
+    'Check tests on Travis',
     'Upload nodegame-installer to website',
     'Update version in index.htm and upload it to website',
     'Update changelog.htm and upload it to website',
@@ -31,6 +34,9 @@ function step(str) {
 console.log();
 
 step()
+    .then(() => { return step(); })
+    .then(() => { return step(); })
+    .then(() => { return step(); })
     .then(() => { return step(); })
     .then(() => { return step(); })
     .then(() => { return step(); })
