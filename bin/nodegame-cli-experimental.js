@@ -11,6 +11,9 @@
 
 "use strict";
 
+console.log('not ready yet!');
+return;
+
 // Modules.
 const fs = require('fs-extra');
 const path = require('path');
