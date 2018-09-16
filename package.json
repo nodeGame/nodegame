@@ -1,6 +1,7 @@
 {
     "name": "nodegame",
-    "description": "Starter package for nodegame: installer, configurations and development files.",
+    "description": "Fast, scalable JavaScript for large-scale, online, multiplayer, real-time games
+and experiments.",
     "version": "4.2.1",
     "homepage": "http://nodegame.org",
     "author": "Stefano Balietti <futur.dorko@gmail.com>",
@@ -15,7 +16,7 @@
         "url": "https://github.com/nodeGame/nodegame.git"
     },
     "engines": {
-        "node": ">= 0.10.0"
+        "node": ">= 6.0.0"
     },
     "dependencies": {
         "commander": "*",
