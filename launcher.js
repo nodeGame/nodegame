@@ -11,10 +11,10 @@
 "use strict";
 
 // Modules.
-var fs = require('fs');
-var path = require('path');
-var exec = require('child_process').exec;
-var J = require('JSUS').JSUS;
+const fs = require('fs');
+const path = require('path');
+const exec = require('child_process').exec;
+const J = require('JSUS').JSUS;
 
 var NDDB;
 
@@ -410,7 +410,7 @@ if (program.build) {
                 output: out
             });
             J.copyFile(path.resolve(info.modulesDir.client, 'build', out),
-                       path.resolve(info.serverDir.build, 'out'));
+                       path.resolve(info.serverDir.build, 'nodegame-full.js'));
             console.log(info.serverDir.build + out + ' rebuilt.');
             console.log('');
         }
