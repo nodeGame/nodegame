@@ -1,5 +1,11 @@
 # nodeGame Changelog
 
+# 4.3.0
+- Treatment selection in waiting room. If ALLOW_SELECT_TREATMENT is true in
+waitroom.setttings.js then a small dropdown menu allows user to select the
+treatment for the game.
+- Small fixes.
+
 # 4.2.1 (current, not npm)
 - Fixed building client.
 
