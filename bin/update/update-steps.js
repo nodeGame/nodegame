@@ -14,6 +14,8 @@ var steps = [
     'Upload nodegame-installer to website',
     'Update version in index.htm and upload it to website',
     'Update changelog.htm and upload it to website',
+    'Commit and push changes to nodegame-website',
+    'Update nodegame-heroku package.json version',
     'Tweet about new version :)'
 ];
 
