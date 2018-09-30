@@ -1,5 +1,9 @@
 # nodeGame Changelog
 
+# 4.3.1
+- Re-enabled support for games without treatment description (bug introduced
+in 4.3.0)
+
 # 4.3.0
 - Treatment selection in waiting room. If ALLOW_SELECT_TREATMENT is true in
 waitroom.settings.js then a small dropdown menu allows user to select the
