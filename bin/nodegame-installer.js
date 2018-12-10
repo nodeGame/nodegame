@@ -40,15 +40,21 @@ const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.5',
 // Installer default version.
 const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
 
-if (process.argv[2] === '--help') {
+// Check if it is a help call.
+let p = process.argv[2];
+if (p === '--help' || p === '-h') {
     printHelp();
     return;
 }
-else if (process.argv[2] === '--list-versions') {
+else if (p === '--list-versions') {
     console.log('  List of stable versions:');
     for (let i=0 ; i < STABLE_VERSIONS.length ; i++) { 
         console.log('   - ' + STABLE_VERSIONS[i]);
     }
+    return;
+}
+else if (p === '--version' || p === '-v') {
+    console.log('nodegame-installer v' + INSTALLER_VERSION);
     return;
 }
 
@@ -106,7 +112,7 @@ for (let i = 0; i < process.argv.length; i++) {
     }
     else if (option === '--ssh') {
         doSSH = true;
-    }    
+    }
 }
 
 if ((doSSH || branch) && !isDev) {
@@ -645,6 +651,7 @@ function printHelp() {
     log('                        stays unchanged');
     log('--no-spinner            Does not start the spinner');
     log('--list-versions         Lists stable versions');
+    log('--version               Print installer version');
     log('--help                  Print this help');
     log();
 }
