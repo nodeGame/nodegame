@@ -583,7 +583,11 @@ function copyGameFromNodeModules(game, enable) {
     if (!enable) return;
 
     // Enable it.
-    makeLink(gameDir, path.resolve(GAMES_ENABLED_DIR, game));
+
+    // Make it relative
+    let gameEnabledPath = path.resolve(GAMES_ENABLED_DIR, game);
+    gameDir = path.join('..', 'games_available', game);
+    makeLink(gameDir, gameEnabledPath);
 }
 
 function confirm(msg, callback) {
