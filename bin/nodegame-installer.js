@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2011-2018 Stefano Balietti
+ * Copyright(c) 2011-2019 Stefano Balietti
  * MIT Licensed
  *
  * http://www.nodegame.org
@@ -32,11 +32,11 @@ const warn = txt => {
     console.error('  Warning: ' + txt);
 };
 
-const MAIN_MODULE = 'nodegame';
+const MAIN_MODULE = 'nodegame-test';
 
 // All stable versions.
 const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.5',
-                          '4.2.0', '4.3.2' ];
+                          '4.2.0', '4.3.2', '5.0.0' ];
 // Installer default version.
 const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
 
