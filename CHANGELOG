@@ -1,47 +1,7 @@
 # nodeGame Changelog
 
-# current
-- Installer checks better for -v and -h options.
-
-# 4.3.3
-- Updated package.json to fix the version numbers of v4
-
-# 4.3.2
-- Re-enabled support for games without treatment description (bug introduced
-in 4.3.0)
-
-# 4.3.0
-- Treatment selection in waiting room. If ALLOW_SELECT_TREATMENT is true in
-waitroom.settings.js then a small dropdown menu allows user to select the
-treatment for the game.
-- Small fixes.
-
-# 4.2.1 (current, not npm)
-- Fixed building client.
-
-# 4.2.0
-- Improved create-game command.
-- Cleanup
-- Small fixes.
-
-# 4.1.5
-- Fixed installer on Node < 8.x
-
-# 4.1.3
-- Improved installer
-- Msg anti-spoofing support
-- Fixed bug on Chrome with flickering scrollbar
-- More options on Monitor, including display of last error
-- Improved nodegame-mturk support
-- Fixed tests
-- Smaller fixes
-
-# 4.0.4
-- Improved monitor error logging.
-- Updated installer version.
-
-# 4.0.2
-- Big release, check CHANGELOG on website.
+# 3.5.2
+- Fixed installer v3.
 
 # 3.5
 - Printing version on startup (launcher).
