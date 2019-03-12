@@ -85,17 +85,16 @@ var requestedVersion = '@' + version;
 
 for (let i = 0; i < process.argv.length; i++) {
     let option = process.argv[i];
-    
+
     if (option.charAt(0) === '@') {
         requestedVersion = process.argv[i].substr(1);
 
         if (requestedVersion === 'dev') {
             isDev = true;
-            version = INSTALLER_VERSION;
             requestedVersion = '@' + version;
 
         }
-        else {            
+        else {
             version = STABLE_VERSIONS[requestedVersion];
             if (!version) {
                 err('invalid version: ', version);
@@ -119,7 +118,7 @@ for (let i = 0; i < process.argv.length; i++) {
             log();
             return;
         }
-    
+
     }
     else if (option === '--ssh') {
         doSSH = true;
@@ -222,7 +221,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
         })
         return;
     }
-    else {        
+    else {
         log('Continue? [y/n] --yes');
         log();
     }
@@ -320,7 +319,7 @@ function checkGitExists(cb) {
                 installationFailed();
             }
             else {
-                if (cb) cb();               
+                if (cb) cb();
             }
         });
 }
@@ -416,7 +415,7 @@ function someMagic() {
     if (!fs.existsSync(path.resolve(mainNgDir, 'private'))) {
         fs.mkdirSync(path.resolve(mainNgDir, 'private'));
     }
-        
+
     if (!doNotMoveInstall) {
         // Move nodegame folder outside node_modules.
         fs.renameSync(mainNgDir, INSTALL_DIR);
@@ -516,7 +515,7 @@ function getAllGitModules(cb) {
                     // Copy pre-commit hook.
                     copyFileSync(gitPrecommitHook,
                                  path.resolve(modulePath, '.git', 'hooks',
-                                              'pre-commit')); 
+                                              'pre-commit'));
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
@@ -784,36 +783,36 @@ function _copyFileSync(src, dest, flag) {
     const MAX_MASK = getMaxMask(constants);
     const isExcl = (flags) => flags & COPYFILE_EXCL;
 
-        
+
     const writeFlag = isExcl(flag) ? 'wx' : 'w';
-    
+
     const {
         size,
         mode,
     } = fs.statSync(src);
-    
+
     const fdSrc = fs.openSync(src, 'r');
     const fdDest = fs.openSync(dest, writeFlag, mode);
-    
+
     const length = size < SIZE ? size : SIZE;
-    
+
     let pos = 0;
     const peaceSize = size < SIZE ? 0 : size % SIZE;
     const offset = 0;
-    
+
     let buffer = Buffer.allocUnsafe(length);
     for (let i = 0; length + pos + peaceSize <= size; i++, pos = length * i) {
         fs.readSync(fdSrc, buffer, offset, length, pos);
         fs.writeSync(fdDest, buffer, offset, length, pos);
     }
-    
+
     if (peaceSize) {
         const length = peaceSize;
         buffer = Buffer.allocUnsafe(length);
         fs.readSync(fdSrc, buffer, offset, length, pos);
         fs.writeSync(fdDest, buffer, offset, length, pos);
     }
-    
+
     fs.closeSync(fdSrc);
     fs.closeSync(fdDest);
 }
