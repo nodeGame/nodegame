@@ -45,7 +45,7 @@ const STABLE_VERSIONS = {
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
 
 // Installer default version.
-const INSTALLER_VERSION = 'v4';
+const INSTALLER_VERSION = 'v5';
 
 // The actual version being installed, user can change it.
 var version = STABLE_VERSIONS[INSTALLER_VERSION];
