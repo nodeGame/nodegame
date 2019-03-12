@@ -1,7 +1,9 @@
 # nodeGame Changelog
 
-# current
-- Installer checks better for -v and -h options.
+# 5.0.0
+- Updated installer, now installing latest versions of v3, v4, v5.
+- Updated installer, checks for node_modules folder above the current folder.
+- Updated package.json with stricter version numbers.
 
 # 4.3.3
 - Updated package.json to fix the version numbers of v4
@@ -9,6 +11,7 @@
 # 4.3.2
 - Re-enabled support for games without treatment description (bug introduced
 in 4.3.0)
+- Installer checks better for -v and -h options.
 
 # 4.3.0
 - Treatment selection in waiting room. If ALLOW_SELECT_TREATMENT is true in
