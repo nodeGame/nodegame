@@ -1,7 +1,7 @@
 {
     "name": "nodegame",
     "description": "Fast, scalable JavaScript for large-scale, online, multiplayer, real-time games and experiments.",
-    "version": "5.0.0-beta.0",
+    "version": "5.0.0",
     "homepage": "http://nodegame.org",
     "author": "Stefano Balietti <futur.dorko@gmail.com>",
     "contributors": [
@@ -18,23 +18,23 @@
         "node": ">= 6.0.0"
     },
     "dependencies": {
-        "commander": "*",
-        "fs-extra": "*",
-        "smoosh": "0.4.0",
-        "nodegame-server": "*",
-        "nodegame-client": "*",
-        "nodegame-window": "*",
-        "nodegame-widgets": "*",
-        "nodegame-requirements": "*",
-        "nodegame-game-template": "*",
-        "nodegame-monitor": "*",
+        "nodegame-server": "^5.0.0",
+        "nodegame-client": "^5.0.0",
+        "nodegame-window": "^5.0.0",
+        "nodegame-widgets": "^5.0.0",
+        "nodegame-requirements": "^5.0.0",
+        "nodegame-game-template": "^5.0.0",
+        "nodegame-monitor": "^5.0.0",
+        "nodegame-generator": "^5.0.0",
+        "nodegame-mturk": "^5.0.0",
+        "ultimatum-game": "^5.0.0",
+        "JSUS": ">= 1.1.0",
+        "NDDB": ">= 1.18.1",
         "nodegame-db": "*",
         "nodegame-mongodb": "*",
-        "nodegame-generator": "*",
-        "nodegame-mturk": "*",
-        "JSUS": "*",
-        "NDDB": "*",
-        "ultimatum-game": "*"
+        "commander": "*",
+        "fs-extra": "*",
+        "smoosh": "0.4.0"
     },
     "devDependencies": {
         "mocha": ">= 0.3.0",
