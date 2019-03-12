@@ -3,6 +3,9 @@
 # current
 - Installer checks better for -v and -h options.
 
+# 4.3.3
+- Updated package.json to fix the version numbers of v4
+
 # 4.3.2
 - Re-enabled support for games without treatment description (bug introduced
 in 4.3.0)
