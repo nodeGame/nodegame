@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2011-2019 Stefano Balietti
+ * Copyright(c) 2011-2018 Stefano Balietti
  * MIT Licensed
  *
  * http://www.nodegame.org
@@ -35,10 +35,20 @@ const warn = txt => {
 const MAIN_MODULE = 'nodegame';
 
 // All stable versions.
-const STABLE_VERSIONS = [ '3.5.1', '4.0.0', '4.0.4', '4.1.5',
-                          '4.2.0', '4.3.2' ]; // , '5.0.0'
+// Versions below < 3 are not available.
+const STABLE_VERSIONS = {
+    v3: '3.5.3',
+    v4: '4.3.3',
+    v5: '5.0.0'
+};
+
+const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
+
 // Installer default version.
-const INSTALLER_VERSION = STABLE_VERSIONS[STABLE_VERSIONS.length-1];
+const INSTALLER_VERSION = 'v4';
+
+// The actual version being installed, user can change it.
+var version = STABLE_VERSIONS[INSTALLER_VERSION];
 
 // Check if it is a help call.
 let p = process.argv[2];
@@ -48,13 +58,15 @@ if (p === '--help' || p === '-h') {
 }
 else if (p === '--list-versions') {
     console.log('  List of stable versions:');
-    for (let i=0 ; i < STABLE_VERSIONS.length ; i++) {
-        console.log('   - ' + STABLE_VERSIONS[i]);
+    for (let i in STABLE_VERSIONS) {
+        if (STABLE_VERSIONS.hasOwnProperty(i)) {
+            console.log('   - ' + i + ': ' + STABLE_VERSIONS[i]);
+        }
     }
     return;
 }
 else if (p === '--version' || p === '-v') {
-    console.log('nodegame-installer v' + INSTALLER_VERSION);
+    console.log('nodegame-installer ' + version);
     return;
 }
 
@@ -68,14 +80,12 @@ var yes;
 var branch;
 var warnings;
 
-// The actual version being installed, user can change it.
-var version = INSTALLER_VERSION;
-// User requested version;
-var requestedVersion = requestedVersion = '@' + version;
+// User requested version.
+var requestedVersion = '@' + version;
 
 for (let i = 0; i < process.argv.length; i++) {
     let option = process.argv[i];
-
+    
     if (option.charAt(0) === '@') {
         requestedVersion = process.argv[i].substr(1);
 
@@ -85,14 +95,15 @@ for (let i = 0; i < process.argv.length; i++) {
             requestedVersion = '@' + version;
 
         }
-        else {
-            version = requestedVersion;
-            if (version.length < 1 || version.length > 5) {
-                err('invalid version number: ', version);
+        else {            
+            version = STABLE_VERSIONS[requestedVersion];
+            if (!version) {
+                err('invalid version: ', version);
+                log('available version options: ' + AVAILABLE_VERSIONS);
                 log();
                 return;
             }
-            requestedVersion = '@' + requestedVersion;
+            requestedVersion = '@' + version;
         }
     }
     else if (option === '--no-spinner') {
@@ -108,13 +119,10 @@ for (let i = 0; i < process.argv.length; i++) {
             log();
             return;
         }
-
+    
     }
     else if (option === '--ssh') {
         doSSH = true;
-    }
-    else if (option === '--verbose') {
-        verbose = true;
     }
 }
 
@@ -214,7 +222,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
         })
         return;
     }
-    else {
+    else {        
         log('Continue? [y/n] --yes');
         log();
     }
@@ -230,20 +238,6 @@ else doInstall();
 
 function doInstall() {
     var sp;
-
-    // Check if a node_modules folder exists above or two folders above.
-    if (fs.existsSync(path.resolve('..', 'node_modules')) ||
-        fs.existsSync(path.resolve('..', '..', 'node_modules'))) {
-
-        log('Attention! A "node_modules" folder was detected in a ' +
-            'parent directory.');
-        log('Installation cannot continue. Please move the "node_modules" ');
-        log('folder or try to install nodeGame on another directory.');
-        log();
-        installationFailed();
-        return;
-    }
-    
     // Create spinner.
     log('Downloading and installing nodeGame packages.');
 
@@ -273,22 +267,7 @@ function doInstall() {
                 return;
             }
             else {
-                if (verbose) {
-                    log();
-                    logList(stdout.trim());
-                }
-                if (!fs.existsSync(path.resolve(NODE_MODULES_DIR))) {
-                    log();
-                    log();
-                    log('Doh! It looks like npm has a different default ' +
-                        'installation folder.');
-                    log('This can happen if you have a directory called '+
-                        '"node_modules" in any of ');
-                    log('the parent folders. Please try using a ' +
-                        'different path.');
-                    installationFailed();
-                    return;
-                }
+                if (verbose) logList(stdout.trim());
                 log();
                 log('Done! Now some final magic...');
                 try {
@@ -341,7 +320,7 @@ function checkGitExists(cb) {
                 installationFailed();
             }
             else {
-                if (cb) cb();
+                if (cb) cb();               
             }
         });
 }
@@ -349,7 +328,7 @@ function checkGitExists(cb) {
 function printNodeGameInfo() {
     log();
     log('***********************************************  ');
-    log('**   WELCOME TO NODEGAME INSTALLER  v' + INSTALLER_VERSION +
+    log('**   WELCOME TO NODEGAME INSTALLER  v' + version +
         '   **  ');
     log('***********************************************  ');
     log();
@@ -437,7 +416,7 @@ function someMagic() {
     if (!fs.existsSync(path.resolve(mainNgDir, 'private'))) {
         fs.mkdirSync(path.resolve(mainNgDir, 'private'));
     }
-
+        
     if (!doNotMoveInstall) {
         // Move nodegame folder outside node_modules.
         fs.renameSync(mainNgDir, INSTALL_DIR);
@@ -537,7 +516,7 @@ function getAllGitModules(cb) {
                     // Copy pre-commit hook.
                     copyFileSync(gitPrecommitHook,
                                  path.resolve(modulePath, '.git', 'hooks',
-                                              'pre-commit'));
+                                              'pre-commit')); 
                     counter--;
                     if (counter == 0 && cb) cb();
                 });
@@ -615,11 +594,7 @@ function copyGameFromNodeModules(game, enable) {
     if (!enable) return;
 
     // Enable it.
-
-    // Make it relative
-    let gameEnabledPath = path.resolve(GAMES_ENABLED_DIR, game);
-    gameDir = path.join('..', 'games_available', game);
-    makeLink(gameDir, gameEnabledPath);
+    makeLink(gameDir, path.resolve(GAMES_ENABLED_DIR, game));
 }
 
 function confirm(msg, callback) {
@@ -688,7 +663,6 @@ function printHelp() {
     log('--no-spinner            Does not start the spinner');
     log('--list-versions         Lists stable versions');
     log('--version               Print installer version');
-    log('--verbose               Print more output');
     log('--help                  Print this help');
     log();
 }
@@ -810,36 +784,36 @@ function _copyFileSync(src, dest, flag) {
     const MAX_MASK = getMaxMask(constants);
     const isExcl = (flags) => flags & COPYFILE_EXCL;
 
-
+        
     const writeFlag = isExcl(flag) ? 'wx' : 'w';
-
+    
     const {
         size,
         mode,
     } = fs.statSync(src);
-
+    
     const fdSrc = fs.openSync(src, 'r');
     const fdDest = fs.openSync(dest, writeFlag, mode);
-
+    
     const length = size < SIZE ? size : SIZE;
-
+    
     let pos = 0;
     const peaceSize = size < SIZE ? 0 : size % SIZE;
     const offset = 0;
-
+    
     let buffer = Buffer.allocUnsafe(length);
     for (let i = 0; length + pos + peaceSize <= size; i++, pos = length * i) {
         fs.readSync(fdSrc, buffer, offset, length, pos);
         fs.writeSync(fdDest, buffer, offset, length, pos);
     }
-
+    
     if (peaceSize) {
         const length = peaceSize;
         buffer = Buffer.allocUnsafe(length);
         fs.readSync(fdSrc, buffer, offset, length, pos);
         fs.writeSync(fdDest, buffer, offset, length, pos);
     }
-
+    
     fs.closeSync(fdSrc);
     fs.closeSync(fdDest);
 }
