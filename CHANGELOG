@@ -1,5 +1,11 @@
 # nodeGame Changelog
 
+# 5.0.1
+- Minor update to installer.
+- Fixed VisualTimer.restart bug introduced in v5.
+- Server does not scan hidden folders inside the games directory.
+- Generator does not allow to create games starting with a dot.
+
 # 5.0.0
 - Updated installer, now installing latest versions of v3, v4, v5.
 - Updated installer, checks for node_modules folder above the current folder.
