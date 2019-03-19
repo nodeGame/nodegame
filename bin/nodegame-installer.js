@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2011-2018 Stefano Balietti
+ * Copyright(c) 2011-2019 Stefano Balietti
  * MIT Licensed
  *
  * http://www.nodegame.org
@@ -237,6 +237,20 @@ else doInstall();
 
 function doInstall() {
     var sp;
+
+    // Check if a node_modules folder exists above or two folders above.
+    if (fs.existsSync(path.resolve('..', 'node_modules')) ||
+        fs.existsSync(path.resolve('..', '..', 'node_modules'))) {
+
+        log('Attention! A "node_modules" folder was detected in a ' +
+            'parent directory.');
+        log('Installation cannot continue. Please move the "node_modules" ');
+        log('folder or try to install nodeGame on another directory.');
+        log();
+        installationFailed();
+        return;
+    }
+
     // Create spinner.
     log('Downloading and installing nodeGame packages.');
 
@@ -266,7 +280,22 @@ function doInstall() {
                 return;
             }
             else {
-                if (verbose) logList(stdout.trim());
+                if (verbose) {
+                    log();
+                    logList(stdout.trim());
+                }
+                if (!fs.existsSync(path.resolve(NODE_MODULES_DIR))) {
+                    log();
+                    log();
+                    log('Doh! It looks like npm has a different default ' +
+                        'installation folder.');
+                    log('This can happen if you have a directory called '+
+                        '"node_modules" in any of ');
+                    log('the parent folders. Please try using a ' +
+                        'different path.');
+                    installationFailed();
+                    return;
+                }
                 log();
                 log('Done! Now some final magic...');
                 try {
