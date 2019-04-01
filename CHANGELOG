@@ -1,5 +1,10 @@
 # nodeGame Changelog
 
+# 5.1.0
+- Minor update to installer.
+- Widgets: CustomInput, and garbage collection.
+- Window and Client: check frame height automatically.
+
 # 5.0.1
 - Minor update to installer.
 - Fixed VisualTimer.restart bug introduced in v5.
