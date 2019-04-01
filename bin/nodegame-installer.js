@@ -60,7 +60,7 @@ else if (p === '--list-versions') {
     console.log('  List of stable versions:');
     for (let i in STABLE_VERSIONS) {
         if (STABLE_VERSIONS.hasOwnProperty(i)) {
-            console.log('   - ' + i + ': ' + STABLE_VERSIONS[i]);
+            console.log('   @' + i + ': ' + STABLE_VERSIONS[i]);
         }
     }
     return;
@@ -680,7 +680,7 @@ function installationFailed() {
 
 function printHelp() {
     log();
-    log('@<version>              Install a specific version (>=3.5.1)');
+    log('@<version>              Install a specific version (v3, v4, v5)');
     log('@dev                    Install latest nodeGame from git repos');
     log('    --branch <name>         Checkout this branch on all git repos');
     log('    --ssh                   Use ssh to get all git repos');
