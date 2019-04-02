@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# current
+- Improved servernode.js conf file.
+
 # 5.1.0
 - Minor update to installer.
 - Widgets: CustomInput, and garbage collection.
