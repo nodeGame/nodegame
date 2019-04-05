@@ -113,11 +113,11 @@ program
             '(overwrites settings.js in test/ folder')
     .option('-k, --killServer',
             'Kill server after all phantoms have reached game over')
-    .option('-a --auth [option]',
+    .option('-a, --auth [option]',
             'Phantoms pass through /auth/. Options: createNew|new|' +
             'nextAvailable|next|code|id:code&pwd:password|file:path/to/file. ' +
             'Default: "new".')
-    .option('-w --wait [milliseconds]',
+    .option('-w, --wait [milliseconds]',
             'Waits before connecting the next phantom. Default: 1000')
 
 
