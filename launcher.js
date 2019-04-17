@@ -89,7 +89,8 @@ program
     .option('-l, --logDir <logDir>',
             'Sets the log directory')
     .option('-L, --logLevel <logDir>',
-            'Sets the log level. Values: error(default)|warn|info|silly')
+            'Sets the log level. Values: error(default)|warn|info|' +
+            'verbose|debug|silly')
     .option('-g, --gamesDir <gamesDir>',
             'Sets the games directory')
     .option('-d, --debug',
