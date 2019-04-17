@@ -1,6 +1,6 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2011-2018 Stefano Balietti
+ * Copyright(c) 2011-2019 Stefano Balietti
  * MIT Licensed
  *
  * Load configuration options and start the server
@@ -88,6 +88,8 @@ program
             'Sets the configuration directory')
     .option('-l, --logDir <logDir>',
             'Sets the log directory')
+    .option('-L, --logLevel <logDir>',
+            'Sets the log level. Values: error(default)|warn|info|silly')
     .option('-g, --gamesDir <gamesDir>',
             'Sets the games directory')
     .option('-d, --debug',
@@ -98,6 +100,9 @@ program
             'Rebuilds the specified components', list)
     .option('-s, --ssl [path-to-ssl-dir]',
             'Starts the server with SSL encryption')
+    .option('-f, --default [channel]',
+            'Sets the default channel')
+
 
 
 // Connect phantoms.
@@ -109,14 +114,13 @@ program
     .option('-t, --clientType <t>',
             'Sets the client type of connecting phantoms (default: autoplay)')
     .option('-T, --runTests',
-            'Run tests after all phantoms have reached game over ' +
-            '(overwrites settings.js in test/ folder')
+            'Run tests after all phantoms are game-over ' +
+            '(overwrites settings.js in test/)')
     .option('-k, --killServer',
-            'Kill server after all phantoms have reached game over')
+            'Kill server after all phantoms are game-over')
     .option('-a, --auth [option]',
-            'Phantoms pass through /auth/. Options: createNew|new|' +
-            'nextAvailable|next|code|id:code&pwd:password|file:path/to/file. ' +
-            'Default: "new".')
+            'Phantoms auth options. Values: new(default)|createNew|' +
+            'nextAvailable|next|code|id:code&pwd:password|file:path/to/file.')
     .option('-w, --wait [milliseconds]',
             'Waits before connecting the next phantom. Default: 1000')
 
@@ -244,6 +248,14 @@ else if ('string' === typeof program.ssl) {
 
     })(program.ssl);
     if (!options.ssl) return;
+}
+
+if (program['default']) {
+    options.defaultChannel = program['default'];
+}
+
+if (program.logLevel) {
+    options.logLevel = program.logLevel;
 }
 
 if (program.nClients) {
