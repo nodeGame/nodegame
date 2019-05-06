@@ -193,7 +193,8 @@ const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
 // Making sure we do not slip out on an exception.
 
 process.on('uncaughtException', function(err) {
-    warn('A generic error occurred during the installation:\n' + err.stack);
+    warn('A generic error occurred during the installation:\n');
+    log(err.stack)
     installationFailed();
 });
 
@@ -212,14 +213,14 @@ if (parseInt(nodeVersion[0], 10) < 4) {
     err('node version >= 4.x is required.\n' +
         'Please upgrade your Node.Js installation, ' +
         'visit: http://nodejs.org');
-    log();
+    installationAborted();
     return;
 }
 
 // Check if install dir exists (abort).
 if (fs.existsSync(INSTALL_DIR)) {
     err('installation directory already existing.');
-    log();
+    installationAborted();
     return;
 }
 
@@ -227,16 +228,21 @@ if (fs.existsSync(INSTALL_DIR)) {
 if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
     warn('A "node_modules" folder was detected in this directory.');
+    log();
+    log('If you continue, it will become a subfolder of the nodeGame ');
+    log('installation. This might affect live node processes, as well as ');
+    log('other Node.JS packages relying on this node_modules folder. If ');
+    log('unsure, choose No and try to install nodeGame on another path.');
     if (!yes) {
         log();
-        confirm('Continue? [y/n] ', function(ok) {
+        confirm('Continue? [y/n]', function(ok) {
             if (ok) {
-                process.stdin.destroy();
+                log();
                 log();
                 checkParentNodeModules();
             }
             else {
-                installationAborted();
+                installationAborted(true);
                 log();
             }
         })
@@ -257,42 +263,47 @@ else checkParentNodeModules();
 ///////////////////////////////////////////////////////////////////////////////
 
 function checkParentNodeModules(cb) {
-    parentNodeModules = getParentNodeModules(); 
+    parentNodeModules = getParentNodeModules();
 
     // Check if a node_modules folder exists in any folder from the one above.
     // to top /.
-    
     if (parentNodeModules.length) {
         let str;
         str = 'A "node_modules" folder was detected in ';
-        str += parentNodeModules.length === 1 ? 'this parent directory: ' :
+        str += parentNodeModules.length === 1 ? 'a parent directory: ' :
             'these parent directories: ';
         warn(str);
         parentNodeModules.forEach(dir => logList(dir));
         log();
-        
-        log('You should quit the installation and manually move the parent');
-        log('"node_modules" folder/s, or install nodeGame on another path.');
+
+        str = 'If you continue, ' + (parentNodeModules.length === 1 ?
+                                     'that folder' : 'those folders');
+        log(str + ' will be temporarily renamed. This');
+        log('might affect only live node processes. If unsure, choose No ');
+        log('and try to install nodeGame on another path.');
         log();
-        log('You may also try to continue the installation, but this is not');
-        log('recommended if another live node process is running from those ' +
-            'folders.');
-        log();
-        confirm('Continue? [y/n] ', function(ok) {
-            if (ok) {
-                let res = renameParentNodeModules(parentNodeModules);
-                if (res !== true) {
-                    err('Could not rename ' + res[0]);
-                    installationFailed();
+        if (!yes) {
+            confirm('Continue? [y/n]', function(ok) {
+                if (ok) {
+                    log();
+                    let res = renameParentNodeModules(parentNodeModules);
+                    if (res !== true) {
+                        err('Could not rename ' + res[0]);
+                        installationFailed();
+                    }
+                    log();
+                    doInstall();
                 }
-                log();
-                doInstall();
-            }
-            else {
-                installationAborted();
-                return;
-            }
-        });
+                else {
+                    installationAborted(true);
+                    return;
+                }
+            });
+        }
+        else {
+            log('Continue? [y/n] --yes');
+            log();
+        }
     }
     else {
         doInstall();
@@ -301,13 +312,14 @@ function checkParentNodeModules(cb) {
 
 function doInstall() {
     var sp;
-   
+
     // Create spinner.
     log('Downloading and installing nodeGame packages.');
 
     if (dry) {
         log();
         warn('Dry run: aborting.');
+        closeRL(2);
         return;
     }
 
@@ -391,6 +403,7 @@ function doInstall() {
                     return;
                 }
             }
+            return;
         });
 }
 
@@ -491,10 +504,14 @@ function printFinalInfo() {
     log();
 }
 
+function closeRL(code) {
+    // rl.clearLine();
+    rl.close();
+    // if (force) process.stdin.destroy();
+    process.exit(code);
+}
 
 function someMagic(cb) {
-    rl.close();
-
     let mainNgDir = path.resolve(NODE_MODULES_DIR, MAIN_MODULE);
 
     // Check if log and private directories have been created.
@@ -518,7 +535,7 @@ function someMagic(cb) {
             fs.rmdirSync(NODE_MODULES_DIR);
         }
     }
-    
+
     if (isDev) {
         getAllGitModules(function() {
             // Move games from node_modules.
@@ -532,6 +549,8 @@ function someMagic(cb) {
 
             // Print final Information.
             printFinalInfo();
+
+            closeRL(0);
         });
     }
     else {
@@ -543,9 +562,11 @@ function someMagic(cb) {
 
         // Restore any parent node_modules folder that was renamed.
         restoreParentNodeModules();
-        
+
         // Print final Information.
         printFinalInfo();
+
+        closeRL(0);
     }
 }
 
@@ -692,7 +713,7 @@ function copyGameFromNodeModules(game, enable) {
 }
 
 function confirm(msg, callback) {
-    rl.question('  ' + msg, function(input) {
+    rl.question('  ' + msg + ' ', function(input) {
         callback(/^y|yes|ok|true$/i.test(input));
     });
 }
@@ -754,7 +775,7 @@ function renameParentNodeModules(parents, restore) {
 }
 
 function restoreParentNodeModules() {
-    if (!parentNodeModules || !parentNodeModules.length) return; 
+    if (!parentNodeModules || !parentNodeModules.length) return;
     let res = renameParentNodeModules(parentNodeModules, true);
     if (res !== true) {
         log();
@@ -763,15 +784,15 @@ function restoreParentNodeModules() {
     }
 }
 
-function installationAborted() {
-    rl.close();
+function installationAborted(byUser) {
+    let str = 'Installation aborted' + (byUser ? ' by user.' : '.');
     log();
-    log('Installation aborted.');
+    log(str);
+    closeRL(1);
+    return;
 }
 
 function installationFailed() {
-    rl.close();
-       
     log();
 
     log('Installation did not complete successfully.');
@@ -787,6 +808,7 @@ function installationFailed() {
 
     // Restore any parent node_modules folder that was renamed.
     restoreParentNodeModules();
+    closeRL(1);
 }
 
 
