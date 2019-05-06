@@ -1,7 +1,9 @@
 # nodeGame Changelog
 
-# current
+# 5.3.0
 - Improved servernode.js conf file.
+- Improved installer: --dry option.
+- Improved installer: better handling of parent node_modules folders.
 
 # 5.1.0
 - Minor update to installer.
