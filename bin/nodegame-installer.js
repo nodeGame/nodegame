@@ -39,13 +39,17 @@ const MAIN_MODULE = 'nodegame';
 const STABLE_VERSIONS = {
     v3: '3.5.3',
     v4: '4.3.3',
-    v5: '5.1.0'
+    v5: '5.3.0'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
 
 // Installer default version.
 const INSTALLER_VERSION = 'v5';
+
+// If node_modules folders are detected, their paths (without node_modules)
+// is stored in here.
+var parentNodeModules;
 
 // The actual version being installed, user can change it.
 var version = STABLE_VERSIONS[INSTALLER_VERSION];
@@ -79,6 +83,7 @@ var doNotMoveInstall = false;
 var yes;
 var branch;
 var warnings;
+var dry;
 
 // User requested version.
 var requestedVersion = '@' + version;
@@ -122,6 +127,9 @@ for (let i = 0; i < process.argv.length; i++) {
     }
     else if (option === '--ssh') {
         doSSH = true;
+    }
+    else if (option === '--dry') {
+        dry = true;
     }
 }
 
@@ -177,6 +185,13 @@ const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
                                          'games_available');
 const GAMES_ENABLED_DIR = path.resolve(INSTALL_DIR, 'games');
 
+// Making sure we do not slip out on an exception.
+
+process.on('uncaughtException', function(err) {
+    warn('A generic error occurred during the installation:\n' + err.stack);
+    installationFailed();
+});
+
 // Printing Info.
 
 // Print cool nodegame logo.
@@ -208,11 +223,11 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
     warn('node_modules directory already existing.');
     if (!yes) {
-        confirm('  Continue? [y/n] ', function(ok) {
+        confirm('Continue? [y/n] ', function(ok) {
             if (ok) {
                 process.stdin.destroy();
                 log();
-                doInstall();
+                checkParentNodeModules();
             }
             else {
                 log('Installation aborted.');
@@ -228,31 +243,67 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
 }
 
 // Install.
-if (isDev) checkGitExists(doInstall);
-else doInstall();
+if (isDev) checkGitExists(checkParentNodeModules);
+else checkParentNodeModules();
 
 
 // Helper functions.
 ///////////////////////////////////////////////////////////////////////////////
 
+function checkParentNodeModules(cb) {
+    parentNodeModules = getParentNodeModules(); 
+
+    // Check if a node_modules folder exists in any folder from the one above.
+    // to top /.
+    
+    if (parentNodeModules.length) {
+        let str;
+        str = 'A "node_modules" folder was detected in ';
+        str += parentNodeModules.length === 1 ? 'this parent directory: ' :
+            ' these parent directories: ';
+        warn(str);
+        parentNodeModules.forEach(dir => logList(dir));
+        log();
+        
+        log('You should quit the installation and manually move the parent');
+        log('"node_modules" folder/s, or install nodeGame on another path.');
+        log();
+        log('You may also try to continue the installation, but this is not');
+        log('recommended if another live node process is running from those ' +
+            'folders.');
+        log();
+        confirm('Continue? [y/n] ', function(ok) {
+            if (ok) {
+                let res = renameParentNodeModules(parentNodeModules);
+                if (res !== true) {
+                    err('Could not rename ' + res[0]);
+                    installationFailed();
+                }
+                log();
+                doInstall();
+            }
+            else {
+                log('Installation aborted.');
+                return;
+            }
+        });
+    }
+    else {
+        doInstall();
+    }
+}
+
 function doInstall() {
     var sp;
-
-    // Check if a node_modules folder exists above or two folders above.
-    if (fs.existsSync(path.resolve('..', 'node_modules')) ||
-        fs.existsSync(path.resolve('..', '..', 'node_modules'))) {
-
-        log('Attention! A "node_modules" folder was detected in a ' +
-            'parent directory.');
-        log('Installation cannot continue. Please move the "node_modules" ');
-        log('folder or try to install nodeGame on another directory.');
-        log();
-        installationFailed();
-        return;
-    }
-
+   
     // Create spinner.
     log('Downloading and installing nodeGame packages.');
+
+    if (dry) {
+        log();
+        warn('Dry run: aborting.');
+        return;
+    }
 
     if (!noSpinner) {
         sp = new Spinner('  This might take a few minutes %s  ');
@@ -277,6 +328,7 @@ function doInstall() {
                 log();
                 logList(stderr.trim());
                 log();
+                installationFailed();
                 return;
             }
             else {
@@ -299,7 +351,7 @@ function doInstall() {
                 log();
                 log('Done! Now some final magic...');
                 try {
-                    someMagic();
+                    someMagic(cb);
                 }
                 catch(e) {
                     //                     execFile(
@@ -434,7 +486,7 @@ function printFinalInfo() {
 }
 
 
-function someMagic() {
+function someMagic(cb) {
     let mainNgDir = path.resolve(NODE_MODULES_DIR, MAIN_MODULE);
 
     // Check if log and private directories have been created.
@@ -467,6 +519,9 @@ function someMagic() {
             // Generator.
             fixGenerator();
 
+            // Restore any parent node_modules folder that was renamed.
+            restoreParentNodeModules();
+
             // Print final Information.
             printFinalInfo();
         });
@@ -478,6 +533,9 @@ function someMagic() {
         // Generator.
         fixGenerator();
 
+        // Restore any parent node_modules folder that was renamed.
+        restoreParentNodeModules();
+        
         // Print final Information.
         printFinalInfo();
     }
@@ -631,7 +689,7 @@ function confirm(msg, callback) {
         output: process.stdout
     });
 
-    rl.question(msg, function(input) {
+    rl.question('  ' + msg, function(input) {
         rl.close();
         callback(/^y|yes|ok|true$/i.test(input));
     });
@@ -661,6 +719,48 @@ function removeDirRecursiveSync(dir) {
     }
 };
 
+function getParentNodeModules() {
+    let tks = ROOT_DIR.split(path.sep);
+    let found = [];
+    let dirPath = tks[0];
+    for (let i = 0 ; i < (tks.length - 1) ; i++) {
+        if (i !== 0) dirPath = path.join(dirPath, tks[i]);
+        if (fs.existsSync(path.join(dirPath, 'node_modules'))) {
+            found.push(dirPath);
+        }
+    }
+    return found;
+}
+
+function renameParentNodeModules(parents, restore) {
+    let out = [];
+    for (let i = 0; i < parents.length; i++) {
+        try {
+            let f1 = path.join(parents[i], 'node_modules');
+            let f2 = f1 + '_backup';
+            // Add _bak or remove _bak from parent node_modules folders.
+            if (restore) fs.renameSync(f2, f1);
+            else fs.renameSync(f1, f2);
+        }
+        catch(e) {
+            out.push(parents[i]);
+            // If we are not restoring original folders, exit immediately.
+            if (!restore) return(out);
+        }
+    }
+    return true;
+}
+
+function restoreParentNodeModules() {
+    if (!parentNodeModules || !parentNodeModules.length) return; 
+    let res = renameParentNodeModules(parentNodeModules, true);
+    if (res !== true) {
+        log();
+        warn('Could not restore parent "node_modules" folder in: ');
+        res.forEach(dir => logList(dir));
+    }
+}
+
 function installationFailed() {
 
     log();
@@ -675,6 +775,9 @@ function installationFailed() {
         'https://github.com/nodeGame/nodegame/issues');
     log('  - send an email to info@nodegame.org');
     log();
+
+    // Restore any parent node_modules folder that was renamed.
+    restoreParentNodeModules();
 }
 
 
@@ -689,6 +792,7 @@ function printHelp() {
     log('                        if equals to node_modules, the npm structure');
     log('                        stays unchanged');
     log('--no-spinner            Does not start the spinner');
+    log('--dry                   Does not actually install anything');
     log('--list-versions         Lists stable versions');
     log('--version               Print installer version');
     log('--help                  Print this help');
