@@ -51,6 +51,11 @@ const INSTALLER_VERSION = 'v5';
 // is stored in here.
 var parentNodeModules;
 
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
 // The actual version being installed, user can change it.
 var version = STABLE_VERSIONS[INSTALLER_VERSION];
 
@@ -221,8 +226,9 @@ if (fs.existsSync(INSTALL_DIR)) {
 // Check if node_modules exists (prompt continue?)
 if (fs.existsSync(NODE_MODULES_DIR)) {
     nodeModulesExisting = true;
-    warn('node_modules directory already existing.');
+    warn('A "node_modules" folder was detected in this directory.');
     if (!yes) {
+        log();
         confirm('Continue? [y/n] ', function(ok) {
             if (ok) {
                 process.stdin.destroy();
@@ -230,7 +236,7 @@ if (fs.existsSync(NODE_MODULES_DIR)) {
                 checkParentNodeModules();
             }
             else {
-                log('Installation aborted.');
+                installationAborted();
                 log();
             }
         })
@@ -260,7 +266,7 @@ function checkParentNodeModules(cb) {
         let str;
         str = 'A "node_modules" folder was detected in ';
         str += parentNodeModules.length === 1 ? 'this parent directory: ' :
-            ' these parent directories: ';
+            'these parent directories: ';
         warn(str);
         parentNodeModules.forEach(dir => logList(dir));
         log();
@@ -283,7 +289,7 @@ function checkParentNodeModules(cb) {
                 doInstall();
             }
             else {
-                log('Installation aborted.');
+                installationAborted();
                 return;
             }
         });
@@ -351,7 +357,7 @@ function doInstall() {
                 log();
                 log('Done! Now some final magic...');
                 try {
-                    someMagic(cb);
+                    someMagic();
                 }
                 catch(e) {
                     //                     execFile(
@@ -487,6 +493,8 @@ function printFinalInfo() {
 
 
 function someMagic(cb) {
+    rl.close();
+
     let mainNgDir = path.resolve(NODE_MODULES_DIR, MAIN_MODULE);
 
     // Check if log and private directories have been created.
@@ -510,7 +518,7 @@ function someMagic(cb) {
             fs.rmdirSync(NODE_MODULES_DIR);
         }
     }
-
+    
     if (isDev) {
         getAllGitModules(function() {
             // Move games from node_modules.
@@ -684,13 +692,7 @@ function copyGameFromNodeModules(game, enable) {
 }
 
 function confirm(msg, callback) {
-    var rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
     rl.question('  ' + msg, function(input) {
-        rl.close();
         callback(/^y|yes|ok|true$/i.test(input));
     });
 }
@@ -761,8 +763,15 @@ function restoreParentNodeModules() {
     }
 }
 
-function installationFailed() {
+function installationAborted() {
+    rl.close();
+    log();
+    log('Installation aborted.');
+}
 
+function installationFailed() {
+    rl.close();
+       
     log();
 
     log('Installation did not complete successfully.');
