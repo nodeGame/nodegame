@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 5.7.0
+- GameRoom.computeBonus handles disconnected players in dump file.
+
 # 5.6.0-5
 - New release, updated installer.
 
