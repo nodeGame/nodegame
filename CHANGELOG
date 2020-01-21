@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 5.8.0
+- Game.stepBack.
+
 # 5.7.0
 - GameRoom.computeBonus handles disconnected players in dump file.
 
