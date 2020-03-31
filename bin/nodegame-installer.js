@@ -39,7 +39,7 @@ const MAIN_MODULE = 'nodegame';
 const STABLE_VERSIONS = {
     v3: '3.5.3',
     v4: '4.3.3',
-    v5: '5.8.1'
+    v5: '5.9.0'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
