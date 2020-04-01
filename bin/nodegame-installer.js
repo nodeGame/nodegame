@@ -86,6 +86,7 @@ var doSSH = false;
 var noSpinner = false;
 var doNotMoveInstall = false;
 var yes;
+var noParentDirCheck;
 var branch;
 var warnings;
 var dry;
@@ -120,6 +121,9 @@ for (let i = 0; i < process.argv.length; i++) {
     }
     else if (option === '--yes') {
         yes = true;
+    }
+    else if (option === '--no-parent-dir-check') {
+        noParentDirCheck = true;
     }
     else if (option === '--branch') {
         branch = process.argv[i+1];
@@ -267,7 +271,7 @@ function checkParentNodeModules(cb) {
 
     // Check if a node_modules folder exists in any folder from the one above.
     // to top /.
-    if (parentNodeModules.length) {
+    if (!noParentDirCheck && parentNodeModules.length) {
         let str;
         str = 'A "node_modules" folder was detected in ';
         str += parentNodeModules.length === 1 ? 'a parent directory: ' :
@@ -283,26 +287,12 @@ function checkParentNodeModules(cb) {
         log('and try to install nodeGame on another path.');
         log();
         if (!yes) {
-            confirm('Continue? [y/n]', function(ok) {
-                if (ok) {
-                    log();
-                    let res = renameParentNodeModules(parentNodeModules);
-                    if (res !== true) {
-                        err('Could not rename ' + res[0]);
-                        installationFailed();
-                    }
-                    log();
-                    doInstall();
-                }
-                else {
-                    installationAborted(true);
-                    return;
-                }
-            });
+            confirm('Continue? [y/n]', renameParentCb);
         }
         else {
             log('Continue? [y/n] --yes');
             log();
+            renameParentCb(true);
         }
     }
     else {
@@ -712,9 +702,9 @@ function copyGameFromNodeModules(game, enable) {
     makeLink(gameDir, path.resolve(GAMES_ENABLED_DIR, game));
 }
 
-function confirm(msg, callback) {
+function confirm(msg, callback, ...params) {
     rl.question('  ' + msg + ' ', function(input) {
-        callback(/^y|yes|ok|true$/i.test(input));
+        callback(/^y|yes|ok|true$/i.test(input, ...params));
     });
 }
 
@@ -753,6 +743,24 @@ function getParentNodeModules() {
         }
     }
     return found;
+}
+
+// Need this wrapper because --yes option
+function renameParentCb(ok) {
+    if (ok) {
+        log();
+        let res = renameParentNodeModules(parentNodeModules);
+        if (res !== true) {
+            err('Could not rename "node_modules" folder in: ' + res[0]);
+            installationFailed();
+        }
+        log();
+        doInstall();
+    }
+    else {
+        installationAborted(true);
+        return;
+    }
 }
 
 function renameParentNodeModules(parents, restore) {
