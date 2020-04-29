@@ -426,7 +426,7 @@ function printNodeGameInfo() {
 
     log();
     log('creator: Stefano Balietti');
-    log('website: http://nodegame.org');
+    log('website: https://nodegame.org');
     log('license: MIT');
     log('mail:    info@nodegame.org');
     log('twitter: @nodegameorg');
