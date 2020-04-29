@@ -15,7 +15,7 @@ MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
 # Change the current working directory to the parent directory of the script,
 # i.e. the nodegame directory. Using the below command instead of simply
 # "cd .." makes sure that it does not matter from where the script is executed
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
+# cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 echo_and_pull nodegame
 
