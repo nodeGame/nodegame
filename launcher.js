@@ -1,6 +1,6 @@
 /**
  * # Launcher file for nodeGame Server
- * Copyright(c) 2011-2019 Stefano Balietti
+ * Copyright(c) 2011-2020 Stefano Balietti
  * MIT Licensed
  *
  * Load configuration options and start the server
@@ -64,8 +64,8 @@ confFile = null;
 confDir = './conf';
 logDir = './log';
 gamesDir = './games';
-debug = false;
-infoQuery = false;
+debug = undefined;
+infoQuery = undefined;
 
 nClients =  4;
 clientType = 'autoplay';
@@ -89,13 +89,12 @@ program
     .option('-l, --logDir <logDir>',
             'Sets the log directory')
     .option('-L, --logLevel <logDir>',
-            'Sets the log level. Values: error(default)|warn|info|' +
-            'verbose|debug|silly')
+            'Sets the log level. Values: error(default)|warn|info|silly')
     .option('-g, --gamesDir <gamesDir>',
             'Sets the games directory')
     .option('-d, --debug',
             'Enables the debug mode')
-    .option('-i, --infoQuery',
+    .option('-i, --infoQuery [false]',
             'Enables getting information via query-string ?q=')
     .option('-b, --build [components]',
             'Rebuilds the specified components', list)
@@ -119,10 +118,10 @@ program
             '(overwrites settings.js in test/)')
     .option('-k, --killServer',
             'Kill server after all phantoms are game-over')
-    .option('-a, --auth [option]',
+    .option('-a --auth [option]',
             'Phantoms auth options. Values: new(default)|createNew|' +
             'nextAvailable|next|code|id:code&pwd:password|file:path/to/file.')
-    .option('-w, --wait [milliseconds]',
+    .option('-w --wait [milliseconds]',
             'Waits before connecting the next phantom. Default: 1000')
 
 
@@ -160,36 +159,41 @@ else {
 
             // Adds a new game directory (Default is nodegame-server/games).
             servernode.gamesDirs.push(gamesDir);
-            // Sets the debug mode, exceptions will be thrown.
-            servernode.debug = debug;
-            // Can get information from /?q=
-            servernode.enableInfoQuery = infoQuery;
+
+            // Sets the debug mode, exceptions will be thrown, if TRUE.
+            if ('undefined' !== typeof debug) {
+                servernode.debug = debug;
+            }
+            // Can get information from /?q=, if TRUE
+            if ('undefined' !== typeof infoQuery) {
+                servernode.enableInfoQuery = infoQuery;
+            }
             // Basepath (without trailing slash).
             // servernode.basepath = '/mybasepath';
 
             return true;
         },
-        http: function(http) {
-            // Special configuration for Express goes here.
-            return true;
-        },
-        sio: function(sio) {
-            // Special configuration for Socket.Io goes here here.
-            // Might not work in Socket.IO 1.x (check).
-
-            // sio.set('transports', ['xhr-polling']);
-            // sio.set('transports', ['jsonp-polling']);
-
-            // sio.set('transports', [
-            //   'websocket'
-            // , 'flashsocket'
-            // , 'htmlfile'
-            // , 'xhr-polling'
-            // , 'jsonp-polling'
-            // ]);
-
-            return true;
-        }
+        // http: function(http) {
+        //     // Special configuration for Express goes here.
+        //     return true;
+        // },
+        // sio: function(sio) {
+        //     // Special configuration for Socket.Io goes here here.
+        //     // Might not work in Socket.IO 1.x (check).
+        //
+        //     // sio.set('transports', ['xhr-polling']);
+        //     // sio.set('transports', ['jsonp-polling']);
+        //
+        //     // sio.set('transports', [
+        //     //   'websocket'
+        //     // , 'flashsocket'
+        //     // , 'htmlfile'
+        //     // , 'xhr-polling'
+        //     // , 'jsonp-polling'
+        //     // ]);
+        //
+        //     return true;
+        // }
     };
 
     // Validate other options.
@@ -212,7 +216,17 @@ else {
         gamesDir = program.gamesDir;
     }
     if (program.debug) debug = true;
-    if (program.infoQuery) infoQuery = true;
+
+    // Parse infoQuery.
+    if (program.infoQuery) {
+        if ('boolean' === typeof program.infoQuery) {
+            infoQuery = program.infoQuery;
+        }
+        else {
+            let i = program.infoQuery.toLowerCase();
+            infoQuery = i === 'f' || i === 'false' || i === '0' ? false : true;
+        }
+    }
 }
 
 // Validate general options.
@@ -375,10 +389,10 @@ if (program.build) {
                 cssOnly = true;
             }
         }
-        
+
         info = J.resolveModuleDir('nodegame-server', __dirname);
         info = require(path.resolve(info, 'bin', 'info.js'));
-        
+
         if (!cssOnly) {
             out = 'nodegame-full.js';
 
@@ -390,7 +404,7 @@ if (program.build) {
                 NDDB: 'NDDB',
                 css: 'css'
             };
-            
+
             // Starting build.
             i = -1, len = program.build.length;
             for ( ; ++i < len ; ) {
@@ -427,7 +441,7 @@ if (program.build) {
             console.log(info.serverDir.build + out + ' rebuilt.');
             console.log('');
         }
-        
+
         if (cssAlso || cssOnly) {
             info.build.css(info.serverDir.css, function(err) {
                 if (!err) {
@@ -519,7 +533,7 @@ function startServer() {
             };
         }
 
-        
+
         startPhantom = function(i) {
             var str, config;
             str = 'Connecting phantom #' + (i+1) + '/' + nClients;
@@ -554,7 +568,7 @@ function startServer() {
         phantoms = [], numFinished = 0;
         for (i = 0; i < nClients; ++i) {
             if (i > 0 && wait) {
-                (function(i) { 
+                (function(i) {
                     setTimeout(function() { startPhantom(i); }, wait * i);
                 })(i);
             }
