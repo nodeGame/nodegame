@@ -1,7 +1,7 @@
 {
     "name": "nodegame",
     "description": "Fast, scalable JavaScript for large-scale, online, multiplayer, real-time games and experiments.",
-    "version": "5.9.0",
+    "version": "5.10.0",
     "homepage": "http://nodegame.org",
     "author": "Stefano Balietti <futur.dorko@gmail.com>",
     "contributors": [
