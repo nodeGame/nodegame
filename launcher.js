@@ -38,7 +38,7 @@ var confFile;
 
 // Other local options.
 var confDir, logDir, gamesDir, debug, infoQuery, runTests;
-var nClients, clientType, killServer, auth, wait;
+var nClients, clientType, killServer, auth, wait, port;
 var codesDb;
 
 var cert, key;
@@ -102,6 +102,8 @@ program
             'Starts the server with SSL encryption')
     .option('-f, --default [channel]',
             'Sets the default channel')
+    .option('-P, --port [port]',
+            'Sets the port of the server')
 
 
 
@@ -267,6 +269,15 @@ else if ('string' === typeof program.ssl) {
 
 if (program['default']) {
     options.defaultChannel = program['default'];
+}
+
+if (program.port) {
+    port = J.isInt(program.port, 0);
+    if (!port) {
+        return printErr('--port ' + program.port +
+                        ' is not a positive number.');
+    }
+    options.port = port;
 }
 
 if (program.logLevel) {

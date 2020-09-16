@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 5.12.0 current
+- Option --port to specify the port of the server in launcher.
+
 # 5.11.0
 - Small update to client and bug fixes.
 
