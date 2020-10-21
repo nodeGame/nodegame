@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2011-2019 Stefano Balietti
+ * Copyright(c) 2011-2020 Stefano Balietti
  * MIT Licensed
  *
  * http://www.nodegame.org
@@ -32,20 +32,22 @@ const warn = txt => {
     console.error('  Warning: ' + txt);
 };
 
-const MAIN_MODULE = 'nodegame';
+// const MAIN_MODULE = 'nodegame';
+const MAIN_MODULE = 'nodegame-test';
 
 // All stable versions.
 // Versions below < 3 are not available.
 const STABLE_VERSIONS = {
     v3: '3.5.3',
     v4: '4.3.3',
-    v5: '5.11.0'
+    v5: '5.11.0',
+    v6: '6.0.0'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
 
 // Installer default version.
-const INSTALLER_VERSION = 'v5';
+const INSTALLER_VERSION = 'v6';
 
 // If node_modules folders are detected, their paths (without node_modules)
 // is stored in here.
