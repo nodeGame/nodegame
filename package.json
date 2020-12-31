@@ -18,7 +18,7 @@
         "node": ">= 6.0.0"
     },
     "dependencies": {
-        "nodegame-server": "^6.0.0",
+        "nodegame-server": "nodeGame/nodegame-server#nophantom",
         "nodegame-client": "^6.0.0",
         "nodegame-window": "^6.0.0",
         "nodegame-widgets": "^6.0.0",
