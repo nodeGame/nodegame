@@ -20,7 +20,7 @@ MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
 # "cd .." makes sure that it does not matter from where the script is executed
 # cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-## Not yet.
+## Not yet, this fails, we just update the modules.
 ## echo_and_pull nodegame
 
 for GAME in "${GAMES[@]}"; do
