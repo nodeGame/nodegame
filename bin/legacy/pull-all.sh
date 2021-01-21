@@ -7,7 +7,7 @@ echo_and_pull() {
   git pull || echo '  FAILED!'
 }
 
-GAMES=(ultimatum)
+GAMES=(ultimatum-game)
 MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
   nodegame-requirements nodegame-game-template nodegame-monitor JSUS NDDB
   nodegame-generator nodegame-mturk)
