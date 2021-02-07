@@ -10,14 +10,18 @@ echo_and_pull() {
 GAMES=(ultimatum)
 MODULES=(nodegame-client nodegame-server nodegame-window nodegame-widgets
   nodegame-requirements nodegame-game-template nodegame-monitor JSUS NDDB
-  nodegame-db nodegame-mongodb nodegame-generator nodegame-mturk)
+  nodegame-generator nodegame-mturk)
+
+## Removed modules for now.
+## nodegame-db nodegame-mongodb
 
 # Change the current working directory to the parent directory of the script,
 # i.e. the nodegame directory. Using the below command instead of simply
 # "cd .." makes sure that it does not matter from where the script is executed
 # cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-echo_and_pull nodegame
+## Not yet.
+## echo_and_pull nodegame
 
 for GAME in "${GAMES[@]}"; do
 (
