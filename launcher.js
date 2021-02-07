@@ -16,7 +16,7 @@ const path = require('path');
 const exec = require('child_process').exec;
 const J = require('JSUS').JSUS;
 
-var NDDB;
+// TODO: refactor, eliminate var; check new Commander options.
 
 // Load commander.
 var program = require('commander');
@@ -129,22 +129,25 @@ program
 
     .parse(process.argv);
 
+debugger
+// User options (Commander >= 7).
+let opts = program.opts();
 
-if (program.confFile) {
-    if (!fs.existsSync(program.ConfFile)) {
-        return printErr('--confFile ' + program.confFile + ' not found.');
+if (opts.confFile) {
+    if (!fs.existsSync(opts.confFile)) {
+        return printErr('--confFile ' + opts.confFile + ' not found.');
     }
-    options = require(program.confFile);
+    options = require(opts.confFile);
     if ('object' !== typeof options) {
-        return printErr('--confFile ' + program.confFile + ' did not return ' +
+        return printErr('--confFile ' + opts.confFile + ' did not return ' +
                         'a configuration object.');
     }
 
-    if (program.confDir) ignoredOptions.push('--confDir');
-    if (program.logDir) ignoredOptions.push('--logDir');
-    if (program.gamesDir) ignoredOptions.push('--gamesDir');
-    if (program.debug) ignoredOptions.push('--debug');
-    if (program.infoQuery) ignoredOptions.push('--infoQuery');
+    if (opts.confDir) ignoredOptions.push('--confDir');
+    if (opts.logDir) ignoredOptions.push('--logDir');
+    if (opts.gamesDir) ignoredOptions.push('--gamesDir');
+    if (opts.debug) ignoredOptions.push('--debug');
+    if (opts.infoQuery) ignoredOptions.push('--infoQuery');
 }
 else {
 
@@ -199,33 +202,33 @@ else {
     };
 
     // Validate other options.
-    if (program.confDir) {
-        if (!fs.existsSync(program.confDir)) {
-            return printErr('--confDir ' + program.confDir + ' not found.');
+    if (opts.confDir) {
+        if (!fs.existsSync(opts.confDir)) {
+            return printErr('--confDir ' + opts.confDir + ' not found.');
         }
-        confDir = program.confDir;
+        confDir = opts.confDir;
     }
-    if (program.logDir) {
-        if (!fs.existsSync(program.logDir)) {
-            return printErr('--logDir ' + program.logDir + ' not found.');
+    if (opts.logDir) {
+        if (!fs.existsSync(opts.logDir)) {
+            return printErr('--logDir ' + opts.logDir + ' not found.');
         }
-        logDir = program.logDir;
+        logDir = opts.logDir;
     }
-    if (program.gamesDir) {
-        if (!fs.existsSync(program.gamesDir)) {
-            return printErr('--gamesDir ' + program.gamesDir + ' not found.');
+    if (opts.gamesDir) {
+        if (!fs.existsSync(opts.gamesDir)) {
+            return printErr('--gamesDir ' + opts.gamesDir + ' not found.');
         }
-        gamesDir = program.gamesDir;
+        gamesDir = opts.gamesDir;
     }
-    if (program.debug) debug = true;
+    if (opts.debug) debug = true;
 
     // Parse infoQuery.
-    if (program.infoQuery) {
-        if ('boolean' === typeof program.infoQuery) {
-            infoQuery = program.infoQuery;
+    if (opts.infoQuery) {
+        if ('boolean' === typeof opts.infoQuery) {
+            infoQuery = opts.infoQuery;
         }
         else {
-            let i = program.infoQuery.toLowerCase();
+            let i = opts.infoQuery.toLowerCase();
             infoQuery = i === 'f' || i === 'false' || i === '0' ? false : true;
         }
     }
@@ -233,10 +236,10 @@ else {
 
 // Validate general options.
 
-if ('boolean' === typeof program.ssl) {
+if ('boolean' === typeof opts.ssl) {
     options.ssl = true;
 }
-else if ('string' === typeof program.ssl) {
+else if ('string' === typeof opts.ssl) {
     options.ssl = (function(dir) {
         var ssl;
 
@@ -263,7 +266,7 @@ else if ('string' === typeof program.ssl) {
 
         return ssl;
 
-    })(program.ssl);
+    })(opts.ssl);
     if (!options.ssl) return;
 }
 
@@ -271,74 +274,74 @@ if (program['default']) {
     options.defaultChannel = program['default'];
 }
 
-if (program.port) {
-    port = J.isInt(program.port, 0);
+if (opts.port) {
+    port = J.isInt(opts.port, 0);
     if (!port) {
-        return printErr('--port ' + program.port +
+        return printErr('--port ' + opts.port +
                         ' is not a positive number.');
     }
     options.port = port;
 }
 
-if (program.logLevel) {
-    options.logLevel = program.logLevel;
+if (opts.logLevel) {
+    options.logLevel = opts.logLevel;
 }
 
-if (program.nClients) {
-    if (!program.phantoms) ignoredOptions.push('--nClients');
+if (opts.nClients) {
+    if (!opts.phantoms) ignoredOptions.push('--nClients');
     else {
-        nClients = parseInt(program.nClients, 10);
+        nClients = parseInt(opts.nClients, 10);
         if (isNaN(nClients)) {
-            return printErr('--nClients ' + program.nClients +
+            return printErr('--nClients ' + opts.nClients +
                             ' is invalid.');
         }
     }
 }
-if (program.clientType) {
-    if (!program.phantoms) ignoredOptions.push('--clientType');
-    else clientType = program.clientType;
+if (opts.clientType) {
+    if (!opts.phantoms) ignoredOptions.push('--clientType');
+    else clientType = opts.clientType;
 }
-if (program.runTests) {
-    if (!program.runTests) ignoredOptions.push('--runTests');
-    else runTests = program.runTests;
+if (opts.runTests) {
+    if (!opts.runTests) ignoredOptions.push('--runTests');
+    else runTests = opts.runTests;
 }
-if (program.killServer) {
-    if (!program.phantoms) ignoredOptions.push('--killServer');
+if (opts.killServer) {
+    if (!opts.phantoms) ignoredOptions.push('--killServer');
     else killServer = true;
 }
-if (program.wait) {
-    if (!program.phantoms) {
+if (opts.wait) {
+    if (!opts.phantoms) {
         ignoredOptions.push('--wait');
     }
     else {
-        if (true === program.wait) {
+        if (true === opts.wait) {
             wait = 1000;
         }
         else {
-            wait = J.isInt(program.wait, 0);
+            wait = J.isInt(opts.wait, 0);
             if (false === wait) {
                 printErr('--wait must be a positive number or undefined. ' +
-                         'Found:' + program.wait);
+                         'Found:' + opts.wait);
                 process.exit();
             }
         }
     }
 }
-if (program.auth) {
-    if (!program.phantoms) {
+if (opts.auth) {
+    if (!opts.phantoms) {
         ignoredOptions.push('--auth');
     }
-    else if ('string' === typeof program.auth) {
+    else if ('string' === typeof opts.auth) {
 
         auth = (function(idIdx, pwdIdx) {
             var auth;
-            idIdx = program.auth.indexOf('id:');
+            idIdx = opts.auth.indexOf('id:');
             if (idIdx === 0) {
-                pwdIdx = program.auth.indexOf('&pwd:');
+                pwdIdx = opts.auth.indexOf('&pwd:');
                 if (pwdIdx !== -1) {
                     auth = {
-                        id: program.auth.substr(3, (pwdIdx-3)),
-                        pwd: program.auth.substr(pwdIdx+5)
+                        id: opts.auth.substr(3, (pwdIdx-3)),
+                        pwd: opts.auth.substr(pwdIdx+5)
                     };
                 }
                 else {
@@ -347,67 +350,65 @@ if (program.auth) {
                     process.exit();
                 }
             }
-            else if (program.auth === 'new') {
+            else if (opts.auth === 'new') {
                 auth = 'createNew';
             }
-            else if (program.auth === 'next') {
+            else if (opts.auth === 'next') {
                 auth = 'nextAvailable';
             }
-            else if (program.auth.indexOf('file:') === 0) {
-                NDDB = require('NDDB').NDDB;
+            else if (opts.auth.indexOf('file:') === 0) {
+                const NDDB = require('NDDB').NDDB;
                 codesDb = new NDDB();
-                codesDb.loadSync(program.auth.substr(5));
+                codesDb.loadSync(opts.auth.substr(5));
                 if (!codesDb.size()) {
-                    printErr('--auth no auth codes found: program.auth');
+                    printErr('--auth no auth codes found: opts.auth');
                     process.exit();
                 }
                 codesDb = codesDb.db;
             }
             else {
-                auth = program.auth;
+                auth = opts.auth;
             }
             return auth;
         })();
     }
-    else if ('boolean' === typeof program.auth) {
+    else if ('boolean' === typeof opts.auth) {
         auth = 'createNew';
     }
-    else if ('number' === typeof program.auth ||
-             'object' === typeof program.auth) {
+    else if ('number' === typeof opts.auth ||
+             'object' === typeof opts.auth) {
 
-        auth = program.auth;
+        auth = opts.auth;
     }
 }
 
 // Rebuild server files as needed.
 
-if (program.build) {
+if (opts.build) {
     (function() {
-        var i, len, opts, modules;
-        var info, module, out;
-        var cssAlso, cssOnly;
+        let cssAlso, cssOnly;
 
-        len = program.build.length;
+        let len = opts.build.length;
         if (!len) {
-            program.build = [ 'client' ];
+            opts.build = [ 'client' ];
         }
         else if (len === 1) {
-            if (program.build[0] === 'all') {
+            if (opts.build[0] === 'all') {
                 // Client will be done anyway.
-                program.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
+                opts.build = [ 'window', 'widgets', 'JSUS', 'NDDB' ];
             }
-            else if (program.build[0] === 'css') {
+            else if (opts.build[0] === 'css') {
                 cssOnly = true;
             }
         }
 
-        info = J.resolveModuleDir('nodegame-server', __dirname);
+        let info = J.resolveModuleDir('nodegame-server', __dirname);
         info = require(path.resolve(info, 'bin', 'info.js'));
 
         if (!cssOnly) {
-            out = 'nodegame-full.js';
+            let out = 'nodegame-full.js';
 
-            modules = {
+            let modules = {
                 window: 'window',
                 client: 'client',
                 widgets: 'widgets',
@@ -417,9 +418,9 @@ if (program.build) {
             };
 
             // Starting build.
-            i = -1, len = program.build.length;
+            let i = -1;
             for ( ; ++i < len ; ) {
-                module = program.build[i];
+                let module = opts.build[i];
                 if (!modules[module]) {
                     throw new Error('unknown build component: ' + module);
                 }
@@ -436,9 +437,7 @@ if (program.build) {
                     continue;
                 }
 
-                opts = { all: true, clean: true };
-
-                info.build[module](opts);
+                info.build[module]({ all: true, clean: true });
                 console.log('');
             }
             // Do client last.
@@ -448,7 +447,7 @@ if (program.build) {
                 output: out
             });
             J.copyFile(path.resolve(info.modulesDir.client, 'build', out),
-                       path.resolve(info.serverDir.build, 'nodegame-full.js'));
+                       path.resolve(info.serverDir.build, out));
             console.log(info.serverDir.build + out + ' rebuilt.');
             console.log('');
         }
@@ -465,7 +464,7 @@ if (program.build) {
             startServer();
         }
 
-    })(program.build);
+    })();
 }
 else {
     startServer();
@@ -492,9 +491,9 @@ function startServer() {
         var numFinished;
 
         // If there are not bots to add returns.
-        if (!program.phantoms) return;
+        if (!opts.phantoms) return;
 
-        gameName = program.phantoms;
+        gameName = opts.phantoms;
         channel = sn.channels[gameName];
         if (!channel) {
             printErr('channel ' + gameName + ' was not found.');

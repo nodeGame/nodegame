@@ -32,7 +32,7 @@
         "NDDB": "^2.0.0",
         "nodegame-db": "*",
         "nodegame-mongodb": "*",
-        "commander": "*",
+        "commander": "^7.0.0",
         "fs-extra": "*",
         "smoosh": "0.4.0"
     },
