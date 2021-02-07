@@ -1,5 +1,9 @@
 # nodeGame Changelog
 
+# 6.1.0
+- Fixed launcher for Commander v7.
+- Updated server,client,window,widgets.
+
 # 6.0.3
 - Fixed corrupted build in 6.0.2 (thanks jjensenius3).
 
