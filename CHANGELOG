@@ -1,7 +1,7 @@
 # nodeGame Changelog
 
 # 6.2.0
-- Removed debugger from launcher.
+- Removed debugger from launcher.js.
 - Updated server with more options for WaitingRoom.
 
 # 6.1.1
