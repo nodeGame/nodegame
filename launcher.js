@@ -129,7 +129,6 @@ program
 
     .parse(process.argv);
 
-debugger
 // User options (Commander >= 7).
 let opts = program.opts();
 
