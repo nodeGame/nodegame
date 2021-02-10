@@ -1,5 +1,8 @@
 # nodeGame Changelog
 
+# 6.2.1
+- New release, fixed support for images loaded in mainframe.
+
 # 6.2.0
 - Removed debugger from launcher.js.
 - Updated server with more options for WaitingRoom.
