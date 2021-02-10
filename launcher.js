@@ -269,8 +269,8 @@ else if ('string' === typeof opts.ssl) {
     if (!options.ssl) return;
 }
 
-if (program['default']) {
-    options.defaultChannel = program['default'];
+if (opts['default']) {
+    options.defaultChannel = opts['default'];
 }
 
 if (opts.port) {
