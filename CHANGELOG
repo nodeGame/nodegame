@@ -1,6 +1,6 @@
 # nodeGame Changelog
 
-# 6.2.3
+# 6.2.4 (6.2.1-6.2.3 deprecated)
 - Fixed "default" option in launcher for Commander v7.
 - New release, fixed support for images loaded in mainframe.
 
