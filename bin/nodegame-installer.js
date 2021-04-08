@@ -53,11 +53,6 @@ const INSTALLER_VERSION = 'v6';
 // is stored in here.
 var parentNodeModules;
 
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 // The actual version being installed, user can change it.
 var version = STABLE_VERSIONS[INSTALLER_VERSION];
 
@@ -80,6 +75,11 @@ else if (p === '--version' || p === '-v') {
     console.log('nodegame-installer ' + version);
     return;
 }
+
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 var verbose = false;
 var nodeModulesExisting = false;
