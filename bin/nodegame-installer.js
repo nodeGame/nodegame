@@ -833,19 +833,20 @@ function installationFailed() {
 
 function printHelp() {
     log();
-    log('@<version>              Install a specific version (v3, v4, v5)');
-    log('@dev                    Install latest nodeGame from git repos');
-    log('    --branch <name>         Checkout this branch on all git repos');
-    log('    --ssh                   Use ssh to get all git repos');
-    log('--yes                   Answer yes to all questions');
-    log('--install-dir <dirname> Set the name of the installation directory;');
+    log('@<version>              Installs a specific version (v3, v4, v5, v6)');
+    log('@dev                    Installs latest nodeGame from git repos');
+    log('--branch <name>         Checkouts this branch on all git repos');
+    log('--ssh                   Uses ssh to get all git repos');
+    log('--yes                   Answers yes to all questions');
+    log('--install-dir <dirname> Sets the name of the installation directory;');
     log('                        if equals to node_modules, the npm structure');
     log('                        stays unchanged');
     log('--no-spinner            Does not start the spinner');
     log('--dry                   Does not actually install anything');
     log('--list-versions         Lists stable versions');
-    log('--version               Print installer version');
-    log('--help                  Print this help');
+    log('--no-games              Does not install default games');
+    log('--version               Prints installer version');
+    log('--help                  Prints this help');
     log();
 }
 
