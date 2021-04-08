@@ -93,6 +93,9 @@ var branch;
 var warnings;
 var dry;
 
+// Add default games in games/ and games_available/.
+var addGames = true;
+
 // User requested version.
 var requestedVersion = '@' + version;
 
@@ -142,6 +145,9 @@ for (let i = 0; i < process.argv.length; i++) {
     else if (option === '--dry') {
         dry = true;
     }
+    else if (option === '--no-games') {
+        addGames = false;
+    }
 }
 
 if ((doSSH || branch) && !isDev) {
@@ -190,7 +196,6 @@ const NODEGAME_MODULES = [
     'JSUS', 'NDDB',
     'ultimatum-game'
 ];
-const N_MODULES = NODEGAME_MODULES.length;
 
 const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
                                          'games_available');
@@ -530,8 +535,11 @@ function someMagic(cb) {
 
     if (isDev) {
         getAllGitModules(function() {
-            // Move games from node_modules.
-            copyGameFromNodeModules('ultimatum-game');
+
+            if (addGames) {
+                // Move games from node_modules.
+                copyGameFromNodeModules('ultimatum-game');
+            }
 
             // Generator.
             fixGenerator();
@@ -546,8 +554,11 @@ function someMagic(cb) {
         });
     }
     else {
-        // Move games from node_modules.
-        copyGameFromNodeModules('ultimatum-game');
+
+        if (addGames) {
+            // Move games from node_modules.
+            copyGameFromNodeModules('ultimatum-game');
+        }
 
         // Generator.
         fixGenerator();
@@ -568,17 +579,15 @@ function fixGenerator() {
                           'nodegame-generator',
                           'bin', 'nodegame'),
              path.resolve(INSTALL_DIR, 'bin', 'nodegame'),
-	     'file');
+             'file');
 
     fs.writeFileSync(path.resolve(INSTALL_DIR_MODULES,
-				  'nodegame-generator',
-				  'conf',
-				  'generator.conf.json'),
-		     JSON.stringify({
-			 author: "",
-			 email: "",
-			 ngDir: INSTALL_DIR
-		     }, 4));
+                    'nodegame-generator', 'conf', 'generator.conf.json'),
+                    JSON.stringify({
+                        author: "",
+                        email: "",
+                        ngDir: INSTALL_DIR
+                    }, 4));
 }
 
 function getAllGitModules(cb) {
@@ -732,7 +741,7 @@ function removeDirRecursiveSync(dir) {
         });
         fs.rmdirSync(dir);
     }
-};
+}
 
 function getParentNodeModules() {
     let tks = ROOT_DIR.split(path.sep);
@@ -843,8 +852,6 @@ function printHelp() {
 // Kudos: cli-spinner package.
 
 function Spinner(text) {
-    var that;
-    that = this;
 
     this.spinners = [
         "|/-\\",
@@ -914,10 +921,10 @@ function Spinner(text) {
         readline.clearLine(stream, 0);
         readline.cursorTo(stream, 0);
     };
-};
+}
 
 function inArray(needle, haystack) {
-    var func, i, len;
+    var i, len;
     len = haystack.length;
     for (i = 0; i < len; i++) {
         if (needle === haystack[i]) {
@@ -945,7 +952,6 @@ function _copyFileSync(src, dest, flag) {
         COPYFILE_FICLONE_FORCE,
     };
 
-    const isNumber = (a) => typeof a === 'number';
     const or = (a, b) => a | b;
     const getValue = (obj) => (key) => obj[key];
 
