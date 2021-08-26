@@ -479,6 +479,8 @@ function startServer() {
     // Add nodeGame version (might be higher than server version) to options.
     options.nodeGameVersion = version;
 
+    options.nodeGameRoot = __dirname;
+
     // Start server, options parameter is optional.
     sn = new ServerNode(options);
 
