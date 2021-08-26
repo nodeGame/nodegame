@@ -61,9 +61,9 @@ ignoredOptions = [];
 
 confFile = null;
 
-confDir = './conf';
-logDir = './log';
-gamesDir = './games';
+confDir = path.resolve(__dirname, 'conf');
+logDir = path.resolve(__dirname, 'log');
+gamesDir = path.resolve(__dirname, 'games');
 debug = undefined;
 infoQuery = undefined;
 
