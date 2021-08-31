@@ -33,9 +33,6 @@ var sn;
 // ServerNode options.
 var options;
 
-// Conf file for all variables.
-var confFile;
-
 // Other local options.
 var confDir, logDir, gamesDir, debug, infoQuery, runTests;
 var nClients, clientType, killServer, auth, wait, port;
@@ -58,8 +55,6 @@ function list(val) {
 ignoredOptions = [];
 
 // Defaults.
-
-confFile = null;
 
 confDir = path.resolve(__dirname, 'conf');
 logDir = path.resolve(__dirname, 'log');
@@ -110,7 +105,7 @@ program
 // Connect phantoms.
 
     .option('-p, --phantoms <channel>',
-            'Connect phantoms to the specified channel')
+            'Connect phantoms to the specified channel **DISCONTINUED**')
     .option('-n, --nClients <n>',
             'Sets the number of clients phantoms to connect (default: 4)')
     .option('-t, --clientType <t>',
@@ -131,6 +126,12 @@ program
 
 // User options (Commander >= 7).
 let opts = program.opts();
+
+if (opts.phantoms) {
+    console.log('***Err: option --phantoms no longer supported. ' +
+    'PhantomJS support discontinued.');
+    return false;
+}
 
 if (opts.confFile) {
     if (!fs.existsSync(opts.confFile)) {
