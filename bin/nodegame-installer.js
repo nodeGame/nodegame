@@ -41,13 +41,14 @@ const STABLE_VERSIONS = {
     v3: '3.5.3',
     v4: '4.3.3',
     v5: '5.11.2',
-    v6: '6.3.0'
+    v6: '6.3.0',
+    v7: '7.0.0'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
 
 // Installer default version.
-const INSTALLER_VERSION = 'v6';
+const INSTALLER_VERSION = 'v7';
 
 // If node_modules folders are detected, their paths (without node_modules)
 // is stored in here.
@@ -110,13 +111,11 @@ for (let i = 0; i < process.argv.length; i++) {
             isDev = true;
             requestedVersion = '@' + version;
 
-
-            MAIN_MODULE = 'nodegame-test';
-
-            version = '7.0.4';
-            requestedVersion = '@' + version;
-
-            alpha = true;
+            // For testing alpha versions.
+            // MAIN_MODULE = 'nodegame-test';
+            // version = '7.0.4';
+            // requestedVersion = '@' + version;
+            // alpha = true;
         }
         else {
             version = STABLE_VERSIONS[requestedVersion];
