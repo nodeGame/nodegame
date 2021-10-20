@@ -1,5 +1,11 @@
 # nodeGame Changelog
 
+# 7.0.0
+- Dropped --phantoms option in launcher.
+- More robust paths in launcher.
+- Added nodeGameRoot path in launcher.
+- Installer adapted to support alpha releases.
+
 # 6.3.0
 - Fixed installer getting stuck on versions and help.
 - Added installer option --no-games to skip installing default games.
@@ -143,7 +149,7 @@ treatment for the game.
 
 # 2.0.2
 - Fixed install.stable script.
-- Fixing launcher options. 
+- Fixing launcher options.
 
 # 2.0.0 (current)
 - Added -s option to launcher. Starts the server in SSL mode. Can be empty (loads nodegame-server/ssl/), or a path to a SSL directory.
