@@ -1,6 +1,6 @@
 # nodeGame Changelog
 
-# 7.0.0
+# 7.0.1
 - Dropped --phantoms option in launcher.
 - More robust paths in launcher.
 - Added nodeGameRoot path in launcher.
