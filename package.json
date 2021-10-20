@@ -1,7 +1,7 @@
 {
     "name": "nodegame",
     "description": "Fast, scalable JavaScript for large-scale, online, multiplayer, real-time games and experiments.",
-    "version": "7.0.1",
+    "version": "7.0.2",
     "homepage": "http://nodegame.org",
     "author": "Stefano Balietti <futur.dorko@gmail.com>",
     "contributors": [
@@ -29,7 +29,7 @@
         "ultimatum-game": "^7.0.0",
         "nodegame-mturk": "^7.0.0",
         "JSUS": "^1.1.0",
-        "NDDB": "^2.0.0",
+        "NDDB": "^3.0.0",
         "nodegame-db": "*",
         "nodegame-mongodb": "*",
         "commander": "^7.0.0",

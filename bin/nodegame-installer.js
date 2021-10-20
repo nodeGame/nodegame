@@ -458,13 +458,12 @@ function printNodeGameInfo() {
 }
 
 function printInstallInfo() {
-    let str;
     log();
     log('----------------------------------------------');
     log();
 
     log('node version:      ' + process.version);
-    str = 'nodeGame version:  ' + VERSION;
+    let str = 'nodeGame version:  ' + VERSION;
     if (branch) str += ' (' + branch + ')';
     log(str);
     str = 'install directory: ' + INSTALL_DIR;
