@@ -15,19 +15,19 @@
         "url": "https://github.com/nodeGame/nodegame.git"
     },
     "engines": {
-        "node": ">= 6.0.0"
+        "node": ">= 10.0.0"
     },
     "dependencies": {
-        "nodegame-server": "^6.0.0",
-        "nodegame-client": "^6.0.0",
-        "nodegame-window": "^6.0.0",
-        "nodegame-widgets": "^6.0.0",
-        "nodegame-requirements": "^6.0.0",
-        "nodegame-game-template": "^6.0.0",
-        "nodegame-monitor": "^6.0.0",
-        "nodegame-generator": "^6.0.0",
-        "ultimatum-game": "^6.0.0",
-        "nodegame-mturk": "^6.0.0",
+        "nodegame-client": "^7.0.0",
+        "nodegame-server": "^7.0.0",
+        "nodegame-window": "^7.0.0",
+        "nodegame-widgets": "^7.0.0",
+        "nodegame-requirements": "^7.0.0",
+        "nodegame-game-template": "^7.0.0",
+        "nodegame-monitor": "^7.0.0",
+        "nodegame-generator": "^7.0.0",
+        "ultimatum-game": "^7.0.0",
+        "nodegame-mturk": "^7.0.0",
         "JSUS": "^1.1.0",
         "NDDB": "^2.0.0",
         "nodegame-db": "*",
