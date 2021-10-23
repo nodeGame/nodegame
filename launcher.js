@@ -106,20 +106,20 @@ program
 
     .option('-p, --phantoms <channel>',
             'Connect phantoms to the specified channel **DISCONTINUED**')
-    .option('-n, --nClients <n>',
-            'Sets the number of clients phantoms to connect (default: 4)')
-    .option('-t, --clientType <t>',
-            'Sets the client type of connecting phantoms (default: autoplay)')
-    .option('-T, --runTests',
-            'Run tests after all phantoms are game-over ' +
-            '(overwrites settings.js in test/)')
-    .option('-k, --killServer',
-            'Kill server after all phantoms are game-over')
-    .option('-a --auth [option]',
-            'Phantoms auth options. Values: new(default)|createNew|' +
-            'nextAvailable|next|code|id:code&pwd:password|file:path/to/file.')
-    .option('-w --wait [milliseconds]',
-            'Waits before connecting the next phantom. Default: 1000')
+    // .option('-n, --nClients <n>',
+    //         'Sets the number of clients phantoms to connect (default: 4)')
+    // .option('-t, --clientType <t>',
+    //         'Sets the client type of connecting phantoms (default: autoplay)')
+    // .option('-T, --runTests',
+    //         'Run tests after all phantoms are game-over ' +
+    //         '(overwrites settings.js in test/)')
+    // .option('-k, --killServer',
+    //         'Kill server after all phantoms are game-over')
+    // .option('-a --auth [option]',
+    //         'Phantoms auth options. Values: new(default)|createNew|' +
+    //         'nextAvailable|next|code|id:code&pwd:password|file:path/to/file.')
+    // .option('-w --wait [milliseconds]',
+    //         'Waits before connecting the next phantom. Default: 1000')
 
 
     .parse(process.argv);

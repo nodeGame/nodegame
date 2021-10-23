@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "nodegame-client": ">=7.0.0",
-        "nodegame-server": ">=7.0.1",
+        "nodegame-server": ">=7.0.2",
         "nodegame-window": ">=7.0.0",
         "nodegame-widgets": ">=7.0.0",
         "nodegame-requirements": ">=7.0.0",

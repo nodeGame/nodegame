@@ -965,7 +965,8 @@ function moveFolderSync(from, to, copy) {
         let fileFrom = path.join(from, element);
         let fileTo = path.join(to, element);
 
-        if (fs.lstatSync(fileFrom).isFile()) {
+        let stats = fs.lstatSync(fileFrom);
+        if (stats.isFile() || stats.isSymbolicLink()) {
             if (copy) fs.copyFileSync(fileFrom, fileTo);
             else fs.renameSync(fileFrom, fileTo);
         }
