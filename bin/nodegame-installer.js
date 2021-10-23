@@ -42,7 +42,7 @@ const STABLE_VERSIONS = {
     v4: '4.3.3',
     v5: '5.11.2',
     v6: '6.3.0',
-    v7: '7.0.3'
+    v7: '7.0.4'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
