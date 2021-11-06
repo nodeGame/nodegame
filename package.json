@@ -18,10 +18,10 @@
         "node": ">= 10.0.0"
     },
     "dependencies": {
-        "nodegame-client": ">=7.0.0",
-        "nodegame-server": ">=7.0.2",
+        "nodegame-client": ">=7.1.0",
+        "nodegame-server": ">=7.0.3",
         "nodegame-window": ">=7.0.0",
-        "nodegame-widgets": ">=7.0.0",
+        "nodegame-widgets": ">=7.0.2",
         "nodegame-requirements": ">=7.0.0",
         "nodegame-game-template": ">=7.0.0",
         "nodegame-monitor": ">=7.0.0",
@@ -29,7 +29,7 @@
         "ultimatum-game": ">=7.0.0",
         "nodegame-mturk": ">=7.0.0",
         "JSUS": ">=1.1.0",
-        "NDDB": ">=3.0.0",
+        "NDDB": ">=3.0.2",
         "nodegame-db": "*",
         "nodegame-mongodb": "*",
         "commander": "^7.0.0",
