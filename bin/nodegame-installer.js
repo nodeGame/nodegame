@@ -120,7 +120,6 @@ for (let i = 0; i < process.argv.length; i++) {
         }
         else if (requestedVersion === 'alpha') {
             // For testing alpha versions.
-            isDev = true;
             MAIN_MODULE = 'nodegame-test';
             requestedVersion = '@latest';            
             alpha = true;
