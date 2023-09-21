@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 /**
  * # nodeGame Installer
- * Copyright(c) 2011-2020 Stefano Balietti
+ * Copyright(c) 2011-2023 Stefano Balietti
  * MIT Licensed
  *
  * http://www.nodegame.org
@@ -43,6 +43,7 @@ const STABLE_VERSIONS = {
     v5: '5.11.2',
     v6: '6.3.0',
     v7: '7.1.0'
+    // v8: '8.0.0'
 };
 
 const AVAILABLE_VERSIONS = Object.keys(STABLE_VERSIONS).concat(['dev']);
@@ -116,6 +117,13 @@ for (let i = 0; i < process.argv.length; i++) {
             // version = '7.0.4';
             // requestedVersion = '@' + version;
             // alpha = true;
+        }
+        else if (requestedVersion === 'alpha') {
+            // For testing alpha versions.
+            isDev = true;
+            MAIN_MODULE = 'nodegame-test';
+            requestedVersion = '@latest';            
+            alpha = true;
         }
         else {
             version = STABLE_VERSIONS[requestedVersion];
