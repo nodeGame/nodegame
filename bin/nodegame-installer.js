@@ -118,12 +118,12 @@ for (let i = 0; i < process.argv.length; i++) {
             // requestedVersion = '@' + version;
             // alpha = true;
         }
-        else if (requestedVersion === 'alpha') {
-            // For testing alpha versions.
-            MAIN_MODULE = 'nodegame-test';
-            requestedVersion = '@latest';            
-            alpha = true;
-        }
+        // else if (requestedVersion === 'alpha') {
+        //     // For testing alpha versions.
+        //     MAIN_MODULE = 'nodegame-test';
+        //     requestedVersion = '@latest';            
+        //     alpha = true;
+        // }
         else {
             version = STABLE_VERSIONS[requestedVersion];
             if (!version) {
@@ -208,7 +208,7 @@ const NODEGAME_MODULES = [
     // No need to replace these now.
     // 'nodegame-db', 'nodegame-mondodb',
     'JSUS', 'NDDB',
-    'ultimatum-game'
+    'ultimatum-game', 'survey-game'
 ];
 
 const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
