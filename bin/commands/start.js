@@ -87,7 +87,9 @@ module.exports = function (program, rootDir) {
         )
         .option("-f, --default [channel]", "Sets the default channel")
         .option("-P, --port [port]", "Sets the port of the server")
-        .action(processOptions)
+        .action(function(options) {
+            processOptions(options);
+        })
         // Connect phantoms.
 
         // .option('-p, --phantoms <channel>',
@@ -107,11 +109,9 @@ module.exports = function (program, rootDir) {
         // .option('-w --wait [milliseconds]',
         //         'Waits before connecting the next phantom. Default: 1000')
 
-        .parse(process.argv);
+        // .parse(process.argv);
 
-    function processOptions() {
-        // User options (Commander >= 7).
-        let opts = program.opts();
+    function processOptions(opts) {
 
         if (opts.phantoms) {
             console.log(
@@ -140,7 +140,8 @@ module.exports = function (program, rootDir) {
             if (opts.gamesDir) ignoredOptions.push("--gamesDir");
             if (opts.debug) ignoredOptions.push("--debug");
             if (opts.infoQuery) ignoredOptions.push("--infoQuery");
-        } else {
+        }
+        else {
             options = {
                 // Additional conf directory.
                 confDir: confDir,
@@ -219,7 +220,8 @@ module.exports = function (program, rootDir) {
             if (opts.infoQuery) {
                 if ("boolean" === typeof opts.infoQuery) {
                     infoQuery = opts.infoQuery;
-                } else {
+                }
+                else {
                     let i = opts.infoQuery.toLowerCase();
                     infoQuery =
                         i === "f" || i === "false" || i === "0" ? false : true;
@@ -231,7 +233,8 @@ module.exports = function (program, rootDir) {
 
         if ("boolean" === typeof opts.ssl) {
             options.ssl = true;
-        } else if ("string" === typeof opts.ssl) {
+        }
+        else if ("string" === typeof opts.ssl) {
             options.ssl = (function (dir) {
                 var ssl;
 
@@ -306,10 +309,12 @@ module.exports = function (program, rootDir) {
         if (opts.wait) {
             if (!opts.phantoms) {
                 ignoredOptions.push("--wait");
-            } else {
+            }
+            else {
                 if (true === opts.wait) {
                     wait = 1000;
-                } else {
+                }
+                else {
                     wait = J.isInt(opts.wait, 0);
                     if (false === wait) {
                         printErr(
@@ -325,7 +330,8 @@ module.exports = function (program, rootDir) {
         if (opts.auth) {
             if (!opts.phantoms) {
                 ignoredOptions.push("--auth");
-            } else if ("string" === typeof opts.auth) {
+            }
+            else if ("string" === typeof opts.auth) {
                 auth = (function (idIdx, pwdIdx) {
                     var auth;
                     idIdx = opts.auth.indexOf("id:");
@@ -336,18 +342,22 @@ module.exports = function (program, rootDir) {
                                 id: opts.auth.substr(3, pwdIdx - 3),
                                 pwd: opts.auth.substr(pwdIdx + 5),
                             };
-                        } else {
+                        }
+                        else {
                             printErr(
                                 "--auth must be a client id or id and " +
                                     'pwd in the form "id:123&pwd:456"'
                             );
                             process.exit();
                         }
-                    } else if (opts.auth === "new") {
+                    }
+                    else if (opts.auth === "new") {
                         auth = "createNew";
-                    } else if (opts.auth === "next") {
+                    }
+                    else if (opts.auth === "next") {
                         auth = "nextAvailable";
-                    } else if (opts.auth.indexOf("file:") === 0) {
+                    }
+                    else if (opts.auth.indexOf("file:") === 0) {
                         const NDDB = require("NDDB").NDDB;
                         codesDb = new NDDB();
                         codesDb.loadSync(opts.auth.substr(5));
@@ -356,14 +366,17 @@ module.exports = function (program, rootDir) {
                             process.exit();
                         }
                         codesDb = codesDb.db;
-                    } else {
+                    }
+                    else {
                         auth = opts.auth;
                     }
                     return auth;
                 })();
-            } else if ("boolean" === typeof opts.auth) {
+            }
+            else if ("boolean" === typeof opts.auth) {
                 auth = "createNew";
-            } else if (
+            }
+            else if (
                 "number" === typeof opts.auth ||
                 "object" === typeof opts.auth
             ) {
@@ -372,7 +385,6 @@ module.exports = function (program, rootDir) {
         }
 
         // Rebuild server files as needed.
-
         if (opts.build) {
             (function () {
                 let cssAlso, cssOnly;
@@ -380,11 +392,13 @@ module.exports = function (program, rootDir) {
                 let len = opts.build.length;
                 if (!len) {
                     opts.build = ["client"];
-                } else if (len === 1) {
+                }
+                else if (len === 1) {
                     if (opts.build[0] === "all") {
                         // Client will be done anyway.
                         opts.build = ["window", "widgets", "JSUS", "NDDB"];
-                    } else if (opts.build[0] === "css") {
+                    }
+                    else if (opts.build[0] === "css") {
                         cssOnly = true;
                     }
                 }
@@ -416,10 +430,12 @@ module.exports = function (program, rootDir) {
                         // Will be done last anyway.
                         if (module === "client") {
                             continue;
-                        } else if (module === "NDDB") {
+                        }
+                        else if (module === "NDDB") {
                             console.log("NDDB does not require build.");
                             continue;
-                        } else if (module === "css") {
+                        }
+                        else if (module === "css") {
                             cssAlso = true;
                             continue;
                         }
@@ -448,11 +464,13 @@ module.exports = function (program, rootDir) {
                             startServer();
                         }
                     });
-                } else {
+                }
+                else {
                     startServer();
                 }
             })();
-        } else {
+        }
+        else {
             startServer();
         }
     }
@@ -530,13 +548,15 @@ module.exports = function (program, rootDir) {
                                     if (killServer) process.exit();
                                 }
                             );
-                        } else {
+                        }
+                        else {
                             printErr(
                                 "Cannot run tests, mocha not found: ",
                                 command
                             );
                         }
-                    } else if (killServer) process.exit();
+                    }
+                    else if (killServer) process.exit();
                 };
             }
 
@@ -545,14 +565,16 @@ module.exports = function (program, rootDir) {
                 str = "Connecting phantom #" + (i + 1) + "/" + nClients;
                 if (codesDb) {
                     config = { queryString: queryString, auth: codesDb[i] };
-                } else {
+                }
+                else {
                     config = { queryString: queryString, auth: auth };
                 }
                 if (config.auth) {
                     if (config.auth.id) {
                         str += " id: " + config.auth.id;
                         if (config.auth.pwd) str += " pwd: " + config.auth.pwd;
-                    } else {
+                    }
+                    else {
                         str += " " + config.auth;
                     }
                 }
@@ -577,7 +599,8 @@ module.exports = function (program, rootDir) {
                             startPhantom(i);
                         }, wait * i);
                     })(i);
-                } else {
+                }
+                else {
                     startPhantom(i);
                 }
             }

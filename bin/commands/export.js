@@ -9,23 +9,26 @@
 "use strict";
 
 // Modules.
-const fs = require("fs");
 const path = require("path");
-const exec = require("child_process").exec;
 const J = require("JSUS").JSUS;
 
-const ServerNode = require("nodegame-server").ServerNode;
- 
-// Split input parameters.
-function list(val) {
-    return val.split(",");
-}
 
 module.exports = function (program, rootDir) {
 
     const version = require(path.resolve(rootDir, "package.json")).version;
 
-    const exp = require(path.resolve(rootDir, 'bin', 'lib', 'export.js'));
+    const conf = {
+        author: 'author',
+        email: 'email',
+        ngDir: rootDir,
+        ngVersion: version,
+        ngGamesAvailDir: path.join(rootDir, 'games_available'),
+        ngGamesEnabledDir: path.join(rootDir, 'games')
+    };
+
+
+    const exp = require(
+        path.resolve(rootDir, 'bin', 'commands', 'lib', 'export.js'));
 
     program
         .command('export-data <game>')
@@ -65,9 +68,13 @@ module.exports = function (program, rootDir) {
             opts.game = game;
             processExportOptions(opts);
 
-            loadConfFile(() => exp.data(conf, opts, terminateExport));
+            // loadConfFile(() => exp.data(conf, opts, terminateExport));
+            exp.data(conf, opts, terminateExport);
 
-        });
+
+        })
+        // .parse(process.argv);
+
 
     program
         .command('export-logs')
@@ -102,14 +109,16 @@ module.exports = function (program, rootDir) {
         .option('-v, --verbose', 'verbose output')
         .allowUnknownOption()
         .action(function(opts) {
-
+            debugger
             processExportOptions(opts);
 
-            loadConfFile(() => exp.logs(conf, opts, terminateExport));
+            // loadConfFile(() => exp.logs(conf, opts, terminateExport));
+            exp.logs(conf, opts, terminateExport);
 
-        });
 
-    
+        })
+        // .parse(process.argv);
+
 };
 
 

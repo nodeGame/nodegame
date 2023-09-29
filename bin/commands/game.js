@@ -25,7 +25,7 @@ module.exports = function (program, rootDir) {
     // This file is "copied" and not linked in Windows,
     // therefore we need to be agnostic while loading the root path.
     const root = J.resolveModuleDir("nodegame-generator");
-    const confFile = path.resolve(root, "conf", "generator.conf.json");
+    const confFile = path.resolve(rootDir, "create-game.json");
 
     const NODEGAME_MODULE = "nodegame";
     // const NODEGAME_MODULE = 'nodegame-test';
@@ -82,14 +82,17 @@ module.exports = function (program, rootDir) {
                 );
                 stdoutConf.lastPrompt = str;
                 rl.output.write(str);
-            } else if (str.length === 2) {
+            }
+            else if (str.length === 2) {
                 rl.output.write(str);
-            } else {
+            }
+            else {
                 // console.log('2');
                 rl.output.write("*");
                 stdoutConf.lastPrompt += "*";
             }
-        } else {
+        }
+        else {
             // console.log('3');
             rl.output.write(str);
         }
@@ -149,7 +152,8 @@ module.exports = function (program, rootDir) {
                 // Nothing.
                 rl.close();
             }, true);
-        });
+        })
+        // .parse(process.argv);
 
     program
         .command("show-conf")
@@ -160,7 +164,9 @@ module.exports = function (program, rootDir) {
                 showConf();
                 rl.close();
             });
-        });
+        })
+        // .parse(process.argv);
+
 
     program
         .command("create-game [game_name] [author] [author_email]")
@@ -195,7 +201,9 @@ module.exports = function (program, rootDir) {
                 });
                 // rl.close in complete();
             });
-        });
+        })
+        // .parse(process.argv);
+
 
     /**
      * ## detectNodeGameInstallation
@@ -234,7 +242,8 @@ module.exports = function (program, rootDir) {
                     "However, folders games and/or games_available " +
                         "could not be found"
                 );
-            } else {
+            }
+            else {
                 return {
                     ngVersion: ngPkg.version,
                     ngDir: ngDir + path.sep,
@@ -496,7 +505,8 @@ module.exports = function (program, rootDir) {
                 gameStages = loadTemplate(t, filePath);
                 filePath = path.join("game", "game.settings_single.js");
                 gameSettings = loadTemplate(t, filePath);
-            } else {
+            }
+            else {
                 filePath = path.join("game", "game.stages.js");
                 gameStages = loadTemplate(t, filePath);
                 filePath = path.join("game", "game.settings.js");
@@ -526,7 +536,8 @@ module.exports = function (program, rootDir) {
                     "autoplay_single.js"
                 );
                 typeAutoplay = loadTemplate(t, filePath);
-            } else {
+            }
+            else {
                 filePath = path.join("game", "client_types", "player.js");
                 typePlayer = loadTemplate(t, filePath);
                 filePath = path.join("game", "client_types", "bot.js");
@@ -553,7 +564,8 @@ module.exports = function (program, rootDir) {
 
                 filePath = path.join("public", "instructions_single.htm");
                 instrPage = loadTemplate(t, filePath);
-            } else {
+            }
+            else {
                 filePath = path.join("public", "game.htm");
                 gamePage = loadTemplate(t, filePath);
 
@@ -575,7 +587,8 @@ module.exports = function (program, rootDir) {
             if (singlePlayer) {
                 filePath = path.join("waitroom", "waitroom.settings_single.js");
                 waitroomSettings = loadTemplate(t, filePath);
-            } else {
+            }
+            else {
                 filePath = path.join("waitroom", "waitroom.settings.js");
                 waitroomSettings = loadTemplate(t, filePath);
             }
@@ -995,7 +1008,8 @@ module.exports = function (program, rootDir) {
 
         if (path.isAbsolute(options.game)) {
             destinationPath = options.game;
-        } else {
+        }
+        else {
             // Is there a default game folder?
             if (!conf.ngGamesAvailDir) {
                 console.log(
@@ -1024,7 +1038,8 @@ module.exports = function (program, rootDir) {
                 return;
             }
             template = opts.template;
-        } else {
+        }
+        else {
             template = DEFAULT_TEMPLATE;
         }
         // Generate game. Check if it is empty.
@@ -1043,7 +1058,8 @@ module.exports = function (program, rootDir) {
                     authorEmail,
                     opts
                 );
-            } else {
+            }
+            else {
                 colorWrite("Warning!", true);
                 str =
                     destinationPath +
@@ -1060,7 +1076,8 @@ module.exports = function (program, rootDir) {
                             authorEmail,
                             opts
                         );
-                    } else {
+                    }
+                    else {
                         console.error("aborting");
                         process.exit(1);
                     }
@@ -1110,7 +1127,8 @@ module.exports = function (program, rootDir) {
                 if (answer.substring(answer.length - 2) !== "\\") {
                     answer += "\\";
                 }
-            } else {
+            }
+            else {
                 if (answer.charAt(answer.length - 1) !== path.sep) {
                     answer += path.sep;
                 }
@@ -1232,7 +1250,8 @@ module.exports = function (program, rootDir) {
                 console.log("Missing or incomple conf. Trying to recover it.");
             }
             createConfFile(cb);
-        } else {
+        }
+        else {
             try {
                 cb();
             } catch (e) {
@@ -1261,27 +1280,30 @@ module.exports = function (program, rootDir) {
     }
 
     // Parsing options.
-    program.parse(process.argv);
+    // program.parse(process.argv);
 
-    let firstCommand = program.rawArgs[2];
-    if (!program.args.length) {
-        if (
-            firstCommand !== "--help" &&
-            firstCommand !== "-h" &&
-            firstCommand !== "--version" &&
-            firstCommand !== "-V"
-        ) {
-            console.log("Error: no command provided.");
-        }
-    } else {
-        if (
-            firstCommand !== "create-game" &&
-            firstCommand !== "show-conf" &&
-            firstCommand !== "update-conf"
-        ) {
-            console.log("Error: invalid command: " + firstCommand);
-        }
-    }
+    // let firstCommand = program.rawArgs[2];
+    // if (!program.args.length) {
+    //     if (
+    //         firstCommand !== "--help" &&
+    //         firstCommand !== "-h" &&
+    //         firstCommand !== "--version" &&
+    //         firstCommand !== "-V"
+    //     ) {
+    //         console.log("Error: no command provided.");
+    //     }
+    // }
+    // else {
+    //     if (
+    //         firstCommand !== "create-game" &&
+    //         firstCommand !== "show-conf" &&
+    //         firstCommand !== "update-conf"
+    //     ) {
+    //         console.log("Error: invalid command: " + firstCommand);
+    //     }
+    // }
+
+
 };
 
 

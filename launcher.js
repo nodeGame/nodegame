@@ -35,6 +35,10 @@ start(program, __dirname);
 const game = require(path.join(CMD_DIR, 'game.js'));
 game(program, __dirname);
 
+const exportStuff = require(path.join(CMD_DIR, 'export.js'));
+exportStuff(program, __dirname);
+
+program.parse();
 
     
 
