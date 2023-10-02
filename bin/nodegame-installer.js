@@ -200,15 +200,25 @@ const INSTALL_DIR_MODULES = doNotMoveInstall ?
       NODE_MODULES_DIR : path.resolve(INSTALL_DIR, 'node_modules');
 
 const NODEGAME_MODULES = [
+    
+    // Standard modules.
     'nodegame-server', 'nodegame-client',
     'nodegame-window', 'nodegame-widgets',
     'nodegame-monitor', 'nodegame-game-template',
     'nodegame-requirements', 'nodegame-generator',
     'nodegame-mturk',
-    // No need to replace these now.
+    
+    // These are no longer maintained.
     // 'nodegame-db', 'nodegame-mondodb',
+    
+    // These are on different versions.
     'JSUS', 'NDDB',
-    'ultimatum-game', 'survey-game'
+    
+    // Games.
+    'ultimatum-game', 'survey-ineq',
+    
+    // This is necessary so that we can do updates.
+    'nodegame'
 ];
 
 const GAMES_AVAILABLE_DIR = path.resolve(INSTALL_DIR,
@@ -306,6 +316,8 @@ function checkParentNodeModules() {
         log(str + ' will be temporarily renamed. This');
         log('might affect only live node processes. If unsure, choose No ');
         log('and try to install nodeGame on another path.');
+        log('If you know what you are doing, you can also use the option: ');
+        log('--no-parent-dir-check');
         log();
         if (!yes) {
             confirm('Continue? [y/n]', renameParentCb);
