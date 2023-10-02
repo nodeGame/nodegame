@@ -590,6 +590,9 @@ function someMagic(cb) {
             // Generator.
             fixGenerator();
 
+            // Copy main folder files.
+            nodegameDev();
+
             // Restore any parent node_modules folder that was renamed.
             restoreParentNodeModules();
 
@@ -617,6 +620,46 @@ function someMagic(cb) {
 
         closeRL(0);
     }
+}
+
+
+function nodegameDev() {
+    let ng = path.resolve(INSTALL_DIR_MODULES, 'nodegame');
+    
+    // nodegame.js
+    let filePath = path.resolve(ng, 'nodegame.js'); 
+    fs.copyFileSync(filePath, path.resolve(INSTALL_DIR, 'nodegame.js'));
+
+    // package.json
+    filePath = path.resolve(ng, 'package.json'); 
+    fs.copyFileSync(filePath, path.resolve(INSTALL_DIR, 'package.json'));
+
+    // .eslintrc.js
+    filePath = path.resolve(ng, '.eslintrc.js'); 
+    fs.copyFileSync(filePath, path.resolve(INSTALL_DIR, '.eslintrc.js'));
+
+    // .gitignore
+    filePath = path.resolve(ng, '.gitignore'); 
+    fs.copyFileSync(filePath, path.resolve(INSTALL_DIR, '.gitignore'));
+    
+    // CHANGELOG
+    filePath = path.resolve(ng, 'CHANGELOG'); 
+    fs.copyFileSync(filePath, path.resolve(INSTALL_DIR, 'CHANGELOG'));
+
+    // Dirs.
+
+    // Bin.
+    filePath = path.resolve(ng, 'bin');
+    copyFolderRecursiveSync(filePath, INSTALL_DIR);
+
+    // Conf.
+    filePath = path.resolve(ng, 'conf');
+    copyFolderRecursiveSync(filePath, INSTALL_DIR);
+
+    // Conf.
+    filePath = path.resolve(ng, 'git-hooks');
+    copyFolderRecursiveSync(filePath, INSTALL_DIR);
+
 }
 
 function fixGenerator() {
@@ -877,6 +920,43 @@ function installationFailed() {
 }
 
 
+function copyFileSync(source, target) {
+
+    let targetFile = target;
+
+    // If target is a directory, a new file with the same name will be created.
+    if (fs.existsSync(target)) {
+        if (fs.lstatSync(target).isDirectory() ) {
+            targetFile = path.join(target, path.basename(source));
+        }
+    }
+
+    fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+
+function copyFolderRecursiveSync(source, target) {
+    let files = [];
+
+    // Check if folder needs to be created or integrated
+    let targetFolder = path.join(target, path.basename(source));
+    if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
+
+    // Copy
+    if (fs.lstatSync(source).isDirectory()) {
+        files = fs.readdirSync(source);
+        files.forEach(file => {
+            let curSource = path.join(source, file);
+            if (fs.lstatSync(curSource).isDirectory()) {
+                copyFolderRecursiveSync(curSource, targetFolder);
+            }
+            else {
+                copyFileSync( curSource, targetFolder );
+            }
+        });
+    }
+}
+
+
 function printHelp() {
     log();
     log('@<version>              Installs a specific version (v3, v4, v5, v6)');
@@ -891,6 +971,7 @@ function printHelp() {
     log('--dry                   Does not actually install anything');
     log('--list-versions         Lists stable versions');
     log('--no-games              Does not install default games');
+    log('--no-parent-dir-check   Skip check for node_modules in parent folder')
     log('--version               Prints installer version');
     log('--help                  Prints this help');
     log();
