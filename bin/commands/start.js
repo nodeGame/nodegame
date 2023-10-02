@@ -48,6 +48,9 @@ module.exports = function (program, vars) {
     let debug = undefined;
     let infoQuery = undefined;
 
+    // No phantoms.
+    let phantoms = false;
+
     let nClients = 4;
     let clientType = "autoplay";
     let runTests = false;
@@ -116,6 +119,7 @@ module.exports = function (program, vars) {
     function processOptions(opts) {
 
         if (opts.phantoms) {
+            phantoms = opts.phantoms;
             console.log(
                 "***Err: option --phantoms no longer supported. " +
                     "PhantomJS support discontinued."
@@ -286,7 +290,7 @@ module.exports = function (program, vars) {
         }
 
         if (opts.nClients) {
-            if (!opts.phantoms) ignoredOptions.push("--nClients");
+            if (!phantoms) ignoredOptions.push("--nClients");
             else {
                 nClients = parseInt(opts.nClients, 10);
                 if (isNaN(nClients)) {
@@ -297,7 +301,7 @@ module.exports = function (program, vars) {
             }
         }
         if (opts.clientType) {
-            if (!opts.phantoms) ignoredOptions.push("--clientType");
+            if (!phantoms) ignoredOptions.push("--clientType");
             else clientType = opts.clientType;
         }
         if (opts.runTests) {
@@ -305,11 +309,11 @@ module.exports = function (program, vars) {
             else runTests = opts.runTests;
         }
         if (opts.killServer) {
-            if (!opts.phantoms) ignoredOptions.push("--killServer");
+            if (!phantoms) ignoredOptions.push("--killServer");
             else killServer = true;
         }
         if (opts.wait) {
-            if (!opts.phantoms) {
+            if (!phantoms) {
                 ignoredOptions.push("--wait");
             }
             else {
@@ -330,7 +334,7 @@ module.exports = function (program, vars) {
             }
         }
         if (opts.auth) {
-            if (!opts.phantoms) {
+            if (!phantoms) {
                 ignoredOptions.push("--auth");
             }
             else if ("string" === typeof opts.auth) {
@@ -500,9 +504,9 @@ module.exports = function (program, vars) {
             var numFinished;
 
             // If there are not bots to add returns.
-            if (!opts.phantoms) return;
+            if (!phantoms) return;
 
-            gameName = opts.phantoms;
+            gameName = phantoms;
             channel = sn.channels[gameName];
             if (!channel) {
                 printErr("channel " + gameName + " was not found.");
