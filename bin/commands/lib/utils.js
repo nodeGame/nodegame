@@ -1,4 +1,5 @@
 const execFile = require("child_process").execFile;
+const fs = require('fs');
 const path = require('path');
 
 module.exports = function(vars) {
@@ -45,6 +46,23 @@ module.exports = function(vars) {
         return path.resolve(vars.rootDir, "node_modules");
     }
 
-    return { logger, checkGitExists, getNodeModulesPath };
+    function getModulePath(module) {
+        const nodeModules = getNodeModulesPath();
+        let pathToModule = path.join(nodeModules, module);
+        if (!fs.existsSync(pathToModule)) return false;
+        return pathToModule;
+    }
+
+    function getGamePath(game) {
+        let pathToGame = path.resolve(vars.rootDir, "games", game);
+        if (!fs.existsSync(pathToGame)) {
+            pathToGame = path.resolve(vars.rootDir, "games_available", game);
+            if (!fs.existsSync(pathToGame)) return false;
+        }
+        return pathToGame;
+    }
+
+    return { logger,
+             checkGitExists, getNodeModulesPath, getGamePath, getModulePath };
 
 };

@@ -23,8 +23,9 @@ module.exports = function (program, vars, utils) {
     const rootDir = vars.rootDir;
     const version = vars.version;
     const NODEGAME_MODULES = vars.NODEGAME_MODULES;
+    const NODEGAME_GAMES = vars.NODEGAME_GAMES;
     const isWin = vars.isWin;
-
+    
     const logger = utils.logger;
     
     const NODEGAME_MODULE = "nodegame";
@@ -39,7 +40,7 @@ module.exports = function (program, vars, utils) {
         .option('-g, --games', 'default games are updated')
         .option('-t, --throws', 'on error, it will throw')
         .action((opts) => {
-            checkGitExists(() => update(showUpdateRes, opts));
+            checkGitExists(() => update(showres, opts));
         });
 
     // Update.
@@ -47,27 +48,65 @@ module.exports = function (program, vars, utils) {
     function update(cb, opts) {
 
         let nodeModulesPath = utils.getNodeModulesPath();
+        
         if (nodeModulesPath === false) {
             logger.err('Could not find node_modules dir. Aborting.');
             return;
         }
 
-        const updateResults = {};
+        const res = {};
+
+        let verbose = opts.verbose;
 
         let counter = NODEGAME_MODULES.length;
         
-        if (opts.verbose) logger.info("Updating all modules./n");
+        if (verbose) logger.info("Updating all modules./n");
 
-        for (let i = 0; i < NODEGAME_MODULES.length; i++) {
+        let modules = NODEGAME_MODULES;
+        
+        let nPackages = NODEGAME_MODULES.length;
+        if (opts.games) {
+            modules = modules.concat(vars.NODEGAME_GAMES);
+        }
+
+        for (let i = 0; i < modules.length; i++) {
             (function (i) {
-                let module = NODEGAME_MODULES[i];
-                let modulePath = path.join(nodeModulesPath, module);
+                let module = modules[i];
+                // console.log(module);
+                
+                let modulePath;
+                // From games/ or games_available/.
+                if (opts.games && i >= nPackages) {
+                    modulePath = utils.getGamePath(module);
+                    // console.log(modulePath)
+                }
+                // From node_modules/.
+                else {
+                    modulePath = utils.getModulePath(module);
+                }
+                if (modulePath === false) {
+                    
+                    if (verbose) {
+                        logger.info();
+                        logger.err('Could not find ' + module);
+                        logger.info();
+                    }
+
+                    res[module] = {
+                        name: module,
+                        err: 'not found'
+                        // path: modulePath
+                    };
+
+                    return;
+                }
+
                 let pkgJSON = path.join(modulePath, 'package.json');
                 let moduleVersion = require(pkgJSON).version;
 
-                updateResults[module] = {
+                res[module] = {
                     name: module,
-                    from: moduleVersion
+                    version: moduleVersion
                     // path: modulePath
                 };
 
@@ -79,20 +118,20 @@ module.exports = function (program, vars, utils) {
                 info.remote = remote;
                 info.branch = branch;
 
-                updateResults[module].remote = remote;
-                updateResults[module].branch = branch;
+                res[module].remote = remote;
+                res[module].branch = branch;
 
                 setTimeout(function () {
                     updateGitModule(info, function (err) {
                         if (err) {
                             if (opts.throw) throw new Error(err);
-                            let errMsg = true;
+                            let errMsg = 'error';
                             if (err.message &&
                                 err.message.indexOf('Please commit your cha')) {
 
                                 errMsg = 'local changes' 
                             }
-                            updateResults[module]._err = errMsg;
+                            res[module].err = errMsg;
                             
                         }
                         else {
@@ -100,11 +139,12 @@ module.exports = function (program, vars, utils) {
                             delete require.cache[require.resolve(pkgJSON)]
                             let newModuleVersion = require(pkgJSON).version;
                             if (newModuleVersion !== moduleVersion) {
-                                updateResults[module].to = newModuleVersion;
+                                res[module].previous = moduleVersion
+                                res[module].version = newModuleVersion;
                             }
                         }
                         counter--;
-                        if (counter === 0 && cb) cb(updateResults);
+                        if (counter === 0 && cb) cb(res);
                     });
                 // This delay needs to be a bit large because otherwise
                 // the loaded package version is not updated (but it should!). 
@@ -174,7 +214,7 @@ module.exports = function (program, vars, utils) {
 
     // Utils.
 
-    function showUpdateRes(res) {
+    function showres(res) {
         
         let totErrored = 0;
         let totUpdated = 0;
@@ -182,37 +222,24 @@ module.exports = function (program, vars, utils) {
         for (let m in res) {
             if (res.hasOwnProperty(m)) {
                 let r = res[m];
-                let from = r.from;
-                let to = r.to;
-                if (to) {
-                    totUpdated++; 
-                    r.version = to;
-                    delete r.to;
-                }
-                else {
-                    r.version = from;
-                    delete r.from;
-                }
-                if (r._err) {
-                    totErrored++;
-                    // So that err is last column.
-                    r.err = r._err;
-                    delete r._err;
-                }
+                if (r.previous) totUpdated++; 
+                if (r.err) totErrored++;
                 table.push(r);
-                // if (res[m].err) str += ' Errored!';
-                // logger.list(m + ': ' + str);
-                
             }
         }
-
+        
         logger.info();
         logger.info('nodeGame update:');
         logger.list(totUpdated + ' package/s updated.');
         if (totErrored) logger.list(totErrored + ' package/s errored.');
         logger.info();
-
-        if (table.length) console.table(table);
+        
+        if (table.length || totErrored) {
+            let tableCols = [ 'name', 'remote', 'branch', 'version' ];
+            if (totUpdated) tableCols.push('previous');
+            if (totErrored) tableCols.push('err');
+            console.table(table, tableCols);
+        }
     }
     
 };
