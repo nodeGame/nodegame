@@ -61,11 +61,12 @@ module.exports = function (program, vars) {
 
     function createRL() {
             
-        readline.createInterface({
+        rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
             terminal: true,
         });
+
         rl.on("SIGINT", function () {
             rl.close();
             console.log();
@@ -1231,7 +1232,8 @@ module.exports = function (program, vars) {
             if (cb) {
                 try {
                     cb();
-                } catch (e) {
+                } 
+                catch (e) {
                     console.log(e);
                     colorWrite("An error occurred. Aborted.");
                     process.exit();
@@ -1245,8 +1247,9 @@ module.exports = function (program, vars) {
         // Try to load configuration. If not found start utility to create it.
         try {
             conf = require(confFile);
-        } catch (e) {
-            console.log(e);
+        }
+        catch (e) {
+            // console.log(e);
             console.log("");
             colorWrite("Warning!");
             console.log(
@@ -1292,44 +1295,4 @@ module.exports = function (program, vars) {
         }
     }
 
-    // Parsing options.
-    // program.parse(process.argv);
-
-    // let firstCommand = program.rawArgs[2];
-    // if (!program.args.length) {
-    //     if (
-    //         firstCommand !== "--help" &&
-    //         firstCommand !== "-h" &&
-    //         firstCommand !== "--version" &&
-    //         firstCommand !== "-V"
-    //     ) {
-    //         console.log("Error: no command provided.");
-    //     }
-    // }
-    // else {
-    //     if (
-    //         firstCommand !== "create-game" &&
-    //         firstCommand !== "show-conf" &&
-    //         firstCommand !== "update-conf"
-    //     ) {
-    //         console.log("Error: invalid command: " + firstCommand);
-    //     }
-    // }
-
-
 };
-
-
-// program
-// .command('game')
-// .description('Handles operation related to games')
-// .argument('<action>', 'create or clone')
-// .action((action, opts) => {
-//     if (action === 'create') {
-//         console.log('CREATING A NEW GAME');
-//     }
-//     else if (action === 'clone') {
-//         console.log('CLONING AN EXISTING GAME');
-//     }
-// })
-// .parse()
