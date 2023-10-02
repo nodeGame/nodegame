@@ -17,10 +17,11 @@ const readline = require("readline");
 const J = require("JSUS").JSUS;
 const ngt = require("nodegame-game-template");
 
-module.exports = function (program, rootDir) {
-    const version = require(path.resolve(rootDir, "package.json")).version;
+module.exports = function (program, vars) {
 
-    const isWin = /^win/.test(process.platform);
+    const rootDir = vars.rootDir;
+    const version = vars.version;
+    const isWin = vars.isWin;
 
     // This file is "copied" and not linked in Windows,
     // therefore we need to be agnostic while loading the root path.
@@ -30,18 +31,8 @@ module.exports = function (program, rootDir) {
     const NODEGAME_MODULE = "nodegame";
     // const NODEGAME_MODULE = 'nodegame-test';
 
-    // Setup readline.
-    let rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        terminal: true,
-    });
-    rl.on("SIGINT", function () {
-        rl.close();
-        console.log();
-        console.log();
-        console.log("canceled");
-    });
+    // Readline (init later).
+    let rl;
 
     var stdoutConf = {
         willBeMuted: false,
@@ -49,7 +40,7 @@ module.exports = function (program, rootDir) {
         lastPrompt: "",
         origPrompt: "",
     };
-    unmute();
+
 
     function muteNext() {
         if (stdoutConf.muted) unmute();
@@ -68,39 +59,58 @@ module.exports = function (program, rootDir) {
         stdoutConf.muted = true;
     }
 
-    rl._writeToOutput = function _writeToOutput(str) {
-        // console.log('INPUT ', str, str.length);
-        if (stdoutConf.muted) {
-            if (str.length > 2) {
-                // console.log('LEN : ', str.length);
-                // console.log('1');
-                let len = stdoutConf.lastPrompt.length;
-                let lenOrig = stdoutConf.origPrompt.length;
-                str = stdoutConf.lastPrompt.substr(
-                    0,
-                    Math.max(lenOrig, len - 1)
-                );
-                stdoutConf.lastPrompt = str;
-                rl.output.write(str);
-            }
-            else if (str.length === 2) {
-                rl.output.write(str);
+    function createRL() {
+            
+        readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            terminal: true,
+        });
+        rl.on("SIGINT", function () {
+            rl.close();
+            console.log();
+            console.log();
+            console.log("canceled");
+        });
+        unmute();
+        
+
+        rl._writeToOutput = function _writeToOutput(str) {
+            // console.log('INPUT ', str, str.length);
+            if (stdoutConf.muted) {
+                if (str.length > 2) {
+                    // console.log('LEN : ', str.length);
+                    // console.log('1');
+                    let len = stdoutConf.lastPrompt.length;
+                    let lenOrig = stdoutConf.origPrompt.length;
+                    str = stdoutConf.lastPrompt.substr(
+                        0,
+                        Math.max(lenOrig, len - 1)
+                    );
+                    stdoutConf.lastPrompt = str;
+                    rl.output.write(str);
+                }
+                else if (str.length === 2) {
+                    rl.output.write(str);
+                }
+                else {
+                    // console.log('2');
+                    rl.output.write("*");
+                    stdoutConf.lastPrompt += "*";
+                }
             }
             else {
-                // console.log('2');
-                rl.output.write("*");
-                stdoutConf.lastPrompt += "*";
+                // console.log('3');
+                rl.output.write(str);
             }
-        }
-        else {
-            // console.log('3');
-            rl.output.write(str);
-        }
-        if (stdoutConf.willBeMuted) {
-            stdoutConf.lastPrompt = stdoutConf.origPrompt = str;
-            mute();
-        }
-    };
+            if (stdoutConf.willBeMuted) {
+                stdoutConf.lastPrompt = stdoutConf.origPrompt = str;
+                mute();
+            }
+        };
+
+        return rl;
+    }
 
     // Game-creation configuration.
 
@@ -148,6 +158,7 @@ module.exports = function (program, rootDir) {
         .description("Updates stored configuration (author, games dir, etc.)")
         .allowUnknownOption()
         .action(function (options) {
+            rl = createRL();
             loadConfFile(function () {
                 // Nothing.
                 rl.close();
@@ -160,6 +171,7 @@ module.exports = function (program, rootDir) {
         .description("Shows current configuration")
         .allowUnknownOption()
         .action(function (options) {
+            rl = createRL();
             loadConfFile(function () {
                 showConf();
                 rl.close();
@@ -176,21 +188,22 @@ module.exports = function (program, rootDir) {
         .option("-v, --verbose", "verbose output")
         .allowUnknownOption()
         .action(function (gameName, author, email, options) {
+            
             if (!gameName) {
                 console.log("Error: game name is missing.");
-                rl.close();
                 return;
             }
-
+            
             // Do not generate confusion with hidden folders, e.g. .git.
             if (gameName.charAt(0) === ".") {
                 console.log(
                     "Error: game names cannot start with a dot. " +
-                        "Please correct the name and try again."
-                );
-                rl.close();
+                    "Please correct the name and try again."
+                    );
                 return;
             }
+            
+            rl = createRL();
 
             loadConfFile(function () {
                 createGame({

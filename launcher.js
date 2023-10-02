@@ -15,28 +15,34 @@ const path = require('path');
 const { Command } = require('commander');
 const program = new Command();
 
-// nodeGame version.
-const version = require('./package.json').version;
+const rootDir = __dirname;
 
-const CMD_DIR = path.join(__dirname, 'bin', 'commands');
+const CMD_DIR = path.join(rootDir, 'bin', 'commands');
+
+const vars = require(path.join(CMD_DIR, 'vars.js'))(rootDir);
+
+const utils = require(path.join(CMD_DIR, 'lib', 'utils.js'))(vars);
 
 // Commander.
 
 program
     .name('nodegame')
     .description('nodeGame server for online surveys and experiments')
-    .version(version);
+    .version(vars.version);
 
 
 // Start server.
 const start = require(path.join(CMD_DIR, 'start.js'));
-start(program, __dirname);
+start(program, vars, utils);
 
 const game = require(path.join(CMD_DIR, 'game.js'));
-game(program, __dirname);
+game(program, vars, utils);
 
 const exportStuff = require(path.join(CMD_DIR, 'export.js'));
-exportStuff(program, __dirname);
+exportStuff(program, vars, utils);
+
+const update = require(path.join(CMD_DIR, 'update.js'));
+update(program, vars, utils);
 
 program.parse();
 

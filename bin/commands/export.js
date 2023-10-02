@@ -13,9 +13,10 @@ const path = require("path");
 const J = require("JSUS").JSUS;
 
 
-module.exports = function (program, rootDir) {
+module.exports = function (program, vars) {
 
-    const version = require(path.resolve(rootDir, "package.json")).version;
+    const rootDir = vars.rootDir;
+    const version = vars.version;
 
     const conf = {
         author: 'author',

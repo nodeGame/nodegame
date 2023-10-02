@@ -12,151 +12,188 @@
 const mkdirp = require("mkdirp");
 const fs = require("fs-extra");
 const path = require("path");
-const readline = require("readline");
-const execFile = require('child_process').execFile;
+// const readline = require("readline");
+const execFile = require("child_process").execFile;
+const execFileSync = require("child_process").execFileSync;
 
 const J = require("JSUS").JSUS;
 const ngt = require("nodegame-game-template");
 
+module.exports = function (program, vars, utils) {
+    const rootDir = vars.rootDir;
+    const version = vars.version;
+    const NODEGAME_MODULES = vars.NODEGAME_MODULES;
+    const isWin = vars.isWin;
 
-const NODEGAME_MODULES = [
-    'nodegame-server', 'nodegame-client',
-    'nodegame-window', 'nodegame-widgets',
-    'nodegame-monitor', 'nodegame-game-template',
-    'nodegame-requirements', 'nodegame-generator',
-    'nodegame-mturk',
-    // No need to replace these now.
-    // 'nodegame-db', 'nodegame-mondodb',
-    'JSUS', 'NDDB',
-    'ultimatum-game', 'survey-game'
-];
-
-module.exports = function (program, rootDir) {
-    const version = require(path.resolve(rootDir, "package.json")).version;
-
-    const isWin = /^win/.test(process.platform);
-
+    const logger = utils.logger;
     
     const NODEGAME_MODULE = "nodegame";
     // const NODEGAME_MODULE = 'nodegame-test';
 
+    const checkGitExists = utils.checkGitExists;
+
     program
-    .command('update')
-        .description('Updates nodeGame to the latest version')
+        .command("update")
+        .description("Updates nodeGame to the latest version")
         // .argument('<action>', 'create or clone')
         .action((action, opts) => {
             
-        })
-
-};
-
-
-function checkGitExists(cb) {
-    let child = execFile(
-        'git',
-        [ '--version' ],
-        { cwd: ROOT_DIR },
-        (error, stdout, stderr) => {
-            if (error) {
-                err('git not found, cannot install @dev version.');
-                log('Install git from: https://git-scm.com/ and retry.');
-                installationFailed();
-            }
-            else {
-                if (cb) cb();
-            }
+            checkGitExists(() => update(updateEnded, opts));
         });
-}
 
+    // Update.
 
-function getAllGitModules(cb) {
-    let gitPrecommitHook = path.resolve(INSTALL_DIR, 'git-hooks', 'pre-commit');
-    let counter = NODEGAME_MODULES.length;
-    if (verbose) log('Converting modules into git repos.');
-    for (let i = 0; i < NODEGAME_MODULES.length; i++) {
-        (function(i) {
-            var nodeModulesCopy;
-            let module = NODEGAME_MODULES[i];
-            let modulePath = path.resolve(INSTALL_DIR_MODULES, module);
-            let nodeModulesPath = path.resolve(modulePath, 'node_modules');
+    function update(cb, opts) {
 
-            // Keep node_modules, if any.
-            if (fs.existsSync(nodeModulesPath)) {
+        let nodeModulesPath = utils.getNodeModulesPath();
+        if (nodeModulesPath === false) {
+            logger.err('Could not find node_modules dir. Aborting.');
+            return;
+        }
 
-                // Remove nodegame modules (if any) will be get by git.
-                fs.readdirSync(nodeModulesPath).forEach(function(file, index) {
-                    if (inArray(file, NODEGAME_MODULES)) {
-                        let modulePath = path.join(nodeModulesPath, file);
-                        removeDirRecursiveSync(modulePath);
-                    }
-                });
+        const updateResults = {};
 
-                let destDir = doNotMoveInstall ?
-                    NODE_MODULES_DIR : INSTALL_DIR_MODULES;
-                nodeModulesCopy = path.resolve(destDir,
-                                               ('_node_modules-' + module));
-                fs.renameSync(nodeModulesPath, nodeModulesCopy);
-            }
+        let counter = NODEGAME_MODULES.length;
+        
+        if (opts.verbose) logger.info("Updating all modules.");
 
-            // Remove npm folder.
-            removeDirRecursiveSync(modulePath);
+        for (let i = 0; i < NODEGAME_MODULES.length; i++) {
+            (function (i) {
+                let module = NODEGAME_MODULES[i];
+                let modulePath = path.join(nodeModulesPath, module);
+                let pkgJSON = path.join(modulePath, 'package.json');
+                let moduleVersion = require(pkgJSON).version;
 
-            setTimeout(function() {
-                getGitModule(module, INSTALL_DIR_MODULES, function(err) {
-                    if (err) throw new Error(err);
-                    // Put back node_modules, if it was copied before.
-                    if (nodeModulesCopy) {
-                        fs.renameSync(nodeModulesCopy, nodeModulesPath);
-                    }
-                    // Copy pre-commit hook.
-                    fs.copyFileSync(gitPrecommitHook,
-                                    path.resolve(modulePath, '.git', 'hooks',
-                                                'pre-commit'));
-                    counter--;
-                    if (counter == 0 && cb) cb();
-                });
-            }, 100);
-        })(i);
+                updateResults[module] = {
+                    name: module,
+                    from: moduleVersion
+                    // path: modulePath
+                };
+
+                let info = { modulePath, module, opts };
+
+                let remote = getGitRemote(info);
+                let branch = getGitBranch(info);
+
+                info.remote = remote;
+                info.branch = branch;
+
+                updateResults[module].remote = remote;
+                updateResults[module].branch = branch;
+
+                setTimeout(function () {
+                    updateGitModule(info, function (err) {
+                        if (err) {
+                            updateResults[module].err = true;
+                            if (opts.throw) throw new Error(err);
+                        }
+                        else {
+                            // Clear cache.
+                            delete require.cache[require.resolve(pkgJSON)]
+                            let newModuleVersion = require(pkgJSON).version;
+                            if (newModuleVersion !== moduleVersion) {
+                                updateResults[module].to = newModuleVersion;
+                            }
+                        }
+                        counter--;
+                        if (counter === 0 && cb) cb(updateResults);
+                    });
+                // This delay needs to be a bit large because otherwise
+                // the loaded package version is not updated (but it should!). 
+                }, 250);
+            })(i);
+        }
     }
-}
 
-function getGitModule(module, cwd, cb, noBranch) {
-    let repo = doSSH ? 'git@github.com:' : 'https://github.com/';
-    repo += 'nodeGame/' + module + '.git';
-    if (verbose) log('Cloning git module: ' + module);
-    let params = !noBranch && branch ?
-        [ 'clone', '-b', branch, repo ] : [ 'clone', repo ];
-    let child = execFile(
-        'git',
-        'pull',
-        { cwd: cwd },
-        (error, stdout, stderr) => {
-            if (error) {
-                // If it could not checkout a branch, it could just
-                // be that the branch does not exists, so just warning.
-                if (!noBranch && branch &&
-                    stderr.indexOf('Remote branch') !== -1 &&
-                    stderr.indexOf('not found in upstream') !== -1) {
+    function getGitRemote(info) {                
 
-                    error = null;
-                    let warnStr = '  Warning! module ' + module +
-                        ' branch not found: ' + branch;
-                    log(warnStr);
-                    warnings = true;
-                    getGitModule(module, cwd, cb, true);
-                    return;
+        let { modulePath, module, opts } = info;
+
+        if (opts.verbose) log("Getting git remote module: " + module);
+        let remote = execFileSync(
+            "git",
+            [ "remote" ],
+            { cwd: modulePath }
+        );
+        return remote ? String(remote).trim() : false;
+    }
+
+    function getGitBranch(info) {                
+        let { modulePath, module, opts } = info;
+        if (opts.verbose) log("Getting git branch module: " + module);
+        let branch = execFileSync(
+            "git",
+            [ "branch", "--show-current" ],
+            { cwd: modulePath }
+        );
+        return branch ? String(branch).trim() : false;
+    }
+
+    function updateGitModule(info, cb) {                
+
+        let { modulePath, module, opts, remote, branch } = info;
+
+        if (opts.verbose) log("Pulling git module: " + module);
+        let child = execFile(
+            "git",
+            [ "pull", remote, branch ],
+            { cwd: modulePath },
+            (error, stdout, stderr) => {
+
+
+                if (error) {
+                    
+                console.log(error);
+                console.log(stdout);
+                console.log(stderr);
+
+                    logger.err('An error occurred.');
+                    logger.list("Could not update: " + module);
+                    logger.list(stderr.trim());
+                    logger.info();
+                } 
+                else if (opts.verbose) {
+                    
+                    console.log(stdout);
+                    logList(stdout.trim());
+                }
+                if (cb) cb(error);
+            }
+        );
+    }
+
+    // Utils.
+
+    function updateEnded(res) {
+        
+        let totUpdated = 0;
+        let table = [];
+        for (let m in res) {
+            if (res.hasOwnProperty(m)) {
+                let r = res[m];
+                let from = r.from;
+                let to = r.to;
+                if (to) {
+                    totUpdated++; 
+                    r.version = to;
+                    delete r.to;
                 }
                 else {
-                    logList('Could not clone: ' + module);
-                    logList(stderr.trim());
+                    r.version = from;
+                    delete r.from;
                 }
-                log();
+                table.push(r);
+                // if (res[m].err) str += ' Errored!';
+                // logger.list(m + ': ' + str);
+                
             }
-            else if (verbose) {
-                logList(stdout.trim());
-            }
-            if (cb) cb(error);
-        });
-}
+        }
 
+        logger.info();
+        logger.info('nodeGame update: ' + totUpdated + ' package/s updated.');
+        logger.info();
 
+        if (table.length) console.table(table);
+    }
+    
+};

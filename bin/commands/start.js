@@ -21,8 +21,10 @@ function list(val) {
     return val.split(",");
 }
 
-module.exports = function (program, rootDir) {
-    const version = require(path.resolve(rootDir, "package.json")).version;
+module.exports = function (program, vars) {
+
+    const rootDir = vars.rootDir;
+    const version = vars.version;
 
     // ServerNode options.
     var options;
