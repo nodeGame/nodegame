@@ -35,10 +35,11 @@ module.exports = function (program, vars, utils) {
     program
         .command("update")
         .description("Updates nodeGame to the latest version")
-        // .argument('<action>', 'create or clone')
-        .action((action, opts) => {
-            
-            checkGitExists(() => update(updateEnded, opts));
+        .option('-v, --verbose', 'verbose output')
+        .option('-g, --games', 'default games are updated')
+        .option('-t, --throws', 'on error, it will throw')
+        .action((opts) => {
+            checkGitExists(() => update(showUpdateRes, opts));
         });
 
     // Update.
@@ -55,7 +56,7 @@ module.exports = function (program, vars, utils) {
 
         let counter = NODEGAME_MODULES.length;
         
-        if (opts.verbose) logger.info("Updating all modules.");
+        if (opts.verbose) logger.info("Updating all modules./n");
 
         for (let i = 0; i < NODEGAME_MODULES.length; i++) {
             (function (i) {
@@ -84,8 +85,15 @@ module.exports = function (program, vars, utils) {
                 setTimeout(function () {
                     updateGitModule(info, function (err) {
                         if (err) {
-                            updateResults[module].err = true;
                             if (opts.throw) throw new Error(err);
+                            let errMsg = true;
+                            if (err.message &&
+                                err.message.indexOf('Please commit your cha')) {
+
+                                errMsg = 'local changes' 
+                            }
+                            updateResults[module]._err = errMsg;
+                            
                         }
                         else {
                             // Clear cache.
@@ -109,7 +117,7 @@ module.exports = function (program, vars, utils) {
 
         let { modulePath, module, opts } = info;
 
-        if (opts.verbose) log("Getting git remote module: " + module);
+        // if (opts.verbose) logger.info("Getting git remote module: " + module);
         let remote = execFileSync(
             "git",
             [ "remote" ],
@@ -120,7 +128,7 @@ module.exports = function (program, vars, utils) {
 
     function getGitBranch(info) {                
         let { modulePath, module, opts } = info;
-        if (opts.verbose) log("Getting git branch module: " + module);
+        // if (opts.verbose) logger.info("Getting git branch module: " + module);
         let branch = execFileSync(
             "git",
             [ "branch", "--show-current" ],
@@ -133,30 +141,32 @@ module.exports = function (program, vars, utils) {
 
         let { modulePath, module, opts, remote, branch } = info;
 
-        if (opts.verbose) log("Pulling git module: " + module);
+        let verbose = opts.verbose;
+
+        // if (verbose) logger.info("Pulling git module: " + module);
+
         let child = execFile(
             "git",
             [ "pull", remote, branch ],
             { cwd: modulePath },
             (error, stdout, stderr) => {
 
-
-                if (error) {
-                    
-                console.log(error);
-                console.log(stdout);
-                console.log(stderr);
-
-                    logger.err('An error occurred.');
-                    logger.list("Could not update: " + module);
-                    logger.list(stderr.trim());
+                if (verbose) {
                     logger.info();
-                } 
-                else if (opts.verbose) {
-                    
-                    console.log(stdout);
-                    logList(stdout.trim());
+                    logger.list("Package: " + module);
+                
+                    if (error) {    
+                        logger.err('An error occurred.');
+                        logger.info();
+                        logger.list(stderr.trim());
+                    } 
+                    else {
+                        logger.list(stdout.trim());
+                    }
+                    logger.info();
                 }
+                        
+                
                 if (cb) cb(error);
             }
         );
@@ -164,8 +174,9 @@ module.exports = function (program, vars, utils) {
 
     // Utils.
 
-    function updateEnded(res) {
+    function showUpdateRes(res) {
         
+        let totErrored = 0;
         let totUpdated = 0;
         let table = [];
         for (let m in res) {
@@ -182,6 +193,12 @@ module.exports = function (program, vars, utils) {
                     r.version = from;
                     delete r.from;
                 }
+                if (r._err) {
+                    totErrored++;
+                    // So that err is last column.
+                    r.err = r._err;
+                    delete r._err;
+                }
                 table.push(r);
                 // if (res[m].err) str += ' Errored!';
                 // logger.list(m + ': ' + str);
@@ -190,7 +207,9 @@ module.exports = function (program, vars, utils) {
         }
 
         logger.info();
-        logger.info('nodeGame update: ' + totUpdated + ' package/s updated.');
+        logger.info('nodeGame update:');
+        logger.list(totUpdated + ' package/s updated.');
+        if (totErrored) logger.list(totErrored + ' package/s errored.');
         logger.info();
 
         if (table.length) console.table(table);
