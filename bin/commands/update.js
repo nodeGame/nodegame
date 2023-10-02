@@ -40,8 +40,21 @@ module.exports = function (program, vars, utils) {
         .option('-g, --games', 'default games are updated')
         .option('-t, --throws', 'on error, it will throw')
         .action((opts) => {
-            checkGitExists(() => update(showres, opts));
+            checkGitExists(() => update(showRes, opts));
         });
+
+
+    program
+        .command("branch [branch]")
+        .description("Checkouts a different branch of nodeGame")
+        .option('-v, --verbose', 'verbose output')
+        .option('-g, --games', 'default games are updated')
+        .option('-t, --throws', 'on error, it will throw')
+        .action((_branch, opts) => {
+            opts.branch = _branch;
+            checkGitExists(() => branch(showRes, opts));
+        });
+
 
     // Update.
 
@@ -153,6 +166,117 @@ module.exports = function (program, vars, utils) {
         }
     }
 
+    function branch(cb, opts) {
+
+        let nodeModulesPath = utils.getNodeModulesPath();
+        
+        if (nodeModulesPath === false) {
+            logger.err('Could not find node_modules dir. Aborting.');
+            return;
+        }
+
+        const res = {};
+
+        let verbose = opts.verbose;
+
+        let counter = NODEGAME_MODULES.length;
+        
+        if (verbose) logger.info("Updating all modules./n");
+
+        let modules = NODEGAME_MODULES;
+        
+        let nPackages = NODEGAME_MODULES.length;
+        if (opts.games) {
+            modules = modules.concat(vars.NODEGAME_GAMES);
+        }
+
+        for (let i = 0; i < modules.length; i++) {
+            (function (i) {
+                let module = modules[i];
+                // console.log(module);
+                
+                let modulePath;
+                // From games/ or games_available/.
+                if (opts.games && i >= nPackages) {
+                    modulePath = utils.getGamePath(module);
+                    // console.log(modulePath)
+                }
+                // From node_modules/.
+                else {
+                    modulePath = utils.getModulePath(module);
+                }
+                if (modulePath === false) {
+                    
+                    if (verbose) {
+                        logger.info();
+                        logger.err('Could not find ' + module);
+                        logger.info();
+                    }
+
+                    res[module] = {
+                        name: module,
+                        err: 'not found'
+                        // path: modulePath
+                    };
+
+                    return;
+                }
+
+                let pkgJSON = path.join(modulePath, 'package.json');
+                let moduleVersion = require(pkgJSON).version;
+
+                res[module] = {
+                    name: module,
+                    version: moduleVersion
+                    // path: modulePath
+                };
+
+                let branch = opts.branch;
+
+                let info = { modulePath, module, opts, branch };
+
+                let remote = getGitRemote(info);
+                let oldBranch = getGitBranch(info);
+
+                info.remote = remote;
+                info.branch = opts.branch;
+
+                res[module].remote = remote;
+                res[module].newBranch = branch;
+                res[module].oldBranch = oldBranch;
+
+                setTimeout(function () {
+                    doGitCheckout(info, function (err) {
+                        if (err) {
+                            if (opts.throw) throw new Error(err);
+                            let errMsg = 'error';
+                            if (err.message &&
+                                err.message.indexOf('Please commit your cha')) {
+
+                                errMsg = 'local changes' 
+                            }
+                            res[module].err = errMsg;
+                            
+                        }
+                        else {
+                            // Clear cache.
+                            delete require.cache[require.resolve(pkgJSON)]
+                            let newModuleVersion = require(pkgJSON).version;
+                            if (newModuleVersion !== moduleVersion) {
+                                res[module].previous = moduleVersion
+                                res[module].version = newModuleVersion;
+                            }
+                        }
+                        counter--;
+                        if (counter === 0 && cb) cb(res);
+                    });
+                // This delay needs to be a bit large because otherwise
+                // the loaded package version is not updated (but it should!). 
+                }, 250);
+            })(i);
+        }
+    }
+
     function getGitRemote(info) {                
 
         let { modulePath, module, opts } = info;
@@ -175,6 +299,19 @@ module.exports = function (program, vars, utils) {
             { cwd: modulePath }
         );
         return branch ? String(branch).trim() : false;
+    }
+
+    function doGitCheckout(info) {                
+        let { modulePath, branch } = info;
+        // console.log(modulePath, branch)
+        // if (opts.verbose) logger.info("Getting git branch module: " + module);
+        let checkout = execFileSync(
+            "git",
+            [ "checkout", branch ],
+            { cwd: modulePath }
+        );
+        return checkout ? String(checkout).trim() : false;
+
     }
 
     function updateGitModule(info, cb) {                
@@ -214,7 +351,7 @@ module.exports = function (program, vars, utils) {
 
     // Utils.
 
-    function showres(res) {
+    function showRes(res) {
         
         let totErrored = 0;
         let totUpdated = 0;
