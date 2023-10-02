@@ -316,6 +316,7 @@ function checkParentNodeModules() {
         log(str + ' will be temporarily renamed. This');
         log('might affect only live node processes. If unsure, choose No ');
         log('and try to install nodeGame on another path.');
+        log('');
         log('If you know what you are doing, you can also use the option: ');
         log('--no-parent-dir-check');
         log();
@@ -356,7 +357,7 @@ function doInstall() {
 
     let child = execFile(
         isWin ? 'npm.cmd' : 'npm',
-        [ 'install', MAIN_MODULE + requestedVersion ],
+        [ 'install', MAIN_MODULE + requestedVersion, '--prefix', ROOT_DIR ],
         { cwd: ROOT_DIR },
         (error, stdout, stderr) => {
             // Stop spinner.
