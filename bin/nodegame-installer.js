@@ -185,8 +185,10 @@ if (installDir !== -1) {
         log();
         return;
     }
-    installDir = path.join(ROOT_DIR, installDir);
-    if (installDir === NODE_MODULES_DIR) doNotMoveInstall = true;
+    // installDir = path.join(ROOT_DIR, installDir);
+    if (path.join(ROOT_DIR, installDir) === NODE_MODULES_DIR) {
+        doNotMoveInstall = true;
+    }
 }
 else {
     installDir = NODEGAME_AND_VERSION;
@@ -378,6 +380,7 @@ function doInstall() {
                     log();
                     logList(stdout.trim());
                 }
+
                 if (!fs.existsSync(path.resolve(NODE_MODULES_DIR))) {
                     log();
                     log();
@@ -502,7 +505,7 @@ function printFinalInfo() {
 
     log('Enter the installation directory and start the server:');
     if (!doNotMoveInstall) {
-        log('  cd ' + NODEGAME_AND_VERSION);
+        log('  cd ' + installDir);
     }
     else {
         log('  cd ' + path.join('node_modules', MAIN_MODULE));
