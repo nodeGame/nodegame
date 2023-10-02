@@ -510,7 +510,7 @@ function printFinalInfo() {
     else {
         log('  cd ' + path.join('node_modules', MAIN_MODULE));
     }
-    log('  node launcher.js');
+    log('  node nodegame.js');
     log();
 
     log('Open a browser tab at the address:');
