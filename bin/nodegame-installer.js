@@ -579,49 +579,38 @@ function someMagic(cb) {
         }
     }
 
-    if (isDev) {
-        getAllGitModules(function() {
-
-            if (addGames) {
-                // Move games from node_modules.
-                copyGameFromNodeModules('ultimatum-game');
-            }
-
-            // Generator.
-            fixGenerator();
-
-            // Copy main folder files.
-            nodegameDev();
-
-            // Restore any parent node_modules folder that was renamed.
-            restoreParentNodeModules();
-
-            // Print final Information.
-            printFinalInfo();
-
-            closeRL(0);
-        });
-    }
-    else {
-
-        if (addGames) {
-            // Move games from node_modules.
-            copyGameFromNodeModules('ultimatum-game');
-        }
-
-        // Generator.
-        fixGenerator();
-
-        // Restore any parent node_modules folder that was renamed.
-        restoreParentNodeModules();
-
-        // Print final Information.
-        printFinalInfo();
-
-        closeRL(0);
-    }
+    // Finalize install (get git modules, if needed).
+    if (isDev) getAllGitModules(() => finalOperations(true));
+    else finalOperations();
 }
 
+function finalOperations(isDev) {
+
+    // Move games from node_modules.
+    installGames(addGames)
+
+    // Generator.
+    // fixGenerator();
+
+    // Copy main folder files.
+    if (isDev) nodegameDev();
+
+    // Restore any parent node_modules folder that was renamed.
+    restoreParentNodeModules();
+
+    // Print final Information.
+    printFinalInfo();
+
+    closeRL(0);
+}
+
+function installGames(addGames) {
+    if (addGames) {
+        // Move games from node_modules.
+        copyGameFromNodeModules('ultimatum-game');
+        copyGameFromNodeModules('survey-ineq');
+    }
+}
 
 function nodegameDev() {
     let ng = path.resolve(INSTALL_DIR_MODULES, 'nodegame');
