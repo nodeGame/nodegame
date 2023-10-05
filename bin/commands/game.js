@@ -17,7 +17,7 @@ const readline = require("readline");
 const J = require("JSUS").JSUS;
 const ngt = require("nodegame-game-template");
 
-module.exports = function (program, vars) {
+module.exports = function (program, vars, utils) {
 
     const rootDir = vars.rootDir;
     const version = vars.version;
@@ -182,6 +182,125 @@ module.exports = function (program, vars) {
 
 
     program
+        // .command("clone-game [game_name] [author] [author_email]")
+        .command("clone-game <game> [new_name] [author] [author_email]")
+        .description("Clones an existing game in the games directory")
+        // .option('-t, --template <template>', 'set the template for game')
+        .option("-f, --force", "force on non-empty directory")
+        .option("-v, --verbose", "verbose output")
+        .allowUnknownOption()
+        .action(function (game, newName, author, email, options) {
+            
+            // if (!gameName) {
+            //     console.log("Error: game name is missing.");
+            //     return;
+            // }
+            
+            // Do not generate confusion with hidden folders, e.g. .git.
+            if (newName.charAt(0) === ".") {
+                console.log(
+                    "Error: game names cannot start with a dot. " +
+                    "Please correct the name and try again."
+                    );
+                return;
+            }
+            if (newName.indexOf(" ") !== -1) {
+                console.log(
+                    "Error: game names cannot contain a dot. " +
+                    "Please correct the name and try again."
+                    );
+                return;
+            }
+
+            newName = newName.toLowerCase();
+
+            const gamePath = utils.getGamePath(game);
+
+            // Package.json.
+            ////////////////
+            let pkgJSON = path.join(gamePath, 'package.json');
+            pkgJSON = require(pkgJSON);
+            
+            pkgJSON.name = newName;
+            
+            if (author) pkgJSON.author = { author: author };
+            if (email) {
+                if (author) pkgJSON.author.email = email;
+                else pkgJSON.author = { email: email };
+            }  
+
+            // Check if package.json has channelName.
+            let oldChannelNameFromPkgJSON;
+            if (pkgJSON.channelName) {
+                oldChannelNameFromPkgJSON = pkgJSON.channelName;
+                pkgJSON.channelName = newName;
+            }
+
+            console.log(pkgJSON);
+
+            // Channel.settings.js
+            //////////////////////
+            let channelFile = path.join(gamePath, 'channel', 'channel.settings.js');
+            let channel = require(channelFile);
+
+            // Player Server.
+            let oldChannelName = channel.playerServer;
+            if ('object' === typeof oldChannelName) {
+                oldChannelName = oldChannelName.name;
+                oldChannelName.name = newName;
+            }
+            else {
+                channel.playerServer = newName;
+            }
+
+            // Admin Server.
+            let oldAdminChannelName =  channel.adminServer;
+            if ('object' === typeof oldAdminChannelName) {
+                oldAdminChannelName = oldAdminChannelName.name;
+                oldAdminChannelName.name = newName + '/admin';
+            }
+            else {
+                channel.adminServer = newName + '/admin';
+            }
+
+            // Replace references to channel name in pages.
+            let cNameToReplace = oldChannelName || channelName;
+            cNameToReplace = '/' + cNameToReplace + '/';
+            let lenRep = cNameToReplace.length;
+            // 404.
+            let page404 = channel.page404;
+            if (page404) {
+                if (page404.indexOf(cNameToReplace) === 0) {
+                    page404 = cNameToReplace + page404.substring(lenRep);
+                    channel.page404 = page404;
+                }
+            }
+            // 404.
+            let denied = channel.accessDeniedUrl;
+            if (denied) {
+                if (denied.indexOf(cNameToReplace) === 0) {
+                    denied = cNameToReplace + denied.substring(lenRep);
+                    channel.accessDeniedUrl = denied;
+                }
+            }
+            
+
+            console.log(channel);
+
+            // rl = createRL();
+
+            // loadConfFile(function () {
+            //     createGame({
+            //         game: gameName,
+            //         author: author,
+            //         email: email,
+            //         options: options,
+            //     });
+            //     // rl.close in complete();
+            // });
+        })
+
+    program
         .command("create-game [game_name] [author] [author_email]")
         .description("Creates a new game in the games directory")
         // .option('-t, --template <template>', 'set the template for game')
@@ -216,8 +335,6 @@ module.exports = function (program, vars) {
                 // rl.close in complete();
             });
         })
-        // .parse(process.argv);
-
 
     /**
      * ## detectNodeGameInstallation
