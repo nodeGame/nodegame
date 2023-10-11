@@ -24,7 +24,12 @@ module.exports = function(rootDir) {
         'survey-game'
     ];
 
+    const gamesAvailDir = path.resolve(rootDir, "games_available");
+    const gamesDir = path.resolve(rootDir, "games");
 
-    return { rootDir, NODEGAME_MODULES, NODEGAME_GAMES, version, isWin };
+    return { 
+        rootDir, NODEGAME_MODULES, NODEGAME_GAMES, version, isWin,
+        gamesAvailDir, gamesDir
+     };
 
 }

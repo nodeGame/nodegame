@@ -62,7 +62,44 @@ module.exports = function(vars) {
         return pathToGame;
     }
 
-    return { logger,
+    function copyFileSync(source, target) {
+
+        let targetFile = target;
+    
+        // If target is a directory, a new file with the same name will be created.
+        if (fs.existsSync(target)) {
+            if (fs.lstatSync(target).isDirectory() ) {
+                targetFile = path.join(target, path.basename(source));
+            }
+        }
+    
+        fs.writeFileSync(targetFile, fs.readFileSync(source));
+    }
+    
+    function copyFolderRecursiveSync(source, target, createTarget = true) {
+        let files = [];
+    
+        // Check if folder needs to be created or integrated
+        let targetFolder = createTarget ?
+            path.join(target, path.basename(source)) : target;
+        if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
+    
+        // Copy
+        if (fs.lstatSync(source).isDirectory()) {
+            files = fs.readdirSync(source);
+            files.forEach(file => {
+                let curSource = path.join(source, file);
+                if (fs.lstatSync(curSource).isDirectory()) {
+                    copyFolderRecursiveSync(curSource, targetFolder);
+                }
+                else {
+                    copyFileSync( curSource, targetFolder );
+                }
+            });
+        }
+    }
+
+    return { logger, copyFolderRecursiveSync, 
              checkGitExists, getNodeModulesPath, getGamePath, getModulePath };
 
 };
