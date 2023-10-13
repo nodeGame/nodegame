@@ -30,8 +30,6 @@
         "nodegame-mturk": ">=7.0.0",
         "JSUS": ">=1.1.0",
         "NDDB": ">=3.0.2",
-        "nodegame-db": "*",
-        "nodegame-mongodb": "*",
         "commander": "^7.0.0",
         "fs-extra": "*",
         "smoosh": "0.4.0"
