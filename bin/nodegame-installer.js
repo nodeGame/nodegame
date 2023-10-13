@@ -701,6 +701,10 @@ function getAllGitModules(cb) {
             removeDirRecursiveSync(modulePath);
 
             setTimeout(function() {
+                
+                // These modules do not follow nodegame versioning.
+                let noBranch = (module === 'JSUS' || module === 'NDDB');
+
                 getGitModule(module, INSTALL_DIR_MODULES, function(err) {
                     if (err) throw new Error(err);
                     // Put back node_modules, if it was copied before.
@@ -713,7 +717,9 @@ function getAllGitModules(cb) {
                                                 'pre-commit'));
                     counter--;
                     if (counter == 0 && cb) cb();
-                });
+                },
+                noBranch);
+
             }, 100);
         })(i);
     }
