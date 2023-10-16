@@ -229,7 +229,8 @@ const setDefaults = (LOGS, serverConf, opts, game) => {
 
         opts.fromRoom = opts.fromRoom ?? false;
         opts.toRoom = opts.toRoom ?? false;
-        opts.rooms = opts.rooms ?? [];
+        if (!opts.rooms) opts.rooms = [];
+        else if ('string' === typeof opts.rooms) opts.rooms = [ opts.rooms ];
 
         if (opts.fromRoom || opts.toRoom || opts.rooms.length) {
 
@@ -243,7 +244,7 @@ const setDefaults = (LOGS, serverConf, opts, game) => {
                 if (!roomNum) return false;
                 if (opts.fromRoom && (roomNum < opts.fromRoom)) return false;
                 if (opts.toRoom && (roomNum > opts.toRoom)) return false;
-                if (opts.rooms.length && !~opts.rooms.indexOf(roomNum)) {
+                if (opts.rooms.length && !~opts.rooms.indexOf((''+roomNum))) {
                     return false;
                 }
                 return true;
