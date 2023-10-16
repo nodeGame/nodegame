@@ -37,7 +37,7 @@ module.exports = function(vars) {
                     // installationFailed();
                 }
                 else {
-                    let v = extractGitVersion(stdout);
+                    let v = _extractGitVersion(stdout);
                     if (v.major < 2) {
                         logger.warn('an old version of git was detected, ' +
                         'please consider updating it from: ' + vars.gitUrl);
@@ -47,7 +47,7 @@ module.exports = function(vars) {
             });
     };
 
-    const extractGitVersion = gitVersion => {
+    const _extractGitVersion = gitVersion => {
         let len = "git version ".length;
         let v = gitVersion.substr(len);
         let tkns = v.split('.');
@@ -78,6 +78,9 @@ module.exports = function(vars) {
     }
 
     function getGamePath(game) {
+        // Normalize game name.
+        game = _extractGameNameFromPath(game);
+        console.log('Normalized game: ' + game);
         let pathToGame = path.resolve(vars.rootDir, "games", game);
         if (!fs.existsSync(pathToGame)) {
             pathToGame = path.resolve(vars.rootDir, "games_available", game);
@@ -89,6 +92,52 @@ module.exports = function(vars) {
             if (!fs.existsSync(pathToGame)) return false;
         }
         return pathToGame;
+    }
+
+    /**
+     * _extractGameNameFromPath
+     * 
+     * Check if a path starts with games/ or games_available/ and strips that
+     * 
+     * @param {string} gamePath The path or game name to check
+     * @param {boolean} retry True if it is a second attempt in recursive search 
+     * 
+     * @returns {string} The name of the game
+     * 
+     * @api private
+     */
+    const _extractGameNameFromPath = (gamePath, retry) => {
+        let found = false;
+        if (retry) sep = '\\'; 
+        else sep = '/';
+
+        let g = "games" + sep;
+        if (gamePath.indexOf(g) === 0) {
+            found = true;
+        }
+        else {
+            g = "./games" + sep;
+            if (gamePath.indexOf(g) === 0) {
+                found = true;
+            }
+            else {
+                g = "games_available" + sep;
+                if (gamePath.indexOf(g) === 0) {
+                    found = true;
+                }
+                else {
+                    g = "./games_available" + sep;
+                    if (gamePath.indexOf(g) === 0) found = true;    
+                }
+            }
+        }
+
+        if (!found && !retry) {
+            found = _extractGameNameFromPath(gamePath, true);
+        }
+        
+        return found ? gamePath.substring(g.length) : gamePath;
+
     }
 
     function copyFileSync(source, target) {
@@ -106,21 +155,34 @@ module.exports = function(vars) {
     }
     
     function copyDirRecSync(source, target, opts = {}) {
-        let files = [];
-
+        
+        let skipLinks = opts.skipLinks ?? true;
+        let skipData  = opts.skipData ?? true;
+        let skipGit   = opts.skipGit  ?? true;
+        
+        let dirName = path.basename(source);     
+        
+        // Do not clone .git dir unless requested.
+        if (skipGit && dirName === '.git') return;
+        
         // Check if folder needs to be created or integrated.
-        let targetFolder = opts.createTarget ?
-            path.join(target, path.basename(source)) : target;
+        let targetFolder = opts.createTarget !== false ?
+            path.join(target, dirName) : target;
         if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
-    
+        
+        // Do not clone data/ dir unless requested.
+        // (but it is created empty).
+        if (skipData && dirName === 'data') return;
+
         // Copy
-
-        let followLinks = opts.followLinks;
+        
         // Manual cloning.
-        opts = { followLinks: followLinks };
-
-        console.log(opts)
-
+        opts = { skipLinks, skipData, skipGit, skipData };
+        
+        // console.log(opts)
+        console.log(source);
+    
+        let files = [];
         if (fs.lstatSync(source).isDirectory()) {
             files = fs.readdirSync(source);
             files.forEach(file => {
@@ -130,7 +192,7 @@ module.exports = function(vars) {
                     copyDirRecSync(curSource, targetFolder, opts);
                 }
                 else if (stat.isSymbolicLink()) {
-                    if (followLinks) {
+                    if (skipLinks) {
                         makeLinkSync(curSource, path.join(targetFolder, file));
                     }
                     else if (opts.verbose) {

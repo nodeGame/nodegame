@@ -16,10 +16,13 @@ const readline = require("readline");
 
 const J = require("JSUS").JSUS;
 const ngt = require("nodegame-game-template");
+const { channel } = require("diagnostics_channel");
 
 module.exports = function (program, vars, utils) {
 
     const logger = utils.logger;
+
+    const makeLink = utils.makeLinkSync;
 
     const rootDir = vars.rootDir;
     const version = vars.version;
@@ -183,207 +186,6 @@ module.exports = function (program, vars, utils) {
         // .parse(process.argv);
 
 
-    program
-        // .command("clone-game [game_name] [author] [author_email]")
-        .command("clone-game <game> [new_name] [author] [author_email]")
-        .description("Clones an existing game in the games directory")
-        // .option('-t, --template <template>', 'set the template for game')
-        .option("-f, --force", "force on non-empty directory")
-        .option("-v, --verbose", "verbose output")
-        .allowUnknownOption()
-        .action(function (game, newName, author, email, options) {
-            
-            // Do not generate confusion with hidden folders, e.g. .git.
-            if (newName.charAt(0) === ".") {
-                logger.err("game names cannot start with a dot. " +
-                    "Please correct the name and try again."
-                    );
-                return;
-            }
-            if (newName.indexOf(" ") !== -1) {
-                logger.err("game names cannot contain a dot. " +
-                    "Please correct the name and try again."
-                    );
-                return;
-            }
-
-            const clonedGamePath = path.join(vars.gamesAvailDir, newName);
-            const clonedGameLinkPath = path.join(vars.gamesDir, newName);
-            if (fs.existsSync(clonedGamePath)) {
-                logger.err("A folder with name " + newName + 
-                           " already exists in games_available/");
-                return;
-            }
-            if (fs.existsSync(clonedGameLinkPath)) {
-                logger.err("A folder with name " + newName + 
-                           " already exists in games/");
-                return;
-            }
-
-            newName = newName.toLowerCase();
-
-            const gamePath = utils.getGamePath(game);
-
-            // Package.json.
-            ////////////////
-            let pkgJSON = path.join(gamePath, 'package.json');
-            pkgJSON = require(pkgJSON);
-            
-            pkgJSON.name = newName;
-            
-            if (author) pkgJSON.author = { author: author };
-            if (email) {
-                if (author) pkgJSON.author.email = email;
-                else pkgJSON.author = { email: email };
-            }  
-
-            // Check if package.json has channelName.
-            let oldChannelNameFromPkgJSON;
-            if (pkgJSON.channelName) {
-                oldChannelNameFromPkgJSON = pkgJSON.channelName;
-                pkgJSON.channelName = newName;
-            }
-
-            // console.log(pkgJSON);
-
-            // Channel.settings.js
-            //////////////////////
-            let channelFile = path.join(gamePath, 'channel', 
-                                        'channel.settings.js');
-            let channel = require(channelFile);
-
-            // Player Server.
-            let playerServer = channel.playerServer;
-            let playerEndpoint = playerServer;
-            if ('object' === typeof playerServer) {
-                playerEndpoint = playerServer.endpoint; 
-                playerServer.endpoint = newName;
-            }
-            else {
-                channel.playerServer = newName;
-            }
-
-            // Admin Server.
-            let adminServer = channel.adminServer;
-            let newAdminEndpoint = getRndAdminEndpoint(newName);
-            if ('object' === typeof adminServer) {
-                adminServer.endpoint = newAdminEndpoint
-            }
-            else {
-                channel.adminServer = newAdminEndpoint;
-            }
-
-            // Replace references to channel name in urls.
-            let cNameToReplace = oldChannelNameFromPkgJSON || playerEndpoint;
-            let cNameToReplaceURL = '/' + cNameToReplace + '/';
-            
-            let lenRep = cNameToReplaceURL.length;
-            // 404.
-            let page404 = channel.page404;
-            if (page404) {
-                if (page404.indexOf(cNameToReplaceURL) === 0) {
-                    page404 = cNameToReplaceURL + page404.substring(lenRep);
-                    channel.page404 = page404;
-                }
-            }
-            // accessDeniedUrl.
-            let denied = channel.accessDeniedUrl;
-            if (denied) {
-                if (denied.indexOf(cNameToReplaceURL) === 0) {
-                    denied = cNameToReplaceURL + denied.substring(lenRep);
-                    channel.accessDeniedUrl = denied;
-                }
-            }
-            
-            // console.log(channel);
-
-            // Index.js
-            ////////////
-
-            let indexPath = path.join(gamePath, 'public', 'js', 'index.js');
-
-            let index = fs.readFileSync(indexPath, "utf-8");
-
-            let oldConnString1 = 'node.connect("/' + cNameToReplace + '")';
-            let oldConnString2 = "node.connect('/" + cNameToReplace + "')";
-            let oldConnString3 = 'node.connect(`/' + cNameToReplace + '`)';
-            let newConnString = 'node.connect("/' + newName + '")';
-
-            let connStrReplaced;
-            // console.log(oldConnString);
-            // console.log(newConnString);
-
-            // Replace both connect() and connect('/channel')
-            
-            if (index.indexOf(oldConnString1) !== -1) {
-                index = index.replace(oldConnString1, newConnString);
-                connStrReplaced = true;
-            }
-            else if (index.indexOf(oldConnString2) !== -1) {
-                index = index.replace(oldConnString2, newConnString);
-                connStrReplaced = true;
-            }
-            else if (index.indexOf(oldConnString3) !== -1) {
-                index = index.replace(oldConnString3, newConnString);
-                connStrReplaced = true;
-            }
-            
-            oldConnString1 = 'node.connect()';
-            if (index.indexOf(oldConnString1) !== -1) {
-                index = index.replace(oldConnString1, newConnString);
-                connStrReplaced = true;
-            }
-            
-            if (!connStrReplaced) {
-                logger.warn('Warning! Could not find connect string in ' +
-                            'public/index.js. Game may not run correctly.');
-                return;
-            }
-            
-            // console.log(index);
-            
-            
-            // Copy folder recursively.
-
-            utils.copyFolderRecursiveSync(gamePath, clonedGamePath, false);
-                            
-            // Replacing files with reference to channel.
-
-            fs.writeFileSync(
-                path.join(clonedGamePath, 'public', 'js', 'index.js'),
-                index
-            );
-
-            fs.writeFileSync(
-                path.join(clonedGamePath, 'channel', 'channel.settings.js'),
-                JSON.stringify(channel, null, 4)
-            );
-
-            fs.writeFileSync(
-                path.join(clonedGamePath, 'package.json'),
-                JSON.stringify(pkgJSON, null, 4)
-            );
-
-            // Make link.
-            
-            makeLink(clonedGamePath, clonedGameLinkPath);
-
-            logger.info("Game cloned, hurray!");
-
-
-
-            // rl = createRL();
-
-            // loadConfFile(function () {
-            //     createGame({
-            //         game: gameName,
-            //         author: author,
-            //         email: email,
-            //         options: options,
-            //     });
-            //     // rl.close in complete();
-            // });
-        })
 
     program
         .command("create-game [game_name] [author] [author_email]")
@@ -419,7 +221,262 @@ module.exports = function (program, vars, utils) {
                 });
                 // rl.close in complete();
             });
+     });
+
+    
+    program
+        .command("clone-game <game> [new_name] [author] [author_email]")
+        .description("Clones an existing game replacing the channel")
+        .option("-f, --force", "force on non-empty directory")
+        .option("--skip-links", "does not copy symbolic links")
+        .option("--skip-data", "does not copy the content of the data/ folder")
+        .option("--skip-git", "does not copy the .git folder")
+        .option("-v, --verbose", "verbose output")
+        .allowUnknownOption()
+        .action(function (game, newName, author, email, options) {
+
+            // Checks on folders.
+            /////////////////////
+
+            // Do not generate confusion with hidden folders, e.g. .git.
+            if (newName.charAt(0) === ".") {
+                logger.err("game names cannot start with a dot. " +
+                    "Please correct the name and try again."
+                    );
+                return;
+            }
+            if (newName.indexOf(" ") !== -1) {
+                logger.err("game names cannot contain a dot. " +
+                    "Please correct the name and try again."
+                    );
+                return;
+            }
+
+            const clonedGamePath = path.join(vars.gamesAvailDir, newName);
+            const clonedGameLinkPath = path.join(vars.gamesDir, newName);
+
+            if (fs.existsSync(clonedGamePath)) {
+                let str = "A folder with name " + newName + 
+                          " already exists in games_available/";
+                
+                if (!options.force) {
+                    logger.err(str);
+                    return;
+                }
+                logger.warn(str);
+            }
+            if (fs.existsSync(clonedGameLinkPath)) {
+                let str = "A folder with name " + newName + 
+                          " already exists in games/";
+                
+                if (!options.force) {
+                    logger.err(str);
+                    return;
+                }
+                logger.warn(str);
+            }
+
+            newName = newName.toLowerCase();
+
+            const gamePath = utils.getGamePath(game);
+
+            if (!gamePath) {
+                logger.err("Could not find game " + game);
+                logger.err("Please check that a folder with such a name " +
+                           "exists in games/ or games_available/ and retry.");
+                return;
+            }
+
+            // Check that it is a V8 game.
+            //////////////////////////////
+
+            let _channelJSON = path.join(gamePath, 'private', 'channel.json');
+            if (!fs.existsSync(_channelJSON)) {
+                logger.err("Game does not follow V8 structure, cannot clone.");
+                logger.err("Please add a valid private/channel.json file " + 
+                           "and retry.");
+                return;
+            }
+
+            // Copy folder recursively.
+            ///////////////////////////
+
+            let copyOpts = {
+                createTarget: false,
+                skipLinks: !options.skipLinks,
+                skipData: !options.skipData,
+                skipGit: !options.skipGit
+            };
+
+            console.log(copyOpts)
+
+            try {
+                utils.copyDirRecSync(gamePath, clonedGamePath, copyOpts);
+            }
+            catch(e) {
+                logger.err('An error occurred while copying the files into ' +
+                           'the cloned game:');
+                logger.info();
+                console.log(e);
+                return;
+            }
+                      
+
+            // Replacing files with reference to channel.
+            /////////////////////////////////////////////
+            
+            // package.json
+            ///////////////
+            
+            let [ pkgJSON, oldChannelName ] = 
+                clonePkgJSON(gamePath, newName, author, email);
+
+            fs.writeFileSync(
+                path.join(clonedGamePath, 'package.json'),
+                JSON.stringify(pkgJSON, null, 4)
+            );
+           
+            // private/channel.json
+            // channel/channel.settings.js
+            //////////////////////////////
+
+            let [ channelJSON, oldPlayerEndpoint ] =
+                 cloneChannelJSON(gamePath, newName);
+            
+            // console.log(channelJSON);
+            fs.writeFileSync(
+                path.join(clonedGamePath, 'private', 'channel.json'),
+                JSON.stringify(channelJSON, null, 4)
+            );
+           
+            // public/js/index.js
+            /////////////////////
+            
+            // This file is no longer used in v8, but it is useful as a 
+            // template in case users want more control.
+            
+            let index = cloneIndexJS(gamePath, newName, oldPlayerEndpoint);
+            if (index) {
+                fs.writeFileSync(
+                    path.join(clonedGamePath, 'public', 'js', 'index.js'),
+                    index
+                );
+            }
+
+            // Make link.
+            
+            makeLink(clonedGamePath, clonedGameLinkPath);
+
+            logger.info("Game cloned, hurray!");
         })
+
+    
+    /**
+     * ## cloneChannelJSON
+     */
+    function cloneChannelJSON(gamePath, newChannelName) {
+        let channelJSON = path.join(gamePath, 'private', 'channel.json');
+        channelJSON = require(channelJSON);
+        
+        // channelJSON.name = newChannelName;
+
+        let oldPlayerEndpoint = channelJSON.playerEndpoint;
+        
+        channelJSON.playerEndpoint = newChannelName;
+        channelJSON.adminEndpoint = getRndAdminEndpoint(newChannelName);
+
+        // console.log(channelJSON);
+
+        // Check for aliases.
+        // //////////////////////
+        let channelFile = path.join(gamePath, 'channel', 'channel.settings.js');
+        let channel = require(channelFile);
+
+        if (channel.alias) {
+            logger.warn('alias found in channel' + os.sep + 
+                        'channel.settings.js: please adjust this setting ' +
+                        'manually.');
+        }
+
+        return [ channelJSON, oldPlayerEndpoint ];
+    }
+        
+    /**
+     * ## clonePkgJSON
+     */
+    function clonePkgJSON(gamePath, newName, author, email) {
+        let pkgJSON = path.join(gamePath, 'package.json');
+        pkgJSON = require(pkgJSON);
+        
+        pkgJSON.name = newName;
+        
+        if (author) pkgJSON.author = { author: author };
+        if (email) {
+            if (author) pkgJSON.author.email = email;
+            else pkgJSON.author = { email: email };
+        }  
+
+        // Check if package.json has channelName.
+        let oldChannelName;
+        if (pkgJSON.channelName) {
+            oldChannelName = pkgJSON.channelName;
+            pkgJSON.channelName = newName;
+        }
+
+        // console.log(pkgJSON);
+
+        return [ pkgJSON, oldChannelName ];
+    }
+
+    /**
+     * ## cloneIndexJS
+     */
+    function cloneIndexJS(gamePath, newName, cNameToReplace) {
+        let indexPath = path.join(gamePath, 'public', 'js', 'index.js');
+        if (!fs.existsSync(indexPath)) return false;
+
+        let index = fs.readFileSync(indexPath, "utf-8");
+
+        let oldConnString1 = 'node.connect("/' + cNameToReplace + '")';
+        let oldConnString2 = "node.connect('/" + cNameToReplace + "')";
+        let oldConnString3 = 'node.connect(`/' + cNameToReplace + '`)';
+        let newConnString = 'node.connect("/' + newName + '")';
+
+        let connStrReplaced;
+        // console.log(oldConnString);
+        // console.log(newConnString);
+
+        // Replace both connect() and connect('/channel')
+        
+        if (index.indexOf(oldConnString1) !== -1) {
+            index = index.replace(oldConnString1, newConnString);
+            connStrReplaced = true;
+        }
+        if (index.indexOf(oldConnString2) !== -1) {
+            index = index.replace(oldConnString2, newConnString);
+            connStrReplaced = true;
+        }
+        if (index.indexOf(oldConnString3) !== -1) {
+            index = index.replace(oldConnString3, newConnString);
+            connStrReplaced = true;
+        }
+        
+        oldConnString1 = 'node.connect()';
+        if (index.indexOf(oldConnString1) !== -1) {
+            index = index.replace(oldConnString1, newConnString);
+            connStrReplaced = true;
+        }
+        
+        if (!connStrReplaced) {
+            logger.warn('Warning! Could not find connect string in ' +
+                        'public/index.js. Game may not run correctly.');
+            return false;
+        }
+        
+        // console.log(index);
+
+        return index;
+    }
 
     /**
      * ## detectNodeGameInstallation
@@ -1483,18 +1540,6 @@ module.exports = function (program, vars, utils) {
     function colorWrite(str, br) {
         console.log("\x1b[36m" + str + "\x1b[0m");
         if (br) console.log("");
-    }
-
-    function makeLink(from, to, type) {
-        if (isWin) {
-            // console.log(from);
-            // console.log(to);
-            if (type === "file") fs.linkSync(from, to, "file");
-            else fs.symlinkSync(from, to, "junction");
-        }
-        else {
-            fs.symlinkSync(from, to);
-        }
     }
 
     function getRndAdminEndpoint(gameName = '') {
