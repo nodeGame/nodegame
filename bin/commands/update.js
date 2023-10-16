@@ -40,7 +40,16 @@ module.exports = function (program, vars, utils) {
         .option('-g, --games', 'default games are updated')
         .option('-t, --throws', 'on error, it will throw')
         .action((opts) => {
-            checkGitExists(() => update(showRes, opts));
+            checkGitExists(gitVersion => {
+                
+                if (gitVersion.minor < 22) {
+                    logger.err('git version too old. Please update to ' + 
+                               'the latest git version: ' + vars.gitUrl);
+                    return;
+                }
+
+                update(showRes, opts)
+            });
         });
 
 

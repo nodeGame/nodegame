@@ -27,9 +27,11 @@ module.exports = function(rootDir) {
     const gamesAvailDir = path.resolve(rootDir, "games_available");
     const gamesDir = path.resolve(rootDir, "games");
 
+    const gitUrl = 'https://git-scm.com/';
+
     return { 
         rootDir, NODEGAME_MODULES, NODEGAME_GAMES, version, isWin,
-        gamesAvailDir, gamesDir
+        gamesAvailDir, gamesDir, gitUrl
      };
 
 }
