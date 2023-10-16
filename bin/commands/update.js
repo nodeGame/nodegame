@@ -43,7 +43,8 @@ module.exports = function (program, vars, utils) {
             checkGitExists(gitVersion => {
                 
                 if (gitVersion.minor < 22) {
-                    logger.err('git version too old. Please update to ' + 
+                    logger.err('git version too old (>= 2.22 required). ' +
+                               'Please update to ' + 
                                'the latest git version: ' + vars.gitUrl);
                     return;
                 }
