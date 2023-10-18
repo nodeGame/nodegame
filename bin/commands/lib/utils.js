@@ -157,8 +157,9 @@ module.exports = function(vars) {
     function copyDirRecSync(source, target, opts = {}) {
         
         let skipLinks = opts.skipLinks ?? true;
-        let skipData  = opts.skipData ?? true;
-        let skipGit   = opts.skipGit  ?? true;
+        let skipData  = opts.skipData  ?? true;
+        let skipGit   = opts.skipGit   ?? true;
+        let verbose   = opts.verbose   ?? false;
         
         let dirName = path.basename(source);     
         
@@ -166,6 +167,11 @@ module.exports = function(vars) {
         if (skipGit && dirName === '.git') return;
         
         // Check if folder needs to be created or integrated.
+
+        // If createTarget is false, files are copied inside the target folder,
+        // otherwise the directory from which files are copied is recreated
+        // inside the destination directory.
+
         let targetFolder = opts.createTarget !== false ?
             path.join(target, dirName) : target;
         if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
@@ -173,14 +179,16 @@ module.exports = function(vars) {
         // Do not clone data/ dir unless requested.
         // (but it is created empty).
         if (skipData && dirName === 'data') return;
-
+        
+        if (opts.createTarget) {
+            // Manual cloning (leaves out opts.createTarget).
+            opts = { skipLinks, skipData, skipGit, skipData };
+        }
+        
         // Copy
         
-        // Manual cloning.
-        opts = { skipLinks, skipData, skipGit, skipData };
-        
         // console.log(opts)
-        console.log(source);
+        if (verbose) logger.info('Copied: ' + path.basename(source));
     
         let files = [];
         if (fs.lstatSync(source).isDirectory()) {
@@ -193,10 +201,10 @@ module.exports = function(vars) {
                 }
                 else if (stat.isSymbolicLink()) {
                     if (skipLinks) {
-                        makeLinkSync(curSource, path.join(targetFolder, file));
+                        logger.info('Skipped link: ' + curSource);
                     }
                     else if (opts.verbose) {
-                        console.log('Skipped link: ' + curSource);
+                        makeLinkSync(curSource, path.join(targetFolder, file));
                     }
                 }
                 else {

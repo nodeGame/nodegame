@@ -265,6 +265,8 @@ module.exports = function (program, vars, utils) {
                 }
                 logger.warn(str);
             }
+
+            let gameLinkExists = false;
             if (fs.existsSync(clonedGameLinkPath)) {
                 let str = "A folder with name " + newName + 
                           " already exists in games/";
@@ -274,6 +276,9 @@ module.exports = function (program, vars, utils) {
                     return;
                 }
                 logger.warn(str);
+
+                // Mark it for later, so we do not recreate it.
+                gameLinkExists = true;
             }
 
             newName = newName.toLowerCase();
@@ -303,11 +308,13 @@ module.exports = function (program, vars, utils) {
 
             let copyOpts = {
                 createTarget: false,
-                skipLinks: !options.skipLinks,
-                skipData: !options.skipData,
-                skipGit: !options.skipGit
+                skipLinks: options.skipLinks ?? false,
+                skipData: options.skipData ?? true,
+                skipGit: options.skipGit ?? false,
+                verbose: options.verbose ?? false
             };
 
+            console.log(options);
             console.log(copyOpts)
 
             try {
@@ -363,9 +370,8 @@ module.exports = function (program, vars, utils) {
                 );
             }
 
-            // Make link.
-            
-            makeLink(clonedGamePath, clonedGameLinkPath);
+            // Make link to games_available/.
+            if (!gameLinkExists) makeLink(clonedGamePath, clonedGameLinkPath);
 
             logger.info("Game cloned, hurray!");
         })
@@ -492,13 +498,15 @@ module.exports = function (program, vars, utils) {
         let ngPkg = {};
         try {
             ngPkg = require(path.resolve(ngDir, "package.json"));
-        } catch (e) {
+        }
+        catch (e) {
             ngDir = path.resolve(root, "..");
         }
         if (!ngPkg) {
             try {
                 ngPkg = require(path.resolve(ngDir, "package.json"));
-            } catch (e) {
+            }
+            catch (e) {
                 // Nothing.
             }
         }
