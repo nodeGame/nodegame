@@ -2,26 +2,12 @@ const execFile = require("child_process").execFile;
 const fs = require('fs');
 const path = require('path');
 
+
 module.exports = function(vars) {
     
-    const logger = {
-        list: txt => {
-            console.log('  - ' + txt);
-        },
     
-        info: txt => {
-            if ('undefined' === typeof txt) console.log();
-            else console.log('  ' + txt);
-        },
-    
-        err: txt => {
-            console.error('  Error: ' + txt);
-        },
-    
-        warn: txt => {
-            console.error('  Warning: ' + txt);
-        }
-    };
+    const { readLine } = require('./rl');
+    const { logger } = require('./logger');
     
         
     const checkGitExists = cb => {
@@ -228,7 +214,7 @@ module.exports = function(vars) {
     }
 
 
-    return { logger, copyDirRecSync, makeLinkSync,
+    return { logger, readLine, copyDirRecSync, makeLinkSync,
              checkGitExists, getNodeModulesPath, getGamePath, getModulePath };
 
 };
