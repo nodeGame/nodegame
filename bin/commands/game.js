@@ -12,7 +12,6 @@
 const mkdirp = require("mkdirp");
 const fs = require("fs-extra");
 const path = require("path");
-const readline = require("readline");
 
 const J = require("JSUS").JSUS;
 const ngt = require("nodegame-game-template");
@@ -36,88 +35,9 @@ module.exports = function (program, vars, utils) {
     const NODEGAME_MODULE = "nodegame";
     // const NODEGAME_MODULE = 'nodegame-test';
 
-    // Readline (init later).
+    // ReadLine used by some commands.
     let rl;
-
-    var stdoutConf = {
-        willBeMuted: false,
-        muted: false,
-        lastPrompt: "",
-        origPrompt: "",
-    };
-
-
-    function muteNext() {
-        if (stdoutConf.muted) unmute();
-        stdoutConf.willBeMuted = true;
-    }
-
-    function unmute() {
-        stdoutConf.willBeMuted = false;
-        stdoutConf.muted = false;
-        stdoutConf.lastPrompt = "";
-        stdoutConf.origPrompt = "";
-    }
-
-    function mute() {
-        stdoutConf.willBeMuted = false;
-        stdoutConf.muted = true;
-    }
-
-    function createRL() {
-            
-        rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            terminal: true,
-        });
-
-        rl.on("SIGINT", function () {
-            rl.close();
-            console.log();
-            console.log();
-            console.log("canceled");
-        });
-        unmute();
-        
-
-        rl._writeToOutput = function _writeToOutput(str) {
-            // console.log('INPUT ', str, str.length);
-            if (stdoutConf.muted) {
-                if (str.length > 2) {
-                    // console.log('LEN : ', str.length);
-                    // console.log('1');
-                    let len = stdoutConf.lastPrompt.length;
-                    let lenOrig = stdoutConf.origPrompt.length;
-                    str = stdoutConf.lastPrompt.substr(
-                        0,
-                        Math.max(lenOrig, len - 1)
-                    );
-                    stdoutConf.lastPrompt = str;
-                    rl.output.write(str);
-                }
-                else if (str.length === 2) {
-                    rl.output.write(str);
-                }
-                else {
-                    // console.log('2');
-                    rl.output.write("*");
-                    stdoutConf.lastPrompt += "*";
-                }
-            }
-            else {
-                // console.log('3');
-                rl.output.write(str);
-            }
-            if (stdoutConf.willBeMuted) {
-                stdoutConf.lastPrompt = stdoutConf.origPrompt = str;
-                mute();
-            }
-        };
-
-        return rl;
-    }
-
+    
     // Game-creation configuration.
 
     // Will be overwritten.
@@ -141,68 +61,125 @@ module.exports = function (program, vars, utils) {
     // Chosen template. Default dictator.
     const DEFAULT_TEMPLATE = "dictator";
 
-    // program
-    //     .command('list-templates')
-    //     .description('List all available game templates')
-    //     .action(function() {
-    //         var t, str;
-    //         console.log();
-    //         for (t in templates ) {
-    //             if (templates.hasOwnProperty(t)) {
-    //                 str = ' - ' + t;
-    //                 if (t === DEFAULT_TEMPLATE) str += '  **default**';
-    //                 console.log(str);
-    //             }
-    //         }
-    //         console.log();
-    //     });
 
-    program.version(version);
+    // Add nested commands using `.command()`.
+    const game = program.command('game');
 
-    program
-        .command("update-conf")
-        .description("Updates stored configuration (author, games dir, etc.)")
+    // LIST.
+    ////////
+    game
+        .command('list [remote]')
+        .description("List installed games")
+        .option("-v, --verbose", "verbose output")
         .allowUnknownOption()
-        .action(function (options) {
-            rl = createRL();
-            loadConfFile(function () {
-                // Nothing.
-                rl.close();
-            }, true);
-        })
-        // .parse(process.argv);
+        .action(function(remote, options) {
+            let games;
 
-    program
-        .command("show-conf")
-        .description("Shows current configuration")
-        .allowUnknownOption()
-        .action(function (options) {
-            rl = createRL();
-            loadConfFile(function () {
-                showConf();
-                rl.close();
+            if (remote) {
+
+                logger.info('List of games available **remotely**.');
+                logger.info();
+
+                try {
+                    games = require('./lib/remote-games');
+                
+                    if (!options.verbose) {
+                        games.forEach(game => {
+                            delete game.wiki;
+                            delete game.url;
+                            delete game.publication;
+                        })
+                    }
+                }
+                catch(e) {
+                    logger.err('Could not load list of remote games.')
+                }
+                
+            }
+            else {
+
+                logger.info('List of games installed **locally**.');
+                logger.info();
+
+                games = [];
+                gamesInfoFromDir(vars.gamesDir, games, true, options);
+                gamesInfoFromDir(vars.gamesAvailDir, games, false, options);
+
+            }
+
+            games = games.sort((a,b) => {
+                if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
             });
-        })
-        // .parse(process.argv);
+            
+            console.table(games);
+        });
 
+    const gamesInfoFromDir = (dir, out, enabled, opts) => {
+        let games = fs.readdirSync(dir);
 
+        games.forEach(game => {                 
+            let stat = fs.lstatSync(path.join(dir, game));
+            if (stat.isDirectory()) {
+                let g = { name: game };
+                
+                g.enabled = enabled || out.indexOf(game) === -1;
+                
+                if (opts.verbose) {
+                    let pkgJSON = path.join(dir, game, 'package.json');
+                    if (fs.existsSync(pkgJSON)) {
+                        try {
+                            pkgJSON = require(pkgJSON);
+                            g.descr = pkgJSON.description;
+                            g.version = pkgJSON.version;
+                            // console.log(pkgJSON);
+                        }
+                        catch(e) {
+                            logger.err('An error occurred while loading ' +
+                            'package.json from ' + game);
+                        }
+                    }
+                    else {
+                        g.descr = '-';
+                    }
 
-    program
-        .command("create-game [game_name] [author] [author_email]")
+                    
+                    let dataDir = path.join(dir, game, 'data');
+                    if (fs.existsSync(dataDir)) {
+                        let rooms = fs.readdirSync(dataDir);
+                        rooms = rooms.filter(r => r.indexOf('room' === 0));
+                        g.rooms = rooms.length;
+                    }
+                    else {
+                        g.rooms = 0;
+                    }
+
+                }
+
+                out.push(g);
+            }
+
+        }); 
+    };
+
+    // CREATE.
+    //////////
+
+    game
+        .command("create [name] [author] [email]")
         .description("Creates a new game in the games directory")
         // .option('-t, --template <template>', 'set the template for game')
         .option("-f, --force", "force on non-empty directory")
         .option("-v, --verbose", "verbose output")
         .allowUnknownOption()
-        .action(function (gameName, author, email, options) {
+        .action(function(name, author, email, options) {
             
-            if (!gameName) {
+            if (!name) {
                 console.log("Error: game name is missing.");
                 return;
             }
             
             // Do not generate confusion with hidden folders, e.g. .git.
-            if (gameName.charAt(0) === ".") {
+            if (name.charAt(0) === ".") {
                 console.log(
                     "Error: game names cannot start with a dot. " +
                     "Please correct the name and try again."
@@ -210,11 +187,11 @@ module.exports = function (program, vars, utils) {
                 return;
             }
             
-            rl = createRL();
+            rl = utils.readLine();
 
             loadConfFile(function () {
                 createGame({
-                    game: gameName,
+                    game: name,
                     author: author,
                     email: email,
                     options: options,
@@ -224,8 +201,8 @@ module.exports = function (program, vars, utils) {
      });
 
     
-    program
-        .command("clone-game <game> [new_name] [author] [author_email]")
+    game
+        .command("clone <game> [new_name] [author] [author_email]")
         .description("Clones an existing game replacing the channel")
         .option("-f, --force", "force on non-empty directory")
         .option("--skip-links", "does not copy symbolic links")
