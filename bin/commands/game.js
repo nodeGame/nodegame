@@ -1426,27 +1426,6 @@ module.exports = function (program, vars, utils) {
         });
     }
 
-    // function loadTemplates() {
-    //     let dir = conf.ngGamesAvailDir;
-    //
-    //     fs.readdirSync(dir).forEach(function(file, index) {
-    //         let curPath = path.join(dir, file);
-    //         //  Recurse.
-    //         if (fs.lstatSync(curPath).isDirectory()) {
-    //             var name;
-    //             try {
-    //                let packageJson = require(path.join(curPath, 'package.json'));
-    //                 name = packageJson.name;
-    //                 if (name) templates[name] = curPath;
-    //             }
-    //             catch(e) {
-    //                 // Ignore errors for now.
-    //             }
-    //         }
-    //
-    //     });
-    // }
-
     function showConf(localConf) {
         localConf = localConf || conf;
         console.log("");
