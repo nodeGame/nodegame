@@ -27,10 +27,6 @@ module.exports = function (program, vars, utils) {
     const version = vars.version;
     const isWin = vars.isWin;
 
-    // This file is "copied" and not linked in Windows,
-    // therefore we need to be agnostic while loading the root path.
-    const root = J.resolveModuleDir("nodegame-generator");
-    const confFile = path.resolve(rootDir, "create-game.json");
 
     const NODEGAME_MODULE = "nodegame";
     // const NODEGAME_MODULE = 'nodegame-test';
@@ -39,16 +35,6 @@ module.exports = function (program, vars, utils) {
     let rl;
     
     // Game-creation configuration.
-
-    // Will be overwritten.
-    var conf = {
-        author: "author",
-        email: "email",
-        ngDir: undefined,
-        ngVersion: undefined,
-        ngGamesAvailDir: undefined,
-        ngGamesEnabledDir: undefined,
-    };
 
     // Available templates.
     var templates = {
@@ -65,141 +51,14 @@ module.exports = function (program, vars, utils) {
     // Add nested commands using `.command()`.
     const game = program.command('game');
 
-    // LIST.
-    ////////
-    game
-        .command('list [remote]')
-        .description("List installed games")
-        .option("-v, --verbose", "verbose output")
-        .allowUnknownOption()
-        .action(function(remote, options) {
-            let games;
+    const list = require('./game/list');
 
-            if (remote) {
+    
+    const create = require('./game/create');
 
-                logger.info('List of games available **remotely**.');
-                logger.info();
+    list(game, vars, utils);
 
-                try {
-                    games = require('./lib/remote-games');
-                
-                    if (!options.verbose) {
-                        games.forEach(game => {
-                            delete game.wiki;
-                            delete game.url;
-                            delete game.publication;
-                        })
-                    }
-                }
-                catch(e) {
-                    logger.err('Could not load list of remote games.')
-                }
-                
-            }
-            else {
-
-                logger.info('List of games installed **locally**.');
-                logger.info();
-
-                games = [];
-                gamesInfoFromDir(vars.gamesDir, games, true, options);
-                gamesInfoFromDir(vars.gamesAvailDir, games, false, options);
-
-            }
-
-            games = games.sort((a,b) => {
-                if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-            });
-            
-            console.table(games);
-        });
-
-    const gamesInfoFromDir = (dir, out, enabled, opts) => {
-        let games = fs.readdirSync(dir);
-
-        games.forEach(game => {                 
-            let stat = fs.lstatSync(path.join(dir, game));
-            if (stat.isDirectory()) {
-                let g = { name: game };
-                
-                g.enabled = enabled || out.indexOf(game) === -1;
-                
-                if (opts.verbose) {
-                    let pkgJSON = path.join(dir, game, 'package.json');
-                    if (fs.existsSync(pkgJSON)) {
-                        try {
-                            pkgJSON = require(pkgJSON);
-                            g.descr = pkgJSON.description;
-                            g.version = pkgJSON.version;
-                            // console.log(pkgJSON);
-                        }
-                        catch(e) {
-                            logger.err('An error occurred while loading ' +
-                            'package.json from ' + game);
-                        }
-                    }
-                    else {
-                        g.descr = '-';
-                    }
-
-                    
-                    let dataDir = path.join(dir, game, 'data');
-                    if (fs.existsSync(dataDir)) {
-                        let rooms = fs.readdirSync(dataDir);
-                        rooms = rooms.filter(r => r.indexOf('room' === 0));
-                        g.rooms = rooms.length;
-                    }
-                    else {
-                        g.rooms = 0;
-                    }
-
-                }
-
-                out.push(g);
-            }
-
-        }); 
-    };
-
-    // CREATE.
-    //////////
-
-    game
-        .command("create [name] [author] [email]")
-        .description("Creates a new game in the games directory")
-        // .option('-t, --template <template>', 'set the template for game')
-        .option("-f, --force", "force on non-empty directory")
-        .option("-v, --verbose", "verbose output")
-        .allowUnknownOption()
-        .action(function(name, author, email, options) {
-            
-            if (!name) {
-                console.log("Error: game name is missing.");
-                return;
-            }
-            
-            // Do not generate confusion with hidden folders, e.g. .git.
-            if (name.charAt(0) === ".") {
-                console.log(
-                    "Error: game names cannot start with a dot. " +
-                    "Please correct the name and try again."
-                    );
-                return;
-            }
-            
-            rl = utils.readLine();
-
-            loadConfFile(function () {
-                createGame({
-                    game: name,
-                    author: author,
-                    email: email,
-                    options: options,
-                });
-                // rl.close in complete();
-            });
-     });
-
+   
     
     game
         .command("clone <game> [new_name] [author] [author_email]")
