@@ -83,5 +83,27 @@ function create() {
     return rl;
 }
 
+ /**
+     * Prompt for confirmation on STDOUT/STDIN
+     */
+ function confirm(msg, cb) {
+    rl.question(msg, function (input) {
+        cb(/^y|yes|ok|true$/i.test(input));
+    });
+}
 
-module.exports = { readLine: create };
+function questionNoBlank(msg, cb) {
+    rl.question(msg, function (answer) {
+        // console.log('ANSWER WAS: ' + answer);
+        if ("undefined" === typeof answer || answer.trim() === "") {
+            questionNoBlank(msg, cb);
+            // Needed return otherwise it continues.
+            return;
+        }
+        cb(answer);
+    });
+}
+
+
+
+module.exports = { create, confirm, questionNoBlank };
