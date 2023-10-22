@@ -25,7 +25,8 @@ module.exports = function(rootDir) {
 
     const url = {
         git: 'https://git-scm.com/',
-        upgrade: 'https://nodegame.org/update/modules-list.json'
+        updateModules: 'https://nodegame.org/update/modules.json',
+        updateGames: 'https://nodegame.org/update/remote-games.json',
     };
 
     const dir = {

@@ -30,13 +30,22 @@ module.exports = function (program, vars, utils) {
     const checkGitExists = utils.checkGitExists;
 
     program
-        .command("Update")
+        .command("update")
         .description("Fetches the latest version of the package list")
         .option('-v, --verbose', 'verbose output')
         .action(async (opts) => {
             
-            const url = vars.url.updgrade;
+            if ('function' !== typeof fetch) {
+                logger.err('fetch not found. Please update to the latest ' +
+                           'version of Node.JS to run update.');
+                return;
+            }
 
+            // let currGames = require(vars.cache.updateGames);
+            // let currGamesLastUpdate = currGames.lastUpdate;
+            // currGames = indexGamesArray(currGames.games);
+
+            const url = vars.url.updateGames;
 
             let res, json;
 
@@ -51,7 +60,6 @@ module.exports = function (program, vars, utils) {
             }
             
             try {
-                
                 json = await res.json();
             }
             catch(e) {
@@ -60,9 +68,26 @@ module.exports = function (program, vars, utils) {
                 return;
             }
 
-            fs.saveFile()
+            fs.writeFileSync(vars.cache.remoteGames, JSON.stringify(json, null, 4));
 
+            logger.info('List of games saved')
         });
+
+
+    // const compareRemoteGames = (currIndexed, test) => {
+    //     test.forEach(g => {
+    //         let currGame = currIndexed[g.name];
+            
+    //     });
+    // };
+
+    const indexGamesArray = arr => {
+        let out = {};
+        arr.forEach(g => {
+            out[g.name] = g;
+        });
+        return out;
+    };
 
     program
         .command("Upgrade")
@@ -107,7 +132,7 @@ module.exports = function (program, vars, utils) {
 
         let counter = NODEGAME_MODULES.length;
         
-        if (verbose) logger.info("Updating all modules./n");
+        if (verbose) logger.info("Upgrading all modules./n");
 
         let modules = NODEGAME_MODULES;
         

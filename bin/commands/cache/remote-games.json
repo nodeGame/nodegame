@@ -1,79 +1,81 @@
-[
-    {
-        "name": "survey-ineq",
-        "description": "A simple survey with focus on inequality",
-        "url": "https://github.com/nodegame/survey",
-        "nodegame": ["v8"]
-    },
-
-    {
-        "name": "ultimatum",
-        "description": "Ultimatum game: take it or leave it",
-        "url": "https://github.com/nodeGame/ultimatum-game",
-        "wiki": "https://en.wikipedia.org/wiki/Ultimatum_game",
-        "nodegame": ["v8"]
-    },
-
-    {
-        "name": "stopgo",
-        "url": "https://github.com/nodeGame/stopgo",
-        "publication": "https://link.springer.com/article/10.1007/BF01803953",
-        "description": "Incomplete Information Two-Player game.",
-        "nodegame": ["v8"]
-    },
-
-    {
-        "name": "trustgame",
-        "url": "https://github.com/nodeGame/trustgame",
-        "description": "Plays an trustgame game with nodegame",
-        "nodegame": ["v?"]
-    },
-
-    {
-        "name": "artex",
-        "description": "Create and review digital images (requires high-res display)",
-        "url": "https://github.com/shakty/artex",
-        "publication": "https://authors.elsevier.com/a/1ccVJB5ASINJW",
-        "nodegame": ["v7"]
-    },
-
-    {
-      "name": "carsharing", 
-      "url": "https://github.com/nodeGame/car-sharing",
-      "publication": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2802049",
-      "description": "Coordination game in time and space framed as car sharing vs public transport choice.",
-      "nodegame": ["v7"]
-    },
-
-    {
-      "name": "meritocracy",
-      "url": "https://github.com/nodeGame/meritocracy-game",
-      "publication": "https://link.springer.com/article/10.1007/s00355-017-1081-5",
-      "description": "Public-Good game with noisy matching of high contributors.",
-      "nodegame": ["v?"]
-    },
-
-    {
-      "name": "pgg",
-      "url": "https://github.com/nodeGame/pgg",
-      "description": "Public good game with income mobility.",
-      "nodegame": ["v?"]
-    },
-
-    {
-      "name": "dictator",
-      "url": "https://github.com/nodeGame/dictator",
-      "wiki": "https://en.wikibooks.org/wiki/Bestiary_of_Behavioral_Economics/Dictator_Game",
-      "description": "One player decides for both.",
-      "nodegame": ["v?"]
-    },
-
+{
+    "lastUpdate": "1697978989855",
     
-    {
-      "name": "burdenshare",
-      "url": "https://github.com/nodeGame/burdenshare",
-      "description": "Share burdens of climate mitigation costs.",
-      "nodegame": ["v?"]
-    }
-    
-]
+    "games": [
+        {
+            "name": "survey-ineq",
+            "description": "A simple survey with focus on inequality",
+            "url": "https://github.com/nodegame/survey",
+            "nodegame": ["v8"]
+        },
+
+        {
+            "name": "ultimatum",
+            "description": "Ultimatum game: take it or leave it",
+            "url": "https://github.com/nodeGame/ultimatum-game",
+            "wiki": "https://en.wikipedia.org/wiki/Ultimatum_game",
+            "nodegame": ["v8"]
+        },
+
+        {
+            "name": "stopgo",
+            "url": "https://github.com/nodeGame/stopgo",
+            "publication": "https://link.springer.com/article/10.1007/BF01803953",
+            "description": "Incomplete Information Two-Player game.",
+            "nodegame": ["v8"]
+        },
+
+        {
+            "name": "trustgame",
+            "url": "https://github.com/nodeGame/trustgame",
+            "description": "Plays an trustgame game with nodegame",
+            "nodegame": ["v?"]
+        },
+
+        {
+            "name": "artex",
+            "description": "Create and review digital images (requires high-res display)",
+            "url": "https://github.com/shakty/artex",
+            "publication": "https://authors.elsevier.com/a/1ccVJB5ASINJW",
+            "nodegame": ["v7"]
+        },
+
+        {
+            "name": "carsharing",
+            "url": "https://github.com/nodeGame/car-sharing",
+            "publication": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2802049",
+            "description": "Coordination game in time and space framed as car sharing vs public transport choice.",
+            "nodegame": ["v7"]
+        },
+
+        {
+            "name": "meritocracy",
+            "url": "https://github.com/nodeGame/meritocracy-game",
+            "publication": "https://link.springer.com/article/10.1007/s00355-017-1081-5",
+            "description": "Public-Good game with noisy matching of high contributors.",
+            "nodegame": ["v?"]
+        },
+
+        {
+            "name": "pgg",
+            "url": "https://github.com/nodeGame/pgg",
+            "description": "Public good game with income mobility.",
+            "nodegame": ["v?"]
+        },
+
+        {
+            "name": "dictator",
+            "url": "https://github.com/nodeGame/dictator",
+            "wiki": "https://en.wikibooks.org/wiki/Bestiary_of_Behavioral_Economics/Dictator_Game",
+            "description": "One player decides for both.",
+            "nodegame": ["v?"]
+        },
+
+        {
+            "name": "burdenshare",
+            "url": "https://github.com/nodeGame/burdenshare",
+            "description": "Share burdens of climate mitigation costs.",
+            "nodegame": ["v?"]
+        }
+    ]
+}
