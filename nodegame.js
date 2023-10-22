@@ -31,6 +31,8 @@ program
     .version(vars.version);
 
 
+utils.logger.info();
+
 // Start server.
 const start = require(path.join(CMD_DIR, 'start.js'));
 start(program, vars, utils);
