@@ -11,6 +11,7 @@
 // Modules.
 const fs = require("fs-extra");
 const path = require("path");
+const c = require('ansi-colors');
 
 module.exports = function (game, vars, utils) {
 
@@ -28,11 +29,11 @@ module.exports = function (game, vars, utils) {
 
             if (remote) {
 
-                logger.info('List of games available **remotely**.');
+                logger.info('Games available ' + c.bold('remotely') + ':');
                 logger.info();
 
                 try {
-                    games = require('./cache/remote-games');
+                    games = require(vars.cache.remoteGames);
                 
                     if (!options.verbose) {
                         games.forEach(game => {
@@ -49,12 +50,12 @@ module.exports = function (game, vars, utils) {
             }
             else {
 
-                logger.info('List of games installed **locally**.');
+                logger.info('Games installed ' + c.bold('locally') + ':');
                 logger.info();
 
                 games = [];
-                gamesInfoFromDir(vars.gamesDir, games, true, options);
-                gamesInfoFromDir(vars.gamesAvailDir, games, false, options);
+                gamesInfoFromDir(vars.dir.games, games, true, options);
+                gamesInfoFromDir(vars.dir.gamesAvail, games, false, options);
 
             }
 

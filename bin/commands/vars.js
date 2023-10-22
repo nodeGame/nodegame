@@ -6,7 +6,6 @@ module.exports = function(rootDir) {
 
     const isWin = /^win/.test(process.platform);
 
-
     const NODEGAME_MODULES = [
         'nodegame-server', 'nodegame-client',
         'nodegame-window', 'nodegame-widgets',
@@ -24,14 +23,25 @@ module.exports = function(rootDir) {
         'survey-game'
     ];
 
-    const gamesAvailDir = path.resolve(rootDir, "games_available");
-    const gamesDir = path.resolve(rootDir, "games");
+    const url = {
+        git: 'https://git-scm.com/',
+        upgrade: 'https://nodegame.org/update/modules-list.json'
+    };
 
-    const gitUrl = 'https://git-scm.com/';
+    const dir = {
+        root: rootDir,
+        gamesAvail: path.resolve(rootDir, "games_available"),
+        games: path.resolve(rootDir, "games"),
+        cache: path.resolve(__dirname, "cache")
+    };
+
+    const cache = {
+        remoteGames: path.join(dir.cache, 'remote-games.json')
+    };
 
     return { 
-        rootDir, NODEGAME_MODULES, NODEGAME_GAMES, version, isWin,
-        gamesAvailDir, gamesDir, gitUrl
+        NODEGAME_MODULES, NODEGAME_GAMES, version, isWin,
+        dir, url, cache
      };
 
 }

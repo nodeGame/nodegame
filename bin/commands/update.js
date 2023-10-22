@@ -9,18 +9,15 @@
 "use strict";
 
 // Modules.
-const mkdirp = require("mkdirp");
 const fs = require("fs-extra");
 const path = require("path");
-// const readline = require("readline");
 const execFile = require("child_process").execFile;
 const execFileSync = require("child_process").execFileSync;
 
 const J = require("JSUS").JSUS;
-const ngt = require("nodegame-game-template");
 
 module.exports = function (program, vars, utils) {
-    const rootDir = vars.rootDir;
+    const rootDir = vars.dir.root;
     const version = vars.version;
     const NODEGAME_MODULES = vars.NODEGAME_MODULES;
     const NODEGAME_GAMES = vars.NODEGAME_GAMES;
@@ -28,14 +25,46 @@ module.exports = function (program, vars, utils) {
     
     const logger = utils.logger;
     
-    const NODEGAME_MODULE = "nodegame";
-    // const NODEGAME_MODULE = 'nodegame-test';
-
     const checkGitExists = utils.checkGitExists;
 
     program
-        .command("update")
-        .description("Updates nodeGame to the latest version")
+        .command("Update")
+        .description("Fetches the latest version of the package list")
+        .option('-v, --verbose', 'verbose output')
+        .action(async (opts) => {
+            
+            const url = vars.url.updgrade;
+
+
+            let res, json;
+
+            // See if fetch exists.
+            try {
+                res = await fetch(url);
+            }
+            catch(e) {
+                logger.err('Could not fetch the list of packages. Check ' +
+                           'your internet connection and try again.')
+                return;
+            }
+            
+            try {
+                
+                json = await res.json();
+            }
+            catch(e) {
+                logger.err('Could not parse the fetched list of packages. ' +
+                           'This downloaded file was malformed/corrupted.');
+                return;
+            }
+
+            fs.saveFile()
+
+        });
+
+    program
+        .command("Upgrade")
+        .description("Upgrade nodeGame modules and games to the latest version")
         .option('-v, --verbose', 'verbose output')
         .option('-g, --games', 'default games are updated')
         .option('-t, --throws', 'on error, it will throw')
@@ -45,7 +74,7 @@ module.exports = function (program, vars, utils) {
                 if (gitVersion.minor < 22) {
                     logger.err('git version too old (>= 2.22 required). ' +
                                'Please update to ' + 
-                               'the latest git version: ' + vars.gitUrl);
+                               'the latest git version: ' + vars.git.url);
                     return;
                 }
 
@@ -66,9 +95,9 @@ module.exports = function (program, vars, utils) {
         });
 
 
-    // Update.
+    // Upgrade.
 
-    function update(cb, opts) {
+    function upgrade(cb, opts) {
 
         let nodeModulesPath = utils.getNodeModulesPath();
         

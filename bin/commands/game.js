@@ -1,5 +1,5 @@
 /**
- * # Creates a new game
+ * # Game/s related commands.
  * Copyright(c) 2023 Stefano Balietti
  * MIT Licensed
  *
@@ -8,18 +8,7 @@
 
 "use strict";
 
-// Modules.
-const mkdirp = require("mkdirp");
-const fs = require("fs-extra");
-const path = require("path");
-
-const J = require("JSUS").JSUS;
-
 module.exports = function (program, vars, utils) {
-
-    const logger = utils.logger;
-
-    const makeLink = utils.makeLinkSync;
 
 
     // Add nested commands using `.command()`.
@@ -32,10 +21,5 @@ module.exports = function (program, vars, utils) {
     list(game, vars, utils);
     create(game, vars, utils);
     clone(game, vars, utils);
-
-
-    function getRndAdminEndpoint(gameName = '') {
-        return gameName + '/' + J.randomString(20, 'aA1');
-    }
 
 };

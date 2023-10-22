@@ -15,7 +15,7 @@ const J = require("JSUS").JSUS;
 
 module.exports = function (program, vars) {
 
-    const rootDir = vars.rootDir;
+    const rootDir = vars.dir.root;
     const version = vars.version;
 
     const conf = {
@@ -23,8 +23,8 @@ module.exports = function (program, vars) {
         email: 'email',
         ngDir: rootDir,
         ngVersion: version,
-        ngGamesAvailDir: path.join(rootDir, 'games_available'),
-        ngGamesEnabledDir: path.join(rootDir, 'games')
+        ngGamesAvailDir: vars.dir.gamesAvail,
+        ngGamesEnabledDir: vars.dir.games
     };
 
 

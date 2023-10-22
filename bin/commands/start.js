@@ -23,7 +23,7 @@ function list(val) {
 
 module.exports = function (program, vars) {
 
-    const rootDir = vars.rootDir;
+    const rootDir = vars.dir.root;
     const version = vars.version;
 
     // ServerNode options.
