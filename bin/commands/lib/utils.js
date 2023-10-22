@@ -52,12 +52,8 @@ module.exports = function(vars) {
         };
     };
 
-    function getNodeModulesPath() {
-        return path.resolve(vars.rootDir, "node_modules");
-    }
-
     function getModulePath(module) {
-        const nodeModules = getNodeModulesPath();
+        const nodeModules = vars.dir.nodeModules;
         let pathToModule = path.join(nodeModules, module);
         if (!fs.existsSync(pathToModule)) return false;
         return pathToModule;
@@ -215,6 +211,6 @@ module.exports = function(vars) {
 
 
     return { logger, readLine, copyDirRecSync, makeLinkSync,
-             checkGitExists, getNodeModulesPath, getGamePath, getModulePath };
+             checkGitExists, getGamePath, getModulePath };
 
 };

@@ -14,6 +14,8 @@ const path = require("path");
 const execFile = require("child_process").execFile;
 const execFileSync = require("child_process").execFileSync;
 
+const c = require('ansi-colors');
+
 const J = require("JSUS").JSUS;
 
 module.exports = function (program, vars, utils) {
@@ -98,13 +100,6 @@ module.exports = function (program, vars, utils) {
     // Upgrade.
 
     function upgrade(cb, opts) {
-
-        let nodeModulesPath = utils.getNodeModulesPath();
-        
-        if (nodeModulesPath === false) {
-            logger.err('Could not find node_modules dir. Aborting.');
-            return;
-        }
 
         const res = {};
 
@@ -207,22 +202,23 @@ module.exports = function (program, vars, utils) {
     
     function branch(cb, opts) {
         
-        let nodeModulesPath = utils.getNodeModulesPath();
-        
-        if (nodeModulesPath === false) {
-            logger.err('Could not find node_modules dir. Aborting.');
-            return;
-        }
-
         const branch = opts.branch;
+
+        let listOnly = 'undefined' === typeof branch;
 
         const res = {};
 
         let verbose = opts.verbose;
         
         if (verbose) {
-            logger.info("Switching to branch " + branch + 
+            if (listOnly) {
+                logger.info("Current branch in modules.\n");
+            }
+            else {
+                logger.info("Switching to branch " + branch + 
                         " all modules (where available).\n");
+            }
+            
         }
 
         let modules = NODEGAME_MODULES;
@@ -273,10 +269,13 @@ module.exports = function (program, vars, utils) {
                 // path: modulePath
             };
 
-
+            
             let info = { modulePath, module, opts, branch };
+            
+            // console.log(info);
 
             let remote = getGitRemote(info);
+            if (!remote) continue;
             let oldBranch = getGitBranch(info);
 
             info.remote = remote;
@@ -284,6 +283,9 @@ module.exports = function (program, vars, utils) {
 
             res[module].remote = remote;
             res[module].branch = oldBranch;
+
+            // We do not switch branch, just show what it is.
+            if (listOnly) continue;
             
             // Already on that branch.
             if (oldBranch === branch) continue;
@@ -319,44 +321,68 @@ module.exports = function (program, vars, utils) {
 
     function getGitRemote(info) {                
 
-        let { modulePath, module, opts } = info;
+        let { res, err } = runGitSync([ 'remote' ], info);
 
-        // if (opts.verbose) logger.info("Getting git remote module: " + module);
-        let remote = execFileSync(
-            "git",
-            [ "remote" ],
-            { cwd: modulePath }
-        );
-        return remote ? String(remote).trim() : false;
+        // TODO parse error.
+        // if (err)
+
+        return res;
     }
 
-    function getGitBranch(info) {                
-        let { modulePath, module, opts } = info;
-        // if (opts.verbose) logger.info("Getting git branch module: " + module);
-        let branch = execFileSync(
-            "git",
-            [ "branch", "--show-current" ],
-            { cwd: modulePath }
-        );
-        return branch ? String(branch).trim() : false;
+    function getGitBranch(info) {            
+        let { res, err } = runGitSync([ "branch", "--show-current" ], info);
+    
+        // TODO parse error.
+        // if (err)
+
+        return res;
     }
+
+    // TODO: homogenize return values from git commands.
 
     function doGitCheckout(info) {                
-        let { modulePath, branch } = info;
+        let { branch } = info;
+        info.stdio = 'ignore'; // pipe.
+        let { res, err } = runGitSync([ "checkout", branch ], info);
+    
+        // TODO parse error.
+        // if (err)
+
+        return res;
+    }
+
+    const runGitSync = (params, opts = {}) => {
+
+        if ('string' === typeof opts) {
+            opts = { cwd: modulePath };
+        }
+        else if (!opts.cwd && opts.modulePath) {
+            opts.cwd = opts.modulePath;
+        }
+        // console.log(params)
+        // console.log(opts)
+
+        let out = { res: false, err: null };
+
         // if (opts.verbose) logger.info("Getting git branch module: " + module);
         try {
-            let checkout = execFileSync(
+            let res = execFileSync(
                 "git",
-                [ "checkout", branch ],
-                // Ignore because it is still printing to console.
-                { cwd: modulePath, stdio: 'pipe' }
+                params,
+                opts
             );
-            return checkout ? String(checkout).trim() : false;
+            if (res) out.res = String(res).trim();
         }
         catch(e) {
-            return e;
+            out.err = e;
+            let err = 'An error occurred while getting current git branch ';
+            if (opts.module) err += 'for ' + c.bold(opts.module)
+            logger.err(err);
         }
-    }
+
+        // console.log(out);
+        return out;
+    };
 
     function updateGitModule(info, cb) {                
 

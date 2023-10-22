@@ -30,6 +30,7 @@ module.exports = function(rootDir) {
 
     const dir = {
         root: rootDir,
+        nodeModules: path.join(rootDir, 'node_modules'),
         gamesAvail: path.resolve(rootDir, "games_available"),
         games: path.resolve(rootDir, "games"),
         cache: path.resolve(__dirname, "cache")
