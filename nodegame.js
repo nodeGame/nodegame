@@ -28,7 +28,7 @@ const utils = require(path.join(CMD_DIR, 'lib', 'utils.js'))(vars);
 program
     .name('nodegame')
     .description('nodeGame server for online surveys and experiments')
-    .version(vars.version);
+    .version(vars.version, '-v, --version');
 
 
 utils.logger.info();
