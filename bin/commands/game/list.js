@@ -33,7 +33,7 @@ module.exports = function (game, vars, utils) {
                 logger.info();
 
                 try {
-                    games = require(vars.cache.remoteGames);
+                    games = require(vars.cache.remoteGames).games;
                 
                     if (!options.verbose) {
                         games.forEach(game => {

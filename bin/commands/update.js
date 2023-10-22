@@ -11,8 +11,6 @@
 // Modules.
 const fs = require("fs-extra");
 const path = require("path");
-const execFile = require("child_process").execFile;
-const execFileSync = require("child_process").execFileSync;
 
 const c = require('ansi-colors');
 
@@ -26,6 +24,9 @@ module.exports = function (program, vars, utils) {
     const isWin = vars.isWin;
     
     const logger = utils.logger;
+
+    const runGit = utils.runGit;
+    const runGitSync = utils.runGitSync;
     
     const checkGitExists = utils.checkGitExists;
 
@@ -41,9 +42,7 @@ module.exports = function (program, vars, utils) {
                 return;
             }
 
-            // let currGames = require(vars.cache.updateGames);
-            // let currGamesLastUpdate = currGames.lastUpdate;
-            // currGames = indexGamesArray(currGames.games);
+            // let remoteGames = utils.getRemoteGamesList({ index: true });
 
             const url = vars.url.updateGames;
 
@@ -80,14 +79,6 @@ module.exports = function (program, vars, utils) {
             
     //     });
     // };
-
-    const indexGamesArray = arr => {
-        let out = {};
-        arr.forEach(g => {
-            out[g.name] = g;
-        });
-        return out;
-    };
 
     program
         .command("Upgrade")
@@ -182,7 +173,8 @@ module.exports = function (program, vars, utils) {
                     // path: modulePath
                 };
 
-                let info = { modulePath, module, opts };
+                // was opts instead of verbose
+                let info = { modulePath, module, verbose }; 
 
                 let remote = getGitRemote(info);
                 let branch = getGitBranch(info);
@@ -376,73 +368,51 @@ module.exports = function (program, vars, utils) {
         return res;
     }
 
-    const runGitSync = (params, opts = {}) => {
-
-        if ('string' === typeof opts) {
-            opts = { cwd: modulePath };
-        }
-        else if (!opts.cwd && opts.modulePath) {
-            opts.cwd = opts.modulePath;
-        }
-        // console.log(params)
-        // console.log(opts)
-
-        let out = { res: false, err: null };
-
-        // if (opts.verbose) logger.info("Getting git branch module: " + module);
-        try {
-            let res = execFileSync(
-                "git",
-                params,
-                opts
-            );
-            if (res) out.res = String(res).trim();
-        }
-        catch(e) {
-            out.err = e;
-            let err = 'An error occurred while getting current git branch ';
-            if (opts.module) err += 'for ' + c.bold(opts.module)
-            logger.err(err);
-        }
-
-        // console.log(out);
-        return out;
-    };
+    
 
     function updateGitModule(info, cb) {                
 
-        let { modulePath, module, opts, remote, branch } = info;
+        let { remote, branch } = info;
 
-        let verbose = opts.verbose;
+        runGit([ "pull", remote, branch ], info, cb);
+    }
 
-        // if (verbose) logger.info("Pulling git module: " + module);
 
-        let child = execFile(
-            "git",
-            [ "pull", remote, branch ],
-            { cwd: modulePath },
-            (error, stdout, stderr) => {
 
-                if (verbose) {
-                    logger.info();
-                    logger.list("Package: " + module);
+    // function updateGitModule(info, cb) {                
+
+    //     let { modulePath, module, opts, remote, branch } = info;
+
+    //     let verbose = opts.verbose;
+
+    //     // if (verbose) logger.info("Pulling git module: " + module);
+
+    //     let child = execFile(
+    //         "git",
+    //         [ "pull", remote, branch ],
+    //         { cwd: modulePath },
+    //         (error, stdout, stderr) => {
+
+    //             if (verbose) {
+    //                 logger.info();
+    //                 logger.list("Package: " + module);
                 
-                    if (error) {    
-                        logger.err('An error occurred.');
-                        logger.info();
-                        logger.list(stderr.trim());
-                    } 
-                    else {
-                        logger.list(stdout.trim());
-                    }
-                    logger.info();
-                }
+    //                 if (error) {    
+    //                     logger.err('An error occurred.');
+    //                     logger.info();
+    //                     logger.list(stderr.trim());
+    //                 } 
+    //                 else {
+    //                     logger.list(stdout.trim());
+    //                 }
+    //                 logger.info();
+    //             }
                         
                 
-                if (cb) cb(error);
-            }
-        );
-    }
+    //             if (cb) cb(error);
+    //         }
+    //     );
+    // }
 
     // Utils.
 

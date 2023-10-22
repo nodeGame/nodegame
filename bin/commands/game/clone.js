@@ -19,6 +19,9 @@ module.exports = function (game, vars, utils) {
 
     const logger = utils.logger;
 
+    const runGit = utils.runGit;
+    const runGitSync = utils.runGitSync;
+
     const makeLink = utils.makeLinkSync;
 
 
@@ -30,12 +33,16 @@ module.exports = function (game, vars, utils) {
         .command("clone <game> [new_name] [author] [author_email]")
         .description("Clones an existing game replacing the channel")
         .option("-f, --force", "force on non-empty directory")
+        .option("-r, --remote", "clones a remote game")
         .option("--skip-links", "does not copy symbolic links")
         .option("--skip-data", "does not copy the content of the data/ folder")
         .option("--skip-git", "does not copy the .git folder")
         .option("-v, --verbose", "verbose output")
         .allowUnknownOption()
-        .action(function (game, newName, author, email, options) {
+        .action(async function (game, newName, author, email, options) {
+
+
+            // console.log(game, newName);
 
             // Checks on folders.
             /////////////////////
@@ -83,100 +90,129 @@ module.exports = function (game, vars, utils) {
                 gameLinkExists = true;
             }
 
-            newName = newName.toLowerCase();
-
+           
             const gamePath = utils.getGamePath(game);
-
-            if (!gamePath) {
-                logger.err("Could not find game " + game);
-                logger.err("Please check that a folder with such a name " +
-                           "exists in games/ or games_available/ and retry.");
-                return;
-            }
-
-            // Check that it is a V8 game.
-            //////////////////////////////
-
-            let _channelJSON = path.join(gamePath, 'private', 'channel.json');
-            if (!fs.existsSync(_channelJSON)) {
-                logger.err("Game does not follow V8 structure, cannot clone.");
-                logger.err("Please add a valid private/channel.json file " + 
-                           "and retry.");
-                return;
-            }
-
-            // Copy folder recursively.
-            ///////////////////////////
-
-            let copyOpts = {
-                createTarget: false,
-                skipLinks: options.skipLinks ?? false,
-                skipData: options.skipData ?? true,
-                skipGit: options.skipGit ?? false,
-                verbose: options.verbose ?? false
-            };
-
-            console.log(options);
-            console.log(copyOpts)
-
-            try {
-                utils.copyDirRecSync(gamePath, clonedGamePath, copyOpts);
-            }
-            catch(e) {
-                logger.err('An error occurred while copying the files into ' +
-                           'the cloned game:');
-                logger.info();
-                console.log(e);
-                return;
-            }
-                      
-
-            // Replacing files with reference to channel.
-            /////////////////////////////////////////////
-            
-            // package.json
-            ///////////////
-            
-            let [ pkgJSON, oldChannelName ] = 
-                clonePkgJSON(gamePath, newName, author, email);
-
-            fs.writeFileSync(
-                path.join(clonedGamePath, 'package.json'),
-                JSON.stringify(pkgJSON, null, 4)
-            );
            
-            // private/channel.json
-            // channel/channel.settings.js
-            //////////////////////////////
+            let conf = { game, newGame, gamePath, clonedGamePath, author, email };
 
-            let [ channelJSON, oldPlayerEndpoint ] =
-                 cloneChannelJSON(gamePath, newName);
-            
-            // console.log(channelJSON);
-            fs.writeFileSync(
-                path.join(clonedGamePath, 'private', 'channel.json'),
-                JSON.stringify(channelJSON, null, 4)
-            );
-           
-            // public/js/index.js
-            /////////////////////
-            
-            // This file is no longer used in v8, but it is useful as a 
-            // template in case users want more control.
-            
-            let index = cloneIndexJS(gamePath, newName, oldPlayerEndpoint);
-            if (index) {
-                fs.writeFileSync(
-                    path.join(clonedGamePath, 'public', 'js', 'index.js'),
-                    index
+
+            if (!options.remote) {
+                if (!gamePath) {
+                    logger.err("Could not find game " + game);
+                    logger.err("Please check that a folder with such a name " +
+                    "exists in games/ or games_available/ and retry.");
+                    return;
+                }
+            }
+            else {
+                
+
+                let remoteGame = getRemoteGamesData(game);
+
+                runGit(
+                    [ "clone", remoteGame.git, newName ], 
+                    { cwd: vars.dir.gamesAvail }, 
+                    {}, 
+                    () => {
+                        doClone(conf);
+                    }
                 );
+                
             }
+            
+           doClone(conf);
 
-            // Make link to games_available/.
-            if (!gameLinkExists) makeLink(clonedGamePath, clonedGameLinkPath);
+        });
 
-            logger.info("Game cloned, hurray!");
-        })
+    function doClone(conf) {
+
+        let { game, newGame, gamePath, clonedGamePath, author, email } = conf;
+
+        newName = newName.toLowerCase();
+
+        // Check that it is a V8 game.
+        //////////////////////////////
+
+        let _channelJSON = path.join(gamePath, 'private', 'channel.json');
+        if (!fs.existsSync(_channelJSON)) {
+            logger.err("Game does not follow V8 structure, cannot clone.");
+            logger.err("Please add a valid private/channel.json file " + 
+                       "and retry.");
+            return;
+        }
+
+        // Copy folder recursively.
+        ///////////////////////////
+
+        let copyOpts = {
+            createTarget: false,
+            skipLinks: options.skipLinks ?? false,
+            skipData: options.skipData ?? true,
+            skipGit: options.skipGit ?? false,
+            verbose: options.verbose ?? false
+        };
+
+        // console.log(options);
+        // console.log(copyOpts)
+
+        try {
+            utils.copyDirRecSync(gamePath, clonedGamePath, copyOpts);
+        }
+        catch(e) {
+            logger.err('An error occurred while copying the files into ' +
+                       'the cloned game:');
+            logger.info();
+            console.log(e);
+            return;
+        }
+                  
+
+        // Replacing files with reference to channel.
+        /////////////////////////////////////////////
+        
+        // package.json
+        ///////////////
+        
+        let [ pkgJSON, oldChannelName ] = 
+            clonePkgJSON(gamePath, newName, author, email);
+
+        fs.writeFileSync(
+            path.join(clonedGamePath, 'package.json'),
+            JSON.stringify(pkgJSON, null, 4)
+        );
+       
+        // private/channel.json
+        // channel/channel.settings.js
+        //////////////////////////////
+
+        let [ channelJSON, oldPlayerEndpoint ] =
+             cloneChannelJSON(gamePath, newName);
+        
+        // console.log(channelJSON);
+        fs.writeFileSync(
+            path.join(clonedGamePath, 'private', 'channel.json'),
+            JSON.stringify(channelJSON, null, 4)
+        );
+       
+        // public/js/index.js
+        /////////////////////
+        
+        // This file is no longer used in v8, but it is useful as a 
+        // template in case users want more control.
+        
+        let index = cloneIndexJS(gamePath, newName, oldPlayerEndpoint);
+        if (index) {
+            fs.writeFileSync(
+                path.join(clonedGamePath, 'public', 'js', 'index.js'),
+                index
+            );
+        }
+
+        // Make link to games_available/.
+        if (!gameLinkExists) makeLink(clonedGamePath, clonedGameLinkPath);
+
+        logger.info("Game cloned, hurray!");
+    }
 
     
     /**

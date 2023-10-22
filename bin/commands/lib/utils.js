@@ -8,6 +8,7 @@ module.exports = function(vars) {
     
     const { readLine } = require('./rl');
     const { logger } = require('./logger');
+    const { runGit, runGitSync } = require('./git');
     
         
     const checkGitExists = cb => {
@@ -209,8 +210,29 @@ module.exports = function(vars) {
         }
     }
 
+    function getRemoteGamesData(game) {
+        let remoteGames = utils.getRemoteGamesList({ index: true });
+        return remoteGames[game] || false;
+    }
 
-    return { logger, readLine, copyDirRecSync, makeLinkSync,
-             checkGitExists, getGamePath, getModulePath };
+    function getRemoteGamesList(opts = {}) {
+        let currGames = require(vars.cache.updateGames);
+        let currGamesLastUpdate = currGames.lastUpdate;
+        if (opts.index) currGames = indexGamesArray(currGames.games);
+        return currGames;
+    }
+    
+    const indexGamesArray = arr => {
+        let out = {};
+        arr.forEach(g => {
+            out[g.name] = g;
+        });
+        return out;
+    };
+
+
+
+    return { logger, readLine, copyDirRecSync, makeLinkSync, runGit, runGitSync, 
+             checkGitExists, getGamePath, getModulePath, getRemoteGamesList };
 
 };
