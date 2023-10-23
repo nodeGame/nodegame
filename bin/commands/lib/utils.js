@@ -63,15 +63,15 @@ module.exports = function(vars) {
     function getGamePath(game) {
         // Normalize game name.
         game = _extractGameNameFromPath(game);
-        console.log('Normalized game: ' + game);
-        let pathToGame = path.resolve(vars.rootDir, "games", game);
+        // console.log('Normalized game: ' + game);
+        let pathToGame = path.resolve(vars.dir.games, game);
         if (!fs.existsSync(pathToGame)) {
-            pathToGame = path.resolve(vars.rootDir, "games_available", game);
+            pathToGame = path.resolve(vars.dir.gamesAvail, game);
             if (!fs.existsSync(pathToGame)) return false;
         }
         // Check if it is a link in games/
         else if (!fs.lstatSync(pathToGame).isDirectory() ) {
-            pathToGame = path.resolve(vars.rootDir, "games_available", game);
+            pathToGame = path.resolve(vars.dir.gamesAvail, game);
             if (!fs.existsSync(pathToGame)) return false;
         }
         return pathToGame;
@@ -211,12 +211,12 @@ module.exports = function(vars) {
     }
 
     function getRemoteGamesData(game) {
-        let remoteGames = utils.getRemoteGamesList({ index: true });
+        let remoteGames = getRemoteGamesList({ index: true });
         return remoteGames[game] || false;
     }
 
     function getRemoteGamesList(opts = {}) {
-        let currGames = require(vars.cache.updateGames);
+        let currGames = require(vars.cache.remoteGames);
         let currGamesLastUpdate = currGames.lastUpdate;
         if (opts.index) currGames = indexGamesArray(currGames.games);
         return currGames;
@@ -230,9 +230,12 @@ module.exports = function(vars) {
         return out;
     };
 
-
-
-    return { logger, readLine, copyDirRecSync, makeLinkSync, runGit, runGitSync, 
-             checkGitExists, getGamePath, getModulePath, getRemoteGamesList };
+    return { 
+        logger, readLine, 
+        copyDirRecSync, makeLinkSync, 
+        runGit, runGitSync, checkGitExists, 
+        getGamePath, getModulePath, 
+        getRemoteGamesList, getRemoteGamesData 
+    };
 
 };

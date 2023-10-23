@@ -47,7 +47,7 @@ const runGit = (params, opts = {}, cb) => {
     // console.log(params)
     // console.log(opts)
 
-    let { modulePath, module, verbose, remote, branch } = info;
+    let { modulePath, module, verbose, remote, branch } = opts;
 
     let out = { res: false, err: null };
 

@@ -12,6 +12,8 @@
 const fs = require("fs-extra");
 const path = require("path");
 
+const c = require('ansi-colors');
+
 const J = require("JSUS").JSUS;
 
 
@@ -93,7 +95,7 @@ module.exports = function (game, vars, utils) {
            
             const gamePath = utils.getGamePath(game);
            
-            let conf = { game, newGame, gamePath, clonedGamePath, author, email };
+            let conf = { game, newName, gamePath, clonedGamePath, author, email };
 
 
             if (!options.remote) {
@@ -103,30 +105,28 @@ module.exports = function (game, vars, utils) {
                     "exists in games/ or games_available/ and retry.");
                     return;
                 }
+                
+                doClone(conf);
             }
             else {
                 
 
-                let remoteGame = getRemoteGamesData(game);
+                let remoteGame = utils.getRemoteGamesData(game);
 
                 runGit(
                     [ "clone", remoteGame.git, newName ], 
                     { cwd: vars.dir.gamesAvail }, 
-                    {}, 
                     () => {
                         doClone(conf);
                     }
                 );
-                
             }
-            
-           doClone(conf);
 
         });
 
     function doClone(conf) {
 
-        let { game, newGame, gamePath, clonedGamePath, author, email } = conf;
+        let { game, newName, gamePath, clonedGamePath, author, email } = conf;
 
         newName = newName.toLowerCase();
 
@@ -135,7 +135,8 @@ module.exports = function (game, vars, utils) {
 
         let _channelJSON = path.join(gamePath, 'private', 'channel.json');
         if (!fs.existsSync(_channelJSON)) {
-            logger.err("Game does not follow V8 structure, cannot clone.");
+            logger.err("Game " + c.bold(game) + 
+                       " does not follow V8 structure, cannot clone.");
             logger.err("Please add a valid private/channel.json file " + 
                        "and retry.");
             return;
