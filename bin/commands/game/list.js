@@ -35,13 +35,14 @@ module.exports = function (game, vars, utils) {
                 try {
                     games = require(vars.cache.remoteGames).games;
                 
-                    if (!options.verbose) {
-                        games.forEach(game => {
-                            delete game.wiki;
+                    games.forEach(game => {
+                        delete game.wiki;
+                        delete game.publication;
+                        if (!options.verbose) {
                             delete game.url;
-                            delete game.publication;
-                        })
-                    }
+                            delete game.description;
+                        }
+                    })
                 }
                 catch(e) {
                     logger.err('Could not load list of remote games.')
