@@ -114,9 +114,22 @@ module.exports = function (game, vars, utils) {
                 let remoteGame = utils.getRemoteGamesData(game);
 
                 runGit(
-                    [ "clone", remoteGame.git, newName ], 
+                    [ "clone", remoteGame.url, newName ], 
                     { cwd: vars.dir.gamesAvail }, 
-                    () => {
+                    (err, vars, utils) => {
+
+                        if (err) {
+                            // utils.logger.error("An error occurred downloading " + 
+                            //              c.bold(game));
+                            console.log(err);
+                            return;
+                        }
+                        console.log('success')
+                        // utils.logger.success(c.bold(game) + 
+                        //                      " successfully downloaded");
+                        
+                        console.log(conf);
+
                         doClone(conf);
                     }
                 );
