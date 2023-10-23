@@ -1,27 +1,29 @@
 const c = require('ansi-colors');
 
+// Indent in msg.
+const _ = '  ';
 
 const logger = {
     
     list: txt => {
-        console.log('  - ' + txt);
+        console.log('- ' + txt);
     },
 
     info: txt => {
         if ('undefined' === typeof txt) console.log();
-        else console.log(c.cyan('  ' + txt));
+        else console.log(_ + c.cyan(txt));
     },
 
     err: txt => {
-        console.log(c.red('  Error: ' + txt));
+        console.log(_ + c.red('Error: ' + txt));
     },
 
     warn: txt => {
-        console.log(c.yellow('  Warning: ' + txt));
+        console.log(_ + c.yellow('Warning: ' + txt));
     },
 
     success: txt => {
-        console.log(c.green(txt));
+        console.log(_ + c.green(txt));
     }
 };
 

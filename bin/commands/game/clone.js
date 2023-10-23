@@ -67,7 +67,7 @@ module.exports = function (game, vars, utils) {
             const clonedGameLinkPath = path.join(vars.dir.games, newName);
 
             if (fs.existsSync(clonedGamePath)) {
-                let str = "A folder with name " + newName + 
+                let str = "A folder with name " + c.bold(newName) + 
                           " already exists in games_available/";
                 
                 if (!options.force) {
@@ -79,7 +79,7 @@ module.exports = function (game, vars, utils) {
 
             let gameLinkExists = false;
             if (fs.existsSync(clonedGameLinkPath)) {
-                let str = "A folder with name " + newName + 
+                let str = "A folder with name " + c.bold(newName) + 
                           " already exists in games/";
                 
                 if (!options.force) {
@@ -100,7 +100,7 @@ module.exports = function (game, vars, utils) {
 
             if (!options.remote) {
                 if (!gamePath) {
-                    logger.err("Could not find game " + game);
+                    logger.err("Could not find game " + c.bold(game));
                     logger.err("Please check that a folder with such a name " +
                     "exists in games/ or games_available/ and retry.");
                     return;
@@ -110,26 +110,25 @@ module.exports = function (game, vars, utils) {
             }
             else {
                 
-
                 let remoteGame = utils.getRemoteGamesData(game);
+                
+                let url = remoteGame.url;
+                logger.info("Downloading " + c.bold(game) + " from: " + url);
 
                 runGit(
-                    [ "clone", remoteGame.url, newName ], 
+                    [ "clone", url, newName ], 
                     { cwd: vars.dir.gamesAvail }, 
-                    (err, vars, utils) => {
+                    (err) => {
 
                         if (err) {
-                            // utils.logger.error("An error occurred downloading " + 
-                            //              c.bold(game));
-                            console.log(err);
+                            logger.err("An error occurred downloading " + 
+                                         c.bold(game));
+                            logger.err(err);
                             return;
                         }
-                        console.log('success')
-                        // utils.logger.success(c.bold(game) + 
-                        //                      " successfully downloaded");
+                        logger.success(c.bold(game) + 
+                                             " successfully downloaded");
                         
-                        console.log(conf);
-
                         doClone(conf);
                     }
                 );
