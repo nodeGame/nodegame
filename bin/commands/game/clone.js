@@ -95,8 +95,11 @@ module.exports = function (game, vars, utils) {
            
             const gamePath = utils.getGamePath(game);
            
-            let conf = { game, newName, gamePath, clonedGamePath, author, email };
-
+            let conf = {
+                game, newName, author, email,
+                gamePath, clonedGamePath, clonedGameLinkPath, gameLinkExists,  
+                options, 
+            };
 
             if (!options.remote) {
                 if (!gamePath) {
@@ -138,7 +141,11 @@ module.exports = function (game, vars, utils) {
 
     function doClone(conf) {
 
-        let { game, newName, gamePath, clonedGamePath, author, email } = conf;
+        let {
+            game, newName, author, email,
+            gamePath, clonedGamePath, clonedGameLinkPath, gameLinkExists,  
+            options, 
+        } = conf;
 
         newName = newName.toLowerCase();
 
@@ -300,7 +307,9 @@ module.exports = function (game, vars, utils) {
         let newConnString = 'node.connect("/' + newName + '")';
 
         let connStrReplaced;
-        // console.log(oldConnString);
+        // console.log(oldConnString1);
+        // console.log(oldConnString2);
+        // console.log(oldConnString3);
         // console.log(newConnString);
 
         // Replace both connect() and connect('/channel')

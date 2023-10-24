@@ -31,8 +31,7 @@ const _export = (type, serverConf, opts, cb) => {
 
     // Data directory.
     const DATADIR = opts.dataDir;
-    // Output directory.
-    const OUTDIR = opts.exportDir;
+    
     // Verbose.
     const V = opts.verbose;
 
@@ -137,8 +136,14 @@ const _export = (type, serverConf, opts, cb) => {
         if (opts.inFormat) opts.format = opts.inFormat;
         else if (LOGS) opts.format = 'ndjson';
 
+        // Loading the files modifies the options object.
+        let origHeader = J.clone(opts.header);
+
         db.loadDirSync(DATADIR, opts);
         processing++;
+
+        // Re-set the original header.
+        opts.header = origHeader;
 
         // Check size.
         if (V) console.log('    items loaded: ' + db.size());
@@ -158,6 +163,8 @@ const _export = (type, serverConf, opts, cb) => {
         }
 
         opts.objectLevel = opts.outCsvObjLevel;
+
+        if (V) console.log('\nWriting file:', outFile);
 
         // Save it.
         if (LOGS) db2.save(outFile, opts, () => checkProcessing(cb));
@@ -186,7 +193,8 @@ const setDefaults = (LOGS, serverConf, opts, game) => {
 
     opts.verbose = opts.verbose ?? true;
 
-    opts.inCsvHeader = opts.inCsvHeader ?? 'all';
+    // Note: 'all' is valid only for saving. True uses the first line.
+    opts.inCsvHeader = opts.inCsvHeader ?? true;
     opts.inCsvFlatten = !!opts.inCsvFlatten;
 
     opts.ouCsvtHeader = opts.outCsvHeader ?? 'all';

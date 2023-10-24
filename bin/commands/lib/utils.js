@@ -157,15 +157,18 @@ module.exports = function(vars) {
 
         let targetFolder = opts.createTarget !== false ?
             path.join(target, dirName) : target;
+
         if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
         
         // Do not clone data/ dir unless requested.
         // (but it is created empty).
         if (skipData && dirName === 'data') return;
         
-        if (opts.createTarget) {
+        if (opts.createTarget === false) {
             // Manual cloning (leaves out opts.createTarget).
             opts = { skipLinks, skipData, skipGit, skipData };
+            // We want to copy the rest of the directory structures.
+            opts.createTarget = true;
         }
         
         // Copy
