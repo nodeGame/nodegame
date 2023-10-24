@@ -48,6 +48,10 @@ exportStuff(program, vars, utils);
 const update = require(path.join(CMD_DIR, 'update.js'));
 update(program, vars, utils);
 
+// AMT
+// const amt = require(path.join(vars.dir.nodeModules, 'nodegame-mturk', 'index.js'));
+// amt(program, vars, utils); // vars and utils not read.
+
 program.parse();
 
     
