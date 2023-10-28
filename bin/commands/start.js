@@ -14,6 +14,8 @@ const path = require("path");
 const exec = require("child_process").exec;
 const J = require("JSUS").JSUS;
 
+const c = require('ansi-colors');
+
 const ServerNode = require("nodegame-server").ServerNode;
 
 // Split input parameters.
@@ -487,7 +489,10 @@ module.exports = function (program, vars) {
         // Print warnings, if any.
         printIgnoredOptions();
 
-        console.log("nodeGame v." + version);
+        console.log("nodeGame " + c.bold.yellow(version) + 
+                    c.dim.gray.italic(' (Ctrl-C to stop server)'));
+        console.log();
+
         // Add nodeGame version (might be higher than server version) to options.
         options.nodeGameVersion = version;
 
