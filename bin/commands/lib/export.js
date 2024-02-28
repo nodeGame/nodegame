@@ -156,7 +156,10 @@ const _export = (type, serverConf, opts, cb) => {
         if (opts.outFormat) opts.format = opts.outFormat;
         else delete opts.format;
 
+        // Export all by default.
         if (opts.outCsvHeader) opts.header = opts.outCsvHeader;
+        else opts.header = 'all';
+
         if (opts.outCsvFlatten) opts.flatten = opts.outCsvFlatten;
         if (opts.outCsvFlattenByGroup) {
             opts.flattenByGroup = opts.outCsvFlattenByGroup;
