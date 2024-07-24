@@ -360,7 +360,7 @@ function doInstall() {
     let child = execFile(
         isWin ? 'npm.cmd' : 'npm',
         [ 'install', MAIN_MODULE + requestedVersion, '--prefix', ROOT_DIR ],
-        { cwd: ROOT_DIR },
+        { cwd: ROOT_DIR, shell: true },
         (error, stdout, stderr) => {
             // Stop spinner.
             if (!noSpinner) sp.stop();
