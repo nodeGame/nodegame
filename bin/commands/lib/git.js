@@ -3,6 +3,8 @@ const execFile = require("child_process").execFile;
 const execFileSync = require("child_process").execFileSync;
 const c = require('ansi-colors');
 
+const { logger } = require('./logger');
+
 const runGitSync = (params, opts = {}) => {
 
     if ('string' === typeof opts) {
