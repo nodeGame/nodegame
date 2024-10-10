@@ -365,6 +365,10 @@ module.exports = function (program, vars, utils) {
         // TODO parse error.
         // if (err)
 
+        // TODO: if there is an error here, e.g., the branch is not existing,
+        // in the final table it still looks like it has been updated to 
+        // the new branch.
+
         return res;
     }
 
